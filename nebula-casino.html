@@ -4884,10 +4884,10 @@ const AUTH=(()=>{
   function enterRemote(){
     const u=API.user;
     bal=u.balance; paintBal(0);
-    $('userName').textContent=u.username;
-    $('userAv').textContent=u.username[0].toUpperCase();
-    $('bellBtn').hidden=!u.admin;
-    $('usersBtn').hidden=!u.admin;
+    if($('userName'))$('userName').textContent=u.username;
+    if($('userAv'))$('userAv').textContent=u.username[0].toUpperCase();
+    if($('bellBtn'))$('bellBtn').hidden=!u.admin;
+    if($('usersBtn'))$('usersBtn').hidden=!u.admin;
     wrap.style.display='none';
     pollRequests();
   }
@@ -4898,9 +4898,10 @@ const AUTH=(()=>{
   function enter(){
     const u=AUTH.meUser();
     bal=u.bal; paintBal(0);
-    $('userName').textContent=u.user;
-    $('userAv').textContent=u.user[0].toUpperCase();
-    $('bellBtn').hidden=!u.admin;
+    if($('userName'))$('userName').textContent=u.user;
+    if($('userAv'))$('userAv').textContent=u.user[0].toUpperCase();
+    if($('bellBtn'))$('bellBtn').hidden=!u.admin;
+    if($('usersBtn'))$('usersBtn').hidden=!u.admin;
     wrap.style.display='none';
     refreshRequests();
   }
