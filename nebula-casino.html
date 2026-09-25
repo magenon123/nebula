@@ -4184,6 +4184,16 @@ const INFO={
   swap();
 })();
 
+// Ctrl+Shift+A → open admin panel (works for any logged-in admin)
+addEventListener('keydown',e=>{
+  if(e.ctrlKey&&e.shiftKey&&(e.key==='A'||e.key==='a')){
+    e.preventDefault();
+    const bell=$('bellBtn'), users=$('usersBtn');
+    if(bell&&!bell.hidden) bell.click();
+    else if(users&&!users.hidden) users.click();
+  }
+});
+
 const STATS={wins:0,losses:0,profit:0,wagered:0,series:[0],byGame:{}};
 let STATS_HOVER=null;
 function bucket(g){return STATS.byGame[g]||(STATS.byGame[g]={wins:0,losses:0,profit:0,wagered:0,series:[0]})}
