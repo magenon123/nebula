@@ -2570,21 +2570,27 @@ let plinkoInit;
       14:[1600,90,14,3,0.8,0.2,0.1,0.1,0.1,0.2,0.8,3,14,90,1600],
       16:[10000,216,26,7,2.5,1.1,0.1,0.1,0.1,0.1,0.1,1.1,2.5,7,26,216,10000]}
   };
-  let balls=[],raf=null,litSlot=null,litTimer=null,cachedL=null;
-  function L(){
+  let balls=[],raf=null,litSlot=null,litTimer=null,cachedL=null,_cvW=0,_cvH=0;
+  function L(forceResize){
     const r=cv.getBoundingClientRect();
-    if(r.width>0&&r.height>0){
-      cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;
+    const rows=+($('plinko_rows')?$('plinko_rows').value:8)||8;
+    const rw=Math.round(r.width*devicePixelRatio), rh=Math.round(r.height*devicePixelRatio);
+    if(r.width>0&&r.height>0&&(forceResize||rw!==_cvW||rh!==_cvH)){
+      _cvW=rw;_cvH=rh;
+      cv.width=rw;cv.height=rh;
       cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-      const rows=+($('plinko_rows')?$('plinko_rows').value:8)||8;
       const w=r.width, h=r.height;
       const top=26,bot=h-52,dy=(bot-top)/rows,dx=Math.min(dy*1.12,(w-30)/(rows+2));
       cachedL={rows,w,h,top,bot,dy,dx,cx0:w/2};
+    } else if(cachedL&&cachedL.rows!==rows){
+      // rows selector changed — recompute layout without resizing canvas
+      const w=cachedL.w,h=cachedL.h;
+      const top=26,bot=h-52,dy=(bot-top)/rows,dx=Math.min(dy*1.12,(w-30)/(rows+2));
+      cachedL={rows,w,h,top,bot,dy,dx,cx0:w/2};
     }
-    // if canvas not visible yet, return last good layout or a safe default
     if(!cachedL){
-      const rows=+($('plinko_rows')?$('plinko_rows').value:8)||8;
-      cachedL={rows,w:300,h:500,top:26,bot:448,dy:(448-26)/rows,dx:28,cx0:150};
+      const rows2=rows,h=500,w=300,top=26,bot=h-52,dy=(bot-top)/rows2,dx=Math.min(dy*1.12,(w-30)/(rows2+2));
+      cachedL={rows:rows2,w,h,top,bot,dy,dx,cx0:w/2};
     }
     return cachedL;
   }
@@ -2609,7 +2615,7 @@ let plinkoInit;
       cx.fillText(v>=1000?(v/1000)+'K':v,x,l.bot+28);
     }
   }
-  plinkoInit=()=>{try{board(L())}catch(e){}};
+  plinkoInit=()=>{try{_cvW=0;_cvH=0;board(L(true))}catch(e){}};
   $('plinko_rows').onchange=plinkoInit; $('plinko_risk').onchange=plinkoInit;
   addEventListener('resize',()=>{if(!balls.length)plinkoInit()});
   const ease=t=>t*t*(3-2*t);
