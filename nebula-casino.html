@@ -2200,7 +2200,10 @@ function winBadge(mult, payout, loss=false){
   if(!BADGE_GAMES.has(current)) return;
   const el=$('winBadge');
   $('wbMult').textContent=mult.toFixed(2)+'×';
-  $('wbAmt').textContent='$'+fmt(payout);
+  // payout is bet*mult; profit = payout - stake = payout*(1 - 1/mult)
+  const stake = mult>0 ? payout/mult : payout;
+  const profit = payout - stake;
+  $('wbAmt').textContent=(profit>=0?'+':'-')+'$'+fmt(Math.abs(profit));
   clearTimeout(_badgeTimer);
   el.classList.remove('on','loss'); void el.offsetWidth;
   if(loss) el.classList.add('loss');
@@ -3042,10 +3045,13 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
   }
   function pick(r,c,b){
     if(!live||r!==row)return;
+    // rigging: force a loss when mult would exceed 4x, by treating the clicked tile as a skull
     if(Math.pow(step(),row+1)>4&&!skulls[r].includes(c)){
-      const skullC=skulls[r][0];
-      const skullB=document.querySelector(`#t_grid .trow[data-r="${r}"] .ttile:nth-child(${skullC+1})`);
-      c=skullC;if(skullB)b=skullB;
+      // show skull on the tile the player actually clicked (not the real skull position)
+      b.textContent='💀';b.classList.add('skull','reveal');
+      document.querySelectorAll(`#t_grid .trow[data-r="${r}"] .ttile`).forEach((t,i)=>{
+        if(i!==c&&!t.textContent)t.textContent='🥚';});
+      flash('-'+fmt(bet),false);logBet('Dragon Tower',bet,0);live=false;row=0;ui();return;
     }
     if(skulls[r].includes(c)){
       b.textContent='💀';b.classList.add('skull','reveal');
