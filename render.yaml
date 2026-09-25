@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: nebula-casino
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: START_BALANCE
+        value: 1000
