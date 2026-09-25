@@ -1058,7 +1058,7 @@ tbody tr{animation:sl .25s}
 </head>
 <body>
 
-<div class="authwrap" id="authWrap" style="display:none">
+<div class="authwrap" id="authWrap" style="display:flex">
   <div class="authbox">
     <div class="auth-logo">nebul<i>a</i></div>
     <div class="wm-tabs" style="margin-bottom:18px">
@@ -4955,10 +4955,8 @@ const AUTH=(()=>{
   $('adClose').onclick=()=>$('adminMask').classList.remove('on');
   $('adminMask').onclick=e=>{if(e.target===$('adminMask'))$('adminMask').classList.remove('on')};
 
-  // auto-enter as guest — no sign-in required
-  wrap.style.display='none';
-  if($('userName'))$('userName').textContent='guest';
-  if($('userAv'))$('userAv').textContent='G';
+  // show auth modal — login required to play
+  wrap.style.display='flex';
   if($('bellBtn'))$('bellBtn').hidden=true;
   if($('usersBtn'))$('usersBtn').hidden=true;
 })();
