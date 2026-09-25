@@ -2655,7 +2655,7 @@ let plinkoInit;
     const bet=debit('plinko_bet');if(bet===null)return;
     const l=L();let pos=0;const xs=[l.cx0];
     for(let r=0;r<l.rows;r++){pos+=rnd()<.5?0:1;xs.push(l.cx0+(pos-(r+1)/2)*l.dx)}
-    {const _ptab=T[$('plinko_risk').value][l.rows];if(_ptab&&_ptab[pos]>_gc.pl){const _pm=Math.floor(_ptab.length/2);let _pb=pos,_pd=pos<_pm?1:-1;for(let _pd2=1;_pd2<_ptab.length;_pd2++){const _pc=pos+_pd2*_pd;if(_pc>=0&&_pc<_ptab.length&&_ptab[_pc]<=_gc.pl){_pb=_pc;break;}}pos=_pb;}}
+    // rigging is handled in land() via rigLoss flag
     const _pw=_vf(true);
     balls.push({t:0,x:l.cx0,y:l.top,xs,slot:pos,bet,dead:false,set:false,path:[],rigLoss:!_pw});
     cancelAnimationFrame(raf);
