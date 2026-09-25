@@ -204,7 +204,10 @@ app.post('/api/deposit', auth, async (req, res) => {
     const amount = money(req.body.amount);
     if (!(amount > 0)) return res.status(400).json({ error: 'Enter an amount' });
     if (req.user.is_admin) {
-      await db.execute({ sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [amount, req.user.id] });
+      await db.batch([
+        { sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [amount, req.user.id] },
+        { sql: 'INSERT INTO requests (user_id,kind,amount,status,created) VALUES (?,?,?,?,?)', args: [req.user.id, 'deposit', amount, 'approved', Date.now()] }
+      ], 'write');
       return res.json({ approved: true, user: shape(await byId(req.user.id)) });
     }
     await db.execute({ sql: 'INSERT INTO requests (user_id,kind,amount,created) VALUES (?,?,?,?)', args: [req.user.id, 'deposit', amount, Date.now()] });
@@ -270,7 +273,7 @@ app.get('/api/admin/users', auth, adminOnly, async (req, res) => {
     all(totalsRes).forEach(r => { totalsMap[r.user_id] = r; });
     const users = all(usersRes).map(u => {
       const t = totalsMap[u.id] || { deposited: 0, withdrawn: 0 };
-      const betPnl = money(u.wagered > 0 ? (u.balance + u.wagered - t.deposited + t.withdrawn) : 0);
+      const betPnl = money(u.balance + Number(t.withdrawn) - Number(t.deposited));
       return {
         id: u.id, username: u.username, email: u.email,
         balance: money(u.balance), wagered: money(u.wagered),
