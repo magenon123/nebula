@@ -1353,6 +1353,9 @@ tbody tr{animation:sl .25s}
     <button class="hd-icon-btn hd-hide-sm" id="usersBtn" aria-label="Sidebar">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M17.5.83h-15C1.58.83.83 1.58.83 2.5v15c0 .92.75 1.67 1.67 1.67h15c.92 0 1.67-.75 1.67-1.67v-15c0-.92-.75-1.67-1.67-1.67m-6.67 15.65c0 .56-.46 1.02-1.01 1.02h-6.3c-.56 0-1.02-.46-1.02-1.02V3.52c0-.56.46-1.02 1.02-1.02h6.3c.55 0 1.01.46 1.01 1.02z"/></svg>
     </button>
+    <button class="hd-icon-btn" id="logoutBtn" aria-label="Sign out" title="Sign out" style="color:#f87171">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
   </div>
 </header>
 
@@ -4914,15 +4917,17 @@ const AUTH=(()=>{
       `<button class="go ghost" style="margin-top:16px" onclick="nebulaSignOut()">Sign out</button>`;
     $('imask').classList.add('on');
   };
-  window.nebulaSignOut=()=>{
-    if(API.online){ API.clear(); $('imask').classList.remove('on'); wrap.style.display='';
+  function doSignOut(){
+    if(API.online){ API.clear(); if($('imask'))$('imask').classList.remove('on'); wrap.style.display='flex';
       $('au_pw').value='';$('au_pw2').value='';$('au_pw3').value='';
-      $('bellBtn').hidden=true; $('usersBtn').hidden=true; return }
+      if($('bellBtn'))$('bellBtn').hidden=true; if($('usersBtn'))$('usersBtn').hidden=true; return; }
     AUTH.setBal(bal); AUTH.signout();
-    $('imask').classList.remove('on');
-    wrap.style.display='';
+    if($('imask'))$('imask').classList.remove('on');
+    wrap.style.display='flex';
     $('au_pw').value='';$('au_pw2').value='';$('au_pw3').value='';
-  };
+  }
+  window.nebulaSignOut=doSignOut;
+  if($('logoutBtn'))$('logoutBtn').onclick=doSignOut;
   // admin queue
   function refreshRequests(){
     const u=AUTH.meUser(); if(!u||!u.admin)return;
