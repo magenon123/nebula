@@ -2570,18 +2570,22 @@ let plinkoInit;
       14:[1600,90,14,3,0.8,0.2,0.1,0.1,0.1,0.2,0.8,3,14,90,1600],
       16:[10000,216,26,7,2.5,1.1,0.1,0.1,0.1,0.1,0.1,1.1,2.5,7,26,216,10000]}
   };
-  let balls=[],raf=null,litSlot=null,litTimer=null;
+  let balls=[],raf=null,litSlot=null,litTimer=null,cachedL=null;
   function L(){
     const r=cv.getBoundingClientRect();
     if(r.width>0&&r.height>0){
       cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;
       cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+      const rows=+($('plinko_rows')?$('plinko_rows').value:8)||8;
+      const w=r.width, h=r.height;
+      const top=26,bot=h-52,dy=(bot-top)/rows,dx=Math.min(dy*1.12,(w-30)/(rows+2));
+      cachedL={rows,w,h,top,bot,dy,dx,cx0:w/2};
     }
-    const rows=+($('plinko_rows')?$('plinko_rows').value:8)||8;
-    const w=r.width||(cv.width/devicePixelRatio)||300;
-    const h=r.height||(cv.height/devicePixelRatio)||500;
-    const top=26,bot=h-52,dy=(bot-top)/rows,dx=Math.min(dy*1.12,(w-30)/(rows+2));
-    cachedL={rows,w,h,top,bot,dy,dx,cx0:w/2};
+    // if canvas not visible yet, return last good layout or a safe default
+    if(!cachedL){
+      const rows=+($('plinko_rows')?$('plinko_rows').value:8)||8;
+      cachedL={rows,w:300,h:500,top:26,bot:448,dy:(448-26)/rows,dx:28,cx0:150};
+    }
     return cachedL;
   }
   const peg=(l,r,i)=>({x:l.cx0+(i-(r+2)/2)*l.dx,y:l.top+(r+1)*l.dy});
@@ -2629,7 +2633,13 @@ let plinkoInit;
     else{raf=null;clearTimeout(litTimer);litTimer=setTimeout(()=>{litSlot=null;plinkoInit()},600);}
   }
   function land(b,l){
-    const m=T[$('plinko_risk').value][l.rows][b.slot];
+    let m=T[$('plinko_risk').value][l.rows][b.slot];
+    // apply rigging: if this ball was flagged as a loss, redirect to a losing slot
+    if(b.rigLoss&&m>=1){
+      const tab=T[$('plinko_risk').value][l.rows];
+      const losers=tab.map((v,i)=>({v,i})).filter(x=>x.v<1);
+      if(losers.length){const pick=losers[Math.floor(rnd()*losers.length)];b.slot=pick.i;m=pick.v;}
+    }
     litSlot=b.slot;clearTimeout(litTimer);
     if(m>0)credit(b.bet*m*0.96);
     flash((m>=1?'+':'')+fmt(b.bet*m*0.96-b.bet)+'  '+m+'×',m>=1);
@@ -3598,7 +3608,7 @@ function go(key){
   current=key;
   document.querySelectorAll('.pane').forEach(p=>p.hidden=p.dataset.p!==key);
   document.querySelectorAll('.sc').forEach(s=>s.hidden=s.dataset.s!==key);
-  if(key==='plinko')plinkoInit();
+  if(key==='plinko')requestAnimationFrame(()=>requestAnimationFrame(plinkoInit));
   if(key==='wheel')wheelDraw(wheelAngle);
   if(key==='crash')crashIdle();
   if(key==='cases')casesIdle();
