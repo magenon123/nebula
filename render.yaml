@@ -9,3 +9,7 @@ services:
         generateValue: true
       - key: START_BALANCE
         value: 0
+      - key: TURSO_URL
+        value: libsql://nebula-magenon123.aws-us-east-2.turso.io
+      - key: TURSO_TOKEN
+        sync: false

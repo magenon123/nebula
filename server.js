@@ -1,27 +1,35 @@
 import express from 'express';
-import Database from 'better-sqlite3';
+import { createClient } from '@libsql/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import crypto from 'crypto';
 import path from 'path';
+import fs from 'fs';
+import os from 'os';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const PORT      = process.env.PORT || 3000;
-const SECRET    = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
-const ADMIN_USER= (process.env.ADMIN_USER || 'magenon').toLowerCase();
-const START_BAL = Number(process.env.START_BALANCE ?? 0);
+const PORT       = process.env.PORT || 3000;
+const SECRET     = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
+const ADMIN_USER = (process.env.ADMIN_USER || 'magenon').toLowerCase();
+const START_BAL  = Number(process.env.START_BALANCE ?? 0);
+const TURSO_URL  = process.env.TURSO_URL;
+const TURSO_TOKEN= process.env.TURSO_TOKEN;
 
 if (!process.env.JWT_SECRET) {
   console.warn('! JWT_SECRET not set - sessions will drop on restart. Set it in production.');
 }
 
 /* ---------------- database ---------------- */
-const db = new Database(path.join(__dirname, 'nebula.db'));
-db.pragma('journal_mode = WAL');
-db.exec(`
+const db = createClient(
+  TURSO_URL
+    ? { url: TURSO_URL, authToken: TURSO_TOKEN }
+    : { url: 'file:nebula.db' }   // local fallback for development
+);
+
+await db.executeMultiple(`
   CREATE TABLE IF NOT EXISTS users (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
@@ -55,37 +63,16 @@ db.exec(`
   );
 `);
 
-const q = {
-  byName:   db.prepare('SELECT * FROM users WHERE lower(username)=?'),
-  byEmail:  db.prepare('SELECT * FROM users WHERE lower(email)=?'),
-  byId:     db.prepare('SELECT * FROM users WHERE id=?'),
-  create:   db.prepare(`INSERT INTO users (username,email,pw_hash,balance,is_admin,created)
-                        VALUES (?,?,?,?,?,?)`),
-  setBal:   db.prepare('UPDATE users SET balance=? WHERE id=?'),
-  addBal:   db.prepare('UPDATE users SET balance=balance+? WHERE id=?'),
-  addWager: db.prepare('UPDATE users SET wagered=wagered+?, rake=rake+? WHERE id=?'),
-  claim:    db.prepare('UPDATE users SET rake=rake-?, claimed=claimed+?, balance=balance+? WHERE id=?'),
-  newReq:   db.prepare('INSERT INTO requests (user_id,kind,amount,created) VALUES (?,?,?,?)'),
-  allUsers: db.prepare(`SELECT id,username,email,balance,wagered,rake,claimed,is_admin,created
-                        FROM users ORDER BY id`),
-  userTotals: db.prepare(`SELECT user_id,
-                           SUM(CASE WHEN kind='deposit'  AND status='approved' THEN amount ELSE 0 END) deposited,
-                           SUM(CASE WHEN kind='withdraw' AND status='approved' THEN amount ELSE 0 END) withdrawn
-                           FROM requests GROUP BY user_id`),
-  setAdmin: db.prepare('UPDATE users SET is_admin=? WHERE id=?'),
-  pending:  db.prepare(`SELECT r.id,r.kind,r.amount,r.created,u.username,u.email,u.balance
-                        FROM requests r JOIN users u ON u.id=r.user_id
-                        WHERE r.status='pending' ORDER BY r.created DESC`),
-  reqById:  db.prepare("SELECT * FROM requests WHERE id=? AND status='pending'"),
-  setReq:   db.prepare('UPDATE requests SET status=? WHERE id=?'),
-  myReqs:   db.prepare('SELECT kind,amount,status,created FROM requests WHERE user_id=? ORDER BY created DESC LIMIT 20'),
-  logBet:   db.prepare('INSERT INTO bets (user_id,game,stake,mult,payout,created) VALUES (?,?,?,?,?,?)'),
-  recent:   db.prepare(`SELECT b.game,b.stake,b.mult,b.payout,b.created,u.username
-                        FROM bets b JOIN users u ON u.id=b.user_id
-                        ORDER BY b.id DESC LIMIT 25`)
-};
+/* helpers */
+const one  = r => r.rows[0] || null;
+const all  = r => r.rows;
+const money = n => Math.round(Number(n) * 100) / 100;
 
-/* ---------------- house edge, used for rakeback ---------------- */
+async function byName(u)  { return one(await db.execute({ sql:'SELECT * FROM users WHERE lower(username)=?', args:[u] })); }
+async function byEmail(e) { return one(await db.execute({ sql:'SELECT * FROM users WHERE lower(email)=?',    args:[e] })); }
+async function byId(id)   { return one(await db.execute({ sql:'SELECT * FROM users WHERE id=?',             args:[id] })); }
+
+/* ---------------- house edge / rakeback tiers ---------------- */
 const EDGE = {
   dice:.01, limbo:.01, crash:.01, mines:.01, plinko:.01, keno:.01, wheel:.01,
   flip:.01, hilo:.01, tower:.01, chicken:.01, blackjack:.005, pump:.02, rps:.02,
@@ -103,8 +90,7 @@ const tierFor = w => TIERS.reduce((t, x) => (w >= x.min ? x : t), TIERS[0]);
 const app = express();
 app.use(cors());
 app.use(express.json());
-// serve the game from ./public, or from this folder, under whatever name it has
-import fs from 'fs';
+
 const pubDir = fs.existsSync(path.join(__dirname,'public')) ? path.join(__dirname,'public') : __dirname;
 app.use(express.static(pubDir));
 const gameFile = (() => {
@@ -120,15 +106,13 @@ app.get('/', (req, res) => {
   res.sendFile(gameFile);
 });
 
-const money = n => Math.round(Number(n) * 100) / 100;
-
-function auth(req, res, next) {
+async function auth(req, res, next) {
   const h = req.headers.authorization || '';
   const token = h.startsWith('Bearer ') ? h.slice(7) : null;
   if (!token) return res.status(401).json({ error: 'Not signed in' });
   try {
     const { id } = jwt.verify(token, SECRET);
-    const user = q.byId.get(id);
+    const user = await byId(id);
     if (!user) return res.status(401).json({ error: 'Account not found' });
     req.user = user;
     next();
@@ -146,150 +130,188 @@ const shape = u => ({
   rate: tierFor(u.wagered).rate
 });
 
-/* ---------------- auth ---------------- */
-app.post('/api/register', (req, res) => {
-  const username = String(req.body.username || '').trim();
-  const email    = String(req.body.email || '').trim();
-  const password = String(req.body.password || '');
+/* ---------------- auth routes ---------------- */
+app.post('/api/register', async (req, res) => {
+  try {
+    const username = String(req.body.username || '').trim();
+    const email    = String(req.body.email || '').trim();
+    const password = String(req.body.password || '');
 
-  if (!/^[a-z0-9_]{3,16}$/i.test(username)) return res.status(400).json({ error: 'Username: 3-16 letters, numbers or underscore' });
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Enter a valid email' });
-  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
-  if (q.byName.get(username.toLowerCase())) return res.status(400).json({ error: 'That username is taken' });
-  if (q.byEmail.get(email.toLowerCase()))   return res.status(400).json({ error: 'That email is already registered' });
+    if (!/^[a-z0-9_]{3,16}$/i.test(username)) return res.status(400).json({ error: 'Username: 3-16 letters, numbers or underscore' });
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return res.status(400).json({ error: 'Enter a valid email' });
+    if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    if (await byName(username.toLowerCase())) return res.status(400).json({ error: 'That username is taken' });
+    if (await byEmail(email.toLowerCase()))   return res.status(400).json({ error: 'That email is already registered' });
 
-  // admin is decided by config, never by "who signed up first"
-  const isAdmin = username.toLowerCase() === ADMIN_USER ? 1 : 0;
-  const info = q.create.run(username, email, bcrypt.hashSync(password, 12), START_BAL, isAdmin, Date.now());
-  const user = q.byId.get(info.lastInsertRowid);
-  res.json({ token: jwt.sign({ id: user.id }, SECRET, { expiresIn: '30d' }), user: shape(user) });
+    const isAdmin = username.toLowerCase() === ADMIN_USER ? 1 : 0;
+    const r = await db.execute({
+      sql: 'INSERT INTO users (username,email,pw_hash,balance,is_admin,created) VALUES (?,?,?,?,?,?)',
+      args: [username, email, bcrypt.hashSync(password, 12), START_BAL, isAdmin, Date.now()]
+    });
+    const user = await byId(Number(r.lastInsertRowid));
+    res.json({ token: jwt.sign({ id: user.id }, SECRET, { expiresIn: '30d' }), user: shape(user) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/login', (req, res) => {
-  const id = String(req.body.id || '').trim().toLowerCase();
-  const user = q.byName.get(id) || q.byEmail.get(id);
-  if (!user || !bcrypt.compareSync(String(req.body.password || ''), user.pw_hash))
-    return res.status(400).json({ error: 'Wrong username or password' });
-  res.json({ token: jwt.sign({ id: user.id }, SECRET, { expiresIn: '30d' }), user: shape(user) });
+app.post('/api/login', async (req, res) => {
+  try {
+    const id = String(req.body.id || '').trim().toLowerCase();
+    const user = (await byName(id)) || (await byEmail(id));
+    if (!user || !bcrypt.compareSync(String(req.body.password || ''), user.pw_hash))
+      return res.status(400).json({ error: 'Wrong username or password' });
+    res.json({ token: jwt.sign({ id: user.id }, SECRET, { expiresIn: '30d' }), user: shape(user) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 app.get('/api/me', auth, (req, res) => res.json({ user: shape(req.user) }));
 
-/* ---------------- play ----------------
-   The server is the authority on balance. The client reports the
-   outcome of a round; the server verifies funds and settles it.     */
-app.post('/api/bet', auth, (req, res) => {
-  const game  = String(req.body.game || '');
-  const stake = money(req.body.stake);
-  const mult  = Number(req.body.mult);
+/* ---------------- play ---------------- */
+app.post('/api/bet', auth, async (req, res) => {
+  try {
+    const game  = String(req.body.game || '');
+    const stake = money(req.body.stake);
+    const mult  = Number(req.body.mult);
 
-  if (!(stake > 0) || !isFinite(mult) || mult < 0) return res.status(400).json({ error: 'Bad bet' });
-  if (stake > req.user.balance + 1e-9) return res.status(400).json({ error: 'Not enough balance' });
+    if (!(stake > 0) || !isFinite(mult) || mult < 0) return res.status(400).json({ error: 'Bad bet' });
+    if (stake > req.user.balance + 1e-9) return res.status(400).json({ error: 'Not enough balance' });
 
-  const payout = money(stake * mult);
-  const edge   = EDGE[game] ?? 0.01;
-  const rake   = stake * edge * tierFor(req.user.wagered).rate;
+    const payout = money(stake * mult);
+    const edge   = EDGE[game] ?? 0.01;
+    const rake   = stake * edge * tierFor(req.user.wagered).rate;
 
-  db.transaction(() => {
-    q.addBal.run(payout - stake, req.user.id);
-    q.addWager.run(stake, rake, req.user.id);
-    q.logBet.run(req.user.id, game, stake, mult, payout, Date.now());
-  })();
+    await db.batch([
+      { sql: 'UPDATE users SET balance=balance+? WHERE id=?',           args: [payout - stake, req.user.id] },
+      { sql: 'UPDATE users SET wagered=wagered+?, rake=rake+? WHERE id=?', args: [stake, rake, req.user.id] },
+      { sql: 'INSERT INTO bets (user_id,game,stake,mult,payout,created) VALUES (?,?,?,?,?,?)', args: [req.user.id, game, stake, mult, payout, Date.now()] }
+    ], 'write');
 
-  res.json({ user: shape(q.byId.get(req.user.id)) });
+    res.json({ user: shape(await byId(req.user.id)) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/rakeback/claim', auth, (req, res) => {
-  const amount = Math.floor(req.user.rake * 100) / 100;
-  if (amount < 0.10) return res.status(400).json({ error: 'Minimum claim is $0.10' });
-  q.claim.run(amount, amount, amount, req.user.id);
-  res.json({ claimed: amount, user: shape(q.byId.get(req.user.id)) });
+app.post('/api/rakeback/claim', auth, async (req, res) => {
+  try {
+    const amount = Math.floor(req.user.rake * 100) / 100;
+    if (amount < 0.10) return res.status(400).json({ error: 'Minimum claim is $0.10' });
+    await db.execute({ sql: 'UPDATE users SET rake=rake-?, claimed=claimed+?, balance=balance+? WHERE id=?', args: [amount, amount, amount, req.user.id] });
+    res.json({ claimed: amount, user: shape(await byId(req.user.id)) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-/* ---------------- deposits need approval ---------------- */
-app.post('/api/deposit', auth, (req, res) => {
-  const amount = money(req.body.amount);
-  if (!(amount > 0)) return res.status(400).json({ error: 'Enter an amount' });
-  // an admin tops up instantly; everyone else waits for approval
-  if (req.user.is_admin) {
-    q.addBal.run(amount, req.user.id);
-    return res.json({ approved: true, user: shape(q.byId.get(req.user.id)) });
-  }
-  q.newReq.run(req.user.id, 'deposit', amount, Date.now());
-  res.json({ approved: false, message: 'Deposit request sent for approval' });
-});
-
-app.post('/api/withdraw', auth, (req, res) => {
-  const amount = money(req.body.amount);
-  if (!(amount > 0)) return res.status(400).json({ error: 'Enter an amount' });
-  if (amount > req.user.balance + 1e-9) return res.status(400).json({ error: 'Not enough balance' });
-  if (req.user.is_admin) {                       // admin adjusts their own balance directly
-    q.addBal.run(-amount, req.user.id);
-    return res.json({ approved: true, user: shape(q.byId.get(req.user.id)) });
-  }
-  // hold the funds while the request is pending so it cannot be spent twice
-  db.transaction(() => {
-    q.addBal.run(-amount, req.user.id);
-    q.newReq.run(req.user.id, 'withdraw', amount, Date.now());
-  })();
-  res.json({ approved: false, message: 'Withdrawal request sent for approval',
-             user: shape(q.byId.get(req.user.id)) });
-});
-
-app.get('/api/requests/mine', auth, (req, res) => res.json({ requests: q.myReqs.all(req.user.id) }));
-
-app.get('/api/admin/requests', auth, adminOnly, (req, res) => res.json({ requests: q.pending.all() }));
-
-app.post('/api/admin/requests/:id', auth, adminOnly, (req, res) => {
-  const reqRow = q.reqById.get(req.params.id);
-  if (!reqRow) return res.status(404).json({ error: 'No such pending request' });
-  const approve = req.body.approve === true;
-  db.transaction(() => {
-    q.setReq.run(approve ? 'approved' : 'denied', reqRow.id);
-    if (reqRow.kind === 'deposit') {
-      if (approve) q.addBal.run(reqRow.amount, reqRow.user_id);      // credit on approval
-    } else {
-      if (!approve) q.addBal.run(reqRow.amount, reqRow.user_id);     // refund the hold on denial
+/* ---------------- deposits / withdrawals ---------------- */
+app.post('/api/deposit', auth, async (req, res) => {
+  try {
+    const amount = money(req.body.amount);
+    if (!(amount > 0)) return res.status(400).json({ error: 'Enter an amount' });
+    if (req.user.is_admin) {
+      await db.execute({ sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [amount, req.user.id] });
+      return res.json({ approved: true, user: shape(await byId(req.user.id)) });
     }
-  })();
-  res.json({ ok: true, requests: q.pending.all() });
+    await db.execute({ sql: 'INSERT INTO requests (user_id,kind,amount,created) VALUES (?,?,?,?)', args: [req.user.id, 'deposit', amount, Date.now()] });
+    res.json({ approved: false, message: 'Deposit request sent for approval' });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-app.get('/api/admin/users', auth, adminOnly, (req, res) => {
-  const totalsMap = {};
-  q.userTotals.all().forEach(r => { totalsMap[r.user_id] = r; });
-  const users = q.allUsers.all().map(u => {
-    const t = totalsMap[u.id] || { deposited: 0, withdrawn: 0 };
-    // bet P&L = total payouts received - total staked (negative = house won)
-    const betPnl = money(u.wagered > 0 ? (u.balance + u.wagered - t.deposited + t.withdrawn) : 0);
-    return {
-      id: u.id, username: u.username, email: u.email,
-      balance: money(u.balance), wagered: money(u.wagered),
-      deposited: money(t.deposited), withdrawn: money(t.withdrawn),
-      rake: Math.floor(u.rake * 100) / 100, claimed: money(u.claimed),
-      admin: !!u.is_admin, tier: tierFor(u.wagered).n,
-      created: u.created,
-      net: betPnl
-    };
-  });
-  res.json({ users });
+app.post('/api/withdraw', auth, async (req, res) => {
+  try {
+    const amount = money(req.body.amount);
+    if (!(amount > 0)) return res.status(400).json({ error: 'Enter an amount' });
+    if (amount > req.user.balance + 1e-9) return res.status(400).json({ error: 'Not enough balance' });
+    if (req.user.is_admin) {
+      await db.execute({ sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [-amount, req.user.id] });
+      return res.json({ approved: true, user: shape(await byId(req.user.id)) });
+    }
+    await db.batch([
+      { sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [-amount, req.user.id] },
+      { sql: 'INSERT INTO requests (user_id,kind,amount,created) VALUES (?,?,?,?)', args: [req.user.id, 'withdraw', amount, Date.now()] }
+    ], 'write');
+    res.json({ approved: false, message: 'Withdrawal request sent for approval', user: shape(await byId(req.user.id)) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-app.post('/api/admin/adjust', auth, adminOnly, (req, res) => {
-  const target = q.byId.get(req.body.id);
-  const amount = money(req.body.amount);
-  if (!target) return res.status(404).json({ error: 'No such account' });
-  if (!isFinite(amount) || amount === 0) return res.status(400).json({ error: 'Enter an amount' });
-  if (target.balance + amount < 0) return res.status(400).json({ error: 'That would go below zero' });
-  q.addBal.run(amount, target.id);
-  res.json({ ok: true, users: q.allUsers.all().length });
+app.get('/api/requests/mine', auth, async (req, res) => {
+  try {
+    const r = await db.execute({ sql: 'SELECT kind,amount,status,created FROM requests WHERE user_id=? ORDER BY created DESC LIMIT 20', args: [req.user.id] });
+    res.json({ requests: all(r) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-app.get('/api/feed', (req, res) => res.json({ bets: q.recent.all() }));
+app.get('/api/admin/requests', auth, adminOnly, async (req, res) => {
+  try {
+    const r = await db.execute(`SELECT r.id,r.kind,r.amount,r.created,u.username,u.email,u.balance
+      FROM requests r JOIN users u ON u.id=r.user_id WHERE r.status='pending' ORDER BY r.created DESC`);
+    res.json({ requests: all(r) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
 
-app.get('/api/health', (req, res) => res.json({ ok: true, users: db.prepare('SELECT COUNT(*) c FROM users').get().c }));
+app.post('/api/admin/requests/:id', auth, adminOnly, async (req, res) => {
+  try {
+    const reqRow = one(await db.execute({ sql: "SELECT * FROM requests WHERE id=? AND status='pending'", args: [req.params.id] }));
+    if (!reqRow) return res.status(404).json({ error: 'No such pending request' });
+    const approve = req.body.approve === true;
+    const ops = [{ sql: 'UPDATE requests SET status=? WHERE id=?', args: [approve ? 'approved' : 'denied', reqRow.id] }];
+    if (reqRow.kind === 'deposit' && approve)  ops.push({ sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [reqRow.amount, reqRow.user_id] });
+    if (reqRow.kind === 'withdraw' && !approve) ops.push({ sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [reqRow.amount, reqRow.user_id] });
+    await db.batch(ops, 'write');
+    const pending = await db.execute(`SELECT r.id,r.kind,r.amount,r.created,u.username,u.email,u.balance
+      FROM requests r JOIN users u ON u.id=r.user_id WHERE r.status='pending' ORDER BY r.created DESC`);
+    res.json({ ok: true, requests: all(pending) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
 
-import os from 'os';
+app.get('/api/admin/users', auth, adminOnly, async (req, res) => {
+  try {
+    const usersRes  = await db.execute('SELECT id,username,email,balance,wagered,rake,claimed,is_admin,created FROM users ORDER BY id');
+    const totalsRes = await db.execute(`SELECT user_id,
+      SUM(CASE WHEN kind='deposit'  AND status='approved' THEN amount ELSE 0 END) deposited,
+      SUM(CASE WHEN kind='withdraw' AND status='approved' THEN amount ELSE 0 END) withdrawn
+      FROM requests GROUP BY user_id`);
+    const totalsMap = {};
+    all(totalsRes).forEach(r => { totalsMap[r.user_id] = r; });
+    const users = all(usersRes).map(u => {
+      const t = totalsMap[u.id] || { deposited: 0, withdrawn: 0 };
+      const betPnl = money(u.wagered > 0 ? (u.balance + u.wagered - t.deposited + t.withdrawn) : 0);
+      return {
+        id: u.id, username: u.username, email: u.email,
+        balance: money(u.balance), wagered: money(u.wagered),
+        deposited: money(t.deposited), withdrawn: money(t.withdrawn),
+        rake: Math.floor(u.rake * 100) / 100, claimed: money(u.claimed),
+        admin: !!u.is_admin, tier: tierFor(u.wagered).n,
+        created: u.created, net: betPnl
+      };
+    });
+    res.json({ users });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/admin/adjust', auth, adminOnly, async (req, res) => {
+  try {
+    const target = await byId(req.body.id);
+    const amount = money(req.body.amount);
+    if (!target) return res.status(404).json({ error: 'No such account' });
+    if (!isFinite(amount) || amount === 0) return res.status(400).json({ error: 'Enter an amount' });
+    if (target.balance + amount < 0) return res.status(400).json({ error: 'That would go below zero' });
+    await db.execute({ sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [amount, target.id] });
+    const cnt = one(await db.execute('SELECT COUNT(*) c FROM users'));
+    res.json({ ok: true, users: cnt.c });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/feed', async (req, res) => {
+  try {
+    const r = await db.execute(`SELECT b.game,b.stake,b.mult,b.payout,b.created,u.username
+      FROM bets b JOIN users u ON u.id=b.user_id ORDER BY b.id DESC LIMIT 25`);
+    res.json({ bets: all(r) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/health', async (req, res) => {
+  try {
+    const r = one(await db.execute('SELECT COUNT(*) c FROM users'));
+    res.json({ ok: true, users: r.c });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   const nets = os.networkInterfaces();
   const lan = Object.values(nets).flat()
@@ -297,9 +319,9 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('');
   console.log('  Nebula is running.');
   console.log(`  On this computer      : http://localhost:${PORT}`);
-  lan.forEach(a => console.log(`  On your wifi          : http://${a}:${PORT}   <- send this to a friend on the same wifi`));
-  console.log(`  Admin username        : "${ADMIN_USER}"   (register with exactly this name)`);
+  lan.forEach(a => console.log(`  On your wifi          : http://${a}:${PORT}`));
+  console.log(`  Database              : ${TURSO_URL ? 'Turso (persistent)' : 'local SQLite'}`);
+  console.log(`  Admin username        : "${ADMIN_USER}"`);
   console.log(`  New accounts start at : $${START_BAL}`);
-  console.log(`  Game file             : ${gameFile ? path.basename(gameFile) : 'NOT FOUND - put the .html next to server.js'}`);
   console.log('');
 });
