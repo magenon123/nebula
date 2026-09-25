@@ -12,7 +12,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT      = process.env.PORT || 3000;
 const SECRET    = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 const ADMIN_USER= (process.env.ADMIN_USER || 'magenon').toLowerCase();
-const START_BAL = Number(process.env.START_BALANCE ?? 1000);
+const START_BAL = Number(process.env.START_BALANCE ?? 0);
 
 if (!process.env.JWT_SECRET) {
   console.warn('! JWT_SECRET not set - sessions will drop on restart. Set it in production.');
@@ -68,6 +68,10 @@ const q = {
   newReq:   db.prepare('INSERT INTO requests (user_id,kind,amount,created) VALUES (?,?,?,?)'),
   allUsers: db.prepare(`SELECT id,username,email,balance,wagered,rake,claimed,is_admin,created
                         FROM users ORDER BY id`),
+  userTotals: db.prepare(`SELECT user_id,
+                           SUM(CASE WHEN kind='deposit'  AND status='approved' THEN amount ELSE 0 END) deposited,
+                           SUM(CASE WHEN kind='withdraw' AND status='approved' THEN amount ELSE 0 END) withdrawn
+                           FROM requests GROUP BY user_id`),
   setAdmin: db.prepare('UPDATE users SET is_admin=? WHERE id=?'),
   pending:  db.prepare(`SELECT r.id,r.kind,r.amount,r.created,u.username,u.email,u.balance
                         FROM requests r JOIN users u ON u.id=r.user_id
@@ -252,14 +256,22 @@ app.post('/api/admin/requests/:id', auth, adminOnly, (req, res) => {
 });
 
 app.get('/api/admin/users', auth, adminOnly, (req, res) => {
-  const users = q.allUsers.all().map(u => ({
-    id: u.id, username: u.username, email: u.email,
-    balance: money(u.balance), wagered: money(u.wagered),
-    rake: Math.floor(u.rake * 100) / 100, claimed: money(u.claimed),
-    admin: !!u.is_admin, tier: tierFor(u.wagered).n,
-    created: u.created,
-    net: money(u.balance - START_BAL)
-  }));
+  const totalsMap = {};
+  q.userTotals.all().forEach(r => { totalsMap[r.user_id] = r; });
+  const users = q.allUsers.all().map(u => {
+    const t = totalsMap[u.id] || { deposited: 0, withdrawn: 0 };
+    // bet P&L = total payouts received - total staked (negative = house won)
+    const betPnl = money(u.wagered > 0 ? (u.balance + u.wagered - t.deposited + t.withdrawn) : 0);
+    return {
+      id: u.id, username: u.username, email: u.email,
+      balance: money(u.balance), wagered: money(u.wagered),
+      deposited: money(t.deposited), withdrawn: money(t.withdrawn),
+      rake: Math.floor(u.rake * 100) / 100, claimed: money(u.claimed),
+      admin: !!u.is_admin, tier: tierFor(u.wagered).n,
+      created: u.created,
+      net: betPnl
+    };
+  });
   res.json({ users });
 });
 
