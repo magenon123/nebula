@@ -2239,8 +2239,10 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
       flash('-'+fmt(bet),false);logBet('Mines',bet,0);
       return;
     }
+    // if this gem would push mult to cap, force a bomb instead (never show the gem)
+    if(mult(found.size+1)>=gameCap('mines')){_minesBlow();return;}
     found.add(i);b.textContent='💎';b.classList.add('gem');
-    if(found.size===N-mines||mult(found.size)>=gameCap('mines')){cash();return}
+    if(found.size===N-mines){cash();return}
     ui();
   }
   function _minesBlow(){
@@ -2253,7 +2255,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
   function cash(){
     if(!live||!found.size)return;
     if(!_mWin){_minesBlow();return;}  // rigged round — force blow
-    const m=Math.min(mult(found.size),gameCap('mines'));  // cap payout, never blow
+    const m=mult(found.size);
     live=false;
     stop(true);
     credit(bet*m);winBadge(m,bet*m);logBet('Mines',bet,m);
