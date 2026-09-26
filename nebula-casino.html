@@ -1048,8 +1048,7 @@ tbody tr{animation:sl .25s}
       <button class="go alt" id="au_up">Create account</button>
     </div>
     <div class="au-msg" id="au_msg"></div>
-    <div class="au-note">Accounts are stored in this browser only. Passwords are salted and hashed,
-      but a browser-only store is not real security &mdash; don't reuse a password you care about.</div>
+    <div class="au-note">Accounts are stored on the server and persist across devices and sessions.</div>
   </div>
 </div>
 
@@ -1175,12 +1174,8 @@ tbody tr{animation:sl .25s}
     <button class="hd-icon-btn hd-hide-sm" id="usersBtn" aria-label="Sidebar">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M17.5.83h-15C1.58.83.83 1.58.83 2.5v15c0 .92.75 1.67 1.67 1.67h15c.92 0 1.67-.75 1.67-1.67v-15c0-.92-.75-1.67-1.67-1.67m-6.67 15.65c0 .56-.46 1.02-1.01 1.02h-6.3c-.56 0-1.02-.46-1.02-1.02V3.52c0-.56.46-1.02 1.02-1.02h6.3c.55 0 1.01.46 1.01 1.02z"/></svg>
     </button>
-    <!-- Auth buttons: sign in shown when logged out, logout shown when logged in -->
-    <button class="hd-icon-btn" id="signInBtn" title="Sign In / Sign Up" style="color:var(--green);font-weight:700;font-size:13px;padding:8px 12px">
-      Sign In
-    </button>
-    <span id="hd-username" style="font-size:12px;color:var(--muted);font-weight:600;padding:0 6px;display:none"></span>
-    <button class="hd-icon-btn" id="logoutBtn" title="Sign Out" style="color:#f87171" hidden>
+    <span id="userName" style="font-size:12px;color:var(--muted);font-weight:700;padding:0 4px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    <button class="hd-icon-btn" id="logoutBtn" title="Sign out" style="color:#f87171;display:none" onclick="nebulaSignOut()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
     </button>
   </div>
@@ -1839,34 +1834,6 @@ tbody tr{animation:sl .25s}
   <div class="sp-chart"><canvas id="spChart" width="225" height="170"></canvas></div>
 </div>
 
-
-<!-- ========== AUTH MODAL ========== -->
-<div class="mask" id="authMask" style="z-index:200">
-  <div class="modal" style="position:relative;max-width:400px;width:100%">
-    <button class="close" id="authClose">&times;</button>
-    <div style="display:flex;gap:0;background:var(--bg);border-radius:8px;margin-bottom:18px;padding:4px">
-      <button id="authTabSignin" style="flex:1;border:none;background:var(--panel2);color:var(--text);font-weight:700;padding:9px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13.5px">Sign In</button>
-      <button id="authTabSignup" style="flex:1;border:none;background:none;color:var(--muted);font-weight:700;padding:9px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:13.5px">Sign Up</button>
-    </div>
-    <h3 id="authTitle" style="margin-bottom:14px">Welcome back</h3>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <div id="authEmailWrap">
-        <div class="lbl"><span>Email</span></div>
-        <div class="inwrap"><input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email"></div>
-      </div>
-      <div>
-        <div class="lbl"><span>Username</span></div>
-        <div class="inwrap"><input type="text" id="authUser" placeholder="username" autocomplete="username"></div>
-      </div>
-      <div>
-        <div class="lbl"><span>Password</span></div>
-        <div class="inwrap"><input type="password" id="authPass" placeholder="••••••••" autocomplete="current-password"></div>
-      </div>
-      <div id="authErr" style="color:var(--red);font-size:12.5px;display:none"></div>
-      <button class="go" id="authSubmit" style="margin-top:4px">Sign In</button>
-    </div>
-  </div>
-</div>
 
 <script>
 /* =========== core =========== */
@@ -4681,10 +4648,11 @@ const AUTH=(()=>{
   function enterRemote(){
     const u=API.user;
     bal=u.balance; paintBal(0);
-    $('userName').textContent=u.username;
-    $('userAv').textContent=u.username[0].toUpperCase();
+    if($('userName'))$('userName').textContent=u.username;
+    if($('userAv'))$('userAv').textContent=u.username[0].toUpperCase();
     $('bellBtn').hidden=!u.admin;
     $('usersBtn').hidden=!u.admin;
+    if($('logoutBtn'))$('logoutBtn').style.display='';
     wrap.style.display='none';
     pollRequests();
   }
@@ -4713,11 +4681,17 @@ const AUTH=(()=>{
   window.nebulaSignOut=()=>{
     if(API.online){ API.clear(); $('imask').classList.remove('on'); wrap.style.display='';
       $('au_pw').value='';$('au_pw2').value='';$('au_pw3').value='';
-      $('bellBtn').hidden=true; $('usersBtn').hidden=true; return }
+      $('bellBtn').hidden=true; $('usersBtn').hidden=true;
+      if($('userName'))$('userName').textContent='';
+      if($('logoutBtn'))$('logoutBtn').style.display='none';
+      bal=0; paintBal(0); return }
     AUTH.setBal(bal); AUTH.signout();
     $('imask').classList.remove('on');
     wrap.style.display='';
     $('au_pw').value='';$('au_pw2').value='';$('au_pw3').value='';
+    if($('userName'))$('userName').textContent='';
+    if($('logoutBtn'))$('logoutBtn').style.display='none';
+    bal=0; paintBal(0);
   };
   // admin queue
   function refreshRequests(){
@@ -4934,14 +4908,16 @@ const RB=(()=>{
   $('usClose').onclick=()=>$('usersMask').classList.remove('on');
   $('usersMask').onclick=e=>{if(e.target===$('usersMask'))$('usersMask').classList.remove('on')};
 
-  // on load, resume a server session if there is one
+  // on load, require sign-in when server is up
   (async()=>{
     const up=await API.probe();
     if(!up)return;
     if(API.token){
-      try{ const r=await API.call('/me'); API.user=r.user; enterRemote(); }
+      try{ const r=await API.call('/me'); API.user=r.user; enterRemote(); return; }
       catch(_){ API.clear(); }
     }
+    // server online but no valid session — show auth screen
+    $('authWrap').style.display='';
   })();
 })();
 
@@ -5130,143 +5106,6 @@ function rndRigged(){ return RIG.skew(rnd()); }
     flash('Blind test started \u2014 play Dice or Limbo',true);
   };
 })();
-
-/* =========== API + AUTH =========== */
-const API = (() => {
-  const BASE = '';
-  let _token = null, _user = null;
-  async function call(path, method='GET', body) {
-    const opts = { method, headers: {'Content-Type':'application/json'} };
-    if (_token) opts.headers['Authorization'] = 'Bearer ' + _token;
-    if (body) opts.body = JSON.stringify(body);
-    const r = await fetch(BASE + '/api' + path, opts);
-    const j = await r.json();
-    if (!r.ok) throw new Error(j.error || 'Request failed');
-    return j;
-  }
-  function saveToken(t) { _token = t; try { localStorage.setItem('nb_tok', t); } catch(_){} }
-  function loadToken() { try { return localStorage.getItem('nb_tok'); } catch(_){ return null; } }
-  function clearToken() { _token = null; try { localStorage.removeItem('nb_tok'); } catch(_){} }
-  return {
-    get token(){ return _token; },
-    get user(){ return _user; },
-    set user(u){ _user = u; },
-    call,
-    async init() {
-      const t = loadToken();
-      if (!t) return false;
-      _token = t;
-      try {
-        const r = await call('/me');
-        _user = r.user;
-        return true;
-      } catch(_) { clearToken(); _token = null; return false; }
-    },
-    async login(username, password) {
-      const r = await call('/signin', 'POST', { username, password });
-      _user = r.user; saveToken(r.token);
-    },
-    async signup(username, email, password) {
-      const r = await call('/signup', 'POST', { username, email, password });
-      _user = r.user; saveToken(r.token);
-    },
-    logout() { clearToken(); _user = null; },
-  };
-})();
-
-const AUTH = { current: () => API.user, setBal: (b) => { /* balance is local */ } };
-
-function _applyUser(user) {
-  if (!user) return;
-  bal = user.balance;
-  paintBal(0);
-  $('hd-username').textContent = user.username;
-  $('hd-username').style.display = '';
-  $('signInBtn').hidden = true;
-  $('logoutBtn').hidden = false;
-}
-
-function _clearUser() {
-  bal = 0; paintBal(0);
-  $('hd-username').style.display = 'none';
-  $('signInBtn').hidden = false;
-  $('logoutBtn').hidden = true;
-}
-
-/* auth modal logic */
-(function(){
-  let mode = 'signin';
-  const mask = $('authMask');
-  const err  = $('authErr');
-
-  function setMode(m) {
-    mode = m;
-    const isSignup = m === 'signup';
-    $('authTabSignin').style.background = isSignup ? 'none' : 'var(--panel2)';
-    $('authTabSignin').style.color = isSignup ? 'var(--muted)' : 'var(--text)';
-    $('authTabSignup').style.background = isSignup ? 'var(--panel2)' : 'none';
-    $('authTabSignup').style.color = isSignup ? 'var(--text)' : 'var(--muted)';
-    $('authTitle').textContent = isSignup ? 'Create account' : 'Welcome back';
-    $('authSubmit').textContent = isSignup ? 'Sign Up' : 'Sign In';
-    $('authEmailWrap').style.display = isSignup ? '' : 'none';
-    err.style.display = 'none';
-  }
-  setMode('signin');
-
-  $('signInBtn').onclick = () => { setMode('signin'); mask.classList.add('on'); };
-  $('authClose').onclick = () => mask.classList.remove('on');
-  mask.addEventListener('click', e => { if (e.target === mask) mask.classList.remove('on'); });
-  $('authTabSignin').onclick = () => setMode('signin');
-  $('authTabSignup').onclick = () => setMode('signup');
-
-  $('authSubmit').onclick = async () => {
-    err.style.display = 'none';
-    const u = $('authUser').value.trim();
-    const p = $('authPass').value;
-    const e = $('authEmail').value.trim();
-    if (!u || !p) { err.textContent = 'Username and password are required'; err.style.display = ''; return; }
-    $('authSubmit').disabled = true;
-    try {
-      if (mode === 'signup') {
-        if (!e) { err.textContent = 'Email is required'; err.style.display = ''; $('authSubmit').disabled = false; return; }
-        await API.signup(u, e, p);
-      } else {
-        await API.login(u, p);
-      }
-      _applyUser(API.user);
-      mask.classList.remove('on');
-    } catch(ex) {
-      err.textContent = ex.message;
-      err.style.display = '';
-    }
-    $('authSubmit').disabled = false;
-  };
-
-  $('authPass').onkeydown = e => { if (e.key === 'Enter') $('authSubmit').click(); };
-
-  $('logoutBtn').onclick = () => {
-    API.logout();
-    _clearUser();
-    flash('Signed out', true);
-  };
-
-  /* wallet btn requires login */
-  const origWallet = $('walletBtn').onclick;
-  $('walletBtn').onclick = () => {
-    if (!API.user) { setMode('signin'); mask.classList.add('on'); return; }
-    if (typeof origWallet === 'function') origWallet();
-    else $('mask').classList.add('on');
-  };
-
-  /* init: restore session */
-  API.init().then(ok => {
-    if (ok) _applyUser(API.user);
-    else _clearUser();
-  });
-})();
-
-/* =========== patch logBet to sync with server =========== */
-const _logBetOrig = typeof logBet === 'function' ? logBet : null;
 
 /* init */
 paintBal(0);
