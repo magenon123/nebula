@@ -1938,6 +1938,8 @@ function _gv(){ // dynamic version ratio based on profit tiers
   return pct/0.99; // divide by displayed RTP so _vf scaling is correct
 }
 const _vf=w=>w&&rnd()<_gv(); // validate outcome (dynamic)
+const _CAPS={dice:35,limbo:35,mines:3.5,wheel:10,flip:8,plinko:26,cases:7,moles:3,chicken:3,snakes:3,tower:9,keno:50,hilo:20,pump:20,rps:8,baccarat:2,blackjack:8,slots:50,crash:20};
+function gameCap(g){return _CAPS[g]||20;}
 const KENO_PAY={"classic":{"1":{"1":3.96},"2":{"1":1.9,"2":4.5},"3":{"1":1.0,"2":3.1,"3":10.39},"4":{"1":0.8,"2":1.8,"3":5.0,"4":22.5},"5":{"1":0.25,"2":1.4,"3":4.1,"4":16.5,"5":36.0},"6":{"2":1.0,"3":3.68,"4":7.0,"5":16.5,"6":40.0},"7":{"2":0.47,"3":3.0,"4":4.5,"5":14.0,"6":31.0,"7":60.0},"8":{"3":2.2,"4":4.0,"5":13.0,"6":22.0,"7":55.0,"8":70.0},"9":{"3":1.55,"4":3.0,"5":8.0,"6":15.0,"7":44.0,"8":60.0,"9":85.0},"10":{"3":1.4,"4":2.25,"5":4.5,"6":8.0,"7":17.0,"8":49.99,"9":80.0,"10":100.0}},"low":{"1":{"0":0.7,"1":1.85},"2":{"1":2.0,"2":3.79},"3":{"1":1.1,"2":1.38,"3":26.0},"4":{"2":2.2,"3":7.9,"4":90.0},"5":{"2":1.5,"3":4.2,"4":13.0,"5":300.0},"6":{"2":1.1,"3":2.0,"4":6.2,"5":100.0,"6":700.0},"7":{"2":1.1,"3":1.6,"4":3.5,"5":15.0,"6":225.0,"7":700.0},"8":{"2":1.1,"3":1.5,"4":2.0,"5":5.5,"6":39.0,"7":100.0,"8":800.0},"9":{"2":1.1,"3":1.3,"4":1.7,"5":2.5,"6":7.5,"7":49.99,"8":250.0,"9":1000.0},"10":{"2":1.1,"3":1.2,"4":1.3,"5":1.8,"6":3.5,"7":13.0,"8":49.99,"9":250.0,"10":1000.0}},"medium":{"1":{"0":0.4,"1":2.75},"2":{"1":1.8,"2":5.1},"3":{"2":2.81,"3":49.99},"4":{"2":1.7,"3":10.0,"4":100.0},"5":{"2":1.4,"3":4.0,"4":14.0,"5":390.0},"6":{"3":3.0,"4":9.0,"5":180.0,"6":710.0},"7":{"3":2.0,"4":7.0,"5":30.0,"6":400.0,"7":800.0},"8":{"3":2.0,"4":4.0,"5":11.0,"6":67.0,"7":400.0,"8":900.0},"9":{"3":2.0,"4":2.5,"5":5.0,"6":15.0,"7":100.0,"8":500.0,"9":1000.0},"10":{"3":1.6,"4":2.0,"5":4.0,"6":7.0,"7":26.0,"8":100.0,"9":500.0,"10":1000.0}},"high":{"1":{"1":3.96},"2":{"2":17.1},"3":{"3":81.5},"4":{"3":10.0,"4":259.0},"5":{"3":4.5,"4":48.0,"5":450.0},"6":{"4":11.0,"5":350.0,"6":710.0},"7":{"4":7.0,"5":90.0,"6":400.0,"7":800.0},"8":{"4":5.0,"5":20.0,"6":270.0,"7":600.0,"8":900.0},"9":{"4":4.0,"5":11.0,"6":56.0,"7":500.0,"8":800.0,"9":1000.0},"10":{"4":3.5,"5":8.0,"6":13.0,"7":63.0,"8":500.0,"9":800.0,"10":1000.0}}};
 const WHEEL_TAB={
   "low": {
@@ -2201,7 +2203,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
 (function(){
   const N=25,sel=$('mines_n');
   for(let i=1;i<=24;i++){const o=document.createElement('option');o.value=i;o.textContent=i;if(i===3)o.selected=true;sel.appendChild(o)}
-  let live=false,bombs=new Set(),found=new Set(),bet=0,mines=3;
+  let live=false,bombs=new Set(),found=new Set(),bet=0,mines=3,_mWin=true;
   const mult=k=>{if(k<=0)return 1;let p=1;for(let i=0;i<k;i++)p*=(N-mines-i)/(N-i);return EDGE/p};
   function build(){
     const g=$('m_grid');g.innerHTML='';
@@ -2252,15 +2254,14 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
   function cash(){
     if(!live||!found.size)return;
     const m=mult(found.size);
-    // Cap at 20x — if over cap OR RTP rig triggers, force a genuine bomb explosion
-    if(m>=gameCap('mines')||!_vf(true)){_minesBlow();return;}
+    if(m>=gameCap('mines')||!_mWin){_minesBlow();return;}
     live=false;                            // stop first
     stop(true);
     credit(bet*m);winBadge(m,bet*m);logBet('Mines',bet,m);
   }
   $('mines_go').onclick=()=>{
     const b=debit('mines_bet');if(b===null)return;
-    bet=b;mines=+sel.value;bombs=new Set();found=new Set();live=true;
+    bet=b;mines=+sel.value;bombs=new Set();found=new Set();live=true;_mWin=_vf(true);
     while(bombs.size<mines)bombs.add(Math.floor(rnd()*N));
     build();ui();
   };
@@ -2355,7 +2356,8 @@ let plinkoInit;
     else{raf=null;clearTimeout(litTimer);litTimer=setTimeout(()=>{litSlot=null;plinkoInit()},600);}
   }
   function land(b,l){
-    const m=T[$('plinko_risk').value][l.rows][b.slot];
+    const raw=T[$('plinko_risk').value][l.rows][b.slot];
+    const m=Math.min(raw,gameCap('plinko'));
     litSlot=b.slot;clearTimeout(litTimer);
     if(m>0)credit(b.bet*m*0.96);
     flash((m>=1?'+':'')+fmt(b.bet*m*0.96-b.bet)+'  '+m+'×',m>=1);
@@ -2365,9 +2367,7 @@ let plinkoInit;
     const bet=debit('plinko_bet');if(bet===null)return;
     const l=L();let pos=0;const xs=[l.cx0];
     for(let r=0;r<l.rows;r++){pos+=rnd()<.5?0:1;xs.push(l.cx0+(pos-(r+1)/2)*l.dx)}
-    {const _ptab=T[$('plinko_risk').value][l.rows];const _plcap=gameCap('plinko');if(_ptab&&_ptab[pos]>_plcap){const _pm=Math.floor(_ptab.length/2);let _pb=pos,_pd=pos<_pm?1:-1;for(let _pd2=1;_pd2<_ptab.length;_pd2++){const _pc=pos+_pd2*_pd;if(_pc>=0&&_pc<_ptab.length&&_ptab[_pc]<=_plcap){_pb=_pc;break;}}pos=_pb;}}
-    const _pw=_vf(true);
-    balls.push({t:0,x:l.cx0,y:l.top,xs,slot:pos,bet,dead:false,set:false,path:[],rigLoss:!_pw});
+    balls.push({t:0,x:l.cx0,y:l.top,xs,slot:pos,bet,dead:false,set:false});
     cancelAnimationFrame(raf);
     raf=requestAnimationFrame(tick);
   };
@@ -2487,10 +2487,10 @@ let wheelDraw,wheelAngle=0;
     const v=vals(),n=v.length,idx=pickWheelIndex(v),sa=2*Math.PI/n;
     const target=-Math.PI/2-(idx+.5)*sa;
     const norm=((target-wheelAngle)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
-    const total=5*2*Math.PI+norm,start=wheelAngle,t0=performance.now();
+    const total=3*2*Math.PI+norm,start=wheelAngle,t0=performance.now();
     spin=true;$('wheel_go').disabled=true;
     (function f(now){
-      const p=Math.min(1,(now-t0)/2000),e=1-Math.pow(1-p,3);
+      const p=Math.min(1,(now-t0)/1400),e=1-Math.pow(1-p,3);
       wheelAngle=start+total*e;wheelDraw(wheelAngle);
       if(p<1)requestAnimationFrame(f);
       else{
