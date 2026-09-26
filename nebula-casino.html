@@ -409,6 +409,9 @@ tbody tr{animation:sl .25s}
 .sc{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
 .sc[data-s="baccarat"]{height:100%}
 .pane{display:flex;flex-direction:column;gap:12px}
+.slot-fullpane{position:fixed;inset:0;z-index:50;padding:0;margin:0;background:#000}
+.slot-back{position:fixed;top:10px;left:10px;z-index:51;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px)}
+.slot-back:hover{background:rgba(255,255,255,.15)}
 .pane[hidden]{display:none!important}
 .go{width:100%;display:block}
 .split2 .go,.seg2 .go{width:100%}
@@ -1512,13 +1515,15 @@ tbody tr{animation:sl .25s}
   </div>
 
   <!-- ============ OLYMPIAN STORM IFRAME ============ -->
-  <div class="pane" data-p="olympian-storm" hidden style="padding:0;height:calc(100vh - 56px)">
-    <iframe id="frame-olympian-storm" src="" style="width:100%;height:100%;border:none;border-radius:8px;display:block" allow="autoplay" loading="lazy"></iframe>
+  <div class="pane slot-fullpane" data-p="olympian-storm" hidden>
+    <button class="slot-back" onclick="go('slots')">&#8592; Back</button>
+    <iframe id="frame-olympian-storm" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay" loading="lazy"></iframe>
   </div>
 
   <!-- ============ LAKE LEGEND IFRAME ============ -->
-  <div class="pane" data-p="lake-legend" hidden style="padding:0;height:calc(100vh - 56px)">
-    <iframe id="frame-lake-legend" src="" style="width:100%;height:100%;border:none;border-radius:8px;display:block" allow="autoplay" loading="lazy"></iframe>
+  <div class="pane slot-fullpane" data-p="lake-legend" hidden>
+    <button class="slot-back" onclick="go('slots')">&#8592; Back</button>
+    <iframe id="frame-lake-legend" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay" loading="lazy"></iframe>
   </div>
 
 </div>
