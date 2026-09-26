@@ -34,39 +34,38 @@ const db = createClient(
     : { url: 'file:nebula.db' }
 );
 
-await db.executeMultiple(`
-  CREATE TABLE IF NOT EXISTS users (
-    id       INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    email    TEXT UNIQUE NOT NULL,
-    pw_hash  TEXT NOT NULL,
-    balance  REAL NOT NULL DEFAULT 0,
-    wagered  REAL NOT NULL DEFAULT 0,
-    rake     REAL NOT NULL DEFAULT 0,
-    claimed  REAL NOT NULL DEFAULT 0,
-    is_admin INTEGER NOT NULL DEFAULT 0,
-    created  INTEGER NOT NULL
-  );
-  CREATE TABLE IF NOT EXISTS requests (
-    id      INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    kind    TEXT NOT NULL DEFAULT 'deposit',
-    amount  REAL NOT NULL,
-    status  TEXT NOT NULL DEFAULT 'pending',
-    created INTEGER NOT NULL,
-    FOREIGN KEY(user_id) REFERENCES users(id)
-  );
-  CREATE TABLE IF NOT EXISTS bets (
-    id      INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    game    TEXT NOT NULL,
-    stake   REAL NOT NULL,
-    mult    REAL NOT NULL,
-    payout  REAL NOT NULL,
-    created INTEGER NOT NULL,
-    FOREIGN KEY(user_id) REFERENCES users(id)
-  );
-`);
+await db.execute(`CREATE TABLE IF NOT EXISTS users (
+  id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE NOT NULL,
+  email    TEXT UNIQUE NOT NULL,
+  pw_hash  TEXT NOT NULL,
+  balance  REAL NOT NULL DEFAULT 0,
+  wagered  REAL NOT NULL DEFAULT 0,
+  rake     REAL NOT NULL DEFAULT 0,
+  claimed  REAL NOT NULL DEFAULT 0,
+  is_admin INTEGER NOT NULL DEFAULT 0,
+  created  INTEGER NOT NULL
+)`);
+await db.execute(`CREATE TABLE IF NOT EXISTS requests (
+  id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  kind    TEXT NOT NULL DEFAULT 'deposit',
+  amount  REAL NOT NULL,
+  status  TEXT NOT NULL DEFAULT 'pending',
+  created INTEGER NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES users(id)
+)`);
+await db.execute(`CREATE TABLE IF NOT EXISTS bets (
+  id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  game    TEXT NOT NULL,
+  stake   REAL NOT NULL,
+  mult    REAL NOT NULL,
+  payout  REAL NOT NULL,
+  created INTEGER NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES users(id)
+)`);
+console.log('DB: tables ready');
 
 /* helpers */
 const one  = r => r.rows[0] || null;
