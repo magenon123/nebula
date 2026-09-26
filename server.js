@@ -15,7 +15,7 @@ const PORT       = process.env.PORT || 3000;
 const SECRET     = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 const ADMIN_USER = (process.env.ADMIN_USER || 'magenon').toLowerCase();
 const START_BAL  = Number(process.env.START_BALANCE ?? 0);
-const TURSO_URL  = process.env.TURSO_URL;
+const TURSO_URL  = process.env.TURSO_URL  || 'libsql://nebula-magenon123.aws-us-east-2.turso.io';
 const TURSO_TOKEN= process.env.TURSO_TOKEN;
 
 if (!process.env.JWT_SECRET) {
