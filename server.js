@@ -98,10 +98,13 @@ app.use(express.json());
 const pubDir = fs.existsSync(path.join(__dirname,'public')) ? path.join(__dirname,'public') : __dirname;
 app.use(express.static(pubDir));
 const gameFile = (() => {
+  const PREFER = ['nebula-casino.html', 'index.html'];
   for (const d of [path.join(__dirname,'public'), __dirname]) {
     if (!fs.existsSync(d)) continue;
     const files = fs.readdirSync(d).filter(f => f.toLowerCase().endsWith('.html'));
-    if (files.length) return path.join(d, files.includes('index.html') ? 'index.html' : files[0]);
+    if (!files.length) continue;
+    const pick = PREFER.find(p => files.includes(p)) || files[0];
+    return path.join(d, pick);
   }
   return null;
 })();
