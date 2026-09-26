@@ -279,22 +279,20 @@ select{
 .kpay.on{color:var(--green)}
 
 /* ---------- flip ---------- */
-.fcoin-wrap{display:flex;align-items:center;justify-content:center}
+.fcoin-wrap{perspective:600px;display:flex;align-items:center;justify-content:center}
 .fcoin{width:170px;height:170px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  transition:background .15s}
+  transition:background .15s;transform-style:preserve-3d}
 .fcoin.h{background:var(--gold)}
 .fcoin.t{background:var(--purple)}
 .fcoin i{width:70px;height:70px;background:var(--panel2);border-radius:50%;display:block;transition:all .15s}
 .fcoin.t i{border-radius:8px;transform:rotate(45deg);width:62px;height:62px}
-.fcoin.spin{animation:fl .7s ease-in-out forwards}
+.fcoin.spin{animation:fl .62s cubic-bezier(.4,0,.2,1)}
 @keyframes fl{
-  0%  {transform:scaleX(1)    scaleY(1)}
-  20% {transform:scaleX(0.05) scaleY(1.05)}
-  40% {transform:scaleX(1)    scaleY(1)}
-  60% {transform:scaleX(0.05) scaleY(1.05)}
-  80% {transform:scaleX(1)    scaleY(1)}
-  90% {transform:scaleX(1.08) scaleY(.95)}
-  100%{transform:scaleX(1)    scaleY(1)}
+  0%  {transform:rotateY(0deg)   scaleY(1)}
+  20% {transform:rotateY(90deg)  scaleY(.9)}
+  50% {transform:rotateY(900deg) scaleY(.85)}
+  80% {transform:rotateY(1710deg) scaleY(.9)}
+  100%{transform:rotateY(1800deg) scaleY(1)}
 }
 .fhist{background:var(--bg);border-radius:var(--r);padding:12px;margin-top:26px;width:100%;max-width:620px}
 .fhist .t{font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:8px}
@@ -2139,7 +2137,7 @@ const _FLIP_CAP=8;
 const _PLINKO_CAP=26;
 const _CASES_CAP=7;
 const _MOLES_CAP=3;
-const _MINES_CAP=3.5;
+const _MINES_CAP=4;
 const _DICE_CAP=35;    // only enforced when target >= 35x
 
 /* ---- dynamic RTP: scales with how much the player is up ---- */
@@ -2540,11 +2538,11 @@ let crashIdle;
       flash('-'+fmt(bet),false);logBet('Mines',bet,0);
       return;
     }
-    // if next step would exceed cap, force a bomb on the tile they clicked (don't reveal board)
+    // if next step would exceed cap, force a bomb on the tile they clicked
     if(mult(found.size+1)>_MINES_CAP){
       live=false;
       b.textContent='💣';b.classList.add('bomb');
-      stop(false);
+      stop(true);
       flash('-'+fmt(bet),false);logBet('Mines',bet,0);
       return;
     }
@@ -2562,7 +2560,7 @@ let crashIdle;
         const _t=_sf[Math.floor(rnd()*_sf.length)];
         bombs.add(_t);
         const _b=$('m_grid').children[_t];
-        if(_b){live=false;_b.textContent='💣';_b.classList.add('bomb');stop(false);flash('-'+fmt(bet),false);logBet('Mines',bet,0);return;}
+        if(_b){live=false;_b.textContent='💣';_b.classList.add('bomb');stop(true);flash('-'+fmt(bet),false);logBet('Mines',bet,0);return;}
       }
     }
     const _mm=Math.min(m,_MINES_CAP);
