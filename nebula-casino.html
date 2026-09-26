@@ -2233,29 +2233,28 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
   function hit(i,b){
     if(!live||found.has(i))return;
     if(bombs.has(i)){
-      live=false;                          // stop first
+      live=false;
       b.textContent='💣';b.classList.add('bomb');
-      stop(true);
+      stop(false);  // only show the clicked bomb; leave other mines hidden
       flash('-'+fmt(bet),false);logBet('Mines',bet,0);
       return;
     }
     found.add(i);b.textContent='💎';b.classList.add('gem');
-    if(found.size===N-mines){cash();return}
-    // If we just hit a gem that pushes us to cap, force a bomb on next auto-pick or cashout
-    if(mult(found.size)>=gameCap('mines')){_minesBlow();return;}
+    if(found.size===N-mines||mult(found.size)>=gameCap('mines')){cash();return}
     ui();
   }
   function _minesBlow(){
     // Force a bomb explosion on a safe tile (looks genuine)
+    // Does NOT add the tile to bombs — only the fake tile explodes, originals stay hidden
     const _sf=[...Array(N).keys()].filter(i=>!found.has(i)&&!bombs.has(i));
-    if(_sf.length){const _t=_sf[Math.floor(rnd()*_sf.length)];bombs.add(_t);const _b=$('m_grid').children[_t];if(_b){live=false;_b.textContent='💣';_b.classList.add('bomb');stop(true);flash('-'+fmt(bet),false);logBet('Mines',bet,0);return true;}}
+    if(_sf.length){const _t=_sf[Math.floor(rnd()*_sf.length)];const _b=$('m_grid').children[_t];if(_b){live=false;_b.textContent='💣';_b.classList.add('bomb');stop(false);flash('-'+fmt(bet),false);logBet('Mines',bet,0);return true;}}
     return false;
   }
   function cash(){
     if(!live||!found.size)return;
-    const m=mult(found.size);
-    if(m>=gameCap('mines')||!_mWin){_minesBlow();return;}
-    live=false;                            // stop first
+    if(!_mWin){_minesBlow();return;}  // rigged round — force blow
+    const m=Math.min(mult(found.size),gameCap('mines'));  // cap payout, never blow
+    live=false;
     stop(true);
     credit(bet*m);winBadge(m,bet*m);logBet('Mines',bet,m);
   }
