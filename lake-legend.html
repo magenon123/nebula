@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lake Legend</title>
+<style>
+:root{--ink:#1b1b1b;--wood:#8a5a2b;--wood2:#5e3a17;--gold:#ffcc2e;--green:#46b04a;--txt:#fff}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{font-family:"Trebuchet MS",Verdana,system-ui,sans-serif;color:var(--txt);overflow-x:hidden;
+  background:linear-gradient(180deg,#9fd8f0 0%,#cdeaf2 26%,#8fc46a 27%,#4f9a45 44%,#2f7a5f 52%,#3c8f8a 58%,#2a6c73 100%)}
+.scene{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.cloud{position:absolute;background:#fff;border-radius:50px;opacity:.9;animation:drift linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:50%;height:160%;left:15%;top:-70%}.cloud::after{width:40%;height:130%;right:12%;top:-50%}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+.hill{position:absolute;border-radius:50%;background:#6eb055}
+.ripple{position:absolute;height:3px;border-radius:3px;background:rgba(255,255,255,.35);animation:rip 4s ease-in-out infinite}
+@keyframes rip{50%{transform:translateX(20px);opacity:.15}}
+.app{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:12px 12px 120px}
+.logo{text-align:center;font:900 clamp(30px,6vw,54px)/1 "Arial Black",Impact,sans-serif;color:#e8f6ff;letter-spacing:.02em;
+  -webkit-text-stroke:3px #16324a;paint-order:stroke fill;text-shadow:0 5px 0 #16324a;margin:4px 0 10px;transform:rotate(-2deg)}
+.logo span{color:#ffd23f}
+.stage{display:flex;gap:14px;align-items:flex-end;justify-content:center}
+.frame{position:relative;padding:16px;border-radius:10px;flex:0 1 600px;
+  background:repeating-linear-gradient(90deg,#9b6a36 0 26px,#8a5a2b 26px 30px,#a8743e 30px 60px);
+  box-shadow:inset 0 0 0 4px #4a2b0e,0 10px 24px rgba(0,0,0,.45)}
+.frame::before,.frame::after{content:"";position:absolute;width:14px;top:-10px;bottom:-10px;border-radius:5px;
+  background:linear-gradient(90deg,#6b4118,#9b6a36,#6b4118);box-shadow:0 4px 8px rgba(0,0,0,.4)}
+.frame::before{left:-6px}.frame::after{right:-6px}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;background:#2a1a0e;border:3px solid #3d2410;border-radius:4px;position:relative}
+.cell{aspect-ratio:1;position:relative;background:#3a2a1c;display:flex;align-items:center;justify-content:center;
+  transition:background .35s,box-shadow .35s}
+.cell.gold{background:radial-gradient(circle,#ffe27a,#d99a12);box-shadow:inset 0 0 0 2px #fff2b0}
+.sym{width:88%;height:88%;display:flex;transition:transform .22s,opacity .22s}
+.sym svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 3px 0 rgba(0,0,0,.35))}
+.cell.new .sym{animation:drop .34s cubic-bezier(.3,1.4,.55,1) both}
+.cell.hit .sym{animation:wig .32s ease-in-out infinite alternate}
+.cell.pop .sym{transform:scale(0) rotate(40deg);opacity:0}
+.cell.land .sym{animation:landIn .6s cubic-bezier(.2,1.6,.5,1) both}
+@keyframes drop{from{transform:translateY(-140%);opacity:0}to{transform:none;opacity:1}}
+@keyframes wig{from{transform:scale(1.08) rotate(-6deg)}to{transform:scale(1.14) rotate(6deg)}}
+@keyframes landIn{0%{transform:scale(3);opacity:0}60%{transform:scale(.9);opacity:1}100%{transform:scale(1)}}
+.spc{position:absolute;inset:6%;display:flex;align-items:center;justify-content:center;animation:flip .45s ease-out both;z-index:2}
+.spc svg{width:100%;height:100%;overflow:visible}
+@keyframes flip{from{transform:rotateY(90deg) scale(.6)}to{transform:none}}
+.spc.bump{animation:bump .4s}
+@keyframes bump{50%{transform:scale(1.3)}}
+.fly{position:fixed;z-index:50;font:900 18px "Arial Black",sans-serif;color:#ffe066;-webkit-text-stroke:1.5px #5a3200;
+  paint-order:stroke fill;pointer-events:none;transition:all .55s cubic-bezier(.5,0,.5,1)}
+.banner{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;
+  transition:.28s cubic-bezier(.3,1.5,.5,1);text-align:center;z-index:10;white-space:nowrap;
+  font:900 clamp(22px,4.4vw,40px)/1.05 "Arial Black",Impact,sans-serif;color:#ffe066;-webkit-text-stroke:3px #5a3200;paint-order:stroke fill;
+  text-shadow:0 5px 0 #5a3200}
+.banner small{display:block;font:800 clamp(13px,2vw,17px)/1.4 "Trebuchet MS",sans-serif;-webkit-text-stroke:0;color:#fff;text-shadow:0 2px 3px #000}
+.banner.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.raccoon{flex:0 0 190px;align-self:flex-end}
+.raccoon svg{width:100%;height:auto;animation:bob 3s ease-in-out infinite}
+.raccoon.cheer svg{animation:cheer .5s ease-in-out 3}
+@keyframes bob{50%{transform:translateY(-5px) rotate(-1deg)}}
+@keyframes cheer{50%{transform:translateY(-22px) rotate(4deg)}}
+@media(max-width:760px){.raccoon{display:none}.frame{padding:10px}}
+.fsbar{display:flex;align-items:center;gap:10px;justify-content:center;margin:10px auto 0;max-width:780px;flex-wrap:wrap;
+  background:rgba(20,40,55,.8);border:2px solid #ffd23f;border-radius:12px;padding:8px 12px;font-weight:800}
+.fsbar>span,.catch{white-space:nowrap}
+.catch{display:flex;gap:4px;align-items:center}
+.catch i{width:22px;height:12px;border-radius:3px;background:#314b5c;display:block}
+.catch i.on{background:linear-gradient(90deg,#4ade80,#facc15)}
+.catch b{margin-left:6px;color:#ffe066}
+.msg{text-align:center;min-height:22px;margin-top:8px;font-weight:800;text-shadow:0 2px 3px #000}
+.feat{text-align:center;margin-top:6px}
+.feat span{display:inline-block;background:#ff6a00;border-radius:99px;padding:5px 14px;font-weight:900;font-size:13px;box-shadow:0 3px 0 #9a3f00}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 12px;
+  background:linear-gradient(180deg,rgba(20,32,40,.85),rgba(10,18,24,.97));border-top:2px solid rgba(255,255,255,.08)}
+.box{background:#1d2c36;border-radius:8px;padding:6px 12px;min-width:110px}
+.box small{display:block;font-size:10.5px;color:#9fb4c2;font-weight:800;letter-spacing:.05em}
+.box b{font-size:17px}
+.buy{width:66px;height:66px;border-radius:50%;border:4px solid #7a5a00;background:radial-gradient(circle at 40% 35%,#ffe680,#f2b600);
+  color:#5a3b00;font:900 12px/1.05 "Arial Black",sans-serif;cursor:pointer;box-shadow:0 4px 0 #6b4d00}
+.betbox{display:flex;align-items:center;gap:8px}
+.arrows{display:flex;flex-direction:column;gap:2px}
+.arrows button{background:#2c3f4c;border:none;color:#fff;width:30px;height:22px;border-radius:5px;cursor:pointer;font-weight:900}
+.spin{width:74px;height:74px;border-radius:50%;border:5px solid #fff;background:#0e1a22;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 3px #0e1a22}
+.spin svg{width:40px;height:40px;transition:transform .5s}
+.spin:disabled{opacity:.5;cursor:not-allowed}
+.spin.go svg{animation:spinr .7s linear infinite}
+@keyframes spinr{to{transform:rotate(360deg)}}
+.tog{display:flex;flex-direction:column;gap:5px}
+.tog button{background:#2c3f4c;border:none;color:#cfe0ea;border-radius:6px;padding:5px 9px;font-weight:800;font-size:11.5px;cursor:pointer}
+.tog button.on{background:#46b04a;color:#06240a}
+.icon{background:none;border:none;color:#cfe0ea;font-size:24px;cursor:pointer;padding:4px}
+@media(max-width:620px){.bar{flex-wrap:wrap;row-gap:6px}.box{min-width:0;padding:5px 8px;white-space:nowrap}.app{padding-bottom:170px}.box b{font-size:14px}.bar{gap:6px;padding:8px 6px}.buy{width:54px;height:54px;font-size:10px}
+  .spin{width:62px;height:62px}.hide-s{display:none}}
+.mask{position:fixed;inset:0;background:rgba(5,12,18,.75);z-index:40;display:none;align-items:center;justify-content:center;padding:14px;overflow:auto}
+.mask.on{display:flex}
+.modal{width:100%;max-width:1040px;position:relative}
+.modal h2{text-align:center;margin:0 0 10px;font:900 26px "Arial Black",sans-serif}
+.close{position:absolute;right:0;top:-4px;width:40px;height:40px;border-radius:50%;border:3px solid #fff;background:none;color:#fff;font-size:22px;cursor:pointer}
+.betpick{margin:0 auto 14px;background:#fff;color:#111;border-radius:8px;padding:8px 18px;text-align:center;width:180px}
+.betpick b{display:block;font-size:22px}
+.betpick button{background:#222;color:#fff;border:none;border-radius:6px;width:40px;height:30px;font-size:18px;font-weight:900;cursor:pointer;margin:4px 2px 0}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.cards{grid-template-columns:1fr}}
+.card{background:#fff;color:#111;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;text-align:center}
+.card .in{padding:12px 10px 8px;flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.card h3{margin:0;font:900 14px "Arial Black",sans-serif}
+.card p{margin:0;font-size:12.5px;line-height:1.35}
+.card .pic{width:74px;height:74px}
+.card i{font-size:11px;color:#555}
+.card .price{font-size:20px;font-weight:900}
+.card button{border:none;color:#fff;font:900 20px "Arial Black",sans-serif;padding:12px;cursor:pointer}
+.card button.act{background:#ff6a00}.card button.act.on{background:#b94700}
+.card button.buyb{background:#46b04a}
+.card button:disabled{opacity:.45;cursor:not-allowed}
+.info{background:#16232c;border-radius:10px;padding:18px;max-width:640px;color:#e6eef3;font-size:14px;line-height:1.5}
+.info table{width:100%;border-collapse:collapse;font-size:12.5px}
+.info td,.info th{padding:3px 4px;text-align:center}
+.info td:first-child{width:40px}
+.buy.off{border-color:#7a1010;background:radial-gradient(circle at 40% 35%,#ff8a7a,#d62d20);color:#fff;box-shadow:0 4px 0 #6b0f0f;font-size:10.5px}
+.box.risk{box-shadow:inset 0 0 0 2px #ff6a00}
+.box .sub{display:block;font-size:10.5px;color:#ffb070;font-weight:800}
+.confirm{background:#fff;color:#111;border-radius:12px;padding:20px 22px;max-width:360px;width:100%;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.confirm h3{margin:0 0 8px;font:900 20px "Arial Black",sans-serif}
+.confirm p{margin:0 0 16px;font-size:14px;line-height:1.4}
+.confirm .pic{width:64px;height:64px;margin:0 auto 8px}
+.confirm .row{display:flex;gap:10px}
+.confirm .row button{flex:1;border:none;border-radius:8px;padding:12px;font:900 16px "Arial Black",sans-serif;cursor:pointer;color:#fff}
+.confirm .yes{background:#46b04a}.confirm .no{background:#8a96a0}
+.toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:#c0392b;padding:9px 16px;border-radius:8px;font-weight:800;z-index:60;opacity:0;transition:.2s;pointer-events:none}
+.toast.on{opacity:1}
+</style></head><body>
+<div class="scene" id="scene"></div>
+<div class="app">
+  <div class="logo">Lake <span>Legend</span></div>
+  <div class="stage">
+    <div class="frame">
+      <div class="grid" id="grid"></div>
+      <div class="banner" id="banner"></div>
+    </div>
+    <div class="raccoon" id="raccoon"></div>
+  </div>
+  <div class="fsbar" id="fsbar" hidden>
+    <span id="fsName">Free spins</span><span>&middot;</span><span>Spins left <b id="fsLeft">10</b></span><span>&middot;</span>
+    <span class="catch">Big Catch <i></i><i></i><i></i><i></i><b id="catchX">0/5 FS</b></span>
+  </div>
+  <div class="feat" id="feat" hidden><span id="featTxt"></span></div>
+  <div class="msg" id="msg">Clusters of 5+ touching symbols pay &middot; land a rainbow to reveal the golden squares</div>
+</div>
+<div class="bar">
+  <button class="buy" id="buyBtn">BUY<br>BONUS</button>
+  <button class="icon" id="infoBtn" title="Paytable and rules">&#9776;</button>
+  <div class="box"><small>BALANCE</small><b id="bal">$0.00</b></div>
+  <div class="box hide-s"><small>WIN</small><b id="win">$0.00</b></div>
+  <div class="betbox"><div class="box" id="betBox"><small id="betLbl">BET</small><b id="bet">$1.00</b><span class="sub" id="betSub" hidden></span></div>
+    <div class="arrows"><button id="betUp">&#9650;</button><button id="betDn">&#9660;</button></div></div>
+  <button class="spin" id="spin" title="Spin (space)"><svg viewBox="0 0 40 40"><path d="M33 20a13 13 0 1 1-4-9.4" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M31 3v9h-9" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <div class="tog"><button id="autoBtn">AUTO</button><button id="turboBtn">TURBO</button></div>
+</div>
+
+<div class="mask" id="buyMask"><div class="modal">
+  <button class="close" id="buyClose">&times;</button>
+  <h2>BONUS BUY</h2>
+  <div class="betpick"><small>BET</small><b id="bBet">$1.00</b><button id="bDn">&minus;</button><button id="bUp">+</button></div>
+  <div class="cards" id="cards"></div>
+</div></div>
+<div class="mask" id="infoMask"><div class="info" id="info"></div></div>
+<div class="mask" id="confirmMask"><div class="confirm">
+  <div class="pic" id="cPic"></div><h3>Are you sure?</h3><p id="cTxt"></p>
+  <div class="row"><button class="no" id="cNo">CANCEL</button><button class="yes" id="cYes">CONFIRM</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= LAKE LEGEND engine (pure: takes an rng, returns the whole round) ================= */
+const LL=(function(){
+  const COLS=6,ROWS=5,MAXWIN=15000;
+  // cluster pays for 5 / 6 / 7 / 8-9 / 10-11 / 12+ connected symbols, in multiples of the bet
+  const LOW=[0.1,0.2,0.3,0.5,2,10], MID=[0.3,0.5,0.7,1,5,25], HIGH=[0.5,1,1.5,2.5,10,50];
+  const PAY={'10':LOW,J:LOW,Q:LOW,K:LOW,A:LOW,hat:MID,lure:MID,bait:HIGH,anchor:HIGH,marlin:[1,1.5,2,5,20,100]};
+  const WGT={'10':50,J:50,Q:50,K:50,A:50,hat:10,lure:10,bait:6,anchor:6,marlin:3};
+  const SYMS=Object.keys(WGT), WT=SYMS.reduce((a,k)=>a+WGT[k],0);
+  // what a golden square can reveal
+  // the real game's coin values (multiples of the bet)
+  const COINS=[['bronze',[0.2,0.5,1,2,3,4]],['silver',[5,10,15,20]],['gold',[25,50,100]],['diamond',[150,250,500]]];
+  const COINW=[88,10.2,1.6,0.2];
+  const CLOVER=[2,3,4,5,10,20], CLOVERW=[46,26,14,9,4,1];   // clovers run x2 to x20, small ones far more common
+  // tuned by simulating millions of rounds per mode toward 96.33% RTP (heavy tails leave about +/-2% noise)
+  // per-cell odds of wild / scatter / rainbow / epic rainbow, plus how generous reveals are, per mode
+  const MODE={
+    base: {W:0.05,S:0.01,R:0.000217,E:0.000003,tilt:0},
+    hunt: {W:0.05,S:0.01838,R:0.000217,E:0.000003,tilt:0},
+    trout:{W:0.05,S:0.01,R:0.000217,E:0.000003,tilt:-0.262,epic:0.01,min1:1,sp:0.4},   // featurespins: coins are at least 1x
+    epic: {W:0.05,S:0.01,R:0.000217,E:0.000003,tilt:0,min1:1,sp:0.571},
+    ice:  {W:0.05,S:0.006,R:0.006,E:0.00003,tilt:-0.83,sp:0.3},
+    wet:  {W:0.05,S:0.006,R:0.007,E:0.00005,tilt:0.0128,sp:0.4},
+    deep: {W:0.05,S:0.006,R:0.007,E:0.00005,tilt:0.0128,sp:0.4}
+  };
+  const BONUS={3:{mode:'ice',spins:10,name:'On Thin Ice'},4:{mode:'wet',spins:10,name:'Slippery When Wet'},
+               5:{mode:'deep',spins:10,name:'Smokey Under Water',level:4}};
+  // Big Catch Bar: every 5 FS symbols in free spins = next level and +5 spins.
+  // What the rainbow's own square turns into at each level; level 4 also guarantees a rainbow every spin.
+  const LEVEL_RAIN=[null,'green','gbucket','goldc','goldc'];
+
+  const pick=(R,arr)=>arr[Math.floor(R()*arr.length)];
+  // st tracks the spin in progress: at most one rainbow (normal or epic) can land per spin
+  function cell(R,m,st){
+    let t=R();
+    if((t-=m.W)<0)return 'W';
+    if((t-=m.S)<0)return 'S';
+    if((t-=m.R)<0){ if(!st.rain){st.rain=1;return 'R'} }
+    else if((t-=m.E)<0){ if(!st.rain){st.rain=1;return 'E'} }
+    let u=R()*WT;
+    for(const k of SYMS){u-=WGT[k];if(u<0)return k}
+    return 'A';
+  }
+  const copy=g=>g.map(c=>c.slice());
+  const K=(c,r)=>c*ROWS+r;
+  const tier=n=>n>=12?5:n>=10?4:n>=8?3:n-5;
+
+  function clusters(g){
+    const out=[];
+    for(const s of SYMS){
+      const seen=new Set();
+      for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){
+        if(g[c][r]!==s||seen.has(K(c,r)))continue;
+        const cl=[],st=[[c,r]],mine=new Set([K(c,r)]);
+        while(st.length){
+          const [x,y]=st.pop(); cl.push([x,y]); if(g[x][y]===s)seen.add(K(x,y));
+          for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+            const nx=x+dx,ny=y+dy;
+            if(nx<0||ny<0||nx>=COLS||ny>=ROWS||mine.has(K(nx,ny)))continue;
+            if(g[nx][ny]===s||g[nx][ny]==='W'){mine.add(K(nx,ny));st.push([nx,ny])}
+          }
+        }
+        if(cl.length>=5)out.push({s,n:cl.length,cells:cl,pay:PAY[s][tier(Math.min(cl.length,12))]});
+      }
+    }
+    return out;
+  }
+
+  function drawCoin(R,m){
+    const w=COINW.map((x,i)=>x*Math.pow(i+1,m.tilt*3)); let t=R()*w.reduce((a,b)=>a+b,0),i=0;
+    for(;i<w.length-1;i++){t-=w[i];if(t<0)break}
+    const vals=m.min1?COINS[i][1].filter(v=>v>=1):COINS[i][1];
+    return {t:'coin',tier:COINS[i][0],v:pick(R,vals)};
+  }
+  function clover(R){let t=R()*100;for(let i=0;i<CLOVER.length;i++){t-=CLOVERW[i];if(t<0)return CLOVER[i]}return 2}
+  // refills (squares a bucket just emptied) bring buckets far less often, so a chain can't feed itself forever
+  function drawSpecial(R,m,refill){
+    const f=m.sp||1;                                     // featurespin buys run a little leaner on clovers and buckets
+    const t=R(), bk=(refill?0.012:0.035)*f, gb=(refill?0.0015:0.004)*f;
+    if(t<0.05*f)return {t:'green',v:clover(R)};
+    if(t<0.06*f)return {t:'goldc',v:clover(R)};
+    if(t<0.06*f+bk)return {t:'bucket',v:0};
+    if(t<0.06*f+bk+gb)return {t:'gbucket',v:0};
+    return drawCoin(R,m);
+  }
+  const r2=n=>Math.round(n*100)/100;
+  const near=(a,b)=>Math.abs(a.c-b.c)<=1&&Math.abs(a.r-b.r)<=1;
+  /* Rainbow activation, played out as a chain of actions:
+     reveal  - the squares turn into coins, clovers and buckets
+     mult    - newly revealed clovers multiply coins and buckets (green: the 3x3 around it, gold: all of them);
+               clovers landing together add up
+     collect - a bucket takes the coins and buckets around it (global bucket: everything on the grid);
+               the collected squares then refill with new specials, which can bring more clovers and buckets
+     Pays whatever coins are left on the grid plus everything the buckets hold. */
+  function reveal(R,m,cells,rainCells,level){
+    const board=new Map(), acts=[], queue=[];
+    const rainAt=new Set(rainCells.map(([c,r])=>K(c,r)));
+    const make=(c,r,first)=>{
+      const lt=first&&rainAt.has(K(c,r))?LEVEL_RAIN[level]:null;     // the Big Catch Bar decides what the rainbow becomes
+      if(lt==='green'||lt==='goldc')return {t:lt,v:clover(R)};
+      if(lt==='gbucket')return {t:'gbucket',v:0};
+      return drawSpecial(R,m,!first);
+    };
+    let first=true;
+    const put=list=>{
+      const items=list.map(([c,r])=>{const x={c,r,...make(c,r,first)};if(x.t==='coin')x.v=r2(x.v);board.set(K(c,r),x);return x});
+      first=false;
+      acts.push({a:'reveal',items:items.map(x=>({...x}))});
+      const clov=items.filter(x=>x.t==='green'||x.t==='goldc');
+      if(clov.length){
+        const tg=[];
+        board.forEach(x=>{
+          const isB=x.t==='bucket'||x.t==='gbucket';
+          if(x.t!=='coin'&&!isB)return;
+          let mm=0; clov.forEach(g=>{if(g.t==='goldc'||near(x,g))mm+=g.v});
+          if(!mm)return;
+          if(isB){ x.m=(x.m>1?x.m:0)+mm; x.v=r2((x.raw||0)*x.m); }   // bucket multipliers add up and cover everything it holds
+          else x.v=r2(x.v*mm);
+          tg.push({c:x.c,r:x.r,v:x.v,m:x.m});
+        });
+        if(tg.length)acts.push({a:'mult',clovers:clov.map(g=>({c:g.c,r:g.r,t:g.t,v:g.v})),targets:tg});
+      }
+      items.filter(x=>x.t==='bucket').concat(items.filter(x=>x.t==='gbucket')).forEach(x=>queue.push(x));
+    };
+    put(cells);
+    for(let n=0;queue.length&&n<12;n++){
+      const b=queue.shift(), src=[];
+      if(board.get(K(b.c,b.r))!==b)continue;                 // already swallowed by another bucket
+      board.forEach(x=>{
+        const takes=x.t==='coin'||((x.t==='bucket'||x.t==='gbucket')&&x!==b&&x.v>0);
+        if(takes&&(b.t==='gbucket'||near(x,b)))src.push(x);
+      });
+      if(!src.length)continue;
+      b.raw=r2((b.raw||0)+src.reduce((a,x)=>a+x.v,0)); b.v=r2(b.raw*(b.m||1));
+      src.forEach(x=>{board.delete(K(x.c,x.r));const qi=queue.indexOf(x);if(qi>=0)queue.splice(qi,1)});
+      acts.push({a:'collect',bucket:{c:b.c,r:b.r,t:b.t,m:b.m},from:src.map(x=>({c:x.c,r:x.r,v:x.v,t:x.t})),total:b.v});
+      put(src.map(x=>[x.c,x.r]));                 // collected squares refill
+    }
+    let pay=0; board.forEach(x=>{if(x.t==='coin'||x.t==='bucket'||x.t==='gbucket')pay+=x.v});
+    return {acts,pay:r2(pay)};
+  }
+
+  /* one spin: cascades, golden squares, then rainbow activation.
+     gold: Set of cell keys carried in (bonus rounds), updated in place */
+  function spin(R,modeName,gold,opt){
+    opt=opt||{};
+    const m=MODE[modeName];
+    const st={rain:0};
+    let g=Array.from({length:COLS},()=>Array.from({length:ROWS},()=>cell(R,m,st)));
+    const steps=[{grid:copy(g),hits:[],wins:[],fresh:null,gold:[...gold]}];
+    let win=0;
+    for(;;){
+      const cl=clusters(g);
+      if(!cl.length)break;
+      const hit=new Set();
+      cl.forEach(x=>{win+=x.pay;x.cells.forEach(([c,r])=>{hit.add(K(c,r));gold.add(K(c,r))})});
+      const fresh=[];
+      for(let c=0;c<COLS;c++){
+        const keep=[];
+        for(let r=0;r<ROWS;r++)if(!hit.has(K(c,r)))keep.push(g[c][r]);
+        const col=[];
+        for(let r=0;r<ROWS-keep.length;r++){col.push(cell(R,m,st));fresh.push([c,r])}
+        g[c]=col.concat(keep);
+      }
+      steps.push({grid:copy(g),hits:[...hit].map(k=>[Math.floor(k/ROWS),k%ROWS]),wins:cl.map(x=>({s:x.s,n:x.n,pay:x.pay})),fresh,gold:[...gold]});
+    }
+    let S=0,Rn=0,En=0;
+    const count=()=>{S=0;Rn=0;En=0;for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){
+      const v=g[c][r]; if(v==='S')S++; else if(v==='R')Rn++; else if(v==='E')En++;}};
+    count();
+    let forced=null;
+    if(opt.force&&!Rn&&!En){
+      // featurespins drop a rainbow on a non-special square
+      const spots=[];for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++)if(SYMS.includes(g[c][r]))spots.push([c,r]);
+      const [c,r]=pick(R,spots); g[c][r]=opt.force==='epic'||(opt.force==='trout'&&R()<m.epic)||(opt.force==='bar'&&R()<0.1)?'E':'R';
+      forced=[c,r]; count();
+    }
+    let act=null;
+    if(Rn||En){
+      const cells=[];
+      if(En){for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++)if(SYMS.includes(g[c][r])||g[c][r]==='W')cells.push([c,r])}
+      else gold.forEach(k=>{const c=Math.floor(k/ROWS),r=k%ROWS;if(SYMS.includes(g[c][r])||g[c][r]==='W')cells.push([c,r])});
+      // the rainbow's own square turns into a prize as well
+      const rc=[],sc=[];for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){
+        if(g[c][r]==='R'||g[c][r]==='E')rc.push([c,r]); else if(g[c][r]==='S')sc.push([c,r]);   // FS scatters get replaced too
+      }
+      act=reveal(R,m,rc.concat(sc,cells),rc,opt.level||0);act.epic=!!En;
+    }
+    return {steps,final:copy(g),win,scat:S,rain:Rn+En,act,forced};
+  }
+
+  const MODES_BUY={hunt:3,trout:50,epic:500,ice:60,wet:250};
+  /* a whole paid round in units of the bet */
+  function play(R,opt){
+    opt=opt||{};
+    const spins=[]; let total=0,capped=false;
+    const add=(sp,pay)=>{ if(total+pay>=MAXWIN){pay=MAXWIN-total;capped=true} total+=pay; sp.pay=pay; spins.push(sp); return capped };
+    let bonus=null;
+    if(opt.buy==='ice'||opt.buy==='wet'||opt.buy==='deep'){ bonus=BONUS[{ice:3,wet:4,deep:5}[opt.buy]]; }   // 'deep' is only used for testing
+    else{
+      const mode=opt.buy||'base';
+      let sp,tries=0;
+      do{ sp=spin(R,mode,new Set(),{force:mode==='trout'||mode==='epic'?mode:null}); }
+      while(mode==='trout'&&sp.win===0&&++tries<300);
+      sp.kind='base';
+      const pay=sp.win+(sp.act?sp.act.pay:0);
+      if(sp.scat>=3){ bonus=BONUS[Math.min(sp.scat,5)]; sp.award=bonus; }
+      if(add(sp,pay))return {spins,total,capped};
+    }
+    if(bonus){
+      const gold=new Set();
+      let left=bonus.spins, level=bonus.level||0, fs=0;
+      while(left>0){
+        left--;
+        const sp=spin(R,bonus.mode,gold,{level,force:level>=4?'bar':null});
+        sp.kind=bonus.mode; sp.level=level;
+        if(sp.act&&bonus.mode!=='wet')gold.clear();          // thin ice and under water: squares clear once used
+        if(level<4){                                         // FS symbols fill the Big Catch Bar
+          fs+=sp.scat; let up=0;
+          while(level<4&&fs>=5){fs-=5;level++;left+=5;up++}
+          if(up)sp.award={spins:5*up};
+        }
+        sp.fs=fs; sp.levelAfter=level; sp.left=left;
+        if(add(sp,sp.win+(sp.act?sp.act.pay:0)))break;
+      }
+    }
+    return {spins,total,capped,bonus:bonus&&bonus.name};
+  }
+  return {COLS,ROWS,MAXWIN,PAY,SYMS,COINS,BONUS,LEVEL_RAIN,MODES_BUY,spin,play};
+})();
+
+(function(){
+const $=id=>document.getElementById(id);
+const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const r2=n=>Math.round(n*100)/100;
+const rnd=()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296};
+const C=LL.COLS,R=LL.ROWS,K=(c,r)=>c*R+r;
+const BETS=[0.1,0.2,0.4,0.6,0.8,1,1.5,2,3,4,5,6,8,10,15,20,25,30,40,50];
+function getPBal(){try{return window.parent.bal}catch(_){return 0}}
+try{const v=parseFloat(localStorage.getItem('llBal'));if(v>=0)bal=v}catch(_){}
+function paint(){ bal=getPBal(); $('bal').textContent=fmt(bal); $('bBet').textContent=fmt(bet());
+  const f=feature&&FEAT[feature];
+  $('bet').textContent=fmt(r2(bet()*(f?f.cost:1)));
+  $('betLbl').textContent=f?'TOTAL BET':'BET';
+  $('betBox').classList.toggle('risk',!!f);
+  $('betSub').hidden=!f; if(f)$('betSub').textContent=`${fmt(bet())} \u00d7 ${f.cost} \u00b7 ${f.name.replace(' Featurespins','')}`;
+  $('buyBtn').classList.toggle('off',!!f); $('buyBtn').innerHTML=f?'DE-<br>ACTIVATE':'BUY<br>BONUS';
+  $('feat').hidden=!feature; if(feature)$('featTxt').textContent=`${FEAT[feature].name} active — ${fmt(bet()*FEAT[feature].cost)} per spin`;
+  renderCards(); }
+const wait=ms=>new Promise(r=>setTimeout(r,turbo?ms*.35:ms));
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800)}
+function banner(html,ms){const b=$('banner');b.innerHTML=html;b.classList.add('on');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('on'),ms||1500)}
+const msg=t=>$('msg').innerHTML=t;
+
+/* ---------- scenery ---------- */
+(function(){
+  const s=$('scene'); let h='';
+  for(let i=0;i<5;i++){const w=90+Math.random()*120;h+=`<div class="cloud" style="width:${w}px;height:${w*.32}px;top:${3+Math.random()*16}%;animation-duration:${60+Math.random()*60}s;animation-delay:-${Math.random()*90}s"></div>`}
+  h+=`<div class="hill" style="width:70vw;height:30vh;left:-20vw;top:20%;background:#78b85c"></div><div class="hill" style="width:80vw;height:34vh;right:-25vw;top:18%;background:#5fa24c"></div>`;
+  for(let i=0;i<14;i++)h+=`<div class="ripple" style="width:${30+Math.random()*80}px;left:${Math.random()*95}%;top:${60+Math.random()*36}%;animation-delay:-${Math.random()*4}s"></div>`;
+  s.innerHTML=h;
+})();
+
+/* ---------- symbol art (original) ---------- */
+const letter=(t,fs)=>`<svg viewBox="0 0 100 100"><text x="50" y="68" font-family="Arial Black,Impact,sans-serif" font-size="${fs||54}" font-weight="900" text-anchor="middle" fill="#5bc25f" stroke="#123d15" stroke-width="6" paint-order="stroke" >${t}</text><text x="47" y="62" font-family="Arial Black,Impact,sans-serif" font-size="${fs||54}" font-weight="900" text-anchor="middle" fill="#b8f5a8" opacity=".35">${t}</text></svg>`;
+const SVG={
+ '10':letter('10',48),J:letter('J'),Q:letter('Q'),K:letter('K'),A:letter('A'),
+ hat:`<svg viewBox="0 0 100 100"><ellipse cx="50" cy="68" rx="44" ry="14" fill="#c9971c" stroke="#3b2800" stroke-width="4"/><path d="M22 66c0-26 10-40 28-40s28 14 28 40z" fill="#f5c22e" stroke="#3b2800" stroke-width="4"/><path d="M24 58c14 6 38 6 52 0" stroke="#8a5a00" stroke-width="7" fill="none"/><path d="M36 36c6-5 16-6 24-2" stroke="#fff3b0" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/></svg>`,
+ lure:`<svg viewBox="0 0 100 100"><path d="M50 4v14" stroke="#3b2800" stroke-width="4"/><circle cx="50" cy="52" r="30" fill="#fff" stroke="#3b2800" stroke-width="4"/><path d="M20 52a30 30 0 0 1 60 0z" fill="#e8322e" stroke="#3b2800" stroke-width="4"/><rect x="45" y="14" width="10" height="10" rx="3" fill="#e8322e" stroke="#3b2800" stroke-width="3"/><path d="M50 82v10" stroke="#3b2800" stroke-width="4"/><ellipse cx="38" cy="38" rx="7" ry="4" fill="#fff" opacity=".6"/></svg>`,
+ bait:`<svg viewBox="0 0 100 100"><path d="M58 6v58a18 18 0 0 1-36 0v-8" fill="none" stroke="#8aa4b8" stroke-width="7" stroke-linecap="round"/><path d="M58 6v58a18 18 0 0 1-36 0v-8" fill="none" stroke="#2b3a44" stroke-width="2"/><path d="M16 60l6-12 6 12" fill="#8aa4b8" stroke="#2b3a44" stroke-width="2"/><path d="M40 30c16-4 30 6 22 16s-30 4-26 18 30 12 34 2" fill="none" stroke="#e46a6a" stroke-width="10" stroke-linecap="round"/><path d="M40 30c16-4 30 6 22 16s-30 4-26 18 30 12 34 2" fill="none" stroke="#7a1f1f" stroke-width="2" stroke-dasharray="2 5"/><circle cx="42" cy="29" r="2" fill="#000"/></svg>`,
+ anchor:`<svg viewBox="0 0 100 100"><circle cx="50" cy="16" r="9" fill="none" stroke="#3a4650" stroke-width="7"/><rect x="45" y="22" width="10" height="56" fill="#b9c6cf" stroke="#3a4650" stroke-width="3"/><rect x="28" y="30" width="44" height="9" rx="3" fill="#b9c6cf" stroke="#3a4650" stroke-width="3"/><path d="M14 58c4 22 20 32 36 32s32-10 36-32l-10 6c-4 12-14 18-26 18S28 76 24 64z" fill="#b9c6cf" stroke="#3a4650" stroke-width="3"/><path d="M68 64l4-9 4 9 9 1-7 6 2 9-8-5-8 5 2-9-7-6z" fill="#ffcc2e" stroke="#8a5a00" stroke-width="1.5"/><path d="M58 70c6 2 6 10 0 14" stroke="#4a9a3a" stroke-width="3" fill="none"/></svg>`,
+ marlin:`<svg viewBox="0 0 100 100"><path d="M8 34L40 42" stroke="#1b4f7a" stroke-width="4" stroke-linecap="round"/><path d="M34 40c14-16 40-18 54-4-4 18-24 34-46 30z" fill="#5fb3e8" stroke="#123a5c" stroke-width="4"/><path d="M42 62c10 4 26 2 36-10" fill="#e8f6ff" opacity=".8"/><path d="M58 28l8-18 10 20z" fill="#2f7fc0" stroke="#123a5c" stroke-width="3"/><path d="M84 38l12-12v30z" fill="#2f7fc0" stroke="#123a5c" stroke-width="3"/><circle cx="46" cy="44" r="5" fill="#fff" stroke="#123a5c" stroke-width="2"/><circle cx="47" cy="44" r="2.2" fill="#000"/><path d="M40 56c6 4 12 4 16 0" stroke="#123a5c" stroke-width="3" fill="none"/></svg>`,
+ W:`<svg viewBox="0 0 100 100"><path d="M10 60c0-26 18-44 40-44s40 18 40 44z" fill="#f47fb6" stroke="#5a1236" stroke-width="4"/><path d="M50 16v44M30 22l10 38M70 22l-10 38M18 36l18 24M82 36l-18 24" stroke="#c94a88" stroke-width="3"/><path d="M8 60h84c-4 16-20 26-42 26S12 76 8 60z" fill="#ffc2dd" stroke="#5a1236" stroke-width="4"/><circle cx="50" cy="70" r="8" fill="#fff" stroke="#9aa" stroke-width="2"/><text x="50" y="56" font-family="Arial Black,Impact,sans-serif" font-size="40" font-weight="900" text-anchor="middle" fill="#fff" stroke="#6b1b8f" stroke-width="5" paint-order="stroke">W</text></svg>`,
+ S:`<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#fff" stroke-width="20"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8322e" stroke-width="20" stroke-dasharray="31.4 31.4"/><circle cx="50" cy="50" r="50" fill="none" stroke="#6b0f0f" stroke-width="3"/><circle cx="50" cy="50" r="30" fill="none" stroke="#6b0f0f" stroke-width="3"/><text x="50" y="64" font-family="Arial Black,Impact,sans-serif" font-size="40" font-weight="900" text-anchor="middle" fill="#ffd23f" stroke="#7a3a00" stroke-width="6" paint-order="stroke">FS</text></svg>`,
+ R:`<svg viewBox="0 0 100 100"><path d="M12 70a38 38 0 0 1 76 0" fill="none" stroke="#1fb6c9" stroke-width="16"/><path d="M12 70a38 38 0 0 1 76 0" fill="none" stroke="#8ff3ff" stroke-width="5" opacity=".7"/><g fill="#fff" stroke="#9ab" stroke-width="2"><circle cx="14" cy="74" r="10"/><circle cx="26" cy="78" r="9"/><circle cx="86" cy="74" r="10"/><circle cx="74" cy="78" r="9"/></g><path d="M50 18l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#fff9c4"/></svg>`,
+ E:`<svg viewBox="0 0 100 100"><path d="M12 70a38 38 0 0 1 76 0" fill="none" stroke="#ef4444" stroke-width="7"/><path d="M19 70a31 31 0 0 1 62 0" fill="none" stroke="#f59e0b" stroke-width="7"/><path d="M26 70a24 24 0 0 1 48 0" fill="none" stroke="#22c55e" stroke-width="7"/><path d="M33 70a17 17 0 0 1 34 0" fill="none" stroke="#3b82f6" stroke-width="7"/><g fill="#fff" stroke="#9ab" stroke-width="2"><circle cx="14" cy="74" r="10"/><circle cx="26" cy="78" r="9"/><circle cx="86" cy="74" r="10"/><circle cx="74" cy="78" r="9"/></g><g fill="#fff9c4"><path d="M50 10l2 6 6 1-5 4 1 6-4-3-5 3 1-6-4-4 6-1z"/><path d="M84 24l2 4 4 1-3 3 1 4-4-2-3 2 1-4-3-3 4-1z"/></g></svg>`
+};
+const COINC={bronze:['#f0b27a','#a0522d','#5a2a0a'],silver:['#f4f6f8','#a9b3bb','#4b5560'],gold:['#fff3a0','#f2b600','#6b4d00'],diamond:['#d8f7ff','#38bdf8','#0b3a66']};
+function coinSvg(tier,v){const [a,b,s]=COINC[tier];const t=v>=100?v.toFixed(0):v>=10?+v.toFixed(1):+v.toFixed(2);
+  return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="${b}" stroke="${s}" stroke-width="4"/><circle cx="50" cy="50" r="34" fill="${a}" stroke="${s}" stroke-width="2" opacity=".85"/>`+
+  (tier==='diamond'?`<path d="M50 14l8 8-8 8-8-8z" fill="#fff" opacity=".8"/>`:'')+
+  `<text x="50" y="${String(t).length>4?60:63}" font-family="Arial Black,Impact,sans-serif" font-size="${String(t).length>4?21:String(t).length>3?25:30}" font-weight="900" text-anchor="middle" fill="#fff" stroke="${s}" stroke-width="5" paint-order="stroke">${t}</text></svg>`}
+const clover=(gold,v)=>`<svg viewBox="0 0 100 100"><g fill="${gold?'#f2b600':'#3fae49'}" stroke="${gold?'#6b4d00':'#12501a'}" stroke-width="3"><circle cx="36" cy="36" r="17"/><circle cx="64" cy="36" r="17"/><circle cx="36" cy="64" r="17"/><circle cx="64" cy="64" r="17"/></g><path d="M50 50l18 40" stroke="${gold?'#6b4d00':'#12501a'}" stroke-width="5"/><text x="50" y="61" font-family="Arial Black,Impact,sans-serif" font-size="28" font-weight="900" text-anchor="middle" fill="#fff" stroke="#222" stroke-width="5" paint-order="stroke">x${v}</text></svg>`;
+const bucket=(v,gold,m)=>`<svg viewBox="0 0 100 100"><path d="M18 34h64l-8 56H26z" fill="${gold?'#f2b600':'#9aa9b4'}" stroke="${gold?'#6b4d00':'#2f3b44'}" stroke-width="4"/><ellipse cx="50" cy="34" rx="32" ry="9" fill="${gold?'#8a5a00':'#3b4b56'}" stroke="${gold?'#6b4d00':'#2f3b44'}" stroke-width="4"/><path d="M20 34c0-30 60-30 60 0" fill="none" stroke="${gold?'#6b4d00':'#2f3b44'}" stroke-width="4"/>`+(gold?`<path d="M30 56l4 8 8 1-6 6 2 8-8-4-8 4 2-8-6-6 8-1z" fill="#fff6c0" opacity=".85"/>`:'')+`<path d="M36 30c4-8 10-10 14-6 4-6 12-4 14 4" fill="#5fb3e8" stroke="#123a5c" stroke-width="2"/>`+
+  (m>1?`<circle cx="80" cy="22" r="17" fill="#3fae49" stroke="#12501a" stroke-width="3"/><text x="80" y="29" font-family="Arial Black,Impact,sans-serif" font-size="17" font-weight="900" text-anchor="middle" fill="#fff">x${m}</text>`:'')+(v?`<text x="50" y="72" font-family="Arial Black,Impact,sans-serif" font-size="${v>=100?20:24}" font-weight="900" text-anchor="middle" fill="#ffe066" stroke="#222" stroke-width="5" paint-order="stroke">${+v.toFixed(2)}</text>`:'')+`</svg>`;
+const specSvg=x=>x.t==='coin'?coinSvg(x.tier,x.v*bet()):x.t==='green'?clover(false,x.v):x.t==='goldc'?clover(true,x.v):bucket(x.v*bet(),x.t==='gbucket',x.m);
+$('raccoon').innerHTML=`<svg viewBox="0 0 200 240"><path d="M150 20L60 230" stroke="#6b4118" stroke-width="6"/><path d="M150 20c20 40 30 110 20 200" stroke="#ddd" stroke-width="1.5" fill="none"/>
+ <ellipse cx="100" cy="228" rx="90" ry="12" fill="#5e3a17"/><path d="M30 225c10-20 130-20 140 0" fill="#8a5a2b"/>
+ <path d="M58 200c-6-40 0-80 42-86s52 36 44 86z" fill="#f28c28" stroke="#1b1b1b" stroke-width="4"/><path d="M76 118l-6 84M124 118l6 84" stroke="#c96a12" stroke-width="5"/>
+ <ellipse cx="100" cy="92" rx="46" ry="40" fill="#9aa2a8" stroke="#1b1b1b" stroke-width="4"/><path d="M58 70l-10-28 30 16M142 70l10-28-30 16" fill="#9aa2a8" stroke="#1b1b1b" stroke-width="4"/>
+ <path d="M60 90c10-14 30-14 40-2 10-12 30-12 40 2-6 12-24 14-40 6-16 8-34 6-40-6z" fill="#2b2b2b"/><circle cx="82" cy="90" r="9" fill="#fff"/><circle cx="118" cy="90" r="9" fill="#fff"/><circle cx="84" cy="91" r="4" fill="#000"/><circle cx="116" cy="91" r="4" fill="#000"/>
+ <path d="M72 80l18 6M128 80l-18 6" stroke="#1b1b1b" stroke-width="4"/><ellipse cx="100" cy="112" rx="18" ry="12" fill="#e6e6e6" stroke="#1b1b1b" stroke-width="3"/><ellipse cx="100" cy="106" rx="7" ry="5" fill="#1b1b1b"/>
+ <path d="M84 118c8-6 24-6 32 0-4 3-10 2-16 0-6 2-12 3-16 0z" fill="#1b1b1b"/>
+ <ellipse cx="100" cy="60" rx="60" ry="10" fill="#d9c27a" stroke="#1b1b1b" stroke-width="4"/><path d="M68 58c0-26 64-26 64 0z" fill="#e8d48a" stroke="#1b1b1b" stroke-width="4"/><rect x="72" y="46" width="56" height="8" fill="#6b8f3a"/><path d="M126 40l14-20 2 22" fill="#2f7fc0" stroke="#1b1b1b" stroke-width="2"/>
+ <circle cx="60" cy="160" r="14" fill="#fff" stroke="#1b1b1b" stroke-width="4"/><circle cx="140" cy="160" r="14" fill="#fff" stroke="#1b1b1b" stroke-width="4"/></svg>`;
+const NAME={'10':'10',J:'J',Q:'Q',K:'K',A:'A',hat:'Hat',lure:'Bobber',bait:'Bait',anchor:'Anchor',marlin:'Marlin'};
+
+/* ---------- grid ---------- */
+let cells=[];
+(function(){let h='';for(let r=0;r<R;r++)for(let c=0;c<C;c++)h+=`<div class="cell" data-k="${K(c,r)}"><div class="sym"></div></div>`;
+  $('grid').innerHTML=h;cells=[...$('grid').children];})();
+const at=(c,r)=>cells[r*C+c];
+function render(grid,fresh,gold){
+  const f=fresh===null?null:new Set((fresh||[]).map(([c,r])=>K(c,r)));
+  const g=new Set(gold||[]);
+  for(let c=0;c<C;c++)for(let r=0;r<R;r++){
+    const el=at(c,r); el.className='cell'+(g.has(K(c,r))?' gold':'');
+    el.querySelectorAll('.spc').forEach(x=>x.remove());
+    const s=el.firstElementChild; s.innerHTML=SVG[grid[c][r]]; s.style.visibility='';
+    if(f===null||f.has(K(c,r))){ s.style.animationDelay=(f===null?c*50+(R-r)*25:c*25)+'ms'; void el.offsetWidth; el.classList.add('new'); }
+  }
+}
+function setGold(gold){const g=new Set(gold);cells.forEach(el=>el.classList.toggle('gold',g.has(+el.dataset.k)))}
+function flyText(from,to,text){
+  const a=from.getBoundingClientRect(),b=to.getBoundingClientRect(),e=document.createElement('div');
+  e.className='fly';e.textContent=text;e.style.left=(a.left+a.width/2-20)+'px';e.style.top=(a.top+a.height/2-12)+'px';
+  document.body.appendChild(e);requestAnimationFrame(()=>{e.style.left=(b.left+b.width/2-20)+'px';e.style.top=(b.top+b.height/2-12)+'px';e.style.opacity='.2'});
+  setTimeout(()=>e.remove(),650);
+}
+
+/* ---------- play one engine spin on screen ---------- */
+async function show(sp,paidBefore){
+  const b=bet();
+  render(sp.steps[0].grid,null,sp.steps[0].gold);
+  await wait(650);
+  let line=0;
+  for(let i=1;i<sp.steps.length;i++){
+    const st=sp.steps[i];
+    st.hits.forEach(([c,r])=>at(c,r).classList.add('hit'));
+    st.wins.forEach(w=>line+=w.pay);
+    msg(st.wins.map(w=>`${w.n}&times; ${NAME[w.s]} &rarr; ${fmt(w.pay*b)}`).join(' &nbsp;&middot;&nbsp; '));
+    $('win').textContent=fmt((paidBefore+line)*b);
+    await wait(650);
+    setGold(st.gold);
+    st.hits.forEach(([c,r])=>at(c,r).classList.add('pop'));
+    await wait(260);
+    render(st.grid,st.fresh,st.gold);
+    await wait(420);
+  }
+  if(sp.forced){
+    const [c,r]=sp.forced, el=at(c,r); el.firstElementChild.innerHTML=SVG[sp.final[c][r]];
+    el.classList.remove('new'); void el.offsetWidth; el.classList.add('land'); await wait(700);
+  }
+  if(sp.act){
+    const a=sp.act;
+    cells.forEach(el=>{const k=+el.dataset.k,c=Math.floor(k/R),r=k%R;const v=sp.final[c][r];if(v==='R'||v==='E')el.classList.add('hit')});
+    banner(a.epic?'EPIC RAINBOW!<small>every square reveals a prize</small>':'RAINBOW!<small>golden squares reveal their prizes</small>',1300);
+    await wait(1200);
+    // play the chain the engine worked out: reveal -> clovers multiply -> buckets collect -> refill -> ...
+    const shown=new Map(), KK=(c,r)=>c*R+r;
+    const place=x=>{
+      const el=at(x.c,x.r); el.classList.add('gold'); el.firstElementChild.style.visibility='hidden';   // the symbol is replaced by its prize
+      const old=shown.get(KK(x.c,x.r)); if(old)old.d.remove();
+      const d=document.createElement('div'); d.className='spc'; d.innerHTML=specSvg(x); el.appendChild(d);
+      shown.set(KK(x.c,x.r),{x:{...x},d});
+    };
+    const redraw=(c,r,v,m)=>{const rec=shown.get(KK(c,r));if(!rec)return;rec.x.v=v;if(m)rec.x.m=m;rec.d.innerHTML=specSvg(rec.x);rec.d.classList.remove('bump');void rec.d.offsetWidth;rec.d.classList.add('bump')};
+    const nearTo=(p,q)=>Math.abs(p.c-q.c)<=1&&Math.abs(p.r-q.r)<=1;
+    for(const act of a.acts){
+      if(act.a==='reveal'){
+        for(const x of act.items){ place(x); await wait(act.items.length>14?40:95); }
+        await wait(300);
+      }else if(act.a==='mult'){
+        act.clovers.forEach(g=>act.targets.forEach(t=>{if(g.t==='goldc'||nearTo(g,t))flyText(at(g.c,g.r),at(t.c,t.r),'x'+g.v)}));
+        await wait(560);
+        act.targets.forEach(t=>redraw(t.c,t.r,t.v,t.m));
+        msg(act.clovers.map(g=>`${g.t==='goldc'?'Gold':'Green'} clover x${g.v}`).join(' + ')+' multiplied '+(act.targets.some(t=>t.m)?'coins and buckets':'the coins'));
+        await wait(450);
+      }else if(act.a==='collect'){
+        const bk=act.bucket, gold=bk.t==='gbucket';
+        const brec=shown.get(KK(bk.c,bk.r)); if(brec){brec.d.classList.remove('bump');void brec.d.offsetWidth;brec.d.classList.add('bump')}
+        act.from.forEach(f=>{flyText(at(f.c,f.r),at(bk.c,bk.r),fmt(f.v*b));const rec=shown.get(KK(f.c,f.r));if(rec){rec.d.style.transition='opacity .45s,transform .45s';rec.d.style.opacity='0';rec.d.style.transform='scale(.4)'}});
+        msg(`${gold?'Gold bucket':'Bucket'} collects ${act.from.length} coin${act.from.length>1?'s':''}`);
+        await wait(620);
+        act.from.forEach(f=>{const rec=shown.get(KK(f.c,f.r));if(rec){rec.d.remove();shown.delete(KK(f.c,f.r))}});
+        redraw(bk.c,bk.r,act.total);
+        await wait(380);
+      }
+    }
+    msg(`Prizes caught: <b>${fmt(a.pay*b)}</b>`);
+    await wait(900);
+  }
+  $('win').textContent=fmt((paidBefore+sp.pay)*b);
+  if(!sp.act)msg(sp.pay>0?`Spin won ${fmt(sp.pay*b)}`:'No win');
+}
+
+const LEVEL_TXT=['','rainbows turn into green clovers','rainbows turn into global buckets','rainbows turn into gold clovers','a rainbow lands every spin'];
+function setCatch(level,fs){
+  $('fsbar').querySelectorAll('.catch i').forEach((x,i)=>x.classList.toggle('on',i<level));
+  $('catchX').textContent=level>=4?'MAX':`${fs||0}/5 FS`;
+}
+async function play(buy){
+  if(busy)return;
+  const b=bet(), mode=buy||feature;
+  const cost=r2(b*(mode?LL.MODES_BUY[mode]:1));
+  if(cost>bal+1e-9){toast('Not enough balance');auto=false;$('autoBtn').classList.remove('on');return}
+  busy=true; $('spin').disabled=true; $('spin').classList.add('go'); $('buyBtn').disabled=true;
+  try{window.parent.bal=window.parent.round2(window.parent.bal-cost);window.parent.paintBal(-1)}catch(_){}; bal=getPBal(); paint(); $('win').textContent=fmt(0);
+  const res=LL.play(rnd,{buy:mode});
+  let paid=0,inBonus=false;
+  if(buy==='ice'||buy==='wet'){ /* straight into the bonus */ }
+  for(const sp of res.spins){
+    if(sp.kind!=='base'&&!inBonus){
+      inBonus=true; const info=res.spins[0].award||LL.BONUS[buy==='ice'?3:4];
+      banner(`${info.name.toUpperCase()}<small>${info.spins} free spins${info.level?' \u00b7 Big Catch Bar at MAX':''}</small>`,2200);
+      $('raccoon').classList.add('cheer'); setTimeout(()=>$('raccoon').classList.remove('cheer'),1600);
+      await wait(2300);
+      $('fsbar').hidden=false; $('fsName').textContent=info.name; setCatch(info.level||0,0); setGold([]);
+    }
+    if(inBonus){ $('fsLeft').textContent=sp.left+1-(sp.award?sp.award.spins:0); }
+    await show(sp,paid);
+    paid+=sp.pay;
+    if(sp.kind==='base'&&sp.award){
+      render(sp.final,[],[]);
+      cells.forEach(el=>{const k=+el.dataset.k;if(sp.final[Math.floor(k/R)][k%R]==='S')el.classList.add('hit')});
+      await wait(1100);
+    }
+    if(inBonus){
+      setCatch(sp.levelAfter,sp.fs); $('fsLeft').textContent=sp.left;
+      if(sp.levelAfter>sp.level){
+        banner(`BIG CATCH LEVEL ${sp.levelAfter}<small>+${sp.award.spins} free spins \u00b7 ${LEVEL_TXT[sp.levelAfter]}</small>`,1900);
+        $('raccoon').classList.add('cheer'); setTimeout(()=>$('raccoon').classList.remove('cheer'),1600);
+        await wait(1900);
+      }
+      $('fsLeft').textContent=sp.left; await wait(300);
+    }
+  }
+  const win=r2(res.total*b);
+  if(inBonus){ banner(`${fmt(win)}<small>${res.capped?'MAX WIN! ':''}total from ${res.bonus}</small>`,2600); await wait(2600); $('fsbar').hidden=true; }
+  else if(res.capped)banner(`MAX WIN<small>${fmt(win)}</small>`,2600);
+  else if(win>=b*25){banner(`BIG WIN<small>${fmt(win)}</small>`,1800);$('raccoon').classList.add('cheer');setTimeout(()=>$('raccoon').classList.remove('cheer'),1600)}
+  try{window.parent.credit(win)}catch(_){}; bal=getPBal(); $('win').textContent=fmt(win); paint();
+  try{window.parent.logBet("Lake Legend",cost,win/cost)}catch(_){}
+  busy=false; $('spin').disabled=false; $('spin').classList.remove('go'); $('buyBtn').disabled=false;
+  if(auto)setTimeout(()=>{if(auto&&!busy)play(null)},450);
+}
+
+/* ---------- bonus buy menu ---------- */
+const FEAT={
+  hunt:{name:'Bonushunt Featurespins',cost:3,kind:'act',pic:SVG.S,vol:'High',txt:'Each spin is about 5 times more likely to trigger a bonus game!'},
+  trout:{name:'Rainbow Trout Featurespins',cost:50,kind:'act',pic:SVG.R,vol:'High',txt:'Each spin guarantees at least 1 win and that a Rainbow or Epic Rainbow lands, and the min. coin value is 1x!'},
+  epic:{name:'Rainbow Epic Drop Featurespins',cost:500,kind:'act',pic:SVG.E,vol:'Very high',txt:'Each spin guarantees that an Epic Rainbow lands and the min. coin value is 1x!'},
+  ice:{name:'On Thin Ice',cost:60,kind:'buy',pic:SVG.S,vol:'Medium',txt:'10 free spins where Golden Squares remain highlighted until activated, and a Big Catch Bar that gives more powerful Rainbows!'},
+  wet:{name:'Slippery When Wet',cost:250,kind:'buy',pic:SVG.S,vol:'High',txt:'10 free spins with a Big Catch Bar, and Golden Squares remain highlighted even after being activated!'}
+};
+function renderCards(){
+  $('cards').innerHTML=Object.entries(FEAT).map(([k,f])=>`<div class="card"><div class="in"><h3>${f.name.toUpperCase()}</h3><p>${f.txt}</p>
+    <div class="pic">${f.pic}</div><i>Volatility: ${f.vol}</i><div class="price">${fmt(bet()*f.cost)}</div></div>
+    <button class="${f.kind==='act'?'act':'buyb'}${feature===k?' on':''}" data-f="${k}">${f.kind==='act'?(feature===k?'DEACTIVATE':'ACTIVATE'):'BUY'}</button></div>`).join('');
+  $('cards').querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.f;
+    if(FEAT[k].kind==='act'){ feature=feature===k?null:k; paint(); $('buyMask').classList.remove('on'); return }
+    $('buyMask').classList.remove('on'); ask(k);
+  });
+}
+$('buyBtn').onclick=()=>{
+  if(busy)return;
+  if(feature){ feature=null; paint(); toast('Featurespins turned off'); return }   // acts as the off switch while one is active
+  $('buyMask').classList.add('on');
+};
+// bonus buys ask first
+let pending=null;
+function ask(k){
+  const f=FEAT[k]; pending=k;
+  $('cPic').innerHTML=f.pic;
+  $('cTxt').innerHTML=`Buy <b>${f.name}</b> for <b>${fmt(r2(bet()*f.cost))}</b>?`;
+  $('confirmMask').classList.add('on');
+}
+$('cNo').onclick=()=>{pending=null;$('confirmMask').classList.remove('on')};
+$('confirmMask').onclick=e=>{if(e.target===$('confirmMask'))$('cNo').onclick()};
+$('cYes').onclick=()=>{const k=pending;pending=null;$('confirmMask').classList.remove('on');if(k)play(k)};
+$('buyClose').onclick=()=>$('buyMask').classList.remove('on');
+$('buyMask').onclick=e=>{if(e.target===$('buyMask'))$('buyMask').classList.remove('on')};
+const step=d=>{if(busy)return;bi=Math.max(0,Math.min(BETS.length-1,bi+d));paint()};
+$('betUp').onclick=$('bUp').onclick=()=>step(1); $('betDn').onclick=$('bDn').onclick=()=>step(-1);
+$('spin').onclick=()=>play(null);
+$('autoBtn').onclick=()=>{auto=!auto;$('autoBtn').classList.toggle('on',auto);if(auto&&!busy)play(null)};
+$('turboBtn').onclick=()=>{turbo=!turbo;$('turboBtn').classList.toggle('on',turbo)};
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!document.querySelector('.mask.on')){e.preventDefault();play(null)}});
+
+/* ---------- rules ---------- */
+$('infoBtn').onclick=()=>{
+  const b=bet(), ic=k=>`<span style="display:inline-block;width:34px;height:34px">${SVG[k]}</span>`;
+  const rows=LL.SYMS.slice().reverse().map(k=>`<tr><td>${ic(k)}</td>${LL.PAY[k].map(p=>`<td>${fmt(p*b)}</td>`).join('')}</tr>`).join('');
+  $('info').innerHTML=`<h2 style="margin:0 0 8px">Lake Legend &mdash; rules</h2>
+  <table><tr style="color:#9fb4c2"><th></th><th>5</th><th>6</th><th>7</th><th>8&ndash;9</th><th>10&ndash;11</th><th>12+</th></tr>${rows}</table>
+  <p><b>Clusters:</b> 5 or more matching symbols touching up, down, left or right pay. Winners vanish and new symbols cascade in.
+  ${ic('W')} <b>Clam wild</b> stands in for any paying symbol.</p>
+  <p><b>Golden Squares:</b> every square under a winning cluster turns gold. When a ${ic('R')} <b>Rainbow</b> lands, each golden square reveals a prize:
+  coins &mdash; bronze 0.2/0.5/1/2/3/4&times;, silver 5/10/15/20&times;, gold 25/50/100&times;, diamond 150/250/500&times; the bet &mdash;
+  <b>green clovers</b> (&times;2&ndash;&times;20) that multiply neighbouring coins and buckets, <b>gold clovers</b> (&times;2&ndash;&times;20) that multiply every coin and bucket,
+  a <b>bucket</b> that collects the coins and buckets in the 3&times;3 around it, and a <b>global bucket</b> that collects every coin and bucket on the grid. The winning symbols are replaced by these prizes. After a bucket collects, the emptied squares refill with new coins, clovers or even more buckets, and new buckets collect in turn. Clovers landing together add up (x2 and x3 make x5), and a multiplied bucket keeps its multiplier for everything it collects later. The rainbow's own square turns into a prize too, and so does any FS scatter on the grid (it still counts toward free spins first). You win every coin left on the grid plus everything the buckets hold.
+  An ${ic('E')} <b>Epic Rainbow</b> reveals a prize on every square. Only one rainbow (normal or epic) can land per spin, and it waits until the last cascade before it activates. In the base game golden squares clear at the start of every spin.</p>
+  <p>${ic('S')} <b>Free spins:</b> 3 scatters &rarr; On Thin Ice (10 spins, gold stays until used). 4 &rarr; Slippery When Wet (10 spins, gold stays for good).
+  5 &rarr; Smokey Under Water (10 spins, Big Catch Bar starts at MAX).
+  <b>Big Catch Bar:</b> during free spins every FS symbol that lands fills the bar. Every 5th one levels it up and adds <b>+5 free spins</b>.
+  After a rainbow activates, its own square becomes: level 1 &rarr; a green clover, level 2 &rarr; a global bucket, level 3 &rarr; a gold clover.
+  Level 4 also guarantees a Rainbow or Epic Rainbow on every free spin.</p>
+  <p><b>Bets</b> $0.10&ndash;$50 &middot; <b>max win</b> 15,000&times; &middot; target <b>RTP 96.33%</b> for every mode (set by simulation; see the note in the file). Hit rate about 42%.</p>
+  <p style="color:#9fb4c2">Space = spin &middot; click outside to close</p>`;
+  $('infoMask').classList.add('on');
+};
+$('infoMask').onclick=()=>$('infoMask').classList.remove('on');
+
+paint();
+render(LL.spin(Math.random,'base',new Set()).steps[0].grid,null,[]);
+})();
+</script></body></html>

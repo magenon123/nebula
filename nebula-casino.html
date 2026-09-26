@@ -1121,6 +1121,10 @@ tbody tr{animation:sl .25s}
   <button class="side-item" data-g="cases"><span class="ic">🎁</span>Cases</button>
   <button class="side-item" data-g="snakes"><span class="ic">🐍</span>Snakes</button>
   <button class="side-item" data-g="moles"><span class="ic">🔨</span>Moles</button>
+  <div class="side-label">Slots</div>
+  <button class="side-item" data-g="slots"><span class="ic">🎰</span>Slots Lobby</button>
+  <button class="side-item" data-g="olympian-storm"><span class="ic">⚡</span>Olympian Storm</button>
+  <button class="side-item" data-g="lake-legend"><span class="ic">🎣</span>Lake Legend</button>
 </aside>
 
 <div class="body">
@@ -1204,7 +1208,7 @@ tbody tr{animation:sl .25s}
   </div>
 
   <div class="lobby-bar">
-    <div class="cats" id="lobbyCats"><button class="on" data-cat="all">All Games</button><button data-cat="originals">Originals</button></div>
+    <div class="cats" id="lobbyCats"><button class="on" data-cat="all">All Games</button><button data-cat="originals">Originals</button><button data-cat="slots">Slots</button></div>
     <div class="sortwrap"><span>Sort</span>
       <select id="lobbySort">
         <option value="popular">Popular</option>
@@ -1476,6 +1480,45 @@ tbody tr{animation:sl .25s}
     <div><div class="lbl"><span>Total Profit</span><span id="moles_mx">1.00&times;</span></div>
       <div class="readonly" id="moles_profit">0.00</div></div>
     <div class="lbl"><span>Next hit chance</span><span id="moles_ch">71.43%</span></div>
+  </div>
+
+  <!-- ============ SLOTS LOBBY ============ -->
+  <div class="pane" data-p="slots" hidden>
+    <div style="padding:8px 0 16px">
+      <h2 style="color:var(--txt);margin:0 0 16px;font-size:20px">Slots</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+        <div class="slot-card" data-game="olympian-storm" style="cursor:pointer;border-radius:10px;overflow:hidden;background:var(--panel2);transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform=''">
+          <div style="position:relative;padding-bottom:75%;background:linear-gradient(135deg,#6b1c14,#3d0d08)">
+            <img src="https://mediumrare.imgix.net/665533b0a1e11f6e3ef8e609?auto=format&fit=crop&w=300" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'" loading="lazy">
+            <div style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.65);border-radius:4px;padding:2px 6px;font-size:11px;color:#bbb">⚡ 359 playing</div>
+          </div>
+          <div style="padding:8px 10px 10px">
+            <div style="font-weight:700;font-size:13px;color:var(--txt)">Olympian Storm</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Pragmatic Play</div>
+          </div>
+        </div>
+        <div class="slot-card" data-game="lake-legend" style="cursor:pointer;border-radius:10px;overflow:hidden;background:var(--panel2);transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform=''">
+          <div style="position:relative;padding-bottom:75%;background:linear-gradient(135deg,#2a6c73,#1a4a50)">
+            <img src="https://mediumrare.imgix.net/665533b0a1e11f6e3ef8e611?auto=format&fit=crop&w=300" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'" loading="lazy">
+            <div style="position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.65);border-radius:4px;padding:2px 6px;font-size:11px;color:#bbb">🎣 67 playing</div>
+          </div>
+          <div style="padding:8px 10px 10px">
+            <div style="font-weight:700;font-size:13px;color:var(--txt)">Lake Legend</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Hacksaw Gaming</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ OLYMPIAN STORM IFRAME ============ -->
+  <div class="pane" data-p="olympian-storm" hidden style="padding:0;height:calc(100vh - 56px)">
+    <iframe id="frame-olympian-storm" src="" style="width:100%;height:100%;border:none;border-radius:8px;display:block" allow="autoplay" loading="lazy"></iframe>
+  </div>
+
+  <!-- ============ LAKE LEGEND IFRAME ============ -->
+  <div class="pane" data-p="lake-legend" hidden style="padding:0;height:calc(100vh - 56px)">
+    <iframe id="frame-lake-legend" src="" style="width:100%;height:100%;border:none;border-radius:8px;display:block" allow="autoplay" loading="lazy"></iframe>
   </div>
 
 </div>
@@ -3285,12 +3328,14 @@ const GAMES=[
  ['cases','Cases','\u{1F381}','#6366f1'],
  ['snakes','Snakes','\u{1F40D}','#16a34a'],
  ['moles','Moles','\u{1F528}','#eab308'],
+ ['olympian-storm','Olympian Storm','⚡','#e3b43c','slots'],
+ ['lake-legend','Lake Legend','\u{1F3A3}','#46b04a','slots'],
 ];
 (function(){
   // Playing counts based on real Stake data
   const REAL_COUNTS={mines:2229,dice:1942,limbo:1578,plinko:1034,keno:1344,
     wheel:160,flip:197,hilo:465,tower:339,chicken:353,baccarat:66,blackjack:1184,pump:127,
-    rps:66,cases:30,snakes:155,moles:310};
+    rps:66,cases:30,snakes:155,moles:310,'olympian-storm':359,'lake-legend':67};
   const seedCount=k=>REAL_COUNTS[k]||(120+((k.split('').reduce((s,c)=>s*31+c.charCodeAt(0),0))%800));
   const counts=Object.fromEntries(GAMES.map(g=>[g[0],seedCount(g[0])]));
   const total=Object.values(counts).reduce((a,b)=>a+b,0);
@@ -3301,7 +3346,12 @@ const GAMES=[
   function render(){
     const q=(el('lobbySearch')?el('lobbySearch').value:'').trim().toLowerCase();
     const sort=el('lobbySort')?el('lobbySort').value:'popular';
-    let list=GAMES.filter(g=>!q||g[1].toLowerCase().includes(q));
+    let list=GAMES.filter(g=>{
+      if(q&&!g[1].toLowerCase().includes(q))return false;
+      if(cat==='slots')return g[4]==='slots';
+      if(cat==='originals')return !g[4];
+      return true;
+    });
     if(sort==='az')list=[...list].sort((a,b)=>a[1].localeCompare(b[1]));
     else if(sort==='popular')list=[...list].sort((a,b)=>counts[b[0]]-counts[a[0]]);
     else list=[...list].reverse();
@@ -3349,9 +3399,22 @@ function go(key){
   if(key==='plinko')plinkoInit();
   if(key==='wheel')wheelDraw(wheelAngle);
   if(key==='cases')casesIdle();
+  // Load slot iframes on demand
+  if(key==='olympian-storm'){const f=$('frame-olympian-storm');if(!f.src||f.src==='about:blank'||!f.src.includes('olympian'))f.src='/olympian-storm.html';}
+  if(key==='lake-legend'){const f=$('frame-lake-legend');if(!f.src||f.src==='about:blank'||!f.src.includes('lake'))f.src='/lake-legend.html';}
+  // Refresh iframe balance when switching to a slot game
+  if(key==='olympian-storm'||key==='lake-legend'){
+    const fid='frame-'+key;
+    setTimeout(()=>{try{const fr=$(fid);if(fr.contentWindow)fr.contentWindow.paintBal&&fr.contentWindow.paintBal()}catch(_){}},400);
+  }
 }
 document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
   go(b.dataset.g); $('sidebar').classList.remove('open'); $('scrim').classList.remove('on');
+});
+// Slot lobby card clicks
+document.addEventListener('click',e=>{
+  const card=e.target.closest('.slot-card[data-game]');
+  if(card)go(card.dataset.game);
 });
 
 /* ---------- wallet: overview / deposit / withdraw ---------- */
