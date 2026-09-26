@@ -23,10 +23,15 @@ if (!process.env.JWT_SECRET) {
 }
 
 /* ---------------- database ---------------- */
+if (TURSO_URL && TURSO_TOKEN) {
+  console.log('DB: connecting to Turso →', TURSO_URL);
+} else {
+  console.warn('DB: TURSO_URL or TURSO_TOKEN missing — using LOCAL file:nebula.db (data will be lost on restart!)');
+}
 const db = createClient(
-  TURSO_URL
+  TURSO_URL && TURSO_TOKEN
     ? { url: TURSO_URL, authToken: TURSO_TOKEN }
-    : { url: 'file:nebula.db' }   // local fallback for development
+    : { url: 'file:nebula.db' }
 );
 
 await db.executeMultiple(`

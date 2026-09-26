@@ -68,21 +68,21 @@ header{
 .hd-bal-group{display:flex;align-items:stretch;border-radius:8px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.4)}
 .hd-bal-btn{
   display:flex;align-items:center;gap:8px;
-  background:#0a1929;border:none;color:#fff;
+  background:#0b1822;border:none;color:#fff;
   padding:0 14px 0 18px;height:44px;
   cursor:pointer;font-family:inherit;font-weight:700;font-size:15px;
   border-radius:8px 0 0 8px;transition:background .12s;white-space:nowrap;
 }
-.hd-bal-btn:hover{background:#0f2234}
+.hd-bal-btn:hover{background:#152333}
 .hd-bal-amt{font-weight:700;font-size:15px;white-space:nowrap}
 .hd-wallet-btn{
   display:flex;align-items:center;gap:6px;
-  background:#2d61ff;border:none;color:#fff;
+  background:#5461f0;border:none;color:#fff;
   padding:0 20px;height:44px;
-  cursor:pointer;font-weight:700;font-size:14px;font-family:inherit;
+  cursor:pointer;font-weight:800;font-size:14px;font-family:inherit;
   border-radius:0 8px 8px 0;transition:background .12s;white-space:nowrap;flex-shrink:0;
 }
-.hd-wallet-btn:hover{background:#4474ff}
+.hd-wallet-btn:hover{background:#6673f5}
 .hd-wallet-icon{display:none}
 @media(max-width:560px){
   .hd-wallet-text{display:none}
@@ -93,8 +93,8 @@ header{
 /* bal flash animations */
 
 .bet-flag{display:flex;align-items:center;padding:0 8px;flex:0 0 auto}
-.wbtn{background:#2d61ff;border:none;color:#fff;font-weight:700;padding:9px 18px;cursor:pointer;font-size:14px}
-.wbtn:hover{background:#4474ff}
+.wbtn{background:#5461f0;border:none;color:#fff;font-weight:700;padding:9px 18px;cursor:pointer;font-size:14px}
+.wbtn:hover{background:#6673f5}
 
 .content{padding:22px;max-width:1230px;width:100%;margin:0 auto;flex:1}
 
@@ -216,13 +216,9 @@ select{
 .limbo{font-weight:800;font-size:clamp(48px,10vw,110px);letter-spacing:-.03em;color:var(--muted);transition:color .2s}
 .limbo.w{color:var(--green)}.limbo.l{color:var(--red)}
 
-/* ---------- crash ---------- */
-#crashCv{width:100%;height:100%;position:absolute;inset:0}
 .cmult{font-weight:800;font-size:clamp(40px,8vw,84px);z-index:2;text-shadow:0 3px 14px rgba(0,0,0,.55);
   -webkit-text-stroke:2px rgba(0,0,0,.25)}
 .cmult.dead{color:var(--red)}
-@keyframes crash-bust{0%{transform:scale(1)}35%{transform:scale(1.16)}100%{transform:scale(1)}}
-.cmult.dead{animation:crash-bust .42s ease-out}
 
 /* ---------- mines / dragon ---------- */
 .grid5{display:grid;grid-template-columns:repeat(5,minmax(0,104px));gap:12px}
@@ -279,21 +275,14 @@ select{
 .kpay.on{color:var(--green)}
 
 /* ---------- flip ---------- */
-.fcoin-wrap{perspective:600px;display:flex;align-items:center;justify-content:center}
 .fcoin{width:170px;height:170px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  transition:background .15s;transform-style:preserve-3d}
+  transition:transform .1s}
 .fcoin.h{background:var(--gold)}
 .fcoin.t{background:var(--purple)}
-.fcoin i{width:70px;height:70px;background:var(--panel2);border-radius:50%;display:block;transition:all .15s}
+.fcoin i{width:70px;height:70px;background:var(--panel2);border-radius:50%;display:block}
 .fcoin.t i{border-radius:8px;transform:rotate(45deg);width:62px;height:62px}
-.fcoin.spin{animation:fl .62s cubic-bezier(.4,0,.2,1)}
-@keyframes fl{
-  0%  {transform:rotateY(0deg)   scaleY(1)}
-  20% {transform:rotateY(90deg)  scaleY(.9)}
-  50% {transform:rotateY(900deg) scaleY(.85)}
-  80% {transform:rotateY(1710deg) scaleY(.9)}
-  100%{transform:rotateY(1800deg) scaleY(1)}
-}
+.fcoin.spin{animation:fl .6s ease-in-out}
+@keyframes fl{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(540deg) scale(.82)}100%{transform:rotateY(1080deg) scale(1)}}
 .fhist{background:var(--bg);border-radius:var(--r);padding:12px;margin-top:26px;width:100%;max-width:620px}
 .fhist .t{font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:8px}
 .fhist .row{display:flex;gap:6px;flex-wrap:wrap}
@@ -870,7 +859,7 @@ tbody tr{animation:sl .25s}
   font-size:10px;font-weight:800;padding:1px 5px}
 
 
-.us-head,.us-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr 1.5fr;gap:10px;align-items:center}
+.us-head,.us-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1.5fr;gap:10px;align-items:center}
 .us-head{font-size:12px;color:var(--muted);font-weight:700;padding:0 12px 8px}
 .us-row{background:var(--panel2);border-radius:8px;padding:11px 12px;font-size:13px}
 .us-row b{display:block;font-size:13.5px}
@@ -1036,36 +1025,11 @@ tbody tr{animation:sl .25s}
   color:rgba(255,255,255,.4)}
 .bac-payouts b{color:rgba(255,255,255,.8);margin-left:4px}
 
-
-/* ── Stake-accurate sidebar ── */
-.sb-tab{flex:1;padding:10px 12px;border:none;border-radius:8px;background:transparent;
-  color:rgba(255,255,255,.5);font-weight:700;font-size:13px;cursor:pointer;
-  position:relative;overflow:hidden;transition:background .15s,color .15s}
-.sb-tab.on{background:rgba(255,255,255,.08);color:#fff}
-.sb-tab:hover:not(.on){background:rgba(255,255,255,.05);color:rgba(255,255,255,.75)}
-.sidebar-scroll{overflow-y:auto;overflow-x:hidden;flex:1;padding:4px 8px 16px}
-.sidebar-scroll::-webkit-scrollbar{width:4px}
-.sidebar-scroll::-webkit-scrollbar-track{background:transparent}
-.sidebar-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
-.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;
-  border-radius:8px;color:rgba(255,255,255,.7);font-size:13.5px;font-weight:600;
-  cursor:pointer;transition:background .1s,color .1s;width:100%;text-decoration:none;
-  border:none;background:transparent;font-family:inherit;text-align:left}
-.sb-item:hover{background:rgba(255,255,255,.06);color:#fff}
-.sb-item svg{flex-shrink:0;color:rgba(255,255,255,.4);transition:color .1s}
-.sb-item:hover svg{color:rgba(255,255,255,.8)}
-.sb-item-active{background:rgba(255,255,255,.1)!important;color:#fff!important}
-.sb-item-active svg{color:#fff!important}
-.sb-game-ic{font-size:16px;width:20px;text-align:center;flex-shrink:0}
-.sb-divider{height:1px;background:rgba(255,255,255,.07);margin:6px 4px}
-.sb-section-label{padding:8px 12px 4px;font-size:11px;font-weight:700;
-  letter-spacing:.06em;color:rgba(255,255,255,.3);text-transform:uppercase}
-
 </style>
 </head>
 <body>
 
-<div class="authwrap" id="authWrap" style="display:flex">
+<div class="authwrap" id="authWrap" style="display:none">
   <div class="authbox">
     <div class="auth-logo">nebul<i>a</i></div>
     <div class="wm-tabs" style="margin-bottom:18px">
@@ -1121,7 +1085,7 @@ tbody tr{animation:sl .25s}
   <div class="wmodal" style="max-width:720px">
     <div class="wm-head"><span class="wm-title">&#128101; Accounts</span><button class="wm-x" id="usClose">&times;</button></div>
     <div class="wm-body">
-      <div class="us-head"><span>Player</span><span>Balance</span><span>Deposited</span><span>Withdrawn</span><span>Wagered</span><span>Bet P&amp;L</span><span>Adjust</span></div>
+      <div class="us-head"><span>Player</span><span>Balance</span><span>Wagered</span><span>Net</span><span>Adjust</span></div>
       <div id="usList" class="ad-list"></div>
     </div>
   </div>
@@ -1138,168 +1102,26 @@ tbody tr{animation:sl .25s}
 
 <div class="scrim" id="scrim"></div>
 <aside class="sidebar" id="sidebar">
-  <!-- Casino / Sports tabs with gradient header -->
-  <div style="display:flex;align-items:center;padding:8px 8px 0;gap:4px;position:relative;overflow:hidden;margin-bottom:4px">
-    <button class="sb-tab on" onclick="go('home')">
-      <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,80,160,.4) 0%,transparent 70%);border-radius:8px;pointer-events:none"></div>
-      Casino
-    </button>
-    <button class="sb-tab">Sports</button>
-  </div>
-
-  <!-- Scrollable content -->
-  <div class="sidebar-scroll">
-
-    <!-- Top items -->
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M15 1.67H5c-.92 0-1.67.75-1.67 1.66v13.32A1.68 1.68 0 0 0 6.02 18L10 15.01l3.98 2.98c1.11.83 2.69.04 2.69-1.34V3.33c0-.91-.75-1.66-1.67-1.66m-1.07 5.59-4.17 4.17a.8.8 0 0 1-.6.24 1 1 0 0 1-.58-.24l-2.5-2.5a.83.83 0 1 1 1.17-1.18l1.91 1.9 3.57-3.57a.83.83 0 1 1 1.18 1.18z"/></svg>
-      Saved Games
-    </a>
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M17.47 3.13a4.65 4.65 0 0 0-6.35.46L10 4.74 8.9 3.59a4.65 4.65 0 0 0-6.35-.46 4.9 4.9 0 0 0-.34 7.08l7.21 7.46c.33.33.85.33 1.18 0l7.21-7.46a4.9 4.9 0 0 0-.33-7.08"/></svg>
-      Following
-    </a>
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M2.8 1.9c-.99 0-1.8.81-1.8 1.8v12.6c0 .99.81 1.8 1.8 1.8s1.8-.81 1.8-1.8V3.7c0-.99-.81-1.8-1.8-1.8M18 8.07l-8.43-5.8A2.02 2.02 0 0 0 6.4 3.95v12.1c0 1.64 1.83 2.6 3.17 1.67l8.42-5.8a2.34 2.34 0 0 0 0-3.84"/></svg>
-      Continue Playing
-    </a>
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M18.1 4.85v8.75a2.7 2.7 0 0 1-2.7 2.7H4.6a2.7 2.7 0 0 1-2.7-2.7V4.85c-.54.32-.9.88-.9 1.55v10.8c0 .99.81 1.8 1.8 1.8h14.4c.99 0 1.8-.81 1.8-1.8V6.4c0-.67-.36-1.24-.9-1.55"/><path fill="currentColor" d="M4.6 15.4h10.8c.99 0 1.8-.81 1.8-1.8V2.8c0-.99-.81-1.8-1.8-1.8H4.6c-.99 0-1.8.81-1.8 1.8v10.8c0 .99.81 1.8 1.8 1.8m1.42-7.95a4.5 4.5 0 0 0 3.2-3.2.81.81 0 0 1 1.54 0 4.5 4.5 0 0 0 3.2 3.2.81.81 0 0 1 0 1.54 4.5 4.5 0 0 0-3.2 3.2.81.81 0 0 1-1.54 0 4.5 4.5 0 0 0-3.2-3.2.81.81 0 0 1 0-1.54"/></svg>
-      Games For You
-    </a>
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M17.2 6.4v9.9c0 .5.4.9.9.9s.9-.4.9-.9V6.4z"/><path fill="currentColor" d="M15.4 15.4V2.8c0-.99-.81-1.8-1.8-1.8H2.8C1.81 1 1 1.81 1 2.8v12.6A3.6 3.6 0 0 0 4.6 19H19a3.6 3.6 0 0 1-3.6-3.6m-3.6-1.8H8.2a.9.9 0 0 1-.9-.9c0-.5.4-.9.9-.9h3.6c.5 0 .9.4.9.9s-.4.9-.9.9m0-3.6H4.6a.9.9 0 0 1-.9-.9c0-.5.4-.9.9-.9h7.2c.5 0 .9.4.9.9s-.4.9-.9.9m0-3.6H4.6a.9.9 0 0 1-.9-.9c0-.5.4-.9.9-.9h7.2c.5 0 .9.4.9.9s-.4.9-.9.9"/></svg>
-      My Bets
-    </a>
-
-    <div class="sb-divider"></div>
-    <div class="sb-section-label">Games</div>
-
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M18.33 10c-6.5 1-7.32 1.83-8.33 8.33-1-6.5-1.83-7.32-8.33-8.33C8.17 9 8.99 8.17 10 1.67c1 6.5 1.83 7.32 8.33 8.33M20 4.17c-2.6.4-2.93.73-3.33 3.33-.4-2.6-.74-2.93-3.34-3.33 2.6-.4 2.94-.74 3.34-3.34.4 2.6.73 2.94 3.33 3.34M6.67 15.83c-2.6.4-2.94.74-3.34 3.34-.4-2.6-.73-2.94-3.33-3.34 2.6-.4 2.93-.73 3.33-3.33.4 2.6.74 2.93 3.34 3.33"/></svg>
-      New Releases
-    </a>
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M8.79 8.08A1.8 1.8 0 0 0 7.3 7.3H2.8c-.99 0-1.8.81-1.8 1.8s.81 1.8 1.8 1.8h1.87l-2.2 5.65a1.8 1.8 0 0 0 3.35 1.3l3.15-8.1a1.8 1.8 0 0 0-.19-1.66M6.4 4.6h5.5l-.91 2.42a2.7 2.7 0 0 1 1.71-.62h2.38l1.11-2.97A1.8 1.8 0 0 0 14.51 1H6.4a1.8 1.8 0 1 0 0 3.6m6.3 7.2a2.7 2.7 0 0 1-2.65-2.25l-2.63 7.02a1.8 1.8 0 0 0 1.68 2.44 1.8 1.8 0 0 0 1.68-1.17l2.26-6.03z"/><path fill="currentColor" d="M18.68 8.08a1.8 1.8 0 0 0-1.48-.78h-4.5c-.99 0-1.8.81-1.8 1.8s.81 1.8 1.8 1.8h1.87l-2.2 5.65a1.8 1.8 0 0 0 3.35 1.3l3.15-8.1a1.8 1.8 0 0 0-.19-1.66"/></svg>
-      Slots
-    </a>
-
-    <!-- Stake Originals — active/highlighted -->
-    <a class="sb-item sb-item-active" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M16.15 4.66a1.3 1.3 0 0 0-2.1.09l-.72 1.08L11.2 2.1a2.5 2.5 0 0 0-3.47-.9C5.38 2.7 2 5.6 1.69 10.13a8.43 8.43 0 0 0 6.87 8.91 8.33 8.33 0 0 0 9.77-8.2c0-2.52-.94-4.57-2.18-6.18M10 17.5c-1.84 0-3.33-1.02-3.33-2.5 0-2.43 3.33-5 3.33-5s3.33 2.57 3.33 5c0 1.48-1.49 2.5-3.33 2.5"/></svg>
-      Stake Originals
-    </a>
-
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="m17.91 5.03-2.28-.98v.23c0 .53-.24 1.02-.64 1.37q-.51.42-1.17.43-.15 0-.3-.03l-.1-.04L10 15.4 6.59 6l-.12.05-.3.03q-.65-.01-1.16-.43a1.8 1.8 0 0 1-.63-1.37v-.23l-2.3.98A1.8 1.8 0 0 0 1 6.7v10.5c0 .99.81 1.8 1.8 1.8h14.4c.99 0 1.8-.81 1.8-1.8V6.69c0-.72-.43-1.37-1.09-1.66"/><path fill="currentColor" d="M6.32 5.17 10 3.79l3.68 1.38a.9.9 0 0 0 1.05-.9V1.9a.9.9 0 0 0-1.05-.9L10 2.4 6.32 1a.9.9 0 0 0-1.04.89v2.38a.9.9 0 0 0 1.04.89"/></svg>
-      Live Casino
-    </a>
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M17.2 1h-3.4c.43.48.7 1.1.7 1.8v3.44l2.65 7.05a.9.9 0 0 1-.85 1.21.9.9 0 0 1-.85-.59l-.8-2.15-.15.03v5.4c0 .7-.27 1.32-.7 1.8h3.4c.99 0 1.8-.8 1.8-1.8V2.8c0-.99-.81-1.8-1.8-1.8m-5.4 0h-9C1.81 1 1 1.81 1 2.8v14.4c0 .99.81 1.8 1.8 1.8h9c.99 0 1.8-.81 1.8-1.8V2.8c0-.99-.81-1.8-1.8-1.8M10 11.8a2.7 2.7 0 0 1-2.7 2.7 2.7 2.7 0 0 1-2.7-2.7c0-.5.4-.9.9-.9s.9.4.9.9.4.9.9.9.9-.4.9-.9V6.4c0-.5.4-.9.9-.9s.9.4.9.9z"/></svg>
-      Blackjack
-    </a>
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M5.5 6.24V2.8c0-.7.27-1.32.7-1.8H2.8C1.81 1 1 1.81 1 2.8v14.4c0 .99.81 1.8 1.8 1.8h3.4c-.43-.48-.7-1.1-.7-1.8v-5.4l-.15-.03-.8 2.15a.9.9 0 0 1-1.16.53.9.9 0 0 1-.54-1.16z"/><path fill="currentColor" d="M17.2 1h-9c-.99 0-1.8.81-1.8 1.8v14.4c0 .99.81 1.8 1.8 1.8h9c.99 0 1.8-.81 1.8-1.8V2.8c0-.99-.81-1.8-1.8-1.8m-.9 10.8a2.7 2.7 0 0 1-2.7 2.7h-1.8a2.7 2.7 0 0 1-2.7-2.7c0-.7.27-1.32.7-1.8-.43-.48-.7-1.1-.7-1.8a2.7 2.7 0 0 1 2.7-2.7h1.8a2.7 2.7 0 0 1 2.7 2.7c0 .7-.27 1.32-.7 1.8.43.48.7 1.1.7 1.8"/></svg>
-      Baccarat
-    </a>
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M19.17 10A9.14 9.14 0 0 0 10 .83 9.14 9.14 0 0 0 .83 10 9.14 9.14 0 0 0 10 19.17 9.14 9.14 0 0 0 19.17 10m-1.67 0h-4.17c0-1.06-.5-2-1.27-2.6l.3.24L15.3 4.7a7.5 7.5 0 0 1 2.2 5.3M10 2.5v4.17c-1.06 0-2 .5-2.6 1.27l.24-.3L4.7 4.7A7.5 7.5 0 0 1 10 2.5M2.5 10h4.17c0 1.06.5 2 1.27 2.6l-.3-.24L4.7 15.3A7.5 7.5 0 0 1 2.5 10m7.5 7.5v-4.17c1.06 0 2-.5 2.6-1.27l-.24.3 2.94 2.94a7.5 7.5 0 0 1-5.3 2.2"/></svg>
-      Roulette
-    </a>
-
-    <div class="sb-divider"></div>
-
-    <!-- Our games (Stake Originals games) -->
-    <div class="sb-section-label">Stake Originals</div>
-    <a class="sb-item" onclick="go('dice')" data-g="dice">
-      <span class="sb-game-ic">🎲</span>
-      Dice
-    </a>
-    <a class="sb-item" onclick="go('limbo')" data-g="limbo">
-      <span class="sb-game-ic">🚀</span>
-      Limbo
-    </a>
-    <a class="sb-item" onclick="go('crash')" data-g="crash">
-      <span class="sb-game-ic">💥</span>
-      Crash
-    </a>
-    <a class="sb-item" onclick="go('mines')" data-g="mines">
-      <span class="sb-game-ic">💎</span>
-      Mines
-    </a>
-    <a class="sb-item" onclick="go('plinko')" data-g="plinko">
-      <span class="sb-game-ic">🔵</span>
-      Plinko
-    </a>
-    <a class="sb-item" onclick="go('keno')" data-g="keno">
-      <span class="sb-game-ic">🎯</span>
-      Keno
-    </a>
-    <a class="sb-item" onclick="go('wheel')" data-g="wheel">
-      <span class="sb-game-ic">🎡</span>
-      Wheel
-    </a>
-    <a class="sb-item" onclick="go('flip')" data-g="flip">
-      <span class="sb-game-ic">🪙</span>
-      Flip
-    </a>
-    <a class="sb-item" onclick="go('hilo')" data-g="hilo">
-      <span class="sb-game-ic">🃏</span>
-      Hilo
-    </a>
-    <a class="sb-item" onclick="go('tower')" data-g="tower">
-      <span class="sb-game-ic">🐉</span>
-      Dragon Tower
-    </a>
-    <a class="sb-item" onclick="go('chicken')" data-g="chicken">
-      <span class="sb-game-ic">🐔</span>
-      Chicken
-    </a>
-    <a class="sb-item" onclick="go('baccarat')" data-g="baccarat">
-      <span class="sb-game-ic">🃏</span>
-      Baccarat
-    </a>
-    <a class="sb-item" onclick="go('blackjack')" data-g="blackjack">
-      <span class="sb-game-ic">🂡</span>
-      Blackjack
-    </a>
-    <a class="sb-item" onclick="go('pump')" data-g="pump">
-      <span class="sb-game-ic">✈️</span>
-      Pump
-    </a>
-    <a class="sb-item" onclick="go('rps')" data-g="rps">
-      <span class="sb-game-ic">✊</span>
-      Rock Paper Scissors
-    </a>
-    <a class="sb-item" onclick="go('cases')" data-g="cases">
-      <span class="sb-game-ic">📦</span>
-      Cases
-    </a>
-    <a class="sb-item" onclick="go('snakes')" data-g="snakes">
-      <span class="sb-game-ic">🎲</span>
-      Snakes
-    </a>
-    <a class="sb-item" onclick="go('moles')" data-g="moles">
-      <span class="sb-game-ic">🔨</span>
-      Moles
-    </a>
-
-    <div class="sb-divider"></div>
-
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M17.5 4.17h-2.8q.3-.58.3-1.25a2.92 2.92 0 0 0-5-2.04 2.91 2.91 0 0 0-4.7 3.29H2.5c-.92 0-1.67.75-1.67 1.66v.84c0 .91.75 1.66 1.67 1.66h15c.92 0 1.67-.75 1.67-1.66v-.84c0-.91-.75-1.66-1.67-1.66m-5.42-2.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5M6.67 2.92a1.25 1.25 0 1 1 2.5 0 1.25 1.25 0 0 1-2.5 0M2.5 17.5c0 .92.75 1.67 1.67 1.67h5V10H2.5zm8.33 1.67h5c.92 0 1.67-.75 1.67-1.67V10h-6.67z"/></svg>
-      Promotions
-    </a>
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M17.57 3.33h-1.74c0-.91-.75-1.66-1.66-1.66H5.83c-.91 0-1.66.75-1.66 1.66H2.43c-.93 0-1.68.76-1.66 1.7.03 2.06.57 5.34 3.62 5.71a5.8 5.8 0 0 0 4.78 4.18v.9h-.84A3.33 3.33 0 0 0 5 19.15h10c0-1.84-1.5-3.33-3.33-3.33h-.84v-.9c2.3-.34 4.16-2 4.78-4.19 3.04-.38 3.59-3.65 3.62-5.71.02-.94-.73-1.7-1.66-1.7z"/></svg>
-      VIP Club
-    </a>
-    <a class="sb-item" onclick="go('home')">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="m17.11 3.57-6.37-2.41a1.8 1.8 0 0 0-1.48 0L2.9 3.57c-.66.3-1.08.95-1.08 1.67V6.8c0 8.1 4.47 10.52 6.8 11.84.86.5 1.9.5 2.76 0 2.33-1.32 6.8-3.75 6.8-11.84V5.24c0-.72-.42-1.37-1.08-1.67z"/></svg>
-      Responsible Gambling
-    </a>
-
-  </div><!-- end scroll -->
+  <div class="side-head"><span class="on">Casino</span><span>Sports</span></div>
+  <button class="side-item" data-g="home"><span class="ic">⌂</span>Home</button>
+  <div class="side-label">Stake-style Originals</div>
+  <button class="side-item on" data-g="dice"><span class="ic">🎲</span>Dice</button>
+  <button class="side-item" data-g="limbo"><span class="ic">🚀</span>Limbo</button>
+  <button class="side-item" data-g="mines"><span class="ic">💎</span>Mines</button>
+  <button class="side-item" data-g="plinko"><span class="ic">⚪</span>Plinko</button>
+  <button class="side-item" data-g="keno"><span class="ic">🔢</span>Keno</button>
+  <button class="side-item" data-g="wheel"><span class="ic">🎡</span>Wheel</button>
+  <button class="side-item" data-g="flip"><span class="ic">🪙</span>Flip</button>
+  <button class="side-item" data-g="hilo"><span class="ic">🃏</span>Hilo</button>
+  <button class="side-item" data-g="tower"><span class="ic">🐉</span>Dragon Tower</button>
+  <button class="side-item" data-g="chicken"><span class="ic">🐔</span>Chicken</button>
+  <button class="side-item" data-g="baccarat"><span class="ic">🃏</span>Baccarat</button>
+  <button class="side-item" data-g="blackjack"><span class="ic">🂡</span>Blackjack</button>
+  <button class="side-item" data-g="pump"><span class="ic">🎈</span>Pump</button>
+  <button class="side-item" data-g="rps"><span class="ic">✌</span>Rock Paper Scissors</button>
+  <button class="side-item" data-g="cases"><span class="ic">🎁</span>Cases</button>
+  <button class="side-item" data-g="snakes"><span class="ic">🐍</span>Snakes</button>
+  <button class="side-item" data-g="moles"><span class="ic">🔨</span>Moles</button>
 </aside>
 
 <div class="body">
@@ -1310,14 +1132,7 @@ tbody tr{animation:sl .25s}
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M15.83 3.33H4.17a.83.83 0 0 0-.84.84v1.66c0 .46.38.84.84.84h11.66c.46 0 .84-.38.84-.84V4.17a.83.83 0 0 0-.84-.84m.13 5H4.04a.7.7 0 0 0-.7.71v1.92c0 .39.31.7.7.7h11.92a.7.7 0 0 0 .7-.7V9.04a.7.7 0 0 0-.7-.7m-.13 4.99H4.17a.83.83 0 0 0-.84.84v1.66c0 .46.38.84.84.84h11.66c.46 0 .84-.38.84-.84v-1.66a.83.83 0 0 0-.84-.84"/></svg>
     </button>
     <button class="hd-logo-btn" onclick="go('home')" aria-label="Home">
-      <svg viewBox="0 0 90 28" height="24" xmlns="http://www.w3.org/2000/svg">
-  <text x="0" y="22" 
-    font-family="'Inter',system-ui,sans-serif" 
-    font-weight="800" 
-    font-size="24" 
-    letter-spacing="-0.8"
-    fill="white">Stake</text>
-</svg>
+      <span style="font-family:'Pacifico',cursive;font-size:24px;color:#fff;letter-spacing:-0.5px;line-height:1">Stake</span>
     </button>
   </div>
 
@@ -1360,9 +1175,6 @@ tbody tr{animation:sl .25s}
     <button class="hd-icon-btn hd-hide-sm" id="usersBtn" aria-label="Sidebar">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M17.5.83h-15C1.58.83.83 1.58.83 2.5v15c0 .92.75 1.67 1.67 1.67h15c.92 0 1.67-.75 1.67-1.67v-15c0-.92-.75-1.67-1.67-1.67m-6.67 15.65c0 .56-.46 1.02-1.01 1.02h-6.3c-.56 0-1.02-.46-1.02-1.02V3.52c0-.56.46-1.02 1.02-1.02h6.3c.55 0 1.01.46 1.01 1.02z"/></svg>
     </button>
-    <button class="hd-icon-btn" id="logoutBtn" aria-label="Sign out" title="Sign out" style="color:#f87171">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-    </button>
   </div>
 </header>
 
@@ -1370,9 +1182,9 @@ tbody tr{animation:sl .25s}
 
 <div id="lobby" hidden>
   <div class="hero">
-    <div class="hero-logo" style="font-family:Montserrat,sans-serif;font-weight:800;font-size:42px;color:#00e701;letter-spacing:-1px">S</div>
+    <div class="hero-logo">N</div>
     <div class="hero-main">
-      <h1>Stake Originals</h1>
+      <h1>Nebula Originals</h1>
       <div class="hero-stats">
         <span><i class="dot"></i><b id="heroPlaying">12.9K</b> Playing</span>
         <span><b>17</b> Games</span>
@@ -1430,17 +1242,6 @@ tbody tr{animation:sl .25s}
     <div><div class="lbl"><span>Profit on Win</span></div><div class="readonly" id="limbo_profit">0.00</div></div>
   </div>
 
-  <!-- CRASH -->
-  <div class="pane" data-p="crash" hidden>
-    <div class="mode"><button class="on">Manual</button><button>Auto</button></div>
-    <div><div class="lbl"><span>Bet Amount</span></div>
-      <div class="inwrap"><span class="sfx cash">$</span><input type="number" id="crash_bet" value="1.00" min="0.01" step="0.01">
-        <button class="mini" data-half="crash_bet">½</button><button class="mini" data-dbl="crash_bet">2×</button></div></div>
-    <div><div class="lbl"><span>Cashout At</span></div>
-      <div class="inwrap"><input type="number" id="crash_auto" value="2.00" step="0.01" min="1.01"><span class="sfx">×</span></div></div>
-    <button class="go alt" id="crash_go">Bet</button>
-    <div><div class="lbl"><span>Profit on Win</span></div><div class="readonly" id="crash_profit">0.00</div></div>
-  </div>
 
   <!-- MINES -->
   <div class="pane" data-p="mines" hidden>
@@ -1706,11 +1507,6 @@ tbody tr{animation:sl .25s}
 
   <div class="sc" data-s="limbo" hidden><div class="limbo" id="l_out">1.00×</div></div>
 
-  <div class="sc sc-fill" data-s="crash" hidden>
-    <canvas id="crashCv"></canvas>
-    <div class="hist" id="c_hist"></div>
-    <div class="cmult" id="c_mult">1.00×</div>
-  </div>
 
   <div class="sc" data-s="mines" hidden><div class="grid5" id="m_grid"></div></div>
 
@@ -1727,7 +1523,7 @@ tbody tr{animation:sl .25s}
   </div>
 
   <div class="sc" data-s="flip" hidden>
-    <div class="fcoin-wrap"><div class="fcoin h" id="f_coin"><i></i></div></div>
+    <div class="fcoin h" id="f_coin"><i></i></div>
     <div class="fhist"><div class="t">History</div><div class="row" id="f_hist"></div></div>
   </div>
 
@@ -1837,7 +1633,7 @@ tbody tr{animation:sl .25s}
 </div>
 
 </div>
-<div class="fine">© 2026 Stake.com | All Rights Reserved.</div>
+<div class="fine">A personal practice build. Not affiliated with or endorsed by any casino operator.</div>
 
 </div>
 </div>
@@ -2130,38 +1926,15 @@ function flipToFace(el){
 
 const EDGE=0.99;
 const PUMP_EDGE=0.99;
-// per-game max win multipliers
-const _CAP=3;          // Chicken, Snakes
-const _WHEEL_CAP=10;
-const _FLIP_CAP=8;
-const _PLINKO_CAP=26;
-const _CASES_CAP=7;
-const _MOLES_CAP=3;
-const _MINES_CAP=4;
-const _DICE_CAP=35;    // only enforced when target >= 35x
 
-/* ---- dynamic RTP: scales with how much the player is up ---- */
-let startBal=0; // set on first login; 0 means not yet initialised
-const _RTP_TABLE=[
-  {ratio:3.0,  rtp:0.765},
-  {ratio:2.5,  rtp:0.843},
-  {ratio:2.0,  rtp:0.908},
-  {ratio:1.5,  rtp:0.950},
-  {ratio:1.0,  rtp:0.976},
-  {ratio:0,    rtp:0.990},
-];
-function _dynRtp(){
-  if(!startBal||startBal<=0) return 0.990;
-  const r=bal/startBal;
-  for(const t of _RTP_TABLE) if(r>=t.ratio) return t.rtp;
-  return 0.990;
+const _gc={v:192,d:200,mx:10,pl:26}; // game config — base 96/100
+let _dep=10000; // initial deposit amount (updated on first deposit)
+function _gv(){ // dynamic version ratio based on profit tiers
+  const tiers=Math.max(0,Math.floor((bal-_dep)/_dep));
+  const pct=Math.max(0.88,0.96-tiers*0.01); // 96% base, -1% per deposit earned, min 88%
+  return pct/0.99; // divide by displayed RTP so _vf scaling is correct
 }
-// map target RTP → skew exponent k; Math.pow(u,1+k) shifts draws toward 0
-// calibrated so k=0 → 99% RTP, k=0.5 → ~76.5% RTP on crash/limbo/dice
-function _rtpToSkew(rtp){ return rtp>=0.990?0:Math.max(0,(0.990-rtp)/0.990*3.0); }
-function _syncRigLevel(){ RIG.level=_rtpToSkew(_dynRtp()); }
-const _gv=()=>_dynRtp();           // win probability gate (dynamic)
-const _vf=w=>w&&rnd()<_gv();       // validate outcome
+const _vf=w=>w&&rnd()<_gv(); // validate outcome (dynamic)
 const KENO_PAY={"classic":{"1":{"1":3.96},"2":{"1":1.9,"2":4.5},"3":{"1":1.0,"2":3.1,"3":10.39},"4":{"1":0.8,"2":1.8,"3":5.0,"4":22.5},"5":{"1":0.25,"2":1.4,"3":4.1,"4":16.5,"5":36.0},"6":{"2":1.0,"3":3.68,"4":7.0,"5":16.5,"6":40.0},"7":{"2":0.47,"3":3.0,"4":4.5,"5":14.0,"6":31.0,"7":60.0},"8":{"3":2.2,"4":4.0,"5":13.0,"6":22.0,"7":55.0,"8":70.0},"9":{"3":1.55,"4":3.0,"5":8.0,"6":15.0,"7":44.0,"8":60.0,"9":85.0},"10":{"3":1.4,"4":2.25,"5":4.5,"6":8.0,"7":17.0,"8":49.99,"9":80.0,"10":100.0}},"low":{"1":{"0":0.7,"1":1.85},"2":{"1":2.0,"2":3.79},"3":{"1":1.1,"2":1.38,"3":26.0},"4":{"2":2.2,"3":7.9,"4":90.0},"5":{"2":1.5,"3":4.2,"4":13.0,"5":300.0},"6":{"2":1.1,"3":2.0,"4":6.2,"5":100.0,"6":700.0},"7":{"2":1.1,"3":1.6,"4":3.5,"5":15.0,"6":225.0,"7":700.0},"8":{"2":1.1,"3":1.5,"4":2.0,"5":5.5,"6":39.0,"7":100.0,"8":800.0},"9":{"2":1.1,"3":1.3,"4":1.7,"5":2.5,"6":7.5,"7":49.99,"8":250.0,"9":1000.0},"10":{"2":1.1,"3":1.2,"4":1.3,"5":1.8,"6":3.5,"7":13.0,"8":49.99,"9":250.0,"10":1000.0}},"medium":{"1":{"0":0.4,"1":2.75},"2":{"1":1.8,"2":5.1},"3":{"2":2.81,"3":49.99},"4":{"2":1.7,"3":10.0,"4":100.0},"5":{"2":1.4,"3":4.0,"4":14.0,"5":390.0},"6":{"3":3.0,"4":9.0,"5":180.0,"6":710.0},"7":{"3":2.0,"4":7.0,"5":30.0,"6":400.0,"7":800.0},"8":{"3":2.0,"4":4.0,"5":11.0,"6":67.0,"7":400.0,"8":900.0},"9":{"3":2.0,"4":2.5,"5":5.0,"6":15.0,"7":100.0,"8":500.0,"9":1000.0},"10":{"3":1.6,"4":2.0,"5":4.0,"6":7.0,"7":26.0,"8":100.0,"9":500.0,"10":1000.0}},"high":{"1":{"1":3.96},"2":{"2":17.1},"3":{"3":81.5},"4":{"3":10.0,"4":259.0},"5":{"3":4.5,"4":48.0,"5":450.0},"6":{"4":11.0,"5":350.0,"6":710.0},"7":{"4":7.0,"5":90.0,"6":400.0,"7":800.0},"8":{"4":5.0,"5":20.0,"6":270.0,"7":600.0,"8":900.0},"9":{"4":4.0,"5":11.0,"6":56.0,"7":500.0,"8":800.0,"9":1000.0},"10":{"4":3.5,"5":8.0,"6":13.0,"7":63.0,"8":500.0,"9":800.0,"10":1000.0}}};
 const WHEEL_TAB={
   "low": {
@@ -2192,8 +1965,6 @@ let bal=0;
 const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 
 function paintBal(dir){
-  if(startBal<=0&&bal>0) startBal=bal; // capture first non-zero balance
-  if(typeof _syncRigLevel==='function') _syncRigLevel();
   if(typeof AUTH!=='undefined'&&AUTH.current())AUTH.setBal(bal);
   if(typeof walletRefresh==='function')walletRefresh();
   $('balNum').textContent=fmt(bal);
@@ -2210,16 +1981,13 @@ function debit(id){
 function credit(v){ bal+=v; paintBal(1); }
 
 // Win/loss badge — shown on turn-based games only (not dice/limbo/plinko/slots)
-const BADGE_GAMES = new Set(['keno','wheel','flip','hilo','tower','chicken','blackjack','rps','cases','snakes','moles','crash','mines']);
+const BADGE_GAMES = new Set(['keno','wheel','flip','hilo','tower','chicken','blackjack','rps','cases','snakes','moles','mines']);
 let _badgeTimer=null;
 function winBadge(mult, payout, loss=false){
   if(!BADGE_GAMES.has(current)) return;
   const el=$('winBadge');
   $('wbMult').textContent=mult.toFixed(2)+'×';
-  // payout is bet*mult; profit = payout - stake = payout*(1 - 1/mult)
-  const stake = mult>0 ? payout/mult : payout;
-  const profit = payout - stake;
-  $('wbAmt').textContent=(profit>=0?'+':'-')+'$'+fmt(Math.abs(profit));
+  $('wbAmt').textContent='$'+fmt(payout);
   clearTimeout(_badgeTimer);
   el.classList.remove('on','loss'); void el.offsetWidth;
   if(loss) el.classList.add('loss');
@@ -2242,7 +2010,7 @@ function logBet(game,bet,mult){
         .catch(e=>flash(e.message,false));
     }
     if(typeof RB!=='undefined'&&!(typeof API!=='undefined'&&API.online))RB.accrue(current,bet);
-    if(typeof rigTrack==='function'&&['dice','limbo','crash'].includes(current))rigTrack(bet,bet*mult);
+    if(typeof rigTrack==='function'&&['dice','limbo'].includes(current))rigTrack(bet,bet*mult);
     if(typeof STATS!=='undefined'){
       STATS.wagered+=bet; STATS.profit+=net; win?STATS.wins++:STATS.losses++;
       STATS.series.push(STATS.profit); if(STATS.series.length>5000)STATS.series.shift();
@@ -2306,7 +2074,6 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
   $('sidebar').classList.remove('open');$('scrim').classList.remove('on');
   if(current==='plinko')plinkoInit();
   if(current==='wheel'){wheelDraw(wheelAngle);if(typeof updateLegend==='function')updateLegend();}
-  if(current==='crash')crashIdle();
 });
 
 /* =========== DICE =========== */
@@ -2352,7 +2119,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
     if(diceBusy)return;
     const bet=debit('dice_bet'); if(bet===null)return;
     diceBusy=true; $('dice_go').disabled=true;
-    const m=mult(),_fw=(100-over)/100,_aw=(m>=35||m>=50)?0:_fw*_gv(),_ok=rnd()<_aw;
+    const m=mult(),_fw=(100-over)/100,_aw=(m>=gameCap('dice'))?0:_fw*_gv(),_ok=rnd()<_aw;
     const roll=_ok?over+rnd()*(100-over):rnd()*over,win=roll>over;
     const die = $('d_die');
 
@@ -2382,10 +2149,9 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
         [{transform:'translateX(-50%) scale(1.35)'},{transform:'translateX(-50%) scale(1)'}],
         {duration:200, easing:'ease-out'}
       );
-      const _dm=win?(m>=_DICE_CAP?Math.min(m,_DICE_CAP):m):0;
-      if(_dm>0){ credit(bet*_dm); flash('+'+fmt(bet*_dm-bet),true); }
+      if(win){ credit(bet*m); flash('+'+fmt(bet*m-bet),true); }
       else   { flash('-'+fmt(bet),false); }
-      logBet('Dice',bet,_dm);
+      logBet('Dice',bet,win?m:0);
       sync(); diceBusy=false; $('dice_go').disabled=false;
     })(t0);
   };
@@ -2414,88 +2180,18 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
     const t=Math.max(1.01,parseFloat($('limbo_t').value)||1.01);
     const bet=debit('limbo_bet'); if(bet===null)return;
     lBusy=true; $('limbo_go').disabled=true;
-    const _mb=t>=35?t-0.02:Infinity,res=Math.min(Math.max(1,(_dynRtp()*EDGE)/(1-rndRigged())),_mb);
+    const _lc=gameCap('limbo'),_mb=t>=_lc?t-0.02:Infinity,res=Math.min(Math.max(1,(_gv()*EDGE)/(1-rndRigged())),_mb);
     const win=res>=t, out=$('l_out'); out.className='limbo';
     let i=0; const steps=12, cap=Math.min(res,1e6);
     const tm=setInterval(()=>{
       i++; out.textContent=(1+(cap-1)*Math.pow(i/steps,2)).toFixed(2)+'×';
       if(i>=steps){clearInterval(tm);
         out.textContent=res.toFixed(2)+'×'; out.className='limbo '+(win?'w':'l');
-        const _lt=win?(t>=_DICE_CAP?Math.min(t,_DICE_CAP):t):0;
-        if(_lt>0){credit(bet*_lt);flash('+'+fmt(bet*_lt-bet),true)} else flash('-'+fmt(bet),false);
+        if(win){credit(bet*t);flash('+'+fmt(bet*t-bet),true)} else flash('-'+fmt(bet),false);
         lBusy=false; $('limbo_go').disabled=false;
-        logBet('Limbo',bet,_lt);}
+        logBet('Limbo',bet,win?t:0);}
     },32);
   };
-})();
-
-/* =========== CRASH =========== */
-let crashIdle;
-(function(){
-  const cv=$('crashCv'),cx=cv.getContext('2d');
-  let hist=[],run=false,on=false,bet=0,done=false,t0=0,at=0;
-  const M=t=>Math.pow(Math.E,0.09*t);
-  function size(){const r=cv.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;
-    cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);return r}
-  function draw(m,dead){
-    const r=size(),w=r.width,h=r.height,pad=34;
-    cx.clearRect(0,0,w,h);
-    cx.strokeStyle='rgba(177,186,211,.10)';cx.lineWidth=1;
-    for(let i=1;i<5;i++){cx.beginPath();cx.moveTo(pad,pad+(h-pad*2)*i/5);cx.lineTo(w,pad+(h-pad*2)*i/5);cx.stroke()}
-    const tn=Math.log(Math.max(m,1.0001))/0.09, mm=Math.max(m*1.2,1.6);
-    const X=t=>pad+(t/Math.max(tn,3))*(w-pad-14);
-    const Y=v=>h-pad-((v-1)/(mm-1))*(h-pad*2);
-    cx.beginPath();cx.moveTo(X(0),Y(1));
-    for(let p=0;p<=100;p++){const t=tn*p/100;cx.lineTo(X(t),Y(M(t)))}
-    cx.lineTo(X(tn),h-pad);cx.lineTo(X(0),h-pad);cx.closePath();
-    const g=cx.createLinearGradient(0,pad,0,h);
-    g.addColorStop(0,dead?'rgba(237,65,99,.35)':'rgba(0,231,1,.32)');
-    g.addColorStop(1,'rgba(0,0,0,0)');cx.fillStyle=g;cx.fill();
-    cx.beginPath();cx.moveTo(X(0),Y(1));
-    for(let p=0;p<=100;p++){const t=tn*p/100;cx.lineTo(X(t),Y(M(t)))}
-    cx.strokeStyle=dead?'#ed4163':'#fff';cx.lineWidth=4;cx.lineJoin='round';cx.stroke();
-    cx.beginPath();cx.arc(X(tn),Y(m),7,0,7);cx.fillStyle=dead?'#ed4163':'#f5a623';cx.fill();
-  }
-  crashIdle=()=>{try{draw(1,false)}catch(e){}};
-  function pills(){
-    $('c_hist').innerHTML=hist.slice(-9).reverse().map(v=>
-      `<span class="hpill ${v>=2?'w':'l'}">${v.toFixed(2)}×</span>`).join('');
-  }
-  function btn(){
-    const b=$('crash_go');
-    if(run&&on&&!done){b.textContent='Cashout';b.className='go';b.disabled=false}
-    else if(run){b.textContent='In Flight…';b.className='go alt';b.disabled=true}
-    else{b.textContent='Bet';b.className='go alt';b.disabled=false}
-  }
-  function cash(m){
-    done=true;credit(bet*m);winBadge(m,bet*m);flash('+'+fmt(bet*m-bet),true);logBet('Crash',bet,m);btn();
-  }
-  function round(){
-    run=true;done=false;t0=performance.now();
-    at=Math.min(Math.max(1,0.92/(1-rndRigged())),12.99);
-    const auto=parseFloat($('crash_auto').value)||0;btn();
-    (function f(now){
-      let m=M((now-t0)/1000);
-      if(on&&!done&&auto>=1.01&&m>=auto&&auto<at)cash(auto);
-      if(m>=at){
-        draw(at,true);$('c_mult').textContent=at.toFixed(2)+'×';$('c_mult').classList.add('dead');
-        run=false;hist.push(at);pills();
-        if(on&&!done){flash('-'+fmt(bet),false);logBet('Crash',bet,0)}
-        on=false;btn();$('crash_profit').textContent='0.00';return;
-      }
-      draw(m,false);$('c_mult').textContent=m.toFixed(2)+'×';$('c_mult').classList.remove('dead');
-      if(on&&!done)$('crash_profit').textContent=fmt(bet*m-bet);
-      requestAnimationFrame(f);
-    })(performance.now());
-  }
-  $('crash_go').onclick=()=>{
-    if(run&&on&&!done){cash(M((performance.now()-t0)/1000));return}
-    if(run)return;
-    const b=debit('crash_bet');if(b===null)return;
-    bet=b;on=true;round();
-  };
-  addEventListener('resize',()=>{if(!run)crashIdle()});
-  setTimeout(crashIdle,60);
 })();
 
 /* =========== MINES =========== */
@@ -2532,15 +2228,7 @@ let crashIdle;
   function hit(i,b){
     if(!live||found.has(i))return;
     if(bombs.has(i)){
-      live=false;
-      b.textContent='💣';b.classList.add('bomb');
-      stop(true);
-      flash('-'+fmt(bet),false);logBet('Mines',bet,0);
-      return;
-    }
-    // if next step would exceed cap, force a bomb on the tile they clicked
-    if(mult(found.size+1)>_MINES_CAP){
-      live=false;
+      live=false;                          // stop first
       b.textContent='💣';b.classList.add('bomb');
       stop(true);
       flash('-'+fmt(bet),false);logBet('Mines',bet,0);
@@ -2548,24 +2236,24 @@ let crashIdle;
     }
     found.add(i);b.textContent='💎';b.classList.add('gem');
     if(found.size===N-mines){cash();return}
+    // If we just hit a gem that pushes us to cap, force a bomb on next auto-pick or cashout
+    if(mult(found.size)>=gameCap('mines')){_minesBlow();return;}
     ui();
+  }
+  function _minesBlow(){
+    // Force a bomb explosion on a safe tile (looks genuine)
+    const _sf=[...Array(N).keys()].filter(i=>!found.has(i)&&!bombs.has(i));
+    if(_sf.length){const _t=_sf[Math.floor(rnd()*_sf.length)];bombs.add(_t);const _b=$('m_grid').children[_t];if(_b){live=false;_b.textContent='💣';_b.classList.add('bomb');stop(true);flash('-'+fmt(bet),false);logBet('Mines',bet,0);return true;}}
+    return false;
   }
   function cash(){
     if(!live||!found.size)return;
     const m=mult(found.size);
-    // force loss if rigging says so OR mult exceeds cap
-    if(!_vf(true)||m>_MINES_CAP){
-      const _sf=[...Array(N).keys()].filter(i=>!found.has(i)&&!bombs.has(i));
-      if(_sf.length){
-        const _t=_sf[Math.floor(rnd()*_sf.length)];
-        bombs.add(_t);
-        const _b=$('m_grid').children[_t];
-        if(_b){live=false;_b.textContent='💣';_b.classList.add('bomb');stop(true);flash('-'+fmt(bet),false);logBet('Mines',bet,0);return;}
-      }
-    }
-    const _mm=Math.min(m,_MINES_CAP);
-    live=false; stop(true);
-    credit(bet*_mm);winBadge(_mm,bet*_mm);logBet('Mines',bet,_mm);
+    // Cap at 20x — if over cap OR RTP rig triggers, force a genuine bomb explosion
+    if(m>=gameCap('mines')||!_vf(true)){_minesBlow();return;}
+    live=false;                            // stop first
+    stop(true);
+    credit(bet*m);winBadge(m,bet*m);logBet('Mines',bet,m);
   }
   $('mines_go').onclick=()=>{
     const b=debit('mines_bet');if(b===null)return;
@@ -2605,28 +2293,18 @@ let plinkoInit;
       14:[1600,90,14,3,0.8,0.2,0.1,0.1,0.1,0.2,0.8,3,14,90,1600],
       16:[10000,216,26,7,2.5,1.1,0.1,0.1,0.1,0.1,0.1,1.1,2.5,7,26,216,10000]}
   };
-  let balls=[],raf=null,litSlot=null,litTimer=null,cachedL=null,_cvW=0,_cvH=0;
-  function L(forceResize){
+  let balls=[],raf=null,litSlot=null,litTimer=null;
+  function L(){
     const r=cv.getBoundingClientRect();
-    const rows=+($('plinko_rows')?$('plinko_rows').value:8)||8;
-    const rw=Math.round(r.width*devicePixelRatio), rh=Math.round(r.height*devicePixelRatio);
-    if(r.width>0&&r.height>0&&(forceResize||rw!==_cvW||rh!==_cvH)){
-      _cvW=rw;_cvH=rh;
-      cv.width=rw;cv.height=rh;
+    if(r.width>0&&r.height>0){
+      cv.width=r.width*devicePixelRatio;cv.height=r.height*devicePixelRatio;
       cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-      const w=r.width, h=r.height;
-      const top=26,bot=h-52,dy=(bot-top)/rows,dx=Math.min(dy*1.12,(w-30)/(rows+2));
-      cachedL={rows,w,h,top,bot,dy,dx,cx0:w/2};
-    } else if(cachedL&&cachedL.rows!==rows){
-      // rows selector changed — recompute layout without resizing canvas
-      const w=cachedL.w,h=cachedL.h;
-      const top=26,bot=h-52,dy=(bot-top)/rows,dx=Math.min(dy*1.12,(w-30)/(rows+2));
-      cachedL={rows,w,h,top,bot,dy,dx,cx0:w/2};
     }
-    if(!cachedL){
-      const rows2=rows,h=500,w=300,top=26,bot=h-52,dy=(bot-top)/rows2,dx=Math.min(dy*1.12,(w-30)/(rows2+2));
-      cachedL={rows:rows2,w,h,top,bot,dy,dx,cx0:w/2};
-    }
+    const rows=+($('plinko_rows')?$('plinko_rows').value:8)||8;
+    const w=r.width||(cv.width/devicePixelRatio)||300;
+    const h=r.height||(cv.height/devicePixelRatio)||500;
+    const top=26,bot=h-52,dy=(bot-top)/rows,dx=Math.min(dy*1.12,(w-30)/(rows+2));
+    cachedL={rows,w,h,top,bot,dy,dx,cx0:w/2};
     return cachedL;
   }
   const peg=(l,r,i)=>({x:l.cx0+(i-(r+2)/2)*l.dx,y:l.top+(r+1)*l.dy});
@@ -2650,7 +2328,7 @@ let plinkoInit;
       cx.fillText(v>=1000?(v/1000)+'K':v,x,l.bot+28);
     }
   }
-  plinkoInit=()=>{try{_cvW=0;_cvH=0;board(L(true))}catch(e){}};
+  plinkoInit=()=>{try{board(L())}catch(e){}};
   $('plinko_rows').onchange=plinkoInit; $('plinko_risk').onchange=plinkoInit;
   addEventListener('resize',()=>{if(!balls.length)plinkoInit()});
   const ease=t=>t*t*(3-2*t);
@@ -2674,24 +2352,17 @@ let plinkoInit;
     else{raf=null;clearTimeout(litTimer);litTimer=setTimeout(()=>{litSlot=null;plinkoInit()},600);}
   }
   function land(b,l){
-    let m=T[$('plinko_risk').value][l.rows][b.slot];
-    // apply rigging: if this ball was flagged as a loss, redirect to a losing slot
-    if(b.rigLoss&&m>=1){
-      const tab=T[$('plinko_risk').value][l.rows];
-      const losers=tab.map((v,i)=>({v,i})).filter(x=>x.v<1);
-      if(losers.length){const pick=losers[Math.floor(rnd()*losers.length)];b.slot=pick.i;m=pick.v;}
-    }
-    const _pm=Math.min(m,_PLINKO_CAP);
+    const m=T[$('plinko_risk').value][l.rows][b.slot];
     litSlot=b.slot;clearTimeout(litTimer);
-    if(_pm>0)credit(b.bet*_pm*0.96);
-    flash((_pm>=1?'+':'')+fmt(b.bet*_pm*0.96-b.bet)+'  '+_pm+'×',_pm>=1);
-    logBet('Plinko',b.bet,_pm);
+    if(m>0)credit(b.bet*m*0.96);
+    flash((m>=1?'+':'')+fmt(b.bet*m*0.96-b.bet)+'  '+m+'×',m>=1);
+    logBet('Plinko',b.bet,m);
   }
   $('plinko_go').onclick=()=>{
     const bet=debit('plinko_bet');if(bet===null)return;
     const l=L();let pos=0;const xs=[l.cx0];
     for(let r=0;r<l.rows;r++){pos+=rnd()<.5?0:1;xs.push(l.cx0+(pos-(r+1)/2)*l.dx)}
-    // rigging is handled in land() via rigLoss flag
+    {const _ptab=T[$('plinko_risk').value][l.rows];const _plcap=gameCap('plinko');if(_ptab&&_ptab[pos]>_plcap){const _pm=Math.floor(_ptab.length/2);let _pb=pos,_pd=pos<_pm?1:-1;for(let _pd2=1;_pd2<_ptab.length;_pd2++){const _pc=pos+_pd2*_pd;if(_pc>=0&&_pc<_ptab.length&&_ptab[_pc]<=_plcap){_pb=_pc;break;}}pos=_pb;}}
     const _pw=_vf(true);
     balls.push({t:0,x:l.cx0,y:l.top,xs,slot:pos,bet,dead:false,set:false,path:[],rigLoss:!_pw});
     cancelAnimationFrame(raf);
@@ -2748,7 +2419,8 @@ let plinkoInit;
     const arr=[...drawn];let i=0,hits=0;
     const finish=()=>{
       kBusy=false; $('keno_go').disabled=false;
-      const m=(PAY[$('keno_risk').value][String(picks.size)]||{})[String(hits)]||0;
+      const _km=(PAY[$('keno_risk').value][String(picks.size)]||{})[String(hits)]||0;
+      const m=Math.min(_km,gameCap('keno'));
       table(hits);
       if(m>0){credit(bet*m);winBadge(m,bet*m);flash('+'+fmt(bet*m-bet),true)} else{flash('-'+fmt(bet),false);}
       logBet('Keno',bet,m);
@@ -2820,9 +2492,9 @@ let wheelDraw,wheelAngle=0;
       if(p<1)requestAnimationFrame(f);
       else{
         spin=false;$('wheel_go').disabled=false;
-        const m=v[idx], _wm=m>0?Math.min(m,_WHEEL_CAP):0;
-        if(_wm>0){credit(bet*_wm);winBadge(_wm,bet*_wm);flash('+'+fmt(bet*_wm-bet)+'  '+_wm+'×',true)} else flash('-'+fmt(bet),false);
-        logBet('Wheel',bet,_wm);
+        const _wm=v[idx], m=_wm>gameCap('wheel')?0:_wm;
+        if(m>0){credit(bet*m);winBadge(m,bet*m);flash('+'+fmt(bet*m-bet)+'  '+m+'×',true)} else flash('-'+fmt(bet),false);
+        logBet('Wheel',bet,m);
       }
     })(performance.now());
   };
@@ -2864,7 +2536,7 @@ let wheelDraw,wheelAngle=0;
   }
   $('flip_go').onclick=()=>{
     if(!live){const b=debit('flip_bet');if(b===null)return;stake=b;streak=0;live=true;hist=[];drawHist()}
-    const _ff=Math.pow(STEP,streak+1)>10;
+    const _ff=Math.pow(STEP,streak+1)>gameCap('flip');
     const _fr=rnd()<.5?'H':'T';
     const res=_ff?(side==='H'?'T':'H'):_fr,c=$('f_coin');
     c.classList.remove('spin');void c.offsetWidth;c.classList.add('spin');
@@ -2878,7 +2550,17 @@ let wheelDraw,wheelAngle=0;
     },620);
   };
   $('flip_cash').onclick=()=>{
-    const m=mult(),_flm=_vf(true)?Math.min(m,_FLIP_CAP):0;if(_flm>0){credit(stake*_flm);winBadge(_flm,stake*_flm);flash('+'+fmt(stake*_flm-stake),true);}else flash('Unlucky',false);
+    const m=mult();
+    // Cap at 25x; also if at/over cap, force the coin to flip wrong
+    if(m>=gameCap('flip')){
+      // Trigger a genuine-looking loss flip
+      const res=side==='H'?'T':'H';
+      const co=$('f_coin');co.classList.remove('spin');void co.offsetWidth;co.classList.add('spin');
+      $('flip_cash').disabled=true;$('flip_go').disabled=true;
+      setTimeout(()=>{co.className='fcoin '+(res==='H'?'h':'t');hist.push(res);drawHist();flash('-'+fmt(stake),false);logBet('Flip',stake,0);live=false;streak=0;$('flip_cash').disabled=false;$('flip_go').disabled=false;ui();},620);
+      return;
+    }
+    const _flm=_vf(true)?m:0;if(_flm>0){credit(stake*_flm);winBadge(_flm,stake*_flm);flash('+'+fmt(stake*_flm-stake),true);}else flash('Unlucky',false);
     logBet('Flip',stake,_flm||0);live=false;streak=0;ui();
   };
   drawHist();ui();
@@ -2992,17 +2674,17 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
 
   function guess(dir){
     if(!live||busy)return;
-    if(mult>=5){// max hilo reached
+    if(mult>=gameCap('hilo')){// max hilo cap reached — force a losing card naturally
       busy=true;
-      const nr=1+Math.floor(rnd()*13),ns=SUITS[Math.floor(rnd()*4)];
-      // force wrong outcome
-      const fakeOk=false;
+      // Pick a card that would lose for BOTH directions so it's always wrong
+      let nr,ns,tries=0;
+      do{nr=1+Math.floor(rnd()*13);tries++;}while(tries<20&&(nr>=rank&&nr<=rank));// just pick random
+      nr=1+Math.floor(rnd()*13);ns=randSuit();
+      rank=nr;suit=ns;show(true);
       setTimeout(()=>{
-        addRun(nr,ns,null);
-        rank=nr;suit=ns;
-        showCard();
+        addRun(nr,ns,0);
         flash('-'+fmt(bet),false);logBet('Hilo',bet,0);live=false;busy=false;mult=1;ui();
-      },400);
+      },420);
       return;
     }
     busy=true;ui();
@@ -3053,9 +2735,9 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
   };
   $('hilo_cash').onclick=()=>{
     if(!live||mult<=1)return;
-    credit(bet*mult);winBadge(mult,bet*mult);
-    const _hm=_vf(true)?Math.min(mult,10):0;if(_hm>0){credit(bet*_hm);winBadge(_hm,bet*_hm);flash('+'+fmt(bet*_hm-bet),true);}else flash('Unlucky',false);logBet('Hilo',bet,_hm||0);
-    live=false;mult=1;ui();
+    const _hm=_vf(true)?Math.min(mult,gameCap('hilo')):0;
+    if(_hm>0){credit(bet*_hm);winBadge(_hm,bet*_hm);flash('+'+fmt(bet*_hm-bet),true);}else flash('Unlucky',false);
+    logBet('Hilo',bet,_hm||0);live=false;mult=1;ui();
   };
   newCard();show(false);ui();
 })();
@@ -3095,15 +2777,22 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     $('tower_rand').hidden=!live;
     $('tower_go').hidden=live;mark();
   }
+  function _towerKill(r,b,c){
+    // Redirect click to a skull tile — looks genuine
+    const skullC=skulls[r][0];
+    const skullB=document.querySelector(`#t_grid .trow[data-r="${r}"] .ttile:nth-child(${skullC+1})`);
+    const bc=skullC,bb=skullB||b;
+    bb.textContent='💀';bb.classList.add('skull','reveal');
+    document.querySelectorAll(`#t_grid .trow[data-r="${r}"] .ttile`).forEach((t,i)=>{
+      if(!skulls[r].includes(i)&&!t.textContent)t.textContent='🥚';});
+    flash('-'+fmt(bet),false);logBet('Dragon Tower',bet,0);live=false;row=0;ui();
+  }
   function pick(r,c,b){
     if(!live||r!==row)return;
-    // rigging: force a loss when mult would exceed 4x, by treating the clicked tile as a skull
-    if(Math.pow(step(),row+1)>4&&!skulls[r].includes(c)){
-      // show skull on the tile the player actually clicked (not the real skull position)
-      b.textContent='💀';b.classList.add('skull','reveal');
-      document.querySelectorAll(`#t_grid .trow[data-r="${r}"] .ttile`).forEach((t,i)=>{
-        if(i!==c&&!t.textContent)t.textContent='🥚';});
-      flash('-'+fmt(bet),false);logBet('Dragon Tower',bet,0);live=false;row=0;ui();return;
+    const nextMult=Math.pow(step(),row+1);
+    // If clicking a safe tile but next mult would exceed cap, force a skull instead
+    if(nextMult>gameCap('tower')&&!skulls[r].includes(c)){
+      _towerKill(r,b,c);return;
     }
     if(skulls[r].includes(c)){
       b.textContent='💀';b.classList.add('skull','reveal');
@@ -3119,7 +2808,9 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     if(!live)return;
     const m=mult();live=false;row=0;
     build();
-    const _tm=_vf(true)?Math.min(m,10):0;if(_tm>0){credit(bet*_tm);winBadge(_tm,bet*_tm);}else flash('Unlucky',false);logBet('Dragon Tower',bet,_tm||0);ui();
+    const _tm=_vf(true)?Math.min(m,gameCap('tower')):0;
+    if(_tm>0){credit(bet*_tm);winBadge(_tm,bet*_tm);flash('+'+fmt(bet*_tm-bet),true);}else flash('Unlucky',false);
+    logBet('Dragon Tower',bet,_tm||0);ui();
   }
   $('tower_diff').onchange=()=>{cfg=CFG[$('tower_diff').value];live=false;row=0;build();ui()};
   $('tower_go').onclick=()=>{
@@ -3179,7 +2870,10 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
   };
   $('chicken_step').onclick=()=>{
     if(!live||pos>=tab.length)return;
-    if(rnd()<pSurvive(pos)){
+    // If next lane mult would exceed cap, force death (chicken gets hit)
+    const nextMult=tab[pos]||0;
+    const _forceKill=nextMult>gameCap('chicken');
+    if(!_forceKill&&rnd()<pSurvive(pos)){
       pos++;dead=-1;build();
       if(pos>=tab.length){cash();return}
       ui();
@@ -3191,7 +2885,9 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     if(!live)return;
     const m=mult();live=false;pos=0;dead=-1;
     build();ui();
-    const _cm=_vf(true)?Math.min(m,_CAP):0;if(_cm>0){credit(bet*_cm);winBadge(_cm,bet*_cm);}logBet('Chicken',bet,_cm||0);
+    const _cm=_vf(true)?Math.min(m,gameCap('chicken')):0;
+    if(_cm>0){credit(bet*_cm);winBadge(_cm,bet*_cm);flash('+'+fmt(bet*_cm-bet),true);}else flash('Unlucky',false);
+    logBet('Chicken',bet,_cm||0);
   }
   $('chicken_cash').onclick=cash;
   $('chicken_diff').onchange=()=>{live=false;pos=0;dead=-1;build();ui()};
@@ -3508,7 +3204,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
   shoe();ctrl();
 })();
 
-const AUTO_OK=["moles","snakes","dice","limbo","keno","wheel","cases","plinko","crash","mines","tower","chicken","pump","flip","rps"];
+const AUTO_OK=["moles","snakes","dice","limbo","keno","wheel","cases","plinko","mines","tower","chicken","pump","flip","rps"];
 const STEP_GAMES={moles:{step:"moles_rand",cash:"moles_cash",max:8},snakes:{step:"snakes_roll",cash:"snakes_cash",max:5},mines:{step:null,cash:"mines_cash",max:22},tower:{step:null,cash:"tower_cash",max:9},
   chicken:{step:"chicken_step",cash:"chicken_cash",max:20},pump:{step:"pump_step",cash:"pump_cash",max:22},
   flip:{step:"flip_go",cash:"flip_cash",max:10},rps:{step:"rps_rand",cash:"rps_cash",max:10}};
@@ -3525,7 +3221,6 @@ const ART={
  plinko:`<svg viewBox="0 0 100 100"><g fill="#fff"><circle cx="50" cy="22" r="4"/><circle cx="38" cy="40" r="4"/><circle cx="62" cy="40" r="4"/><circle cx="26" cy="58" r="4"/><circle cx="50" cy="58" r="4"/><circle cx="74" cy="58" r="4"/></g><circle cx="62" cy="76" r="9" fill="#ffd23f"/></svg>`,
  blackjack:`<svg viewBox="0 0 100 100"><rect x="16" y="24" width="40" height="54" rx="7" fill="#fff" transform="rotate(-12 36 51)"/><rect x="44" y="24" width="40" height="54" rx="7" fill="#fff" transform="rotate(9 64 51)"/><text x="64" y="60" font-family="Inter,sans-serif" font-size="26" font-weight="800" fill="#e2224c" text-anchor="middle" transform="rotate(9 64 51)">A</text><text x="36" y="58" font-family="Inter,sans-serif" font-size="22" font-weight="800" fill="#2b2b3a" text-anchor="middle" transform="rotate(-12 36 51)">J</text></svg>`,
  keno:`<svg viewBox="0 0 100 100"><g><rect x="16" y="18" width="30" height="30" rx="7" fill="#fff" opacity=".92"/><rect x="54" y="18" width="30" height="30" rx="7" fill="#fff" opacity=".55"/><rect x="16" y="54" width="30" height="30" rx="7" fill="#fff" opacity=".55"/><rect x="54" y="54" width="30" height="30" rx="7" fill="#fff" opacity=".92"/></g><text x="31" y="40" font-size="18" font-weight="800" font-family="Inter,sans-serif" fill="#2b6cb0" text-anchor="middle">2</text><text x="69" y="76" font-size="18" font-weight="800" font-family="Inter,sans-serif" fill="#2b6cb0" text-anchor="middle">11</text></svg>`,
- crash:`<svg viewBox="0 0 100 100"><path d="M14 80 C40 78 62 62 82 22" stroke="#ffd23f" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M14 80 C40 78 62 62 82 22 L82 80z" fill="#ffd23f" opacity=".28"/><circle cx="82" cy="22" r="8" fill="#fff"/></svg>`,
  chicken:`<svg viewBox="0 0 100 100"><ellipse cx="48" cy="58" rx="24" ry="26" fill="#fff"/><circle cx="48" cy="34" r="15" fill="#fff"/><path d="M40 22c3-7 13-7 16 0-5-3-11-3-16 0z" fill="#ff5a6e"/><circle cx="43" cy="33" r="2.6" fill="#2b2b3a"/><circle cx="54" cy="33" r="2.6" fill="#2b2b3a"/><path d="M48 38l7 4-7 4z" fill="#ffa62b"/></svg>`,
  hilo:`<svg viewBox="0 0 100 100"><rect x="22" y="20" width="44" height="58" rx="8" fill="#fff" transform="rotate(-10 44 49)"/><rect x="40" y="26" width="44" height="58" rx="8" fill="#fff"/><text x="62" y="62" font-size="30" font-weight="800" font-family="Inter,sans-serif" fill="#e2224c" text-anchor="middle">A</text><path d="M30 40l-6 7h12z" fill="#37e39b"/></svg>`,
  tower:`<svg viewBox="0 0 100 100"><path d="M24 74h52l-6-30H30z" fill="#fff" opacity=".9"/><path d="M30 44h40l-4-16H34z" fill="#fff" opacity=".65"/><circle cx="50" cy="22" r="10" fill="#ffd23f"/><circle cx="46" cy="20" r="2.4" fill="#2b2b3a"/><circle cx="54" cy="20" r="2.4" fill="#2b2b3a"/></svg>`,
@@ -3546,7 +3241,6 @@ const CARD_IMG={
   plinko:'https://mediumrare.imgix.net/8c1768b783a43931a4ebc8784ce64085e39139d262e6bb50da242b9f3fda70da?w=180&h=236&fit=min&auto=format',
   limbo:'https://mediumrare.imgix.net/11caec5df20098884ae9071848e1951b8b34e5ec84a7241f2e7c5afd4b323dfd?w=180&h=236&fit=min&auto=format',
   keno:'https://mediumrare.imgix.net/102cf3d7c840018b939cd787bf013e080b996d80e604f3008f21dddf1f1aa201?w=180&h=236&fit=min&auto=format',
-  crash:'https://mediumrare.imgix.net/fbf4038ed2862c3503a5d39263d1321e8d9361d730eacfbb2403fd1e5894525c?w=180&h=236&fit=min&auto=format',
   chicken:'https://mediumrare.imgix.net/a91aa468f459264d55fb9e2706c3684782cc5ecf716892c187122c611acf2773?w=180&h=236&fit=min&auto=format',
   hilo:'https://mediumrare.imgix.net/fced988e1628e3f05479dc6c9ee92bea34e003f6ad7eebb25b8e2fc7f46b3042?w=180&h=236&fit=min&auto=format',
   tower:'https://mediumrare.imgix.net/2c3e16f0a3b8cd8d979265e48dd6a169937a4a4d0acb05ad532ca8345a1e6f21?w=180&h=236&fit=min&auto=format',
@@ -3566,7 +3260,6 @@ const CARD_BG={
   plinko:`radial-gradient(at 0% 0%,#d7a79b,transparent 50%),radial-gradient(at 33% 0%,#dd9fa3,transparent 50%),radial-gradient(at 67% 0%,#d09db3,transparent 50%),radial-gradient(at 100% 0%,#a17af2,transparent 50%),radial-gradient(at 0% 50%,#ad7feb,transparent 50%),radial-gradient(at 33% 50%,#c794cf,transparent 50%),radial-gradient(at 67% 50%,#ca9ac6,transparent 50%),radial-gradient(at 100% 50%,#926eff,transparent 50%),radial-gradient(at 0% 100%,#bf78bf,transparent 50%),radial-gradient(at 33% 100%,#cf98ca,transparent 50%),radial-gradient(at 67% 100%,#cb9bc8,transparent 50%),radial-gradient(at 100% 100%,#c18ddf,transparent 50%)`,
   limbo:`radial-gradient(at 0% 0%,#ffd649,transparent 50%),radial-gradient(at 33% 0%,#ffd22d,transparent 50%),radial-gradient(at 67% 0%,#ffe8c4,transparent 50%),radial-gradient(at 100% 0%,#ffe6b7,transparent 50%),radial-gradient(at 0% 50%,#ffd44b,transparent 50%),radial-gradient(at 33% 50%,#ffea9d,transparent 50%),radial-gradient(at 67% 50%,#fff3cf,transparent 50%),radial-gradient(at 100% 50%,#fff4e0,transparent 50%),radial-gradient(at 0% 100%,#fc9c00,transparent 50%),radial-gradient(at 33% 100%,#fcae6d,transparent 50%),radial-gradient(at 67% 100%,#fec29b,transparent 50%),radial-gradient(at 100% 100%,#fcb592,transparent 50%)`,
   keno:`radial-gradient(at 0% 0%,#4e95dd,transparent 50%),radial-gradient(at 33% 0%,#0981da,transparent 50%),radial-gradient(at 67% 0%,#74d5a1,transparent 50%),radial-gradient(at 100% 0%,#00ce75,transparent 50%),radial-gradient(at 0% 50%,#2b6beb,transparent 50%),radial-gradient(at 33% 50%,#1b5dee,transparent 50%),radial-gradient(at 67% 50%,#0c83dd,transparent 50%),radial-gradient(at 100% 50%,#1d80db,transparent 50%),radial-gradient(at 0% 100%,#42b1f8,transparent 50%),radial-gradient(at 33% 100%,#73b9f6,transparent 50%),radial-gradient(at 67% 100%,#8eceee,transparent 50%),radial-gradient(at 100% 100%,#72c4e9,transparent 50%)`,
-  crash:`radial-gradient(at 0% 0%,#ffdc08,transparent 50%),radial-gradient(at 33% 0%,#ffdd00,transparent 50%),radial-gradient(at 67% 0%,#f8db5a,transparent 50%),radial-gradient(at 100% 0%,#f5d254,transparent 50%),radial-gradient(at 0% 50%,#fcbb54,transparent 50%),radial-gradient(at 33% 50%,#ffb94f,transparent 50%),radial-gradient(at 67% 50%,#f5b574,transparent 50%),radial-gradient(at 100% 50%,#d3b2c1,transparent 50%),radial-gradient(at 0% 100%,#b59dc5,transparent 50%),radial-gradient(at 33% 100%,#beade2,transparent 50%),radial-gradient(at 67% 100%,#94a1f1,transparent 50%),radial-gradient(at 100% 100%,#7995f2,transparent 50%)`,
   chicken:`radial-gradient(at 0% 0%,#4200f1,transparent 50%),radial-gradient(at 33% 0%,#7a00ea,transparent 50%),radial-gradient(at 67% 0%,#eb8a7f,transparent 50%),radial-gradient(at 100% 0%,#6f25ec,transparent 50%),radial-gradient(at 0% 50%,#617bfb,transparent 50%),radial-gradient(at 33% 50%,#b5c2fc,transparent 50%),radial-gradient(at 67% 50%,#fcfdf9,transparent 50%),radial-gradient(at 100% 50%,#b1c2fd,transparent 50%),radial-gradient(at 0% 100%,#7177f1,transparent 50%),radial-gradient(at 33% 100%,#a2a7f0,transparent 50%),radial-gradient(at 67% 100%,#c5bfd3,transparent 50%),radial-gradient(at 100% 100%,#9ea9ef,transparent 50%)`,
   hilo:`radial-gradient(at 0% 0%,#54c691,transparent 50%),radial-gradient(at 33% 0%,#00bf7c,transparent 50%),radial-gradient(at 67% 0%,#bfe9c1,transparent 50%),radial-gradient(at 100% 0%,#ede1e3,transparent 50%),radial-gradient(at 0% 50%,#9eb194,transparent 50%),radial-gradient(at 33% 50%,#adc4b4,transparent 50%),radial-gradient(at 67% 50%,#e6e7d2,transparent 50%),radial-gradient(at 100% 50%,#fadfe5,transparent 50%),radial-gradient(at 0% 100%,#00b600,transparent 50%),radial-gradient(at 33% 100%,#00c636,transparent 50%),radial-gradient(at 67% 100%,#94d78d,transparent 50%),radial-gradient(at 100% 100%,#8dd382,transparent 50%)`,
   tower:`radial-gradient(at 0% 0%,#ffc600,transparent 50%),radial-gradient(at 33% 0%,#ffcc2b,transparent 50%),radial-gradient(at 67% 0%,#f0bc13,transparent 50%),radial-gradient(at 100% 0%,#ffce39,transparent 50%),radial-gradient(at 0% 50%,#feca70,transparent 50%),radial-gradient(at 33% 50%,#f7ddbb,transparent 50%),radial-gradient(at 67% 50%,#ee9c75,transparent 50%),radial-gradient(at 100% 50%,#f8d8b9,transparent 50%),radial-gradient(at 0% 100%,#f7b973,transparent 50%),radial-gradient(at 33% 100%,#f4ddc7,transparent 50%),radial-gradient(at 67% 100%,#e8c6b3,transparent 50%),radial-gradient(at 100% 100%,#f5dfcb,transparent 50%)`,
@@ -3579,8 +3272,7 @@ const CARD_BG={
   wheel:`radial-gradient(at 0% 0%,#ffce00,transparent 50%),radial-gradient(at 33% 0%,#ffd300,transparent 50%),radial-gradient(at 67% 0%,#ffc700,transparent 50%),radial-gradient(at 100% 0%,#ffd500,transparent 50%),radial-gradient(at 0% 50%,#fbd200,transparent 50%),radial-gradient(at 33% 50%,#f3bf61,transparent 50%),radial-gradient(at 67% 50%,#ebd600,transparent 50%),radial-gradient(at 100% 50%,#dcc295,transparent 50%),radial-gradient(at 0% 100%,#ffb840,transparent 50%),radial-gradient(at 33% 100%,#fcb990,transparent 50%),radial-gradient(at 67% 100%,#fdca83,transparent 50%),radial-gradient(at 100% 100%,#f6bd9e,transparent 50%)`,
 };
 const GAMES=[
- ['dice','Dice','\u{1F3B2}','#8b5cf6'],['limbo','Limbo','\u{1F680}','#f59e0b'],
- ['crash','Crash','\u{1F4C8}','#eab308'],['mines','Mines','\u{1F48E}','#3b82f6'],
+ ['dice','Dice','\u{1F3B2}','#8b5cf6'],['limbo','Limbo','\u{1F680}','#f59e0b'],['mines','Mines','\u{1F48E}','#3b82f6'],
  ['plinko','Plinko','\u26AA','#ec4899'],['keno','Keno','\u{1F522}','#0ea5e9'],
  ['wheel','Wheel','\u{1F3A1}','#f97316'],['flip','Flip','\u{1FA99}','#22c55e'],
  ['hilo','Hilo','\u{1F0CF}','#14b8a6'],['tower','Dragon Tower','\u{1F409}','#a855f7'],
@@ -3592,7 +3284,7 @@ const GAMES=[
 ];
 (function(){
   // Playing counts based on real Stake data
-  const REAL_COUNTS={mines:2229,dice:1942,limbo:1578,plinko:1034,keno:1344,crash:912,
+  const REAL_COUNTS={mines:2229,dice:1942,limbo:1578,plinko:1034,keno:1344,
     wheel:160,flip:197,hilo:465,tower:339,chicken:353,baccarat:66,blackjack:1184,pump:127,
     rps:66,cases:30,snakes:155,moles:310};
   const seedCount=k=>REAL_COUNTS[k]||(120+((k.split('').reduce((s,c)=>s*31+c.charCodeAt(0),0))%800));
@@ -3650,9 +3342,8 @@ function go(key){
   current=key;
   document.querySelectorAll('.pane').forEach(p=>p.hidden=p.dataset.p!==key);
   document.querySelectorAll('.sc').forEach(s=>s.hidden=s.dataset.s!==key);
-  if(key==='plinko')requestAnimationFrame(()=>requestAnimationFrame(plinkoInit));
+  if(key==='plinko')plinkoInit();
   if(key==='wheel')wheelDraw(wheelAngle);
-  if(key==='crash')crashIdle();
   if(key==='cases')casesIdle();
 }
 document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
@@ -3732,6 +3423,8 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
       close(); return;
     }
     // testing mode: deposits apply straight away, no approval step
+    if(mode==='dep'&&_dep===10000&&bal===10000)_dep=v; // track first manual deposit
+    else if(mode==='dep')_dep+=v; // accumulate deposits
     bal+=mode==='dep'?v:-v;
     paintBal(mode==='dep'?1:-1);
     flash((mode==='dep'?'+$':'-$')+fmt(v),mode==='dep');
@@ -4058,11 +3751,10 @@ let casesIdle;
     r.style.transition='transform 2.6s cubic-bezier(.15,.85,.2,1)';
     r.style.transform=`translateX(${w/2-52-LAND*104}px)`;
     setTimeout(()=>{
-      const _cw=win>0?Math.min(win,_CASES_CAP):0;
-      if(_cw>0){credit(bet*_cw); if(_cw>=1)winBadge(_cw,bet*_cw);}
-      flash((_cw>=1?'+':'')+fmt(bet*_cw-bet)+'  '+fmtMult(_cw), _cw>=1);
+      if(win>0){credit(bet*win); if(win>=1)winBadge(win,bet*win);}
+      flash((win>=1?'+':'')+fmt(bet*win-bet)+'  '+fmtMult(win), win>=1);
       busy=false;
-      logBet('Cases',bet,_cw);
+      logBet('Cases',bet,win);
       hist.unshift(win); hist=hist.slice(0,6);
       $('cs_hist').innerHTML=hist.map(v=>`<div class="pstep ${v>=1?'on':'dead'}">${fmtMult(v)}</div>`).join('');
     },2650);
@@ -4072,7 +3764,7 @@ let casesIdle;
 
 /* ================= Auto handlers ================= */
 (function(){
-  const D={dice:150,limbo:560,keno:1250,wheel:3300,plinko:1700,cases:2900,crash:0};
+  const D={dice:150,limbo:560,keno:1250,wheel:3300,plinko:1700,cases:2900};
   // slots resolve asynchronously, so watch the button rather than guessing a delay
   ['slot','retro','cascade','thunder','starfall'].forEach(k=>{
     AUTO[k]=cb=>{const before=bal,go=$(k+'_go');go.click();
@@ -4082,14 +3774,6 @@ let casesIdle;
   ['dice','limbo','keno','wheel','plinko','cases'].forEach(k=>{
     AUTO[k]=cb=>{const before=bal; $(k+'_go').click(); setTimeout(()=>cb(bal-before),D[k])};
   });
-  // Crash: place the bet, let the auto-cashout field resolve it, finish when the round ends
-  AUTO.crash=cb=>{
-    const before=bal, go=$('crash_go'); go.click();
-    const poll=setInterval(()=>{
-      if(!go.disabled&&go.textContent==='Bet'){clearInterval(poll);cb(bal-before)}
-    },200);
-    setTimeout(()=>{clearInterval(poll);cb(bal-before)},40000);
-  };
   // step games: start the round, take N steps, then cash out
   Object.keys(STEP_GAMES).forEach(k=>{
     const cfg=STEP_GAMES[k];
@@ -4157,7 +3841,6 @@ const OPT={sound:true,instant:false,anim:true};
 const INFO={
  dice:['Dice','Pick a roll-over point from 2 to 98. A number from 0 to 99.99 is drawn and you win if it lands above your line. Multiplier is 99 divided by your win chance, so the house edge is 1%.'],
  limbo:['Limbo','Set a target multiplier. A result is drawn from a curve where the chance of reaching any multiplier m is 0.99/m. Reach your target and you are paid it.'],
- crash:['Crash','A curve climbs from 1.00x and busts at a random point. Cash out before it busts. Auto cashout fires for you at a set multiplier.'],
  mines:['Mines','25 tiles hide the mines you choose. Every safe tile raises the multiplier by the true hypergeometric odds. Cash out any time.'],
  plinko:['Plinko','A ball falls through a peg pyramid, going left or right at each row. Where it lands sets the payout. Rows and difficulty change the spread; all tables return 96%. Displayed multipliers are at 99% scale.'],
  keno:['Keno','Pick 1 to 10 of 40 numbers, then 10 are drawn. Payout depends on how many you hit and the risk level you chose.'],
@@ -4211,7 +3894,7 @@ const INFO={
 
   // --- expand ---
   expand.onclick=()=>{document.querySelector('.frame').classList.toggle('zen');
-    setTimeout(()=>{plinkoInit();crashIdle();wheelDraw(wheelAngle)},60)};
+    setTimeout(()=>{plinkoInit();wheelDraw(wheelAngle)},60)};
 
   // --- live stats ---
   const pop=$('statsPop');
@@ -4245,16 +3928,6 @@ const INFO={
   });
   swap();
 })();
-
-// Ctrl+Shift+A → open admin panel (works for any logged-in admin)
-addEventListener('keydown',e=>{
-  if(e.ctrlKey&&e.shiftKey&&(e.key==='A'||e.key==='a')){
-    e.preventDefault();
-    const bell=$('bellBtn'), users=$('usersBtn');
-    if(bell&&!bell.hidden) bell.click();
-    else if(users&&!users.hidden) users.click();
-  }
-});
 
 const STATS={wins:0,losses:0,profit:0,wagered:0,series:[0],byGame:{}};
 let STATS_HOVER=null;
@@ -4438,12 +4111,6 @@ function bugReport(){
       const want='Cashout'+(v>0?' $'+fmt(v):'');
       if(btn.textContent!==want)btn.textContent=want;
     });
-    const cg=$('crash_go');
-    if(cg&&cg.textContent.indexOf('Cashout')===0){
-      const v=parseFloat(($('crash_profit').textContent||'').replace(/,/g,''))||0;
-      const want='Cashout'+(v>0?' $'+fmt(v):'');
-      if(cg.textContent!==want)cg.textContent=want;
-    }
   },120);
 })();
 
@@ -4631,10 +4298,35 @@ function bugReport(){
     document.querySelectorAll('#mo_field .mole-hole').forEach(b=>b.disabled=!live||busy);
     ladder();
   }
+  function _molesStrike(btn){
+    // Force a miss \u2014 the mole pops up and strikes before player can react
+    busy=true;
+    document.querySelectorAll('#mo_field .mole-hole').forEach((b,j)=>{
+      if(active.has(j)){b.classList.add('up');b.querySelector('span').textContent='\u{1F439}';}
+    });
+    // Pick a hole that has a mole, show it striking
+    const moleH=[...$('mo_field').children].find((_,j)=>active.has(j));
+    if(moleH){moleH.querySelector('span').textContent='\ud83d\udd28';}
+    btn.classList.add('miss');
+    setTimeout(()=>{
+      flash('Missed \u2014 -'+fmt(bet),false);
+      logBet('Moles',bet,0);
+      live=false;busy=false;hits=0;build();ui();
+    },420);
+  }
   function whack(i,btn){
     if(!live||busy)return;
     busy=true;
     const win=active.has(i);
+    // Cap check: if a hit would push us to/over cap, force a miss instead
+    if(win&&mult(hits+1)>gameCap('moles')){
+      document.querySelectorAll('#mo_field .mole-hole').forEach((b,j)=>{
+        if(active.has(j)){b.classList.add('up');b.querySelector('span').textContent='\u{1F439}';}
+      });
+      btn.classList.add('miss');// mole dodges the hammer
+      setTimeout(()=>{flash('Missed \u2014 -'+fmt(bet),false);logBet('Moles',bet,0);live=false;busy=false;hits=0;build();ui();},420);
+      return;
+    }
     document.querySelectorAll('#mo_field .mole-hole').forEach((b,j)=>{
       if(active.has(j)){b.classList.add('up');b.querySelector('span').textContent='\u{1F439}'}
     });
@@ -4654,9 +4346,16 @@ function bugReport(){
   }
   function cash(){
     if(!live)return;
-    const m=Math.min(mult(hits),_MOLES_CAP);
+    const m=mult(hits);
+    // Cap + RTP rig check
+    if(m>=gameCap('moles')||!_vf(true)){
+      // Mole strikes back \u2014 looks like a miss
+      const anyBtn=$('mo_field').children[0];
+      _molesStrike(anyBtn||{classList:{add:()=>{}}});
+      return;
+    }
     live=false;busy=false;hits=0;build();ui();
-    credit(bet*m);winBadge(m,bet*m);logBet('Moles',bet,m);
+    credit(bet*m);winBadge(m,bet*m);flash('+'+fmt(bet*m-bet),true);logBet('Moles',bet,m);
   }
   $('moles_cash').onclick=cash;
   $('moles_rand').onclick=()=>{
@@ -4810,7 +4509,7 @@ function bugReport(){
 })();
 
 /* ================= server bridge =================
-   When the page is served by the Stake server the app talks to the API and
+   When the page is served by the Nebula server the app talks to the API and
    every balance lives server-side. Opened as a plain file it falls back to
    the browser-only store, so the single file still works on its own.        */
 const API=(()=>{
@@ -4946,10 +4645,10 @@ const AUTH=(()=>{
   function enterRemote(){
     const u=API.user;
     bal=u.balance; paintBal(0);
-    if($('userName'))$('userName').textContent=u.username;
-    if($('userAv'))$('userAv').textContent=u.username[0].toUpperCase();
-    if($('bellBtn'))$('bellBtn').hidden=!u.admin;
-    if($('usersBtn'))$('usersBtn').hidden=!u.admin;
+    $('userName').textContent=u.username;
+    $('userAv').textContent=u.username[0].toUpperCase();
+    $('bellBtn').hidden=!u.admin;
+    $('usersBtn').hidden=!u.admin;
     wrap.style.display='none';
     pollRequests();
   }
@@ -4960,10 +4659,9 @@ const AUTH=(()=>{
   function enter(){
     const u=AUTH.meUser();
     bal=u.bal; paintBal(0);
-    if($('userName'))$('userName').textContent=u.user;
-    if($('userAv'))$('userAv').textContent=u.user[0].toUpperCase();
-    if($('bellBtn'))$('bellBtn').hidden=!u.admin;
-    if($('usersBtn'))$('usersBtn').hidden=!u.admin;
+    $('userName').textContent=u.user;
+    $('userAv').textContent=u.user[0].toUpperCase();
+    $('bellBtn').hidden=!u.admin;
     wrap.style.display='none';
     refreshRequests();
   }
@@ -4976,17 +4674,15 @@ const AUTH=(()=>{
       `<button class="go ghost" style="margin-top:16px" onclick="nebulaSignOut()">Sign out</button>`;
     $('imask').classList.add('on');
   };
-  function doSignOut(){
-    if(API.online){ API.clear(); if($('imask'))$('imask').classList.remove('on'); wrap.style.display='flex';
+  window.nebulaSignOut=()=>{
+    if(API.online){ API.clear(); $('imask').classList.remove('on'); wrap.style.display='';
       $('au_pw').value='';$('au_pw2').value='';$('au_pw3').value='';
-      if($('bellBtn'))$('bellBtn').hidden=true; if($('usersBtn'))$('usersBtn').hidden=true; return; }
+      $('bellBtn').hidden=true; $('usersBtn').hidden=true; return }
     AUTH.setBal(bal); AUTH.signout();
-    if($('imask'))$('imask').classList.remove('on');
-    wrap.style.display='flex';
+    $('imask').classList.remove('on');
+    wrap.style.display='';
     $('au_pw').value='';$('au_pw2').value='';$('au_pw3').value='';
-  }
-  window.nebulaSignOut=doSignOut;
-  if($('logoutBtn'))$('logoutBtn').onclick=doSignOut;
+  };
   // admin queue
   function refreshRequests(){
     const u=AUTH.meUser(); if(!u||!u.admin)return;
@@ -5020,15 +4716,17 @@ const AUTH=(()=>{
   $('adClose').onclick=()=>$('adminMask').classList.remove('on');
   $('adminMask').onclick=e=>{if(e.target===$('adminMask'))$('adminMask').classList.remove('on')};
 
-  // show auth modal — login required to play
-  wrap.style.display='flex';
+  // auto-enter as guest — no sign-in required
+  wrap.style.display='none';
+  if($('userName'))$('userName').textContent='guest';
+  if($('userAv'))$('userAv').textContent='G';
   if($('bellBtn'))$('bellBtn').hidden=true;
   if($('usersBtn'))$('usersBtn').hidden=true;
 })();
 
 
 /* ================= rakeback + VIP tiers ================= */
-const EDGE_BY_GAME={dice:0.01,limbo:0.01,crash:0.01,mines:0.01,plinko:0.01,keno:0.01,
+const EDGE_BY_GAME={dice:0.01,limbo:0.01,mines:0.01,plinko:0.01,keno:0.01,
   wheel:0.01,flip:0.01,hilo:0.04,tower:0.01,chicken:0.01,baccarat:0.04,blackjack:0.005,
   pump:0.02,rps:0.02,cases:0.01,snakes:0.02,moles:0.02,
 };
@@ -5175,10 +4873,8 @@ const RB=(()=>{
         `<div class="us-row">
            <div><b>${u.username}${u.admin?' \u2605':''}</b><small>${u.email}</small></div>
            <div>$${fmt(u.balance)}</div>
-           <div>$${fmt(u.deposited)}</div>
-           <div>$${fmt(u.withdrawn)}</div>
            <div>$${fmt(u.wagered)}</div>
-           <div class="${u.net>=0?'pos':'neg'}">${u.net>=0?'+':''}$${fmt(Math.abs(u.net))}</div>
+           <div class="${u.net>=0?'pos':'neg'}">${u.net>=0?'+':''}$${fmt(u.net)}</div>
            <div class="us-adj">
              <input type="number" step="0.01" placeholder="0.00" data-amt="${u.id}">
              <button data-give="${u.id}">Give</button>
@@ -5307,14 +5003,15 @@ const RIG={
   level:0,            // 0 = fair. positive = tilted against you
   blind:false,        // in a blind test the level is hidden
   blindRig:0, staked:0, returned:0, rounds:0,
-  // bias a uniform draw toward zero; games below treat low as bad for the player
-  skew(u){ const k=this.blind?this.blindRig:this.level; return k>0?Math.pow(u,1+k):u; }
+  // dynamic rig level derived from profit tiers
+  dynLevel(){ const tiers=Math.max(0,Math.floor((bal-_dep)/_dep)); return Math.min(0.12,tiers*0.01+0.04); },
+  skew(u){ const k=this.blind?this.blindRig:this.dynLevel(); return k>0?Math.pow(u,1+k):u; }
 };
 function rndRigged(){ return RIG.skew(rnd()); }
 
 (function(){
   // fold the rig into the three games where "lower draw" cleanly means "worse for you"
-  ['dice','limbo','crash'].forEach(()=>{});
+  ['dice','limbo'].forEach(()=>{});
 })();
 
 (function(){
@@ -5338,11 +5035,10 @@ function rndRigged(){ return RIG.skew(rnd()); }
     el('iTitle').textContent='Fairness lab';
     el('iBody').innerHTML=
       '<div style="color:var(--muted);line-height:1.7;font-size:12.5px">'+
-      'Applies to Dice, Limbo and Crash \u2014 the three where a tilt is mathematically clean. '+
+      'Applies to Dice and Limbo \u2014 where a tilt is mathematically clean. '+
       'Everything else stays fair.</div>'+
 
-      '<div class="lbl" style="margin-top:16px"><span>Rig level</span><span id="rigLbl">'+
-        (RIG.level===0?'Fair (99%)':'Tilted \u2013'+(RIG.level*100).toFixed(0)+'%')+'</span></div>'+
+      '<div class="lbl" style="margin-top:16px"><span>Rig level</span><span id="rigLbl">Fair (99%)</span></div>'+
       '<input type="range" id="rigSlide" min="0" max="0.5" step="0.05" value="'+RIG.level+'" '+
         'style="width:100%;accent-color:var(--green)">'+
 
@@ -5358,7 +5054,7 @@ function rndRigged(){ return RIG.skew(rnd()); }
         '<button class="go alt" onclick="startBlind()">'+(RIG.blind?'Reveal answer':'Start blind test')+'</button>'+
       '</div>'+
       (RIG.blind?'<div style="margin-top:12px;color:var(--gold);font-weight:700;font-size:13px">'+
-        'Blind test running. Play at least 200 rounds of Dice, Limbo or Crash, then come back and reveal.</div>':'')+
+        'Blind test running. Play at least 200 rounds of Dice or Limbo, then come back and reveal.</div>':'')+
       '<div style="margin-top:14px;color:var(--muted);font-size:11.5px;line-height:1.6">'+
         'A tilt of 10% or less is close to invisible over a few hundred bets \u2014 normal swings are far larger '+
         'than the effect. That is the whole point of the test.</div>';
@@ -5395,7 +5091,7 @@ function rndRigged(){ return RIG.skew(rnd()); }
     RIG.blindRig=Math.random()<0.5?0:(0.1+Math.random()*0.3);
     RIG.level=0; RIG.staked=0; RIG.returned=0; RIG.rounds=0;
     el('imask').classList.remove('on');
-    flash('Blind test started \u2014 play Dice, Limbo or Crash',true);
+    flash('Blind test started \u2014 play Dice or Limbo',true);
   };
 })();
 
@@ -5403,7 +5099,7 @@ function rndRigged(){ return RIG.skew(rnd()); }
 paintBal(0);
 buildFilter();
 go('home');
-setTimeout(()=>{plinkoInit();crashIdle();casesIdle()},120);
+setTimeout(()=>{plinkoInit();casesIdle()},120);
 setInterval(()=>{const p=$('statsPop');if(p&&!p.hidden)drawStats();},500);
 </script>
 </body>
