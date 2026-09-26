@@ -409,9 +409,6 @@ tbody tr{animation:sl .25s}
 .sc{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
 .sc[data-s="baccarat"]{height:100%}
 .pane{display:flex;flex-direction:column;gap:12px}
-.slot-fullpane{position:fixed;inset:0;z-index:50;padding:0;margin:0;background:#000}
-.slot-back{position:fixed;top:10px;left:10px;z-index:51;background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px)}
-.slot-back:hover{background:rgba(255,255,255,.15)}
 .pane[hidden]{display:none!important}
 .go{width:100%;display:block}
 .split2 .go,.seg2 .go{width:100%}
@@ -1514,22 +1511,18 @@ tbody tr{animation:sl .25s}
     </div>
   </div>
 
-  <!-- ============ OLYMPIAN STORM IFRAME ============ -->
-  <div class="pane slot-fullpane" data-p="olympian-storm" hidden>
-    <button class="slot-back" onclick="go('slots')">&#8592; Back</button>
-    <iframe id="frame-olympian-storm" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay" loading="lazy"></iframe>
-  </div>
-
-  <!-- ============ LAKE LEGEND IFRAME ============ -->
-  <div class="pane slot-fullpane" data-p="lake-legend" hidden>
-    <button class="slot-back" onclick="go('slots')">&#8592; Back</button>
-    <iframe id="frame-lake-legend" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay" loading="lazy"></iframe>
-  </div>
 
 </div>
 
 <!-- ============ STAGES ============ -->
 <div class="stage" id="stages">
+  <!-- Slot iframes overlay the stage area -->
+  <div id="slot-olympian-storm" hidden style="position:absolute;inset:0;z-index:10;background:#0d0620">
+    <iframe id="frame-olympian-storm" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay"></iframe>
+  </div>
+  <div id="slot-lake-legend" hidden style="position:absolute;inset:0;z-index:10;background:#2a6c73">
+    <iframe id="frame-lake-legend" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay"></iframe>
+  </div>
   <div class="pop" id="pop"></div>
   <div class="badge" id="winBadge">
     <div class="m" id="wbMult">0.00×</div>
@@ -2016,6 +2009,8 @@ const PUMP_TAB={"easy": [1.02, 1.07, 1.11, 1.17, 1.23, 1.29, 1.36, 1.44, 1.53, 1
 
 let bal=0;
 const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+// Expose balance API for slot iframes (window.bal conflicts with id="bal" DOM element)
+window._slotAPI={get bal(){return bal},set bal(v){bal=v},get credit(){return credit},get paintBal(){return paintBal},get round2(){return round2},get logBet(){return logBet}};
 
 function paintBal(dir){
   if(typeof AUTH!=='undefined'&&AUTH.current())AUTH.setBal(bal);
@@ -3404,13 +3399,16 @@ function go(key){
   if(key==='plinko')plinkoInit();
   if(key==='wheel')wheelDraw(wheelAngle);
   if(key==='cases')casesIdle();
-  // Load slot iframes on demand
-  if(key==='olympian-storm'){const f=$('frame-olympian-storm');if(!f.src||f.src==='about:blank'||!f.src.includes('olympian'))f.src='/olympian-storm.html';}
-  if(key==='lake-legend'){const f=$('frame-lake-legend');if(!f.src||f.src==='about:blank'||!f.src.includes('lake'))f.src='/lake-legend.html';}
-  // Refresh iframe balance when switching to a slot game
-  if(key==='olympian-storm'||key==='lake-legend'){
-    const fid='frame-'+key;
-    setTimeout(()=>{try{const fr=$(fid);if(fr.contentWindow)fr.contentWindow.paintBal&&fr.contentWindow.paintBal()}catch(_){}},400);
+  // Slot iframe overlays
+  const SLOTS=['olympian-storm','lake-legend'];
+  SLOTS.forEach(s=>{
+    const el=$('slot-'+s);
+    if(el)el.hidden=key!==s;
+  });
+  if(key==='olympian-storm'){const f=$('frame-olympian-storm');if(!f.src||!f.src.includes('olympian'))f.src='/olympian-storm.html';}
+  if(key==='lake-legend'){const f=$('frame-lake-legend');if(!f.src||!f.src.includes('lake'))f.src='/lake-legend.html';}
+  if(SLOTS.includes(key)){
+    setTimeout(()=>{try{const fr=$('frame-'+key);if(fr.contentWindow&&fr.contentWindow.paintBal)fr.contentWindow.paintBal();}catch(_){}},500);
   }
 }
 document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{

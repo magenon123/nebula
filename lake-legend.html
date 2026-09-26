@@ -409,7 +409,8 @@ const r2=n=>Math.round(n*100)/100;
 const rnd=()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296};
 const C=LL.COLS,R=LL.ROWS,K=(c,r)=>c*R+r;
 const BETS=[0.1,0.2,0.4,0.6,0.8,1,1.5,2,3,4,5,6,8,10,15,20,25,30,40,50];
-function getPBal(){try{return window.parent.bal}catch(_){return 0}}
+const _API=()=>{try{return window.parent._slotAPI}catch(_){return null}};
+function getPBal(){const a=_API();return a?a.bal:0}
 try{const v=parseFloat(localStorage.getItem('llBal'));if(v>=0)bal=v}catch(_){}
 function paint(){ bal=getPBal(); $('bal').textContent=fmt(bal); $('bBet').textContent=fmt(bet());
   const f=feature&&FEAT[feature];
@@ -568,7 +569,7 @@ async function play(buy){
   const cost=r2(b*(mode?LL.MODES_BUY[mode]:1));
   if(cost>bal+1e-9){toast('Not enough balance');auto=false;$('autoBtn').classList.remove('on');return}
   busy=true; $('spin').disabled=true; $('spin').classList.add('go'); $('buyBtn').disabled=true;
-  try{window.parent.bal=window.parent.round2(window.parent.bal-cost);window.parent.paintBal(-1)}catch(_){}; bal=getPBal(); paint(); $('win').textContent=fmt(0);
+  const _a=_API();if(_a){_a.bal=_a.round2(_a.bal-cost);_a.paintBal(-1);}; bal=getPBal(); paint(); $('win').textContent=fmt(0);
   const res=LL.play(rnd,{buy:mode});
   let paid=0,inBonus=false;
   if(buy==='ice'||buy==='wet'){ /* straight into the bonus */ }
@@ -602,8 +603,8 @@ async function play(buy){
   if(inBonus){ banner(`${fmt(win)}<small>${res.capped?'MAX WIN! ':''}total from ${res.bonus}</small>`,2600); await wait(2600); $('fsbar').hidden=true; }
   else if(res.capped)banner(`MAX WIN<small>${fmt(win)}</small>`,2600);
   else if(win>=b*25){banner(`BIG WIN<small>${fmt(win)}</small>`,1800);$('raccoon').classList.add('cheer');setTimeout(()=>$('raccoon').classList.remove('cheer'),1600)}
-  try{window.parent.credit(win)}catch(_){}; bal=getPBal(); $('win').textContent=fmt(win); paint();
-  try{window.parent.logBet("Lake Legend",cost,win/cost)}catch(_){}
+  const _a2=_API();if(_a2)_a2.credit(win); bal=getPBal(); $('win').textContent=fmt(win); paint();
+  const _a3=_API();if(_a3)_a3.logBet("Lake Legend",cost,win/cost);
   busy=false; $('spin').disabled=false; $('spin').classList.remove('go'); $('buyBtn').disabled=false;
   if(auto)setTimeout(()=>{if(auto&&!busy)play(null)},450);
 }

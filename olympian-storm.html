@@ -263,13 +263,13 @@ const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDi
 const mx=m=>fmt(m)+'×';   // paytable shows multiples of the base bet
 const round2=n=>Math.round(n*100)/100;
 const rnd=()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296};
-function getBal(){try{return window.parent.bal}catch(_){return 0}}
-function setBal(v){try{window.parent.bal=v;window.parent.paintBal(0)}catch(_){}}
+const _API=()=>{try{return window.parent._slotAPI}catch(_){return null}};
+function getBal(){const a=_API();return a?a.bal:0}
 let bal=getBal();
 function paintBal(){ bal=getBal(); $('creditV').textContent='$'+fmt(bal); }
-function credit(v){try{window.parent.credit(v)}catch(_){}; bal=getBal(); paintBal();}
+function credit(v){const a=_API();if(a)a.credit(v);bal=getBal();paintBal();}
 function flash(t){const p=$('pop');p.textContent=t;p.classList.add('on');clearTimeout(p._t);p._t=setTimeout(()=>p.classList.remove('on'),1900)}
-function logBet(game,cost,mult){try{window.parent.logBet(game,cost,mult)}catch(_){}}
+function logBet(game,cost,mult){const a=_API();if(a)a.logBet(game,cost,mult);}
 const AUTO={};
 
 /* ================= OLYMPIAN STORM engine (pure: takes an rng, returns the whole round) ================= */
@@ -699,7 +699,7 @@ const OLY=(function(){
     const cost=round2(buy==='super'?b*SBUY:buy?b*BUY:stake());
     bal=getBal();
     if(cost>bal+1e-9){flash('NOT ENOUGH CREDIT');auto=false;sync();return}
-    try{window.parent.bal=window.parent.round2(window.parent.bal-cost);window.parent.paintBal(-1)}catch(_){}
+    const _a=_API();if(_a){_a.bal=_a.round2(_a.bal-cost);_a.paintBal(-1);}
     bal=getBal(); paintBal();
     busy=true; skip=false; idle(false); sync(); setWin(0); msg('GOOD LUCK!');
     const res=OLY.play(rnd,{ante:!buy&&anteOn,buy});
