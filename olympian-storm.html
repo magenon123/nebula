@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Olympian Storm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;background:#0d0620;
+  font-family:Anton,Impact,'Arial Narrow Bold','Arial Black',sans-serif;color:#fff;user-select:none;-webkit-user-select:none}
+button{font-family:inherit;cursor:pointer}
+#game{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden}
+.box{position:absolute}
+.nolay,.off{display:none!important}
+
+/* backgrounds */
+#bg,#bgFs{position:absolute;inset:0;transition:opacity .9s}
+#bg{background:
+  radial-gradient(40% 18% at 12% 88%,rgba(255,255,255,.75),transparent 70%),
+  radial-gradient(45% 20% at 88% 92%,rgba(255,255,255,.7),transparent 70%),
+  radial-gradient(35% 14% at 50% 97%,rgba(255,240,250,.8),transparent 70%),
+  radial-gradient(30% 16% at 8% 30%,rgba(255,255,255,.55),transparent 70%),
+  radial-gradient(28% 14% at 92% 12%,rgba(255,250,240,.6),transparent 70%),
+  radial-gradient(70% 50% at 50% 0%,#fff1d6 0%,transparent 70%),
+  linear-gradient(180deg,#f6d6c4 0%,#e7b9d3 35%,#bfa1e0 65%,#9a86d8 100%)}
+#bgFs{opacity:0;background:
+  radial-gradient(40% 18% at 12% 90%,rgba(190,140,255,.45),transparent 70%),
+  radial-gradient(45% 20% at 88% 92%,rgba(190,140,255,.4),transparent 70%),
+  radial-gradient(60% 40% at 50% 40%,#7e30d9 0%,transparent 75%),
+  linear-gradient(180deg,#3a0f7a 0%,#5b1aa8 45%,#3b0c78 100%)}
+#bgFs::before{content:"";position:absolute;inset:0;opacity:.8;
+  background-image:radial-gradient(2px 2px at 10% 20%,#fff,transparent),radial-gradient(2px 2px at 30% 70%,#fff,transparent),
+  radial-gradient(1.5px 1.5px at 55% 15%,#fff,transparent),radial-gradient(2px 2px at 80% 40%,#fff,transparent),
+  radial-gradient(1.5px 1.5px at 90% 80%,#fff,transparent),radial-gradient(2px 2px at 70% 90%,#fff,transparent),
+  radial-gradient(1.5px 1.5px at 20% 50%,#fff,transparent),radial-gradient(1.5px 1.5px at 45% 85%,#fff,transparent)}
+#temple{position:absolute;right:0;top:0;width:560px;height:1080px;opacity:.55}
+.port #temple{display:none}
+
+/* text styles */
+.gold{background:linear-gradient(180deg,#fffbd6 0%,#ffe066 38%,#e0a21a 52%,#b36b00 62%,#ffd966 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:2px #4d2a00;
+  filter:drop-shadow(0 3px 0 rgba(40,15,0,.7))}
+.blue{background:linear-gradient(180deg,#eefaff 0%,#8fd3ff 45%,#2e7fe6 60%,#9fe0ff 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.5px #0a1a4f;
+  filter:drop-shadow(0 3px 0 rgba(0,0,30,.6))}
+.whiteT{color:#fff;filter:drop-shadow(0 3px 0 rgba(0,0,0,.55))}
+
+/* top line / tumble plaque */
+#top{display:flex;align-items:center;justify-content:center;text-align:center}
+#topText{font-size:54px;letter-spacing:1px;white-space:nowrap}
+#tumble{position:absolute;left:120px;right:120px;top:0;bottom:0;border-radius:0 0 18px 18px;
+  background:linear-gradient(#6b1c14,#3d0d08);border:4px solid #e3b43c;border-top:none;
+  box-shadow:0 0 0 3px #6b4300,inset 0 0 18px rgba(0,0,0,.7),0 6px 16px rgba(0,0,0,.4);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+#tumble .tl{font-size:28px}
+#tumbleAmt{font-size:42px;margin-top:2px;white-space:nowrap}
+
+/* frame + grid */
+#frame{padding:16px;border-radius:10px;
+  background:linear-gradient(135deg,#fff3a6 0%,#d9a520 22%,#8a5a00 45%,#f7d774 62%,#b07800 80%,#ffe38a 100%);
+  box-shadow:0 0 0 3px #5c3a00,0 14px 40px rgba(40,0,60,.55)}
+#frame::before,#frame::after{content:"";position:absolute;top:-26px;width:90px;height:60px;
+  background:linear-gradient(135deg,#fff3a6,#d9a520 40%,#8a5a00 70%,#f7d774);clip-path:polygon(0 100%,20% 0,45% 55%,100% 60%,40% 100%)}
+#frame::before{left:-22px}#frame::after{right:-22px;transform:scaleX(-1)}
+#grid{position:relative;width:100%;height:100%;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));
+  border-radius:4px;overflow:hidden;background:
+  linear-gradient(90deg,rgba(0,0,0,.25) 0,transparent 8%,transparent 92%,rgba(0,0,0,.25) 100%),
+  linear-gradient(180deg,#8a2418,#6a1a10 50%,#521209);box-shadow:inset 0 0 40px rgba(0,0,0,.6)}
+.cell{position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;border-left:3px solid rgba(40,6,2,.5)}
+.cell:nth-child(6n+1){border-left:none}
+.cell svg{height:90%;width:auto;max-width:96%;aspect-ratio:1;overflow:visible;filter:drop-shadow(0 5px 3px rgba(0,0,0,.45))}
+.cell.new{animation:drop .38s cubic-bezier(.35,1.25,.55,1) both}
+@keyframes drop{from{transform:translateY(-140%);opacity:0}60%{opacity:1}to{transform:none;opacity:1}}
+.cell.hit{background:rgba(110,220,255,.14);box-shadow:inset 0 0 0 3px #aef6ff,inset 0 0 22px #36c8ff,0 0 16px #36c8ff;z-index:2}
+.cell.hit svg{animation:hitG .45s ease-in-out infinite alternate}
+@keyframes hitG{from{transform:scale(1)}to{transform:scale(1.08);filter:drop-shadow(0 0 14px #bff6ff) brightness(1.15)}}
+.cell.pop svg{transform:scale(1.35);opacity:0;transition:transform .22s,opacity .22s}
+.cell.glow svg{animation:glowP .5s ease-in-out infinite alternate}
+@keyframes glowP{from{filter:drop-shadow(0 0 4px #fff6b0)}to{filter:drop-shadow(0 0 22px #ffe066) brightness(1.25);transform:scale(1.1)}}
+.cell.dim{filter:brightness(.4) saturate(.7)}
+.amt{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:5;font-size:64px;white-space:nowrap;
+  color:#f3e8ff;-webkit-text-stroke:2px #3b0a6b;filter:drop-shadow(0 4px 2px rgba(0,0,0,.5));pointer-events:none;
+  animation:amtIn .3s ease-out}
+@keyframes amtIn{from{transform:translate(-50%,-50%) scale(.4);opacity:0}}
+.port .amt{font-size:52px}
+
+/* left panels */
+.plq{border-radius:14px;background:linear-gradient(#2f357c,#161a52);border:5px solid #e3b43c;
+  box-shadow:0 0 0 3px #6b4300,inset 0 0 0 2px #fbe39a,inset 0 0 26px rgba(0,0,0,.7),0 8px 18px rgba(0,0,0,.35)}
+.btnp{cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1;transition:transform .12s,filter .2s}
+.btnp:hover{transform:scale(1.03)}
+.btnp .t1{font-size:40px}.btnp .t2{font-size:30px;margin-top:2px}.btnp .t2.sm{font-size:24px}.btnp .t3{font-size:46px;margin-top:6px}
+.btnp .fa{display:none;font-size:44px;line-height:1.05}
+.btnp.act>:not(.fa){display:none}.btnp.act .fa{display:block}
+.btnp.act,.btnp.dis{filter:saturate(.35) brightness(.75);cursor:default;transform:none}
+.parch{border-radius:12px;background:linear-gradient(180deg,#fbf2d8,#ecdcae 60%,#dcc48a);border:5px solid #e3b43c;
+  box-shadow:0 0 0 3px #6b4300,inset 0 0 20px rgba(120,80,0,.35),0 8px 18px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.02;color:#1d2a6b}
+.parch .a1{font-size:44px}.parch .a2{font-size:48px}.parch .a3{font-size:26px;margin:4px 8px 10px;color:#1d2a6b}
+.parch .a1,.parch .a3{-webkit-text-stroke:1px #fff;filter:drop-shadow(0 2px 0 rgba(255,255,255,.6))}
+.tog{display:flex;align-items:center;gap:8px;background:#2c2c2c;border-radius:6px;padding:3px 14px 3px 3px;cursor:pointer;border:2px solid #0d0d0d}
+.tog .arr{background:linear-gradient(#5ee05e,#1e8c1e);color:#fff;border-radius:4px;width:44px;height:30px;display:flex;align-items:center;justify-content:center;font-size:22px}
+.tog b{font-size:24px;color:#fff;font-weight:400;min-width:40px}
+.tog.on{background:#1f5e1f}.tog.on .arr{background:linear-gradient(#fff38a,#e0a21a);color:#4d2a00}
+.dark{background:linear-gradient(#34101a,#1c060c);border-radius:12px;padding:8px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+#list{display:flex;flex-direction:column;gap:6px}
+.le{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(#4a4750,#2e2b33);border-radius:6px;
+  padding:4px 12px;font-size:30px;animation:amtIn .25s}
+.le span{display:flex;align-items:center;gap:6px}.le svg{width:34px;height:34px}
+.port #list{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.port .le{font-size:26px}
+
+/* free spins column */
+#multBox{display:flex;flex-direction:column;align-items:center}
+#multBox .ml{font-size:36px;text-align:center;line-height:1;margin-bottom:-6px;z-index:2}
+#coin{position:relative;width:250px;height:160px;z-index:2}
+#coin svg{width:100%;height:100%}
+#coinTxt{position:absolute;left:0;right:0;top:50%;transform:translateY(-52%);text-align:center;font-size:66px;line-height:1}
+#coin.bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.18);filter:brightness(1.4) drop-shadow(0 0 20px #ffe066)}}
+#pillar{flex:1;width:190px;margin-top:-26px}
+.port #pillar{display:none}
+.port #coin{width:230px;height:140px}.port #multBox .ml{font-size:32px}
+#fsLeftBox{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1}
+#fsLeftBox .l1{font-size:34px}#fsLeft{font-size:62px;margin-top:4px}
+
+/* right side */
+#logo svg,#zeus svg{width:100%;height:100%;overflow:visible}
+#zArm{transform-origin:208px 160px;transition:transform .25s}
+#zeus.raise #zArm{transform:rotate(-155deg)}
+#zeus{animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+
+/* bottom bar */
+#credit{display:flex;flex-direction:column;justify-content:center;gap:2px;font-size:36px;line-height:1.05;white-space:nowrap}
+#credit .gl{display:inline-block;min-width:118px;text-align:right;margin-right:12px}
+.gl{background:linear-gradient(180deg,#fff6b0,#f5c21a 55%,#c07a0c);-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:1px #4d2a00;font-style:italic}
+#winBox{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.05}
+#winLine{font-size:76px;white-space:nowrap;display:flex;align-items:baseline;gap:18px}
+#winLine .gl{font-style:normal;-webkit-text-stroke:2px #4d2a00}
+#winV{color:#fff;filter:drop-shadow(0 4px 0 rgba(0,0,0,.5))}
+#msg{font-size:36px;white-space:nowrap;display:flex;align-items:center;gap:10px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.55))}
+#msg svg{width:44px;height:44px}
+.circ{border-radius:50%;background:rgba(10,4,30,.25);border:4px solid rgba(255,255,255,.75);color:#fff;font-size:46px;line-height:1;
+  display:flex;align-items:center;justify-content:center;padding:0 0 4px}
+.circ:disabled{opacity:.35;cursor:default}
+#spinBtn{border-radius:50%;background:radial-gradient(circle,rgba(30,10,60,.35),rgba(10,4,30,.55));border:6px solid #fff;
+  box-shadow:0 0 18px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;padding:0}
+#spinBtn svg{width:70%;height:70%;transition:transform .4s}
+#spinBtn:hover svg{transform:rotate(90deg)}
+#spinBtn .stop{display:none;width:44%;height:44%;border:6px solid #ff4d5a;border-radius:10px;background:rgba(255,77,90,.15)}
+#spinBtn.busy svg{display:none}#spinBtn.busy .stop{display:block}
+#autoBox{display:flex;border-radius:28px;overflow:hidden;border:3px solid #fff;background:rgba(10,4,30,.55)}
+#autoBox button{border:none;background:none;color:#fff;font-size:26px;letter-spacing:1px}
+#turboBtn{width:56px;border-right:2px solid rgba(255,255,255,.5)!important;font-size:30px!important}
+#turboBtn.on{color:#ffd23f;text-shadow:0 0 10px #ffd23f}
+#autoBtn{flex:1}#autoBtn.on{color:#5dff7a;text-shadow:0 0 10px #5dff7a}
+#sys{display:flex;flex-direction:column;gap:14px;align-items:center}
+#sys button{width:60px;height:60px;border-radius:50%;border:3px solid rgba(255,255,255,.85);background:rgba(10,4,30,.45);color:#fff;font-size:34px;
+  display:flex;align-items:center;justify-content:center;padding:0;font-family:Georgia,serif;font-style:italic;font-weight:700}
+#menuBtn{font-family:Anton,sans-serif!important;font-style:normal!important;font-weight:400!important}
+
+/* effects + overlays */
+#fx{position:absolute;inset:0;pointer-events:none;z-index:40}
+.fly{position:absolute;transition:transform .65s cubic-bezier(.5,0,.4,1),opacity .65s;z-index:41}
+.fly svg{width:100%;height:100%;overflow:visible}
+.bolt{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;animation:boltF .45s ease-out forwards}
+@keyframes boltF{0%{opacity:1}100%{opacity:0}}
+#ov{position:absolute;inset:0;z-index:60;background:rgba(15,0,35,.62);display:flex;align-items:center;justify-content:center;animation:fadeIn .25s}
+@keyframes fadeIn{from{opacity:0}}
+.stone{position:relative;border:10px solid #e3b43c;border-radius:6px;
+  box-shadow:0 0 0 4px #6b4300,inset 0 0 0 3px #fbe39a,inset 0 0 60px rgba(0,0,0,.8),0 20px 60px rgba(0,0,0,.6);
+  background:radial-gradient(circle at 50% 50%,#3a3a3a,#1f1f22 70%),#26262a;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;animation:plIn .35s cubic-bezier(.3,1.4,.6,1)}
+@keyframes plIn{from{transform:scale(.6);opacity:0}}
+.stone .h{font-size:92px;line-height:1.05}
+.stone .p{font-size:110px;line-height:1.1}
+.okx{display:flex;gap:210px;margin-top:40px}
+.okx button{width:150px;height:120px;border-radius:12px;border:4px solid #e3b43c;background:linear-gradient(#aef0ee,#46b8b6 60%,#2f8f8d);
+  box-shadow:inset 0 0 18px rgba(0,60,60,.6),0 6px 0 #1d5c5b;font-size:90px;line-height:1;display:flex;align-items:center;justify-content:center}
+.okx .no{color:#e52222;-webkit-text-stroke:2px #fff}.okx .yes{color:#6fe01e;-webkit-text-stroke:2px #1f4d00}
+.congr{position:relative;width:1560px;height:860px;animation:plIn .4s cubic-bezier(.3,1.4,.6,1)}
+.congr>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.congr .in{position:absolute;left:0;right:0;top:400px;display:flex;flex-direction:column;align-items:center;line-height:1}
+.congr .won{font-size:72px}
+.congr .bar{margin:26px 0;min-width:720px;padding:14px 60px;border-radius:14px;border:5px solid #e3b43c;
+  background:linear-gradient(#6d5cf0,#3a22b8 55%,#2a1690);box-shadow:inset 0 0 18px rgba(0,0,0,.45),0 0 0 3px #6b4300;
+  font-size:118px;text-align:center}
+.congr .sub{font-size:74px}
+.congr .note{font-size:40px;margin-top:14px}
+.congr .cont{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-family:Arial,sans-serif;font-size:30px;letter-spacing:1px;color:#fff}
+.port .congr{transform:scale(.66)}
+.port .stone{transform:scale(.8)}
+.bigwin{text-align:center;animation:plIn .4s cubic-bezier(.3,1.4,.6,1)}
+.bigwin .bw{font-size:190px;line-height:1}.bigwin .bv{font-size:120px;color:#fff;filter:drop-shadow(0 6px 0 rgba(0,0,0,.5))}
+.port .bigwin .bw{font-size:140px}.port .bigwin .bv{font-size:96px}
+.scroll{width:1180px;max-height:860px;padding:30px 44px;justify-content:flex-start;overflow:auto;text-align:left;
+  font-family:Arial,sans-serif;font-size:26px;line-height:1.45;color:#eee}
+.port .scroll{width:1000px;max-height:1600px;transform:none}
+.scroll h3{font-family:Anton,Impact,sans-serif;font-weight:400;font-size:48px;margin:6px 0 10px;letter-spacing:1px}
+.scroll table{border-collapse:collapse;margin:0 auto 10px;font-size:30px}
+.scroll td,.scroll th{padding:4px 22px;text-align:center}
+.scroll th{font-family:Anton,Impact,sans-serif;font-weight:400;color:#fde68a}
+.orbrow{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 6px;margin:4px 0 12px}.orbrow span{width:92px;height:92px}.orbrow svg{width:100%;height:100%;overflow:visible}
+.scroll .ic{display:inline-block;width:70px;height:70px;vertical-align:middle}.scroll .ic svg{width:100%;height:100%}
+.scroll .sm{display:inline-block;width:40px;height:40px;vertical-align:middle}.scroll .sm svg{width:100%;height:100%}
+.pwrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:22px}
+.xbtn{position:absolute;right:-34px;top:-34px;z-index:3;width:84px;height:84px;border-radius:50%;border:5px solid #e3b43c;
+  background:linear-gradient(#c62828,#7a0f0f);color:#fff;font-size:52px;line-height:1;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 3px #6b4300,0 6px 14px rgba(0,0,0,.5);padding:0 0 6px}
+.closeBig{font-size:40px;letter-spacing:2px;padding:10px 70px;border-radius:12px;border:4px solid #e3b43c;color:#fff;
+  background:linear-gradient(#aef0ee,#46b8b6 60%,#2f8f8d);text-shadow:0 2px 0 #1d5c5b;box-shadow:0 6px 0 #1d5c5b}
+.setrow{display:flex;justify-content:space-between;align-items:center;gap:30px;font-family:Anton,sans-serif;font-size:40px;margin:14px 0}
+.setrow button{font-size:30px;padding:8px 24px;border-radius:10px;border:3px solid #e3b43c;background:#2f357c;color:#fff}
+#pop{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);z-index:70;background:rgba(160,20,40,.92);border:3px solid #ffb4b4;
+  padding:18px 40px;border-radius:14px;font-size:44px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+#pop.on{opacity:1}
+</style></head><body>
+<div id="game" class="land">
+  <div id="bg"></div><div id="bgFs"></div>
+  <svg id="temple" viewBox="0 0 560 1080" preserveAspectRatio="xMaxYMin slice">
+    <defs><linearGradient id="tpl" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff8ee"/><stop offset="1" stop-color="#e4cfe6"/></linearGradient></defs>
+    <path d="M120 150 L360 60 L600 150Z" fill="url(#tpl)" stroke="#d8bcd8" stroke-width="3"/>
+    <rect x="120" y="150" width="480" height="30" fill="url(#tpl)" stroke="#d8bcd8" stroke-width="3"/>
+    <g fill="url(#tpl)" stroke="#d8bcd8" stroke-width="3">
+      <rect x="150" y="180" width="44" height="480"/><rect x="250" y="180" width="44" height="480"/><rect x="350" y="180" width="44" height="480"/><rect x="450" y="180" width="44" height="480"/></g>
+    <g fill="#e9d8ea"><rect x="100" y="660" width="520" height="24"/><rect x="80" y="684" width="560" height="24"/><rect x="60" y="708" width="600" height="24"/></g>
+  </svg>
+
+  <div class="box" id="top"><div id="topText" class="gold">WIN UP TO 50,000× BET</div>
+    <div id="tumble" hidden><div class="tl gold">TUMBLE WIN</div><div id="tumbleAmt" class="gold">$0.00</div></div></div>
+  <div class="box" id="logo"></div>
+  <div class="box" id="zeus"></div>
+
+  <div class="box plq btnp" id="buyBox"><div class="t1 blue">BUY</div><div class="t2 blue">FREE SPINS</div><div class="t3 gold" id="buyPrice">$200.00</div><div class="fa blue">FEATURE<br>ACTIVE</div></div>
+  <div class="box plq btnp" id="sbuyBox"><div class="t1 blue">BUY</div><div class="t2 sm blue">SUPER FREE SPINS</div><div class="t3 gold" id="sbuyPrice">$1,000.00</div><div class="fa blue">FEATURE<br>ACTIVE</div></div>
+  <div class="box parch" id="anteBox"><div class="a1">BET</div><div class="a2 gold" id="antePrice">$3.00</div><div class="a3">DOUBLE CHANCE TO WIN FEATURE</div>
+    <div class="tog" id="anteTog"><span class="arr">&#10140;</span><b id="anteTxt">OFF</b></div></div>
+  <div class="box" id="multBox"><div class="ml gold">TOTAL<br>MULTIPLIER</div><div id="coin"></div><svg id="pillar" viewBox="0 0 200 400" preserveAspectRatio="none"></svg></div>
+  <div class="box plq" id="fsLeftBox"><div class="l1 gold">FREE SPINS<br>LEFT</div><div id="fsLeft" class="blue">15</div></div>
+  <div class="box dark" id="listBox"><div id="list"></div></div>
+
+  <div class="box" id="frame"><div id="grid"></div></div>
+
+  <div class="box" id="sys"><button id="menuBtn" title="Settings">&#8801;</button><button id="infoBtn" title="Paytable and rules">i</button></div>
+  <div class="box" id="credit"><div><span class="gl">CREDIT</span><span id="creditV" class="whiteT">$0.00</span></div>
+    <div><span class="gl">BET</span><span id="betV" class="whiteT">$2.00</span></div></div>
+  <div class="box" id="winBox"><div id="winLine" hidden><span class="gl">WIN</span><span id="winV">$0.00</span></div><div id="msg"></div></div>
+  <button class="box circ" id="minus">&minus;</button>
+  <button class="box" id="spinBtn" title="Spin (space)"><svg viewBox="0 0 100 100"><path d="M50 12a38 38 0 0 1 36 26" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+    <path d="M94 26l-4 22-20-10z" fill="#fff"/><path d="M50 88a38 38 0 0 1-36-26" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+    <path d="M6 74l4-22 20 10z" fill="#fff"/></svg><div class="stop"></div></button>
+  <button class="box circ" id="plus">+</button>
+  <div class="box" id="autoBox"><button id="turboBtn" title="Quick spin">&raquo;</button><button id="autoBtn">AUTOPLAY</button></div>
+
+  <div id="fx"></div>
+  <div id="ov" hidden></div>
+  <div id="pop"></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const mx=m=>fmt(m)+'×';   // paytable shows multiples of the base bet
+const round2=n=>Math.round(n*100)/100;
+const rnd=()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296};
+const _API=()=>{try{return window.parent._slotAPI}catch(_){return null}};
+function getBal(){const a=_API();return a?a.bal:0}
+let bal=getBal();
+function paintBal(){ bal=getBal(); $('creditV').textContent='$'+fmt(bal); }
+function credit(v){const a=_API();if(a)a.credit(v);bal=getBal();paintBal();}
+function flash(t){const p=$('pop');p.textContent=t;p.classList.add('on');clearTimeout(p._t);p._t=setTimeout(()=>p.classList.remove('on'),1900)}
+function logBet(game,cost,mult){const a=_API();if(a)a.logBet(game,cost,mult);}
+const AUTO={};
+
+/* ================= OLYMPIAN STORM engine (pure: takes an rng, returns the whole round) ================= */
+const OLY=(function(){
+  const COLS=6,ROWS=5,MAXWIN=50000;
+  // pays in multiples of the base bet for 8-9 / 10-11 / 12-30 of a symbol anywhere
+  const PAY={crown:[10,25,50],hourglass:[2.5,10,25],ring:[2,5,15],chalice:[1.5,2,12],
+    red:[1,1.5,10],purple:[0.8,1.2,8],yellow:[0.5,1,5],green:[0.4,0.9,4],blue:[0.25,0.75,2]};
+  const WGT={crown:10,hourglass:11.3,ring:12.77,chalice:14.43,red:16.3,purple:18.42,yellow:20.82,green:23.53,blue:26.58};
+  const SCAT_PAY={4:3,5:5,6:100};                 // 6 or more pays 100x
+  const SUPER_PAY=[0,100,500,5000,50000];          // by super scatters in the trigger
+  const ORBS=[2,3,4,5,6,8,10,12,15,20,25,50,100,250,500];
+  const ORBW=[30,22,17,14,11,9,7,5,4,3,2.2,1,0.12,0.02,0.006];
+  // per-cell odds for scatter, super scatter and multiplier orb, per mode
+  const MODE={
+    base:{S:0.0171,Z:0.00045,M:0.007,min:2,tilt:0.6765,cap:20,pw:1.0393},
+    ante:{S:0.02327,Z:0.00043,M:0.007,min:2,tilt:0.6765,cap:20,pw:1.0393},
+    fs:  {S:0.012,Z:0,M:0.021,min:2,tilt:-0.8,cap:20,pw:1.6042},      // super scatters never land in free spins
+    sfs: {S:0.012,Z:0,M:0.021,min:10,tilt:0.3,cap:100,pw:1.652}      // super free spins: every orb is x10 or more
+  };
+  const SYMS=Object.keys(WGT);
+  // pw>1 skews a mode's reels toward the common symbols, so wins connect more often 
+  for(const k in MODE){const m=MODE[k]; m.sw=SYMS.map(s=>Math.pow(WGT[s],m.pw||1)); m.st=m.sw.reduce((a,b)=>a+b,0);}
+  const tier=n=>n>=12?2:n>=10?1:n>=8?0:-1;
+
+  // bonus modes lean the orb values upward: weight x min(value,cap)^tilt (normal free spins cap at 20 so 50x-500x stay rare), orbs below min never land
+  for(const k in MODE){const m=MODE[k];
+    m.ow=ORBS.map((v,i)=>v<m.min?0:ORBW[i]*Math.pow(Math.min(v,m.cap),m.tilt)); m.ot=m.ow.reduce((a,b)=>a+b,0)}
+  function orb(R,m){
+    let t=R()*m.ot;
+    for(let i=0;i<ORBS.length;i++){ t-=m.ow[i]; if(t<0)return ORBS[i]; }
+    return ORBS[ORBS.length-1];
+  }
+  function cell(R,m){
+    const t=R();
+    if(t<m.S)return 'S';
+    if(t<m.S+m.Z)return 'Z';
+    if(t<m.S+m.Z+m.M)return {m:orb(R,m)};
+    let u=R()*m.st;
+    for(let i=0;i<SYMS.length;i++){ u-=m.sw[i]; if(u<0)return SYMS[i]; }
+    return 'blue';
+  }
+  const copy=g=>g.map(c=>c.slice());
+  const key=c=>typeof c==='string'?c:'M';
+
+  /* one spin with all its tumbles. grid is [col][row], row 0 at the top */
+  function spin(R,modeName){
+    const m=MODE[modeName];
+    const g=Array.from({length:COLS},()=>Array.from({length:ROWS},()=>cell(R,m)));
+    const steps=[{grid:copy(g),hits:[],wins:[],fresh:null}];
+    let win=0;
+    for(;;){
+      const cnt={};
+      for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){const k=key(g[c][r]);cnt[k]=(cnt[k]||0)+1}
+      const wins=SYMS.filter(s=>cnt[s]&&tier(cnt[s])>=0).map(s=>({s,n:cnt[s],pay:PAY[s][tier(cnt[s])]}));
+      if(!wins.length)break;
+      const hit=new Set(wins.map(w=>w.s)), hits=[], fresh=[];
+      wins.forEach(w=>win+=w.pay);
+      for(let c=0;c<COLS;c++){
+        const keep=[];
+        for(let r=0;r<ROWS;r++){ if(hit.has(key(g[c][r])))hits.push([c,r]); else keep.push(g[c][r]); }
+        const add=ROWS-keep.length;
+        const col=[];
+        for(let r=0;r<add;r++){ col.push(cell(R,m)); fresh.push([c,r]); }
+        g[c]=col.concat(keep);
+      }
+      steps.push({grid:copy(g),hits,wins,fresh});
+    }
+    let orbSum=0,S=0,Z=0;
+    for(let c=0;c<COLS;c++)for(let r=0;r<ROWS;r++){
+      const v=g[c][r];
+      if(v==='S')S++; else if(v==='Z')Z++; else if(typeof v==='object')orbSum+=v.m;
+    }
+    return {steps,win,orbSum,scat:S+Z,sup:Z};
+  }
+
+  /* a whole paid round: base spin (or a buy) plus any free spins, in units of the base bet */
+  function play(R,opt){
+    opt=opt||{};
+    const spins=[]; let total=0, capped=false;
+    const add=(sp,pay)=>{
+      if(total+pay>=MAXWIN){ pay=MAXWIN-total; capped=true; }
+      total+=pay; sp.pay=pay; spins.push(sp); return capped;
+    };
+    let fs=0, fsMode=null;
+    if(opt.buy){
+      fs=15; fsMode=opt.buy==='super'?'sfs':'fs';
+    }else{
+      const sp=spin(R,opt.ante?'ante':'base');
+      let pay=sp.win>0&&sp.orbSum>0?sp.win*sp.orbSum:sp.win;
+      sp.kind='base'; sp.mult=sp.win>0?sp.orbSum:0;
+      if(sp.scat>=4){
+        sp.scatPay=sp.sup?SUPER_PAY[Math.min(sp.sup,4)]:SCAT_PAY[Math.min(sp.scat,6)];
+        pay+=sp.scatPay; fs=15; fsMode='fs'; sp.award=15;
+      }
+      if(add(sp,pay))return {spins,total,capped};
+    }
+    let fsMult=0, left=fs;
+    while(left>0){
+      const sp=spin(R,fsMode);
+      sp.kind=fsMode; left--;
+      if(sp.win>0&&sp.orbSum>0)fsMult+=sp.orbSum;
+      let pay=sp.win*(fsMult>0?fsMult:1);
+      sp.mult=fsMult;
+      if(sp.scat>=3){ left+=5; sp.award=5; }
+      sp.left=left;
+      if(add(sp,pay))break;
+    }
+    return {spins,total,capped,fs};
+  }
+  return {COLS,ROWS,MAXWIN,PAY,SCAT_PAY,SUPER_PAY,ORBS,MODE,spin,play};
+})();
+
+/* ================= OLYMPIAN STORM UI (full-screen, 16:9 landscape or 9:16 portrait) ================= */
+(function(){
+  const GAME='Olympian Storm', MINBET=0.2, MAXBET=3000, ANTE=1.5, BUY=100, SBUY=500;
+  const LEVELS=[0.2,0.4,0.6,0.8,1,1.2,1.6,2,2.4,3,4,5,6,8,10,12,16,20,24,30,40,50,60,80,100,120,160,200,250,300,400,500,600,800,1000,1500,2000,2500,3000];
+  let li=LEVELS.indexOf(2); try{const v=parseInt(localStorage.getItem('olyBetI'));if(v>=0&&v<LEVELS.length)li=v}catch(_){}
+
+  /* ---------- art ---------- */
+  const defs=document.createElement('div');
+  defs.style.cssText='position:absolute;width:0;height:0;overflow:hidden';
+  const lg=(id,...c)=>`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">${c.map((s,i)=>`<stop offset="${i/(c.length-1)}" stop-color="${s}"/>`).join('')}</linearGradient>`;
+  const rg=(id,a,b,cx=.4,cy=.35)=>`<radialGradient id="${id}" cx="${cx}" cy="${cy}" r=".75"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></radialGradient>`;
+  defs.innerHTML=`<svg><defs>
+    ${lg('oGold','#fffbd0','#f5c842','#b87400','#ffe17a')}${lg('oGoldD','#f7d774','#a86a00','#5c3a00')}
+    ${lg('oBlue','#e6fbff','#6fd0ff','#1466d6','#0b2f7a')}${lg('oGreen','#e4ffd9','#5de04a','#16891f','#0a4a10')}
+    ${lg('oYellow','#fffbe0','#ffdd33','#d99a00','#8a5a00')}${lg('oPurple','#fbe6ff','#d060ff','#8a1fd6','#45107a')}
+    ${lg('oRed','#ffe0d4','#ff6a3d','#d0260f','#7a1206')}
+    ${rg('dPurple','#8a4dff','#2a0a6e')}${rg('dPink','#ff3fae','#5a0634')}${rg('dGreen','#35c24a','#063a12')}
+    ${rg('dRed','#ff3b2e','#5a0707')}${rg('dSky','#b58cff','#3a1580',.5,.3)}${rg('zSkin','#ffdcbc','#d08b5c',.45,.3)}
+    ${rg('oOrbB','#b6e4ff','#1b2fa8',.35,.3)}${rg('oOrbP','#f0c6ff','#6a13b8',.35,.3)}${rg('oOrbG','#c8ffb0','#1f8a1f',.35,.3)}${rg('oOrbR','#ffc2b0','#b01818',.35,.3)}
+    ${lg('orbTxt','#fbffb0','#d6ff3a','#7bd11a')}${lg('zRobe','#ffffff','#e7e9f6','#c7cbe3')}${lg('zPurp','#9b84ff','#5a3fd0','#2f1f8a')}
+    ${lg('marb','#ffffff','#efe7f7','#d6c8ea')}
+  </defs></svg>`;
+  document.body.appendChild(defs);
+
+  const gem=(outer,inner,fill,facets)=>`<svg viewBox="0 0 100 100">`+
+    `<polygon points="${outer}" fill="url(#oGoldD)" stroke="#4d2a00" stroke-width="2" stroke-linejoin="round" transform="translate(50 50) scale(1.1) translate(-50 -50)"/>`+
+    `<polygon points="${outer}" fill="url(#${fill})" stroke="url(#oGold)" stroke-width="5" stroke-linejoin="round"/>`+
+    `<polygon points="${inner}" fill="#fff" opacity=".22"/>${facets||''}<circle cx="36" cy="30" r="4" fill="#fff" opacity=".85"/></svg>`;
+  const disc=(fill,body)=>`<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="url(#oGoldD)"/>`+
+    `<circle cx="50" cy="50" r="44" fill="url(#${fill})" stroke="url(#oGold)" stroke-width="5"/>`+
+    `<ellipse cx="40" cy="26" rx="18" ry="8" fill="#fff" opacity=".18"/>${body}</svg>`;
+  const SVG={
+    blue:  gem('50,4 96,50 50,96 4,50','50,24 76,50 50,76 24,50','oBlue','<path d="M50 4v92M4 50h92" stroke="#fff" stroke-width="1.2" opacity=".35"/>'),
+    green: gem('50,5 95,90 5,90','50,34 74,80 26,80','oGreen','<path d="M50 5L50 90M50 55L5 90M50 55L95 90" stroke="#fff" stroke-width="1.2" opacity=".35"/>'),
+    yellow:gem('28,8 72,8 95,50 72,92 28,92 5,50','38,28 62,28 74,50 62,72 38,72 26,50','oYellow','<path d="M28 8L50 50 72 8M5 50H95M28 92L50 50 72 92" stroke="#fff" stroke-width="1.2" opacity=".3"/>'),
+    purple:gem('5,10 95,10 50,94','28,24 72,24 50,64','oPurple','<path d="M50 10V94M5 10L50 45 95 10" stroke="#fff" stroke-width="1.2" opacity=".35"/>'),
+    red:   gem('50,4 96,38 78,94 22,94 4,38','50,26 72,42 63,72 37,72 28,42','oRed','<path d="M50 4V50M96 38L50 50 4 38M78 94L50 50 22 94" stroke="#fff" stroke-width="1.2" opacity=".3"/>'),
+    chalice:disc('dPurple',`<path d="M26 22h48c0 20-9 32-19 35v12h11l5 9H29l5-9h11V57C35 54 26 42 26 22z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/><ellipse cx="50" cy="23" rx="24" ry="5" fill="#7c4a03" opacity=".55"/><circle cx="50" cy="40" r="5" fill="#38bdf8" stroke="#fff4b0" stroke-width="1.5"/><path d="M33 28c2 12 8 20 14 24" stroke="#fff" stroke-width="2.5" fill="none" opacity=".55"/>`),
+    ring:  disc('dPink',`<ellipse cx="52" cy="60" rx="26" ry="21" fill="none" stroke="url(#oGold)" stroke-width="10"/><ellipse cx="52" cy="60" rx="26" ry="21" fill="none" stroke="#6b3e00" stroke-width="1.5" opacity=".6"/><path d="M38 38l14-20 14 20-14 10z" fill="#ff2e6a" stroke="#fff4b0" stroke-width="2"/><path d="M44 32l8-10 4 10z" fill="#fff" opacity=".6"/>`),
+    hourglass:disc('dGreen',`<rect x="26" y="14" width="48" height="9" rx="3" fill="url(#oGold)" stroke="#6b3e00" stroke-width="1.5"/><rect x="26" y="77" width="48" height="9" rx="3" fill="url(#oGold)" stroke="#6b3e00" stroke-width="1.5"/><path d="M33 23h34c0 15-13 21-13 27s13 12 13 27H33c0-15 13-21 13-27S33 38 33 23z" fill="#d6f2ff" opacity=".9" stroke="#fff4b0" stroke-width="2"/><path d="M39 71c5-8 17-8 22 0v6H39z" fill="#ffd23f"/><path d="M41 29h18c-2 7-9 10-9 13 0-3-7-6-9-13z" fill="#ffd23f"/><rect x="29" y="23" width="4" height="54" fill="url(#oGold)"/><rect x="67" y="23" width="4" height="54" fill="url(#oGold)"/>`),
+    crown: disc('dRed',`<path d="M18 66l-4-34 19 17 17-28 17 28 19-17-4 34z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2" stroke-linejoin="round"/><rect x="18" y="63" width="64" height="13" rx="4" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/><circle cx="50" cy="69.5" r="5" fill="#22d05a" stroke="#fff4b0" stroke-width="1.2"/><circle cx="33" cy="69.5" r="3.5" fill="#ff3b3b"/><circle cx="67" cy="69.5" r="3.5" fill="#ff3b3b"/><circle cx="50" cy="20" r="4" fill="#fff4b0"/>`),
+    // scatter: an old sky-god portrait (original drawing) with a SCATTER plate
+    S:`<svg viewBox="0 0 100 100"><rect x="6" y="2" width="88" height="80" rx="4" fill="url(#dSky)" stroke="url(#oGold)" stroke-width="4"/>`+
+      `<path d="M26 34Q24 10 50 8Q76 10 74 34Q82 50 76 64L24 64Q18 50 26 34Z" fill="#eef0f8"/>`+
+      `<ellipse cx="50" cy="36" rx="15" ry="18" fill="url(#zSkin)"/>`+
+      `<path d="M34 38Q36 62 50 80Q64 62 66 38Q60 52 50 51Q40 52 34 38Z" fill="#f7f8fd" stroke="#c9ccd9" stroke-width="1"/>`+
+      `<path d="M41 47Q50 42 59 47Q54 51 50 48Q46 51 41 47Z" fill="#fff"/>`+
+      `<path d="M38 29l9 3M62 29l-9 3" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>`+
+      `<ellipse cx="44" cy="35" rx="3" ry="1.8" fill="#7ff9ff"/><ellipse cx="56" cy="35" rx="3" ry="1.8" fill="#7ff9ff"/>`+
+      `<path d="M33 22Q50 8 67 22" stroke="url(#oGold)" stroke-width="3" fill="none"/>`+
+      `<g fill="url(#oGold)"><ellipse cx="36" cy="18" rx="5" ry="2.4" transform="rotate(-40 36 18)"/><ellipse cx="43" cy="13" rx="5" ry="2.4" transform="rotate(-20 43 13)"/><ellipse cx="57" cy="13" rx="5" ry="2.4" transform="rotate(20 57 13)"/><ellipse cx="64" cy="18" rx="5" ry="2.4" transform="rotate(40 64 18)"/></g>`+
+      `<text x="50" y="97" font-family="Anton,Impact,sans-serif" font-size="25" fill="url(#oGold)" stroke="#4d2a00" stroke-width="1.6" paint-order="stroke" text-anchor="middle" letter-spacing=".5">SCATTER</text></svg>`,
+    Z:`<svg viewBox="0 0 100 100"><path d="M14 48C0 42-2 26 3 18c6 11 14 15 22 17zM86 48c14-6 16-22 11-30-6 11-14 15-22 17z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="1.5"/>`+
+      `<circle cx="50" cy="44" r="36" fill="url(#oGoldD)"/><circle cx="50" cy="44" r="32" fill="url(#oOrbB)" stroke="url(#oGold)" stroke-width="4"/>`+
+      `<path d="M58 14L32 50h16l-8 30 30-42H54z" fill="#fff36b" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>`+
+      `<path d="M14 78h72l-6 16H20z" fill="#c21d1d" stroke="url(#oGold)" stroke-width="2.5"/>`+
+      `<text x="50" y="92" font-family="Anton,Impact,sans-serif" font-size="14" fill="url(#oGold)" stroke="#4d2a00" stroke-width=".8" paint-order="stroke" text-anchor="middle">SUPER SCATTER</text></svg>`
+  };
+  const orbFill=m=>m>=100?'oOrbR':m>=20?'oOrbP':m>=8?'oOrbB':'oOrbG';
+  const orbSvg=m=>`<svg viewBox="0 0 100 100"><path d="M20 52C4 46 0 30 4 20c7 11 16 16 26 18zM80 52c16-6 20-22 16-32-7 11-16 16-26 18z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="1.5"/>`+
+    `<path d="M22 60c-10 2-14 10-12 16 6-6 12-8 18-8zM78 60c10 2 14 10 12 16-6-6-12-8-18-8z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="1.2"/>`+
+    `<circle cx="50" cy="50" r="33" fill="url(#oGoldD)"/><circle cx="50" cy="50" r="29" fill="url(#${orbFill(m)})" stroke="url(#oGold)" stroke-width="4"/>`+
+    `<ellipse cx="40" cy="36" rx="11" ry="6" fill="#fff" opacity=".35"/>`+
+    `<text x="52" y="${m>=100?61:64}" font-family="Anton,Impact,sans-serif" font-size="${m>=100?30:m>=10?36:40}" fill="url(#orbTxt)" stroke="#1d2a00" stroke-width="2.4" paint-order="stroke" text-anchor="middle">${m}x</text></svg>`;
+  const face=v=>typeof v==='object'?orbSvg(v.m):SVG[v];
+
+  $('logo').innerHTML=`<svg viewBox="0 0 300 190">
+    <path d="M10 70C-4 60-4 38 6 28c4 14 14 20 28 22zM290 70c14-10 14-32 4-42-4 14-14 20-28 22z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/>
+    <path d="M28 40L272 40 258 118 42 118Z" fill="#a61e17" stroke="url(#oGold)" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M28 40L272 40 258 118 42 118Z" fill="none" stroke="#5c3a00" stroke-width="1.5"/>
+    <text x="150" y="104" font-family="Anton,Impact,sans-serif" font-size="58" fill="url(#oGold)" stroke="#3d1f00" stroke-width="3" paint-order="stroke" text-anchor="middle" letter-spacing="2">OLYMPIAN</text>
+    <path d="M40 128Q150 104 260 128L252 172Q150 150 48 172Z" fill="#3b2a9c" stroke="url(#oGold)" stroke-width="5"/>
+    <text x="150" y="162" font-family="Anton,Impact,sans-serif" font-size="36" fill="url(#oGold)" stroke="#1a0f4d" stroke-width="2.5" paint-order="stroke" text-anchor="middle" letter-spacing="6">STORM</text>
+    <path d="M150 6L138 30h10l-6 16 18-22h-10l6-18z" fill="#fff36b" stroke="#6b3e00" stroke-width="1.5"/></svg>`;
+
+  $('zeus').innerHTML=`<svg viewBox="0 0 300 620">
+    <path d="M70 150Q18 350 36 612L264 612Q284 350 230 150Z" fill="url(#zPurp)" opacity=".92"/>
+    <path d="M112 440L102 588L136 588L146 440Z" fill="url(#zSkin)"/><path d="M154 440L164 588L198 588L188 440Z" fill="url(#zSkin)"/>
+    <path d="M98 520h40l-2 82H96z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/><path d="M162 520h40l-2 82h-40z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/>
+    <ellipse cx="114" cy="606" rx="26" ry="9" fill="url(#oGold)"/><ellipse cx="184" cy="606" rx="26" ry="9" fill="url(#oGold)"/>
+    <path d="M94 300L206 300L238 500Q150 522 62 500Z" fill="url(#zRobe)" stroke="#b8bdd6" stroke-width="2"/>
+    <path d="M134 308L166 308L188 508L112 508Z" fill="url(#zPurp)"/><path d="M62 500Q150 522 238 500" stroke="url(#oGold)" stroke-width="7" fill="none"/>
+    <path d="M92 150Q150 134 208 150L200 300L100 300Z" fill="url(#zSkin)"/>
+    <path d="M110 192Q130 212 150 196Q170 212 190 192" stroke="#b36f45" stroke-width="3" fill="none"/>
+    <path d="M150 215V285M130 235h40M132 258h36" stroke="#b36f45" stroke-width="2.5" fill="none" opacity=".7"/>
+    <path d="M92 150L200 300L178 300L92 178Z" fill="url(#zRobe)" stroke="#c7cbe3" stroke-width="1.5"/>
+    <rect x="94" y="286" width="112" height="28" rx="7" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/><circle cx="150" cy="300" r="9" fill="#3b82f6" stroke="#fff4b0" stroke-width="2"/>
+    <path d="M92 156Q58 200 60 292L88 292Q92 222 106 186Z" fill="url(#zSkin)"/><rect x="58" y="246" width="32" height="40" rx="6" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/><circle cx="74" cy="306" r="17" fill="url(#zSkin)"/>
+    <g id="zArm"><path d="M208 156Q242 200 240 292L212 292Q208 222 194 186Z" fill="url(#zSkin)"/><rect x="210" y="246" width="32" height="40" rx="6" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/><circle cx="226" cy="306" r="17" fill="url(#zSkin)"/></g>
+    <path d="M62 150Q86 112 128 136L112 178Q82 170 62 150Z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/>
+    <path d="M238 150Q214 112 172 136L188 178Q218 170 238 150Z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/>
+    <path d="M62 150L40 128 70 138 50 110 84 128" fill="url(#oGold)" stroke="#6b3e00" stroke-width="1.5"/><path d="M238 150L260 128 230 138 250 110 216 128" fill="url(#oGold)" stroke="#6b3e00" stroke-width="1.5"/>
+    <rect x="136" y="112" width="28" height="38" fill="url(#zSkin)"/>
+    <path d="M106 92Q100 28 150 22Q200 28 194 92Q206 132 190 152L110 152Q94 132 106 92Z" fill="#eef0f7"/>
+    <ellipse cx="150" cy="84" rx="30" ry="36" fill="url(#zSkin)"/>
+    <path d="M116 88Q118 146 150 206Q182 146 184 88Q172 118 150 116Q128 118 116 88Z" fill="#f7f8fd" stroke="#c9ccd9" stroke-width="1.5"/>
+    <path d="M150 130V196M138 128Q142 170 150 196M162 128Q158 170 150 196" stroke="#d3d6e4" stroke-width="1.5" fill="none"/>
+    <path d="M131 104Q150 94 169 104Q159 113 150 106Q141 113 131 104Z" fill="#fff"/>
+    <path d="M127 72L146 78M173 72L154 78" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+    <ellipse cx="139" cy="84" rx="6" ry="3.4" fill="#7ff9ff"/><ellipse cx="161" cy="84" rx="6" ry="3.4" fill="#7ff9ff"/>
+    <path d="M118 60Q150 34 182 60" stroke="url(#oGold)" stroke-width="6" fill="none"/>
+    <g fill="url(#oGold)" stroke="#6b3e00" stroke-width="1"><ellipse cx="122" cy="52" rx="10" ry="4.5" transform="rotate(-40 122 52)"/><ellipse cx="136" cy="42" rx="10" ry="4.5" transform="rotate(-20 136 42)"/><ellipse cx="164" cy="42" rx="10" ry="4.5" transform="rotate(20 164 42)"/><ellipse cx="178" cy="52" rx="10" ry="4.5" transform="rotate(40 178 52)"/></g></svg>`;
+
+  $('coin').innerHTML=`<svg viewBox="0 0 250 160"><path d="M70 80C30 70 8 40 14 10c14 24 38 36 64 40zM180 80c40-10 62-40 56-70-14 24-38 36-64 40z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/>
+    <path d="M70 100c-26 4-40 22-36 38 12-14 26-18 42-20zM180 100c26 4 40 22 36 38-12-14-26-18-42-20z" fill="url(#oGold)" stroke="#6b3e00" stroke-width="1.5"/>
+    <circle cx="125" cy="80" r="66" fill="url(#oGoldD)"/><circle cx="125" cy="80" r="58" fill="url(#oGold)" stroke="#6b3e00" stroke-width="2"/>
+    <circle cx="125" cy="80" r="46" fill="url(#dSky)" stroke="#6b3e00" stroke-width="2"/>
+    <path id="coinBolt" d="M134 42L108 86h16l-8 32 28-44h-16l10-32z" fill="url(#oGold)" stroke="#4d2a00" stroke-width="2"/></svg><div id="coinTxt" class="gold"></div>`;
+  $('pillar').innerHTML=`<rect x="10" y="0" width="180" height="22" rx="6" fill="url(#marb)" stroke="#c8b8dc" stroke-width="2"/>
+    <circle cx="26" cy="30" r="18" fill="url(#marb)" stroke="#c8b8dc" stroke-width="3"/><circle cx="174" cy="30" r="18" fill="url(#marb)" stroke="#c8b8dc" stroke-width="3"/>
+    <rect x="40" y="22" width="120" height="30" fill="url(#marb)" stroke="#c8b8dc" stroke-width="2"/>
+    <rect x="48" y="52" width="104" height="348" fill="url(#marb)"/>
+    <g stroke="#cdbfe0" stroke-width="3"><path d="M64 60V400M82 60V400M100 60V400M118 60V400M136 60V400"/></g>`;
+
+  /* ---------- layout (all positions in a fixed 1920x1080 / 1080x1920 design space, scaled to the window) ---------- */
+  const LAYOUT={
+    land:{W:1920,H:1080, top:[520,4,880,84], logo:[1622,86,285,180], zeus:[1616,272,296,600],
+      buyBox:[48,16,258,150], sbuyBox:[48,186,258,150], anteBox:[48,354,258,262], listBox:[48,642,258,272],
+      multBox:[16,30,290,610], fsLeftBox:[46,432,232,148],
+      frame:[300,86,1316,852], sys:[196,940,70,140], credit:[300,944,420,126], winBox:[690,934,560,120],
+      minus:[1286,925,70,70], spinBtn:[1380,872,166,166], plus:[1570,925,70,70], autoBox:[1368,1018,190,52]},
+    port:{W:1080,H:1920, top:[100,232,880,84], logo:[270,14,540,210], zeus:null,
+      buyBox:[18,1172,338,206], sbuyBox:[371,1172,338,206], anteBox:[724,1172,338,206], listBox:[18,1396,1044,150],
+      multBox:[18,1162,338,226], fsLeftBox:[371,1172,338,206],
+      frame:[12,322,1056,832], sys:[30,1730,70,150], credit:[10,1570,480,126], winBox:[470,1566,600,126],
+      minus:[318,1752,80,80], spinBtn:[457,1702,166,166], plus:[682,1752,80,80], autoBox:[445,1862,190,52]}
+  };
+  const G=$('game'); let S=1, port=false;
+  function lay(){
+    const W=innerWidth,H=innerHeight; port=W/H<0.8;
+    const L=LAYOUT[port?'port':'land']; G.className=port?'port':'land';
+    G.style.width=L.W+'px'; G.style.height=L.H+'px';
+    for(const k in L){ if(k==='W'||k==='H')continue; const e=$(k),v=L[k];
+      e.classList.toggle('nolay',!v); if(v)Object.assign(e.style,{left:v[0]+'px',top:v[1]+'px',width:v[2]+'px',height:v[3]+'px'}); }
+    S=Math.min(W/L.W,H/L.H);
+    G.style.transform=`translate(${(W-L.W*S)/2}px,${(H-L.H*S)/2}px) scale(${S})`;
+  }
+  addEventListener('resize',lay); lay();
+
+  /* ---------- state ---------- */
+  let anteOn=false, auto=false, turbo=false, hold=false, skip=false, busy=false, inFs=false, ovRes=null, ovClose=null;
+  try{turbo=localStorage.getItem('olyTurbo')==='1'}catch(_){}
+  const C=OLY.COLS, R=OLY.ROWS;
+  const bet=()=>LEVELS[li];
+  const stake=()=>round2(bet()*(anteOn?ANTE:1));
+  const fast=()=>turbo||hold||skip;
+  const wait=ms=>new Promise(r=>setTimeout(r,fast()?ms*.3:ms));
+  const at=(c,r)=>$('grid').children[r*C+c];
+  const money=v=>'$'+fmt(v);
+  let cur=null;
+
+  /* draws the board; new symbols drop in one at a time, bottom row first, left to right
+     (all together in quick spin). Returns how long the drop takes in ms. */
+  const STEP=26, DROP=300;
+  function render(grid,fresh){
+    cur=grid; const f=new Set((fresh||[]).map(([c,r])=>c+','+r)); const q=fast();
+    const order={}; let n=0;
+    for(let r=R-1;r>=0;r--)for(let c=0;c<C;c++)if(fresh===null||f.has(c+','+r))order[c+','+r]=n++;
+    let h='';
+    for(let r=0;r<R;r++)for(let c=0;c<C;c++){
+      const k=c+','+r, isNew=k in order;
+      h+=`<div class="cell${isNew?' new':''}" style="${isNew?`animation-delay:${q?0:order[k]*STEP}ms;animation-duration:${q?180:DROP}ms`:''}">${face(grid[c][r])}</div>`;
+    }
+    $('grid').innerHTML=h;
+    return q?200:Math.max(0,n-1)*STEP+DROP+60;
+  }
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+  function mode(fs){
+    inFs=fs;
+    ['buyBox','sbuyBox','anteBox'].forEach(k=>$(k).classList.toggle('off',fs));
+    ['multBox','fsLeftBox'].forEach(k=>$(k).classList.toggle('off',!fs));
+    $('bgFs').style.opacity=fs?1:0; $('bg').style.opacity=fs?0:1;
+  }
+  function setCoin(m){ $('coinTxt').textContent=m>0?m+'x':''; $('coinBolt').style.display=m>0?'none':''; }
+  function sync(){
+    const b=bet();
+    $('betV').textContent=money(b); $('antePrice').textContent=money(b*ANTE);
+    $('buyPrice').textContent=money(b*BUY); $('sbuyPrice').textContent=money(b*SBUY);
+    $('anteTxt').textContent=anteOn?'ON':'OFF'; $('anteTog').classList.toggle('on',anteOn);
+    ['buyBox','sbuyBox'].forEach(k=>{$(k).classList.toggle('act',busy);$(k).classList.toggle('dis',!busy&&anteOn)});
+    $('minus').disabled=busy||li===0; $('plus').disabled=busy||li===LEVELS.length-1;
+    $('spinBtn').classList.toggle('busy',busy);
+    $('autoBtn').classList.toggle('on',auto); $('autoBtn').textContent=auto?'STOP AUTO':'AUTOPLAY';
+    $('turboBtn').classList.toggle('on',turbo);
+  }
+  function setWin(v){ $('winLine').hidden=!(v>0); $('winV').textContent=money(v); }
+  function msg(html){ $('msg').innerHTML=html; }
+  let idleI=0, idleT=null;
+  function idle(on){
+    clearInterval(idleT);
+    if(!on)return;
+    const lines=[['WIN UP TO 50,000× BET','HOLD SPACE FOR TURBO SPIN'],['SYMBOLS PAY ANYWHERE ON THE SCREEN','PLACE YOUR BETS!']];
+    const tick=()=>{ const l=lines[idleI++%2]; $('topText').textContent=l[0]; if(!busy&&!($('winLine').hidden===false))msg(l[1]); };
+    tick(); idleT=setInterval(tick,4000);
+  }
+  function tumble(html){ const t=$('tumble'); if(html==null){t.hidden=true;$('topText').hidden=false;return} t.hidden=false; $('topText').hidden=true; $('tumbleAmt').innerHTML=html; }
+  function listClear(){ $('list').innerHTML=''; }
+  function listAdd(n,s,v){
+    const d=document.createElement('div'); d.className='le';
+    d.innerHTML=`<span>${n} ${SVG[s]}</span><span>${money(v)}</span>`;
+    const l=$('list'); l.appendChild(d); while(l.children.length>(port?6:5))l.removeChild(l.firstChild);
+  }
+
+  /* position of an element's centre in design space */
+  function pos(el){ const g=G.getBoundingClientRect(), r=el.getBoundingClientRect();
+    return {x:(r.left-g.left+r.width/2)/S, y:(r.top-g.top+r.height/2)/S, w:r.width/S, h:r.height/S}; }
+  function bolt(to){
+    const z=$('zeus'); let from;
+    if(!port&&!z.classList.contains('nolay')){ const p=pos(z); from={x:p.x+62,y:p.y-p.h/2+40}; z.classList.add('raise'); clearTimeout(z._t); z._t=setTimeout(()=>z.classList.remove('raise'),700); }
+    else from={x:to.x+(Math.random()-.5)*200,y:0};
+    let d=`M${from.x} ${from.y}`; const n=7;
+    for(let i=1;i<n;i++){const t=i/n; d+=` L${from.x+(to.x-from.x)*t+(Math.random()-.5)*60} ${from.y+(to.y-from.y)*t+(Math.random()-.5)*40}`;}
+    d+=` L${to.x} ${to.y}`;
+    const s=document.createElementNS('http://www.w3.org/2000/svg','svg'); s.setAttribute('class','bolt');
+    s.setAttribute('viewBox',`0 0 ${G.offsetWidth} ${G.offsetHeight}`);
+    s.innerHTML=`<path d="${d}" stroke="#b58cff" stroke-width="22" fill="none" opacity=".45" stroke-linejoin="round"/><path d="${d}" stroke="#fff" stroke-width="7" fill="none" stroke-linejoin="round"/>`;
+    $('fx').appendChild(s); setTimeout(()=>s.remove(),500);
+  }
+  function fly(cell,target){
+    return new Promise(res=>{
+      const a=pos(cell), b=pos(target), e=document.createElement('div'); e.className='fly';
+      const w=Math.min(a.w,a.h)*.9; e.style.cssText=`left:${a.x-w/2}px;top:${a.y-w/2}px;width:${w}px;height:${w}px`;
+      e.innerHTML=cell.innerHTML; $('fx').appendChild(e);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ e.style.transform=`translate(${b.x-a.x}px,${b.y-a.y}px) scale(.45)`; e.style.opacity='.2'; }));
+      setTimeout(()=>{e.remove();res()},fast()?260:680);
+    });
+  }
+
+  /* ---------- overlays ---------- */
+  function overlay(html,{click=true,autoMs=0,outside=false}={}){
+    return new Promise(res=>{
+      const o=$('ov'); o.innerHTML=html; o.hidden=false;
+      let done=false; const fin=v=>{ if(done)return; done=true; o.hidden=true; o.innerHTML=''; ovRes=null; ovClose=null; res(v); };
+      ovRes=click?()=>fin(true):null; ovClose=()=>fin(false);
+      o.onclick=e=>{ const b=e.target.closest('[data-v]'); if(b){fin(b.dataset.v==='1');return}
+        if(e.target.closest('.xbtn,.closeBig')||(outside&&e.target===o)){fin(false);return} if(click)fin(true); };
+      if(autoMs)setTimeout(()=>fin(true),autoMs);
+    });
+  }
+  const congrSvg=`<svg viewBox="0 0 1560 860"><defs><path id="arcT" d="M90 420Q780 110 1470 420"/>
+      ${lg('cTxt','#dff1ff','#7b8cff','#4a3ae0','#8fb0ff')}</defs>
+    <path d="M60 70Q20 40 30 0Q110 60 230 90L1330 90Q1450 60 1530 0Q1540 40 1500 70L1470 800L90 800Z" fill="url(#oGold)" stroke="#5c3a00" stroke-width="4"/>
+    <path d="M120 120L1440 120L1410 780L150 780Z" fill="#2a2b30" stroke="#6b4300" stroke-width="4"/>
+    <path d="M120 120L1440 120L1410 780L150 780Z" fill="url(#dSky)" opacity=".12"/>
+    <g opacity=".13" stroke="#000" stroke-width="3" fill="none"><path d="M160 200h1240M160 300h1240M160 400h1240M160 500h1240M160 600h1240M160 700h1240"/></g>
+    <path d="M700 30L780 -20 860 30 860 120 780 170 700 120Z" fill="url(#oGold)" stroke="#5c3a00" stroke-width="4"/>
+    <path d="M725 45L780 10 835 45 835 105 780 140 725 105Z" fill="url(#oGreen)" stroke="#fff4b0" stroke-width="3"/>
+    <text font-family="Anton,Impact,sans-serif" font-size="128" fill="url(#cTxt)" stroke="#f5c842" stroke-width="7" paint-order="stroke" letter-spacing="4"><textPath href="#arcT" startOffset="50%" text-anchor="middle">CONGRATULATIONS!</textPath></text></svg>`;
+  const congrats=(won,big,sub,note)=>overlay(`<div class="congr">${congrSvg}<div class="in"><div class="won gold">YOU HAVE WON</div>`+
+    `<div class="bar"><span class="gold">${big}</span></div><div class="sub gold">${sub}</div>${note?`<div class="note gold">${note}</div>`:''}</div>`+
+    `<div class="cont">PRESS ANYWHERE TO CONTINUE</div></div>`,{autoMs:auto||fast()?2600:0});
+  async function bigWin(win,b){
+    const x=win/b; if(x<20)return;
+    const t=x>=100?'EPIC WIN':x>=50?'MEGA WIN':'BIG WIN';
+    await overlay(`<div class="bigwin"><div class="bw gold">${t}</div><div class="bv">${money(win)}</div></div>`,{autoMs:auto||fast()?1800:3200});
+  }
+
+  /* ---------- one spin (already decided by the engine) ---------- */
+  async function show(sp,b,paidBefore){
+    listClear(); tumble(null);
+    if(sp.kind!=='base'){ $('fsLeft').textContent=sp.left-(sp.award?5:0); msg(`FREE SPINS LEFT ${sp.left-(sp.award?5:0)}`); }
+    await sleep(render(sp.steps[0].grid,null)+(fast()?0:150));
+    let line=0;
+    for(let i=1;i<sp.steps.length;i++){
+      const st=sp.steps[i], prev=sp.steps[i-1].grid, key=v=>typeof v==='string'?v:'M';
+      for(const w of st.wins){
+        const cs=[]; for(let r=0;r<R;r++)for(let c=0;c<C;c++)if(key(prev[c][r])===w.s)cs.push(at(c,r));
+        cs.forEach(e=>e.classList.add('hit'));
+        const mid=cs[Math.floor(cs.length/2)], a=document.createElement('div'); a.className='amt'; a.textContent=money(w.pay*b); mid.appendChild(a);
+        line+=w.pay; listAdd(w.n,w.s,w.pay*b);
+        msg(`${w.n}x ${SVG[w.s]} PAYS ${money(w.pay*b)}`);
+        tumble(money(line*b)); setWin(paidBefore*b+line*b);
+      }
+      await wait(1000);
+      st.hits.forEach(([c,r])=>at(c,r).classList.add('pop'));
+      await wait(260);
+      await sleep(render(st.grid,st.fresh)+(fast()?0:120));
+    }
+    const orbCells=[]; for(let r=0;r<R;r++)for(let c=0;c<C;c++)if(typeof cur[c][r]==='object')orbCells.push([at(c,r),cur[c][r].m]);
+    if(sp.win>0&&sp.orbSum>0){
+      for(const [e] of orbCells){ bolt(pos(e)); e.classList.add('glow'); await wait(260); }
+      await wait(350);
+      if(sp.kind==='base'){
+        await Promise.all(orbCells.map(([e])=>fly(e,$('top'))));
+        tumble(`${money(line*b)} x ${sp.orbSum}`);
+      }else{
+        const before=sp.mult-sp.orbSum;
+        tumble(`${money(line*b)} x ${sp.mult}`);
+        let acc=before;
+        for(const [e,m] of orbCells){ await fly(e,$('coin')); acc+=m; setCoin(acc); const c=$('coin'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump'); }
+        setCoin(sp.mult);
+      }
+      await wait(1000);
+    }
+    setWin((paidBefore+sp.pay)*b);
+    if(sp.award){
+      for(let r=0;r<R;r++)for(let c=0;c<C;c++){const v=cur[c][r]; if(v==='S'||v==='Z')at(c,r).classList.add('glow'); else at(c,r).classList.add('dim')}
+      await wait(1300);
+      if(sp.kind==='base'){
+        const note=sp.sup?`${sp.sup} SUPER SCATTER${sp.sup>1?'S':''} PAY ${money(sp.scatPay*b)}`:`SCATTERS PAY ${money(sp.scatPay*b)}`;
+        await congrats('',15,'FREE SPINS',note);
+      }else{
+        await congrats('','+5','MORE FREE SPINS','');
+      }
+    }
+    if(sp.kind!=='base'){ $('fsLeft').textContent=sp.left; msg(`FREE SPINS LEFT ${sp.left}`); }
+    else if(sp.pay>0&&!sp.award) msg('');
+  }
+
+  async function play(buy){
+    if(busy||!$('ov').hidden)return;
+    const b=bet();
+    const cost=round2(buy==='super'?b*SBUY:buy?b*BUY:stake());
+    bal=getBal();
+    if(cost>bal+1e-9){flash('NOT ENOUGH CREDIT');auto=false;sync();return}
+    const _a=_API();if(_a){_a.bal=_a.round2(_a.bal-cost);_a.paintBal(-1);}
+    bal=getBal(); paintBal();
+    busy=true; skip=false; idle(false); sync(); setWin(0); msg('GOOD LUCK!');
+    const res=OLY.play(rnd,{ante:!buy&&anteOn,buy});
+    let paid=0, fsCount=0;
+    if(buy){
+      mode(true); setCoin(0); $('fsLeft').textContent=15;
+      await congrats('',15,buy==='super'?'SUPER FREE SPINS':'FREE SPINS',buy==='super'?'EVERY MULTIPLIER IS 10x OR MORE':'');
+    }
+    for(const sp of res.spins){
+      if(sp.kind!=='base'&&!inFs){ mode(true); setCoin(0); }
+      if(sp.kind!=='base')fsCount++;
+      await show(sp,b,paid);
+      paid+=sp.pay;
+      if(sp.kind!=='base')await wait(450);
+    }
+    const win=round2(res.total*b);
+    tumble(null); listClear();
+    if(inFs){
+      await congrats('',money(win),`IN ${fsCount} FREE SPINS`,res.capped?'MAX WIN REACHED':'');
+      mode(false); setCoin(0);
+    }else{
+      if(res.capped)await overlay(`<div class="bigwin"><div class="bw gold">MAX WIN</div><div class="bv">${money(win)}</div></div>`,{autoMs:3000});
+      else await bigWin(win,b);
+    }
+    if(win>0)credit(win);
+    setWin(win); msg(win>0?'':'PLACE YOUR BETS!');
+    logBet(GAME,cost,win/cost);
+    busy=false; skip=false; sync(); idle(true);
+    if(auto)setTimeout(()=>{ if(auto&&!busy)play(null) },fast()?250:700);
+  }
+
+  /* ---------- controls ---------- */
+  $('spinBtn').onclick=()=>{ if(busy){skip=true;return} play(null) };
+  $('minus').onclick=()=>{ if(!busy&&li>0){li--;saveBet()} };
+  $('plus').onclick=()=>{ if(!busy&&li<LEVELS.length-1){li++;saveBet()} };
+  function saveBet(){ try{localStorage.setItem('olyBetI',li)}catch(_){} sync(); }
+  $('anteTog').onclick=()=>{ if(busy)return; anteOn=!anteOn; sync(); };
+  async function buyAsk(kind){
+    if(busy||anteOn)return;
+    const price=bet()*(kind==='super'?SBUY:BUY);
+    const ok=await overlay(`<div class="stone" style="width:900px;height:560px"><div class="h blue">${kind==='super'?'BUY SUPER FREE SPINS':'BUY FREE SPINS'}</div>`+
+      `<div class="p gold">${money(price)}</div><div class="okx"><button class="no" data-v="0">&#10007;</button><button class="yes" data-v="1">&#10003;</button></div></div>`,{click:false});
+    if(ok)play(kind==='super'?'super':'fs');
+  }
+  $('buyBox').onclick=()=>buyAsk('fs');
+  $('sbuyBox').onclick=()=>buyAsk('super');
+  $('autoBtn').onclick=()=>{ auto=!auto; sync(); if(auto&&!busy)play(null); };
+  $('turboBtn').onclick=()=>{ turbo=!turbo; try{localStorage.setItem('olyTurbo',turbo?'1':'0')}catch(_){} sync(); };
+  addEventListener('keydown',e=>{
+    if(e.code==='Escape'){ if(ovClose&&!ovRes)ovClose(); return; }
+    if(e.code!=='Space')return; e.preventDefault();
+    if(e.repeat){hold=true;return}
+    if(ovRes){ovRes();return}
+    if(!$('ov').hidden)return;
+    if(busy)skip=true; else play(null);
+  });
+  addEventListener('keyup',e=>{ if(e.code==='Space')hold=false; });
+
+  $('menuBtn').onclick=()=>{
+    if(!$('ov').hidden)return;
+    overlay(`<div class="pwrap"><button class="xbtn" title="Close">&times;</button><div class="stone scroll" style="width:760px"><h3 class="gold">SETTINGS</h3>`+
+      `<div class="setrow"><span>QUICK SPIN</span><button id="stTurbo">${turbo?'ON':'OFF'}</button></div>`+
+      `<div class="setrow"><span>AUTOPLAY</span><button id="stAuto">${auto?'ON':'OFF'}</button></div>`+
+      `<div class="setrow"><span>PAYTABLE &amp; RULES</span><button id="stPay">OPEN</button></div></div><button class="closeBig">CLOSE</button></div>`,{click:false,outside:true});
+    $('stTurbo').onclick=e=>{e.stopPropagation();$('turboBtn').click();$('stTurbo').textContent=turbo?'ON':'OFF'};
+    $('stAuto').onclick=e=>{e.stopPropagation();auto=!auto;sync();$('stAuto').textContent=auto?'ON':'OFF'};
+    $('stPay').onclick=e=>{e.stopPropagation();ovClose();setTimeout(()=>$('infoBtn').click(),0)};
+  };
+  $('infoBtn').onclick=()=>{
+    if(!$('ov').hidden)return;
+    const ic=k=>`<span class="ic">${SVG[k]}</span>`, sm=k=>`<span class="sm">${SVG[k]}</span>`;
+    const rows=Object.keys(OLY.PAY).map(k=>`<tr><td>${ic(k)}</td>`+OLY.PAY[k].map(p=>`<td>${mx(p)}</td>`).join('')+'</tr>').join('');
+    overlay(`<div class="pwrap"><button class="xbtn" title="Close">&times;</button><div class="stone scroll"><h3 class="gold">PAYTABLE</h3>`+
+      `<table><tr><th></th><th>8&ndash;9</th><th>10&ndash;11</th><th>12&ndash;30</th></tr>${rows}</table>`+
+      `<p>Pays are multiples of your bet: a win pays the multiplier &times; your bet.</p>`+
+      `<h3 class="gold">TUMBLE FEATURE</h3><p>8 or more of a symbol anywhere on the screen pays. Winning symbols disappear, the rest fall down and new symbols drop in. It keeps going while new wins form.</p>`+
+      `<h3 class="gold">MULTIPLIERS</h3><p>Multiplier orbs (2&times; to 500&times;) can land on any spin. When the tumbles end with a win, all orbs on screen are added together and the tumble win is multiplied by the total. The bigger the value, the rarer it is.</p>`+
+      `<div class="orbrow">${OLY.ORBS.map(m=>`<span>${orbSvg(m)}</span>`).join('')}</div>`+
+      `<h3 class="gold">FREE SPINS</h3><p>${sm('S')} 4 or more scatters award <b>15 free spins</b> and pay 3&times; / 5&times; / 100&times; for 4 / 5 / 6+. During free spins, every orb that hits on a winning spin is added to the <b>total multiplier</b>, which keeps growing for the whole feature. 3 or more scatters award 5 more free spins.</p>`+
+      `<h3 class="gold">SUPER SCATTER</h3><p>${sm('Z')} counts as a scatter and only lands in the base game. If a free spins trigger includes super scatters it pays instead of the normal scatter pay: 1 &rarr; 100&times;, 2 &rarr; 500&times;, 3 &rarr; 5,000&times;, 4+ &rarr; 50,000&times;.</p>`+
+      `<h3 class="gold">DOUBLE CHANCE &amp; BUYS</h3><p>Double Chance costs 1.5&times; the bet and makes free spins about 2.5&times; as likely. Buy Free Spins costs 100&times; the bet. Buy Super Free Spins costs 500&times; the bet and every orb in it is 10&times; or more. Buys are off while Double Chance is on.</p>`+
+      `<p>Max win 50,000&times; the bet. Bets $0.20&ndash;$3,000. RTP 96.5% (simulated over tens of millions of rounds). Hold space for turbo spin.</p></div><button class="closeBig">CLOSE</button></div>`,{click:false,outside:true});
+  };
+
+  AUTO.olympus=cb=>{ const before=bal; play(null); const poll=setInterval(()=>{if(!busy){clearInterval(poll);cb(bal-before)}},250); };
+
+  mode(false); setCoin(0); paintBal(); sync(); setWin(0);
+  render(OLY.spin(Math.random,'base').steps[0].grid,null);
+  idle(true);
+})();
+</script></body></html>
