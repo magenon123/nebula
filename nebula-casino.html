@@ -101,6 +101,7 @@ header{
 /* ---------- game frame ---------- */
 .frame{background:var(--panel);border-radius:var(--r);overflow:hidden;width:100%;display:flex;flex-direction:column}
 .frame-body{display:flex;min-height:600px;flex:1}
+.frame-body.slot-active{min-height:calc(100vh - 160px)}
 .panel{
   width:310px;flex:0 0 310px;background:var(--panel);padding:14px;
   display:flex;flex-direction:column;gap:12px;border-right:1px solid var(--bg);
@@ -3399,15 +3400,18 @@ function go(key){
   if(key==='plinko')plinkoInit();
   if(key==='wheel')wheelDraw(wheelAngle);
   if(key==='cases')casesIdle();
-  // Slot iframe overlays
+  // Slot iframe overlays — hide the bet panel so stage fills full width
   const SLOTS=['olympian-storm','lake-legend'];
+  const isSlot=SLOTS.includes(key);
+  $('panels').style.display=isSlot?'none':'';
+  document.querySelector('.frame-body').classList.toggle('slot-active',isSlot);
   SLOTS.forEach(s=>{
     const el=$('slot-'+s);
     if(el)el.hidden=key!==s;
   });
   if(key==='olympian-storm'){const f=$('frame-olympian-storm');if(!f.src||!f.src.includes('olympian'))f.src='/olympian-storm.html';}
   if(key==='lake-legend'){const f=$('frame-lake-legend');if(!f.src||!f.src.includes('lake'))f.src='/lake-legend.html';}
-  if(SLOTS.includes(key)){
+  if(isSlot){
     setTimeout(()=>{try{const fr=$('frame-'+key);if(fr.contentWindow&&fr.contentWindow.paintBal)fr.contentWindow.paintBal();}catch(_){}},500);
   }
 }
