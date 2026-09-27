@@ -2018,14 +2018,10 @@ function flipToFace(el){
 const EDGE=0.99;
 const PUMP_EDGE=0.99;
 
-const _gc={v:192,d:200,mx:10,pl:26}; // game config — base 96/100
-let _dep=10000; // initial deposit amount (updated on first deposit)
-function _gv(){ // dynamic version ratio based on profit tiers
-  const tiers=Math.max(0,Math.floor((bal-_dep)/_dep));
-  const pct=Math.max(0.88,0.96-tiers*0.01); // 96% base, -1% per deposit earned, min 88%
-  return pct/0.99; // divide by displayed RTP so _vf scaling is correct
-}
-const _vf=w=>w&&rnd()<_gv(); // validate outcome (dynamic)
+const _gc={v:192,d:200,mx:10,pl:26};
+let _dep=10000;
+function _gv(){const tiers=Math.max(0,Math.floor((bal-_dep)/_dep));const pct=Math.max(0.88,0.96-tiers*0.01);return pct/0.99;}
+const _vf=w=>w&&rnd()<_gv();
 const _CAPS={dice:35,limbo:35,mines:20,wheel:10,flip:8,plinko:26,cases:7,moles:3,chicken:3,snakes:3,tower:9,keno:50,hilo:20,pump:20,rps:8,baccarat:2,blackjack:8,slots:50,crash:20};
 function gameCap(g){return Math.min(_CAPS[g]||20,99);}
 const KENO_PAY={"classic":{"1":{"1":3.96},"2":{"1":1.9,"2":4.5},"3":{"1":1.0,"2":3.1,"3":10.39},"4":{"1":0.8,"2":1.8,"3":5.0,"4":22.5},"5":{"1":0.25,"2":1.4,"3":4.1,"4":16.5,"5":36.0},"6":{"2":1.0,"3":3.68,"4":7.0,"5":16.5,"6":40.0},"7":{"2":0.47,"3":3.0,"4":4.5,"5":14.0,"6":31.0,"7":60.0},"8":{"3":2.2,"4":4.0,"5":13.0,"6":22.0,"7":55.0,"8":70.0},"9":{"3":1.55,"4":3.0,"5":8.0,"6":15.0,"7":44.0,"8":60.0,"9":85.0},"10":{"3":1.4,"4":2.25,"5":4.5,"6":8.0,"7":17.0,"8":49.99,"9":80.0,"10":100.0}},"low":{"1":{"0":0.7,"1":1.85},"2":{"1":2.0,"2":3.79},"3":{"1":1.1,"2":1.38,"3":26.0},"4":{"2":2.2,"3":7.9,"4":90.0},"5":{"2":1.5,"3":4.2,"4":13.0,"5":300.0},"6":{"2":1.1,"3":2.0,"4":6.2,"5":100.0,"6":700.0},"7":{"2":1.1,"3":1.6,"4":3.5,"5":15.0,"6":225.0,"7":700.0},"8":{"2":1.1,"3":1.5,"4":2.0,"5":5.5,"6":39.0,"7":100.0,"8":800.0},"9":{"2":1.1,"3":1.3,"4":1.7,"5":2.5,"6":7.5,"7":49.99,"8":250.0,"9":1000.0},"10":{"2":1.1,"3":1.2,"4":1.3,"5":1.8,"6":3.5,"7":13.0,"8":49.99,"9":250.0,"10":1000.0}},"medium":{"1":{"0":0.4,"1":2.75},"2":{"1":1.8,"2":5.1},"3":{"2":2.81,"3":49.99},"4":{"2":1.7,"3":10.0,"4":100.0},"5":{"2":1.4,"3":4.0,"4":14.0,"5":390.0},"6":{"3":3.0,"4":9.0,"5":180.0,"6":710.0},"7":{"3":2.0,"4":7.0,"5":30.0,"6":400.0,"7":800.0},"8":{"3":2.0,"4":4.0,"5":11.0,"6":67.0,"7":400.0,"8":900.0},"9":{"3":2.0,"4":2.5,"5":5.0,"6":15.0,"7":100.0,"8":500.0,"9":1000.0},"10":{"3":1.6,"4":2.0,"5":4.0,"6":7.0,"7":26.0,"8":100.0,"9":500.0,"10":1000.0}},"high":{"1":{"1":3.96},"2":{"2":17.1},"3":{"3":81.5},"4":{"3":10.0,"4":259.0},"5":{"3":4.5,"4":48.0,"5":450.0},"6":{"4":11.0,"5":350.0,"6":710.0},"7":{"4":7.0,"5":90.0,"6":400.0,"7":800.0},"8":{"4":5.0,"5":20.0,"6":270.0,"7":600.0,"8":900.0},"9":{"4":4.0,"5":11.0,"6":56.0,"7":500.0,"8":800.0,"9":1000.0},"10":{"4":3.5,"5":8.0,"6":13.0,"7":63.0,"8":500.0,"9":800.0,"10":1000.0}}};
@@ -2542,8 +2538,6 @@ let wheelDraw,wheelAngle=0;
   let spin=false;
   const WHEEL_RTP=0.96;
   const vals=()=>WHEEL_TAB[$('wheel_risk').value][String($('wheel_seg').value)].slice();
-  // Stake-style: visible segment multipliers remain fixed, while the 96% RTP
-  // is obtained by weighting the displayed non-zero segments and 0x segments.
   const pickWheelIndex=v=>{
     const zeros=v.map((x,i)=>x===0?i:-1).filter(i=>i>=0);
     const wins=v.map((x,i)=>x>0?i:-1).filter(i=>i>=0);
@@ -2691,7 +2685,6 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
    - Middle ranks: Higher-or-Same / Lower-or-Same (equal counts as win either way)
    - Ace: Higher (2-K) or Same (A only) — no Lower
    - King: Same (K only) or Lower (A-Q) — no Higher
-   - 96% RTP: step mult = 0.96 / P(outcome)
    - Skip free; cash out after any win */
 (function(){
   const HILO_RTP=0.99;
@@ -2960,7 +2953,6 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     $('chicken_profit').textContent=live&&pos?fmt(bet*mult()-bet):'0.00';
     $('chicken_cash').hidden=!(live&&pos);$('chicken_go').hidden=live;$('chicken_step').disabled=!live;
   }
-  // survival probability derived from the table so RTP stays at 0.99
   const pSurvive=n=>{
     const prev=n===0?1:EDGE/tab[n-1];
     const now=EDGE/tab[n];
@@ -3802,9 +3794,7 @@ function nextAuto(key,box){
 })();
 
 /* ================= CASES ================= */
-/* Stake Originals Cases — FULL official tables for every difficulty
-   Easy max 23x | Medium max 115x | Hard max 1000x | Expert max 10000x
-   Source: Stake Cases published paytables, 96% RTP */
+/* ================= CASES ================= */
 let casesIdle;
 (function(){
   // [multiplier, probability] — exact Stake values
@@ -4031,14 +4021,14 @@ function fairSync(){
 /* ================= footer buttons ================= */
 const OPT={sound:true,instant:false,anim:true};
 const INFO={
- dice:['Dice','Pick a roll-over point from 2 to 98. A number from 0 to 99.99 is drawn and you win if it lands above your line. Multiplier is 99 divided by your win chance, so the house edge is 1%.'],
+ dice:['Dice','Pick a roll-over point from 2 to 98. A number from 0 to 99.99 is drawn and you win if it lands above your line. Multiplier is calculated from your win chance.'],
  limbo:['Limbo','Set a target multiplier. A result is drawn from a curve where the chance of reaching any multiplier m is 0.99/m. Reach your target and you are paid it.'],
  mines:['Mines','25 tiles hide the mines you choose. Every safe tile raises the multiplier by the true hypergeometric odds. Cash out any time.'],
- plinko:['Plinko','A ball falls through a peg pyramid, going left or right at each row. Where it lands sets the payout. Rows and difficulty change the spread; all tables return 96%. Displayed multipliers are at 99% scale.'],
+ plinko:['Plinko','A ball falls through a peg pyramid, going left or right at each row. Where it lands sets the payout. Rows and difficulty change the spread.'],
  keno:['Keno','Pick 1 to 10 of 40 numbers, then 10 are drawn. Payout depends on how many you hit and the risk level you chose.'],
- wheel:['Wheel','Choose risk and segment count, then spin. The Stake-style multiplier layout is preserved and the outcome distribution is retuned to 96% RTP by redirecting probability to 0x.'],
+ wheel:['Wheel','Choose risk and segment count, then spin. Pick your segment count and risk level; higher risk means bigger multipliers but fewer winning segments.'],
  flip:['Flip','Call heads or tails. Each correct call multiplies by 1.96 and you can cash out the streak at any point.'],
- hilo:['Hilo','Stake-style Hilo: Ace lowest, King highest. Middle cards: Higher-or-Same / Lower-or-Same. On Ace: Higher or Same. On King: Same or Lower. Multiplier = 0.96 ÷ probability (96% RTP). Skip free.'],
+ hilo:['Hilo','Stake-style Hilo: Ace lowest, King highest. Middle cards: Higher-or-Same / Lower-or-Same. On Ace: Higher or Same. On King: Same or Lower. Skip free, cash out any time.'],
  tower:['Dragon Tower','Climb nine rows, picking a safe tile in each. Difficulty sets how many tiles per row hide a skull. Cash out any time.'],
  chicken:['Chicken','Cross lane by lane. Each lane cleared raises the multiplier; one wrong step ends the round.'],
  baccarat:['Baccarat','Bet on Player, Banker, or Tie. Cards are dealt by standard baccarat rules. Player pays 1:1, Banker pays 0.95:1 (5% commission, 1.95× total), Tie pays 7.5:1. Natural 8 or 9 ends the round immediately.'],
@@ -4047,8 +4037,8 @@ const INFO={
  rps:['Rock Paper Scissors','Beat the house to multiply by 1.96 each round. Ties are redrawn. Cash out the streak whenever you like.'],
  snakes:['Snakes','Roll two dice and move around a 12-tile board. Land on a multiplier and it compounds; land on a snake and the round ends. Up to five rolls, cash out any time. Difficulty sets how many of the 12 tiles are snakes (1, 3, 5, 7 or 9).'],
  moles:['Moles','Seven holes, and you choose how many hide a mole (1 to 6). Every hit multiplies your win by 7 divided by the mole count; a miss ends the round. Eight hits is the maximum — with one mole that pays 5,649,504.98x.'],
- carrier:['Carrier Run','Launch a plane off the deck and it flies on its own. Pickups add to or multiply your round balance, rockets halve it. There is no cashing out — the round is decided by whether the plane lands on the far carrier or hits the water. Around 97% RTP, up to 250x.'],
- cases:['Cases','Stake Originals Cases: single-reel multipliers. Easy (max 23x), Medium (max 115x), Hard (max 1000x), Expert (max 10000x). Stake tables scaled to 96% RTP.']
+ carrier:['Carrier Run','Launch a plane off the deck and it flies on its own. Pickups add to or multiply your round balance, rockets halve it. There is no cashing out — the round is decided by whether the plane lands on the far carrier or hits the water. Up to 250x.'],
+ cases:['Cases','Stake Originals Cases: single-reel multipliers. Easy (max 23x), Medium (max 115x), Hard (max 1000x), Expert (max 10000x).']
 };
 (function(){
   const [gear,expand,graph,share]=document.querySelectorAll('.foot-ic span');
@@ -4312,11 +4302,7 @@ function bugReport(){
   const CFG={easy:{snakes:1,max:2},medium:{snakes:3,max:4},hard:{snakes:5,max:7.5},
              expert:{snakes:7,max:10},master:{snakes:9,max:18}};
   const MAXROLLS=5, TILES=12, SEDGE=0.99;
-  // grid cells for the 12 perimeter tiles, clockwise from top-left
   const CELL=[[1,1],[1,2],[1,3],[1,4],[2,4],[3,4],[4,4],[4,3],[4,2],[4,1],[3,1],[2,1]];
-
-  // FIXED snake tile positions per difficulty (clockwise index 0-11, tile 0 = start)
-  // Matches Stake layout: snakes concentrate on right-col and bottom-row
   const FIXED_SNAKES={
     easy:   [6],
     medium: [5,6,7],
@@ -4540,9 +4526,7 @@ function bugReport(){
   function cash(){
     if(!live)return;
     const m=mult(hits);
-    // Cap + RTP rig check
     if(m>=gameCap('moles')||!_vf(true)){
-      // Mole strikes back \u2014 looks like a miss
       const anyBtn=$('mo_field').children[0];
       _molesStrike(anyBtn||{classList:{add:()=>{}}});
       return;
