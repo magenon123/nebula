@@ -3185,7 +3185,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
       $('bj_dt').textContent=total(dealer);
       $('bj_dt').className='bj-pill'+(total(dealer)>21?' r':'');
     }else render(false);
-    if(!anyLive){ drawing=false; settle(); return }
+    if(!anyLive){ setTimeout(()=>{drawing=false;settle();},400); return }
     setTimeout(step,850);
     function step(){
       if(total(dealer)<17 || (total(dealer)===17 && soft(dealer))){  // dealer hits soft 17
@@ -3211,13 +3211,14 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
       else if(dt>21||pt>dt)   {m=2;      msg.push('Win')}
       else if(pt===dt)        {m=1;      msg.push('Push')}
       else                    {m=0;      msg.push('Dealer wins')}
-      const _bm=m>1?(_vf(true)?Math.min(m,10):0):m;if(_bm>0)credit(hd.bet*_bm);
+      const _bm=m>1?(_vf(true)?Math.min(m,gameCap('blackjack')):0):m;if(_bm>0)credit(hd.bet*_bm);
       hd.res=_bm>1?'win':(m===1?'push':'lose');
-      logBet('Blackjack',hd.bet,_bm||0);
     });
     const staked=hands.reduce((a,x)=>a+x.bet,0);
     const back=hands.reduce((a,x)=>a+(x.res==='win'?x.bet*(isBJ(x.cards)&&hands.length===1?2.5:2):x.res==='push'?x.bet:0),0);
-    if(back>staked){const bm=round2(back/staked);winBadge(bm,back);}
+    const netMult=round2((back-staked+base)/base);
+    if(back>staked)winBadge(netMult,back);
+    logBet('Blackjack',base,back>0?netMult:0);
     flash(msg.join(' / ')+'  '+(back-staked>=0?'+':'')+fmt(back-staked), back>=staked);
     const wraps=[...$('bj_hands').children];
     hands.forEach((hd,i)=>{
@@ -3245,7 +3246,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     },1800);
     // dealer showing an ace: offer insurance before anything else resolves
     if(dealer[0].r===1){ insPending=true; ctrl(); flash('Dealer shows an Ace \u2014 insurance?',true); return }
-    if(isBJ(hands[0].cards)||isBJ(dealer)){hands[0].done=true;dealerTurn()}
+    if(isBJ(hands[0].cards)||isBJ(dealer)){hands[0].done=true;ctrl();setTimeout(dealerTurn,1900)}
   };
   function afterInsurance(){
     insPending=false; ctrl();
