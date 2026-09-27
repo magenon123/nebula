@@ -3478,7 +3478,7 @@ document.addEventListener('click',e=>{
   };
   function refresh(){
     const b=fmt(bal);
-    const vv=fmt(API.user?API.user.vault||0:0);
+    const vv=fmt(typeof API!=='undefined'&&API.user?API.user.vault||0:0);
     el('wBalBig').textContent='$'+b;
     el('wBalRow').textContent=b;
     el('wBalRow2').textContent='$'+b;
