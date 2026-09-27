@@ -1,0 +1,81 @@
+//@version=6
+indicator("Sessions H/L", overlay = true, max_lines_count = 50, max_labels_count = 50)
+
+// ─── Inputs ────────────────────────────────────────────────────────────────
+tz          = input.string("America/New_York", "Timezone")
+
+asiaOn      = input.bool(true, "Asia", inline = "asia", group = "Sessions")
+asiaSess    = input.session("2000-0000", "", inline = "asia", group = "Sessions")
+asiaCol     = input.color(#4CAF50, "", inline = "asia", group = "Sessions")
+
+ldnOn       = input.bool(true, "London", inline = "ldn", group = "Sessions")
+ldnSess     = input.session("0200-0500", "", inline = "ldn", group = "Sessions")
+ldnCol      = input.color(#4FC3F7, "", inline = "ldn", group = "Sessions")
+
+nyOn        = input.bool(true, "New York", inline = "ny", group = "Sessions")
+nySess      = input.session("0930-1600", "", inline = "ny", group = "Sessions")
+nyCol       = input.color(#000000, "", inline = "ny", group = "Sessions")
+
+lineWidth   = input.int(1, "Line width", minval = 1, maxval = 4, group = "Style")
+lblOffset   = input.int(15, "Label offset (bars right of last bar)", minval = 0, group = "Style")
+lblSize     = input.string(size.small, "Label size", options = [size.tiny, size.small, size.normal], group = "Style")
+
+// ─── Session tracker ───────────────────────────────────────────────────────
+type Sess
+    float h      = na
+    float l      = na
+    int   hTime  = na
+    int   lTime  = na
+    bool  active = false
+    line  hLine  = na
+    line  lLine  = na
+    label hLbl   = na
+    label lLbl   = na
+
+newLine(int t, float y, color c) =>
+    line.new(t, y, time, y, xloc = xloc.bar_time, extend = extend.right, color = c, width = lineWidth)
+
+newLabel(float y, string txt, color c) =>
+    label.new(bar_index, y, txt, style = label.style_label_left, color = color.new(c, 100), textcolor = c, size = lblSize)
+
+// Track one session; when it closes, redraw its high/low lines and labels.
+track(Sess s, bool enabled, string sessStr, string name, color c) =>
+    inSess = enabled and timeframe.isintraday and not na(time(timeframe.period, sessStr, tz))
+
+    if inSess
+        if not s.active
+            s.active := true
+            s.h      := high
+            s.l      := low
+            s.hTime  := time
+            s.lTime  := time
+        else
+            if high > s.h
+                s.h     := high
+                s.hTime := time
+            if low < s.l
+                s.l     := low
+                s.lTime := time
+    else if s.active
+        // Session just ended → publish its levels
+        s.active := false
+        line.delete(s.hLine)
+        line.delete(s.lLine)
+        s.hLine := newLine(s.hTime, s.h, c)
+        s.lLine := newLine(s.lTime, s.l, c)
+        if na(s.hLbl)
+            s.hLbl := newLabel(s.h, name + " H", c)
+            s.lLbl := newLabel(s.l, name + " L", c)
+
+    // Keep labels pinned to the right edge
+    if barstate.islast and not na(s.hLine)
+        label.set_xy(s.hLbl, bar_index + lblOffset, line.get_y1(s.hLine))
+        label.set_xy(s.lLbl, bar_index + lblOffset, line.get_y1(s.lLine))
+
+var asia = Sess.new()
+var ldn  = Sess.new()
+var ny   = Sess.new()
+
+track(asia, asiaOn, asiaSess, "Asia", asiaCol)
+track(ldn,  ldnOn,  ldnSess,  "LDN",  ldnCol)
+track(ny,   nyOn,   nySess,   "NY",   nyCol)
