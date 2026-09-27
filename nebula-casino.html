@@ -2655,6 +2655,7 @@ let wheelDraw,wheelAngle=0;
     const _flm=_vf(true)?m:0;if(_flm>0){credit(stake*_flm);winBadge(_flm,stake*_flm);flash('+'+fmt(stake*_flm-stake),true);}else flash('Unlucky',false);
     logBet('Flip',stake,_flm||0);live=false;streak=0;ui();
   };
+  window._flipAbort=()=>{ if(!live)return; if(streak>0){const m=mult();credit(stake*m);winBadge(m,stake*m);logBet('Flip',stake,m);}else{credit(stake);flash('Bet refunded',true);} live=false;streak=0;ui(); };
   drawHist();ui();
 })();
 
@@ -2831,6 +2832,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     if(_hm>0){credit(bet*_hm);winBadge(_hm,bet*_hm);flash('+'+fmt(bet*_hm-bet),true);}else flash('Unlucky',false);
     logBet('Hilo',bet,_hm||0);live=false;mult=1;ui();
   };
+  window._hiloAbort=()=>{ if(!live)return; if(mult>1){const m=mult;credit(bet*m);winBadge(m,bet*m);logBet('Hilo',bet,m);}else{credit(bet);flash('Bet refunded',true);} live=false;mult=1;ui(); };
   newCard();show(false);ui();
 })();
 
@@ -2921,6 +2923,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     const t=tiles[Math.floor(rnd()*tiles.length)];
     if(t)t.click();
   };
+  window._towerAbort=()=>{ if(!live)return; if(row>0){const m=mult();credit(bet*m);winBadge(m,bet*m);logBet('Dragon Tower',bet,m);}else{credit(bet);flash('Bet refunded',true);} live=false;row=0;build();ui(); };
   build();ui();
 })();
 
@@ -2987,6 +2990,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     const b=debit('chicken_bet');if(b===null)return;
     bet=b;pos=0;dead=-1;live=true;build();ui();
   };
+  window._chickenAbort=()=>{ if(!live)return; if(pos>0){const m=mult();credit(bet*m);winBadge(m,bet*m);logBet('Chicken',bet,m);}else{credit(bet);flash('Bet refunded',true);} live=false;pos=0;dead=-1;build();ui(); };
   build();ui();
 })();
 
@@ -3293,6 +3297,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     if(aces){hands[0].done=true;hands[1].done=true;active=2;render(true);ctrl();setTimeout(nextHand,900);return}  // split aces get one card each
     active=0;render(true);ctrl();
   };
+  window._blackjackAbort=()=>{ if(!live||over)return; live=false;over=true; hands.forEach(hd=>{if(!hd.res){hd.done=true;hd.res='push';}});credit(hands.reduce((s,h)=>s+h.bet,0));flash('Bet refunded',true); ctrl(); };
   shoe();ctrl();
 })();
 
@@ -3436,6 +3441,14 @@ const GAMES=[
 })();
 function go(key){
   if(window._minesAbort)window._minesAbort();
+  if(window._hiloAbort)window._hiloAbort();
+  if(window._towerAbort)window._towerAbort();
+  if(window._chickenAbort)window._chickenAbort();
+  if(window._blackjackAbort)window._blackjackAbort();
+  if(window._pumpAbort)window._pumpAbort();
+  if(window._flipAbort)window._flipAbort();
+  if(window._rpsAbort)window._rpsAbort();
+  if(window._snakesAbort)window._snakesAbort();
   hideBadge();
   const home=key==='home';
   $('lobby').hidden=!home; $('gameWrap').hidden=home;
@@ -3747,6 +3760,7 @@ function nextAuto(key,box){
     const b=debit('pump_bet'); if(b===null)return;
     bet=b;n=0;live=true;$('pu_bal').classList.remove('pop');ui();
   };
+  window._pumpAbort=()=>{ if(!live)return; if(n>0){const m=mult();credit(bet*m);winBadge(m,bet*m);logBet('Pump',bet,m);}else{credit(bet);flash('Bet refunded',true);} live=false;n=0;ui(); };
   ui();
 })();
 
@@ -3789,6 +3803,7 @@ function nextAuto(key,box){
     bet=b;streak=0;live=true;
     $('rps_you').className='rps-hand';$('rps_them').className='rps-hand';ui();
   };
+  window._rpsAbort=()=>{ if(!live)return; if(streak>0){const m=mult();credit(bet*m);winBadge(m,bet*m);logBet('Rock Paper Scissors',bet,m);}else{credit(bet);flash('Bet refunded',true);} live=false;streak=0;ui(); };
   ui();
 })();
 
@@ -4434,6 +4449,7 @@ function bugReport(){
     draw(false,false);ui();
   };
   $('snakes_diff').onchange=()=>{if(!live){cfg=CFG[$('snakes_diff').value];board=makeBoard(0)||[];draw(false,false);ui()}};
+  window._snakesAbort=()=>{ if(!live)return; if(rolls>0){const m=SEDGE*prod;credit(bet*m);winBadge(m,bet*m);logBet('Snakes',bet,m);}else{credit(bet);flash('Bet refunded',true);} live=false;busy=false;draw(false,false);ui(); };
   cfg=CFG.easy; board=makeBoard(0)||[]; draw(false,false); ui();
 })();
 
