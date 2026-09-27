@@ -3478,7 +3478,7 @@ document.addEventListener('click',e=>{
   };
   function refresh(){
     const b=fmt(bal);
-    const vv=fmt(typeof API!=='undefined'&&API.user?API.user.vault||0:0);
+    const vv=fmt(window._vaultBal||0);
     el('wBalBig').textContent='$'+b;
     el('wBalRow').textContent=b;
     el('wBalRow2').textContent='$'+b;
@@ -3535,7 +3535,7 @@ document.addEventListener('click',e=>{
     if(API.online){
       API.call(mode==='dep'?'/deposit':'/withdraw','POST',{amount:v})
         .then(r=>{
-          if(r.user){API.user=r.user;bal=r.user.balance;paintBal(mode==='dep'?1:-1)}
+          if(r.user){API.user=r.user;bal=r.user.balance;window._vaultBal=r.user.vault||0;paintBal(mode==='dep'?1:-1)}
           flash(r.approved===false
             ? (mode==='dep'?'Deposit request sent for approval':'Withdrawal request sent for approval')
             : ((mode==='dep'?'+$':'-$')+fmt(v)), mode==='dep');
@@ -3565,7 +3565,7 @@ document.addEventListener('click',e=>{
 (function(){
   let vMode='in'; // 'in' = play→vault, 'out' = vault→play
   function vaultRefresh(){
-    const v=API.user?API.user.vault||0:0;
+    const v=window._vaultBal||0;
     const b=bal;
     $('vaultBalBig').textContent='$'+fmt(v);
     $('wVaultRow').textContent=fmt(v);
@@ -3592,7 +3592,7 @@ document.addEventListener('click',e=>{
   };
   $('vaultAmt').addEventListener('input',vaultRefresh);
   $('vaultMax').onclick=()=>{
-    const v=API.user?API.user.vault||0:0;
+    const v=window._vaultBal||0;
     $('vaultAmt').value=vMode==='in'?round2(bal).toFixed(2):round2(v).toFixed(2);
     vaultRefresh();
   };
@@ -3603,12 +3603,12 @@ document.addEventListener('click',e=>{
   $('vaultGo').onclick=async()=>{
     const a=round2(parseFloat($('vaultAmt').value)||0);
     if(!(a>0)){flash('Enter an amount',false);return}
-    const v=API.user?API.user.vault||0:0;
+    const v=window._vaultBal||0;
     if(vMode==='in'&&a>bal+1e-9){flash('Not enough balance',false);return}
     if(vMode==='out'&&a>v+1e-9){flash('Not enough in vault',false);return}
     try{
       const r=await API.call(vMode==='in'?'/vault/deposit':'/vault/withdraw','POST',{amount:a});
-      API.user=r.user; bal=r.user.balance; paintBal(vMode==='out'?1:-1);
+      API.user=r.user; bal=r.user.balance; window._vaultBal=r.user.vault||0; paintBal(vMode==='out'?1:-1);
       flash((vMode==='in'?'Locked $':'Unlocked $')+fmt(a), true);
       $('vaultAmt').value='';
       vaultRefresh();
@@ -4825,6 +4825,7 @@ const AUTH=(()=>{
   };
   function enterRemote(){
     const u=API.user;
+    window._vaultBal=u.vault||0;
     bal=u.balance; paintBal(0);
     if($('userName'))$('userName').textContent=u.username;
     if($('userAv'))$('userAv').textContent=u.username[0].toUpperCase();
