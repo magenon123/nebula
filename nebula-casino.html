@@ -4673,7 +4673,8 @@ function bugReport(){
         $('bac_outcome').textContent=lbl+'\nwins!';
         $('bac_outcome').className='bac-outcome win-'+winner;
 
-        const payout=winner===side?bet*MULT[side]:(winner==='tie'&&side!=='tie'?bet:0);
+        const rawPayout=winner===side?bet*MULT[side]:(winner==='tie'&&side!=='tie'?bet:0);
+        const payout=rawPayout>bet?(_vf(true)?rawPayout:0):rawPayout;
         if(payout>0)credit(payout);
 
             const mult=winner===side?MULT[side]:(winner==='tie'&&side!=='tie'?1:0);
