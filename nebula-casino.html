@@ -2341,7 +2341,6 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
   }
   function cash(){
     if(!live||!found.size)return;
-    if(!_mWin){_minesBlow();return;}  // rigged round — force blow
     const m=mult(found.size);
     live=false;
     stop(true);
