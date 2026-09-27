@@ -2291,6 +2291,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
   const N=25,sel=$('mines_n');
   for(let i=1;i<=24;i++){const o=document.createElement('option');o.value=i;o.textContent=i;if(i===3)o.selected=true;sel.appendChild(o)}
   let live=false,bombs=new Set(),found=new Set(),bet=0,mines=3,_mWin=true;
+  window._minesAbort=()=>{ if(!live)return; live=false; if(found.size>0){const m=mult(found.size);credit(bet*m);winBadge(m,bet*m);logBet('Mines',bet,m);}else{credit(bet);flash('Bet refunded',true);} stop(false); };
   const mult=k=>{if(k<=0)return 1;let p=1;for(let i=0;i<k;i++)p*=(N-mines-i)/(N-i);return EDGE/p};
   function build(){
     const g=$('m_grid');g.innerHTML='';
@@ -3434,6 +3435,7 @@ const GAMES=[
   };
 })();
 function go(key){
+  if(window._minesAbort)window._minesAbort();
   hideBadge();
   const home=key==='home';
   $('lobby').hidden=!home; $('gameWrap').hidden=home;
