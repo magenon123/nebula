@@ -3558,7 +3558,7 @@ document.addEventListener('click',e=>{
   refresh();
 
   // vault tab button
-  el('wGoVault').onclick=()=>{ show('vault'); vaultRefresh(); };
+  el('wGoVault').onclick=()=>{ show('vault'); if(window.vaultRefresh)window.vaultRefresh(); };
 })();
 
 /* ---------- vault ---------- */
@@ -3586,7 +3586,7 @@ document.addEventListener('click',e=>{
   }
   window.vaultRefresh=vaultRefresh;
 
-  $('vaultBack').onclick=()=>{
+  $('wVaultBack').onclick=()=>{
     document.querySelectorAll('[data-w]').forEach(p=>p.hidden=p.dataset.w!=='over');
     if(typeof walletRefresh==='function')walletRefresh();
   };

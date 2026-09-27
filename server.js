@@ -40,14 +40,14 @@ await db.execute(`CREATE TABLE IF NOT EXISTS users (
   email    TEXT UNIQUE NOT NULL,
   pw_hash  TEXT NOT NULL,
   balance  REAL NOT NULL DEFAULT 0,
-  vault    REAL NOT NULL DEFAULT 0,
+  vault    REAL DEFAULT 0,
   wagered  REAL NOT NULL DEFAULT 0,
   rake     REAL NOT NULL DEFAULT 0,
   claimed  REAL NOT NULL DEFAULT 0,
   is_admin INTEGER NOT NULL DEFAULT 0,
   created  INTEGER NOT NULL
 )`);
-await db.execute(`ALTER TABLE users ADD COLUMN vault REAL NOT NULL DEFAULT 0`).catch(()=>{});
+await db.execute(`ALTER TABLE users ADD COLUMN vault REAL DEFAULT 0`).catch(()=>{});
 await db.execute(`CREATE TABLE IF NOT EXISTS requests (
   id      INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
