@@ -396,11 +396,16 @@ select{
 .bets-tabs{display:flex;gap:4px;padding:12px;background:var(--panel)}
 .bets-tabs span{padding:8px 16px;border-radius:99px;font-weight:700;font-size:13px;color:var(--muted)}
 .bets-tabs span.on{background:var(--panel2);color:var(--text)}
-table{width:100%;border-collapse:collapse}
-th{text-align:left;font-size:12px;color:var(--muted);font-weight:700;padding:10px 16px}
-td{padding:9px 16px;font-size:13px;font-weight:600;border-top:1px solid var(--panel2)}
-td.g{color:var(--green)}td.r{color:var(--red)}
-tbody tr{animation:sl .25s}
+.bets table{width:100%;border-collapse:collapse;table-layout:fixed}
+.bets th{text-align:left;font-size:12px;color:var(--muted);font-weight:700;padding:8px 14px}
+.bets td{padding:8px 14px;font-size:13px;font-weight:600;border-top:1px solid var(--panel2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bets th:nth-child(1),.bets td:nth-child(1){width:22%}
+.bets th:nth-child(2),.bets td:nth-child(2){width:20%;color:var(--muted)}
+.bets th:nth-child(3),.bets td:nth-child(3){width:18%}
+.bets th:nth-child(4),.bets td:nth-child(4){width:18%}
+.bets th:nth-child(5),.bets td:nth-child(5){width:22%;text-align:right}
+.bets td.g{color:var(--green)}.bets td.r{color:var(--red)}
+.bets tbody tr{animation:sl .25s}
 @keyframes sl{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
 .empty{padding:26px 16px;color:var(--muted);font-size:13px;text-align:center}
 .fine{color:var(--muted);font-size:11.5px;margin:18px 2px 30px;line-height:1.7}
@@ -1687,7 +1692,7 @@ tbody tr{animation:sl .25s}
 </div>
 <div class="bets">
   <div class="bets-tabs"><span class="on">My Bets</span><span>All Bets</span><span>High Rollers</span></div>
-  <table><thead><tr><th>Game</th><th>Time</th><th>Bet</th><th>Multiplier</th><th style="text-align:right">Payout</th></tr></thead>
+  <table><thead><tr><th>Game</th><th>Time</th><th>Bet</th><th>Multiplier</th><th>Payout</th></tr></thead>
   <tbody id="betRows"></tbody></table>
   <div class="empty" id="betEmpty">No bets yet — place one to get started.</div>
 </div>
@@ -2120,11 +2125,11 @@ function logBet(game,bet,mult){
     const tb=$('betRows'); if(!tb)return;
     const tr=document.createElement('tr');
     const t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    tr.innerHTML=`<td>${game}</td><td style="color:var(--muted)">${t}</td><td>${fmt(bet)}</td>`+
-      `<td>${(+mult||0).toFixed(2)}×</td><td style="text-align:right" class="${win?'g':'r'}">${net>=0?'+':''}${fmt(net)}</td>`;
+    tr.innerHTML=`<td>${game}</td><td>${t}</td><td>$${fmt(bet)}</td>`+
+      `<td>${(+mult||0).toFixed(2)}×</td><td class="${win?'g':'r'}">${net>=0?'+$':'-$'}${fmt(Math.abs(net))}</td>`;
     tb.prepend(tr);
     while(tb.children.length>10) tb.lastChild.remove();
-  }catch(e){}
+  }catch(e){console.error('logBet error',e);}
 }
 document.querySelectorAll('[data-half]').forEach(b=>b.onclick=()=>{
   const i=$(b.dataset.half); i.value=round2(Math.max(0.01,(parseFloat(i.value)||0)/2)).toFixed(2);});
