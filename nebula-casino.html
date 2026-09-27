@@ -1681,14 +1681,15 @@ tbody tr{animation:sl .25s}
 </div>
 </div>
 
+</div>
+
+
+</div>
 <div class="bets">
   <div class="bets-tabs"><span class="on">My Bets</span><span>All Bets</span><span>High Rollers</span></div>
   <table><thead><tr><th>Game</th><th>Time</th><th>Bet</th><th>Multiplier</th><th style="text-align:right">Payout</th></tr></thead>
   <tbody id="betRows"></tbody></table>
   <div class="empty" id="betEmpty">No bets yet — place one to get started.</div>
-</div>
-</div>
-
 </div>
 <div class="fine">A personal practice build. Not affiliated with or endorsed by any casino operator.</div>
 
@@ -5039,7 +5040,7 @@ const RB=(()=>{
       $('imask').classList.add('on');
       return;
     }
-    await pollRequests();
+    // Open immediately with cached data; refresh in background
     const r=window.__reqs||[];
     $('adList').innerHTML=r.length? r.map(x=>
       `<div class="ad-item">
@@ -5086,6 +5087,8 @@ const RB=(()=>{
       }catch(e){$('adTxList').innerHTML='<div class="ad-empty">'+e.message+'</div>'}
     };
     $('adminMask').classList.add('on');
+    // Refresh requests in background so next open (or re-render) has fresh data
+    pollRequests().catch(()=>{});
   };
 
   $('usersBtn').onclick=async()=>{
