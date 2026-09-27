@@ -877,6 +877,7 @@ tbody tr{animation:sl .25s}
   padding:3px 7px;border-radius:99px;margin-right:8px}
 .ad-kind.dep{background:rgba(0,231,1,.16);color:var(--green)}
 .ad-kind.wit{background:rgba(245,196,81,.16);color:var(--gold)}
+.ad-kind.vlt{background:rgba(245,158,11,.16);color:#f59e0b}
 
 
 .codebox{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;
@@ -1092,9 +1093,18 @@ tbody tr{animation:sl .25s}
 </div>
 
 <div class="mask" id="adminMask">
-  <div class="wmodal" style="max-width:520px">
-    <div class="wm-head"><span class="wm-title">Credit requests</span><button class="wm-x" id="adClose">&times;</button></div>
-    <div class="wm-body"><div id="adList" class="ad-list"></div></div>
+  <div class="wmodal" style="max-width:560px">
+    <div class="wm-head"><span class="wm-title">Admin Panel</span><button class="wm-x" id="adClose">&times;</button></div>
+    <div class="wm-body">
+      <div class="wm-tabs" style="margin-bottom:14px">
+        <button class="on" id="adTabReq">Requests</button>
+        <button id="adTabTx">Transactions</button>
+      </div>
+      <div id="adPaneReq"><div id="adList" class="ad-list"></div></div>
+      <div id="adPaneTx" hidden>
+        <div id="adTxList" class="ad-list"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1695,7 +1705,7 @@ tbody tr{animation:sl .25s}
     <!-- overview -->
     <div class="wm-body" data-w="over">
       <div class="wm-tabs">
-        <button class="on">Overview</button><button id="wGoDep">Deposit</button><button id="wGoWit">Withdraw</button>
+        <button class="on">Overview</button><button id="wGoDep">Deposit</button><button id="wGoWit">Withdraw</button><button id="wGoVault">Vault</button>
       </div>
       <div class="wm-balrow">
         <div class="wm-ballbl">Balance</div>
@@ -1708,11 +1718,42 @@ tbody tr{animation:sl .25s}
           <div class="wm-cname"><b>PLAY</b><small>Play Balance</small></div>
           <div class="wm-cval"><b id="wBalRow">10,000.00</b><small id="wBalRow2">$10,000.00</small></div>
         </div>
+        <div class="wm-item">
+          <span class="wm-coin" style="background:#f59e0b">🔒</span>
+          <div class="wm-cname"><b>VAULT</b><small>Safe storage</small></div>
+          <div class="wm-cval"><b id="wVaultRow">0.00</b><small id="wVaultRow2">$0.00</small></div>
+        </div>
       </div>
       <div class="wm-actions">
         <button class="wm-btn grey" id="wWithdraw">Withdraw</button>
         <button class="wm-btn blue" id="wDeposit">Deposit</button>
       </div>
+    </div>
+
+    <!-- vault -->
+    <div class="wm-body" data-w="vault" hidden>
+      <button class="wm-back" id="wVaultBack">&#8249; Vault</button>
+      <div style="background:var(--panel2);border-radius:10px;padding:16px;margin-bottom:16px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Vault Balance</div>
+        <div style="font-size:28px;font-weight:800;color:var(--txt)" id="vaultBalBig">$0.00</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">🔒 Locked away from gameplay</div>
+      </div>
+      <div class="wm-seg" id="vaultSeg">
+        <button class="on" data-vs="in">Deposit to Vault</button><button data-vs="out">Withdraw from Vault</button>
+      </div>
+      <div style="margin-top:14px">
+        <div class="wm-flabel"><span id="vaultAmtLbl">Amount to lock</span><span id="vaultAvail">Play: $0.00</span></div>
+        <div class="wm-input">
+          <span class="pfx">$</span><input type="number" id="vaultAmt" value="100" min="0.01" step="0.01">
+          <button class="wm-max" id="vaultMax">Max</button>
+        </div>
+      </div>
+      <div class="wm-summary" style="margin-top:12px">
+        <div><span id="vaultFromLbl">Play balance</span><b id="vaultFrom">$0.00</b></div>
+        <div><span id="vaultToLbl">Vault after</span><b id="vaultTo">$0.00</b></div>
+      </div>
+      <button class="wm-btn blue wide" id="vaultGo" style="margin-top:14px">Lock Funds</button>
+      <div class="wm-note">Vault funds are protected — they can't be wagered until you move them back.</div>
     </div>
 
     <!-- deposit / withdraw -->
@@ -3437,9 +3478,12 @@ document.addEventListener('click',e=>{
   };
   function refresh(){
     const b=fmt(bal);
+    const vv=fmt(API.user?API.user.vault||0:0);
     el('wBalBig').textContent='$'+b;
     el('wBalRow').textContent=b;
     el('wBalRow2').textContent='$'+b;
+    el('wVaultRow').textContent=vv;
+    el('wVaultRow2').textContent='$'+vv;
     el('wAvail').textContent='Balance $'+b;
     el('wCur').textContent='$'+b;
     el('wFormTitle').textContent=mode==='dep'?'Deposit':'Withdraw';
@@ -3512,6 +3556,65 @@ document.addEventListener('click',e=>{
   };
   window.walletRefresh=refresh;
   refresh();
+
+  // vault tab button
+  el('wGoVault').onclick=()=>{ show('vault'); vaultRefresh(); };
+})();
+
+/* ---------- vault ---------- */
+(function(){
+  let vMode='in'; // 'in' = play→vault, 'out' = vault→play
+  function vaultRefresh(){
+    const v=API.user?API.user.vault||0:0;
+    const b=bal;
+    $('vaultBalBig').textContent='$'+fmt(v);
+    $('wVaultRow').textContent=fmt(v);
+    $('wVaultRow2').textContent='$'+fmt(v);
+    $('vaultAvail').textContent=vMode==='in'?'Play: $'+fmt(b):'Vault: $'+fmt(v);
+    $('vaultAmtLbl').textContent=vMode==='in'?'Amount to lock':'Amount to unlock';
+    $('vaultFromLbl').textContent=vMode==='in'?'Play after':'Vault after';
+    $('vaultToLbl').textContent=vMode==='in'?'Vault after':'Play after';
+    $('vaultGo').textContent=vMode==='in'?'Lock Funds':'Unlock Funds';
+    const a=round2(parseFloat($('vaultAmt').value)||0);
+    if(vMode==='in'){
+      $('vaultFrom').textContent='$'+fmt(Math.max(0,b-a));
+      $('vaultTo').textContent='$'+fmt(v+a);
+    } else {
+      $('vaultFrom').textContent='$'+fmt(Math.max(0,v-a));
+      $('vaultTo').textContent='$'+fmt(b+a);
+    }
+  }
+  window.vaultRefresh=vaultRefresh;
+
+  $('vaultBack').onclick=()=>{
+    document.querySelectorAll('[data-w]').forEach(p=>p.hidden=p.dataset.w!=='over');
+    if(typeof walletRefresh==='function')walletRefresh();
+  };
+  $('vaultAmt').addEventListener('input',vaultRefresh);
+  $('vaultMax').onclick=()=>{
+    const v=API.user?API.user.vault||0:0;
+    $('vaultAmt').value=vMode==='in'?round2(bal).toFixed(2):round2(v).toFixed(2);
+    vaultRefresh();
+  };
+  $('vaultSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    $('vaultSeg').querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); vMode=b.dataset.vs; vaultRefresh();
+  });
+  $('vaultGo').onclick=async()=>{
+    const a=round2(parseFloat($('vaultAmt').value)||0);
+    if(!(a>0)){flash('Enter an amount',false);return}
+    const v=API.user?API.user.vault||0:0;
+    if(vMode==='in'&&a>bal+1e-9){flash('Not enough balance',false);return}
+    if(vMode==='out'&&a>v+1e-9){flash('Not enough in vault',false);return}
+    try{
+      const r=await API.call(vMode==='in'?'/vault/deposit':'/vault/withdraw','POST',{amount:a});
+      API.user=r.user; bal=r.user.balance; paintBal(vMode==='out'?1:-1);
+      flash((vMode==='in'?'Locked $':'Unlocked $')+fmt(a), true);
+      $('vaultAmt').value='';
+      vaultRefresh();
+      if(typeof walletRefresh==='function')walletRefresh();
+    }catch(e){flash(e.message,false)}
+  };
 })();
 
 /* ---------- Auto mode ---------- */
@@ -4947,6 +5050,31 @@ const RB=(()=>{
     };
     $('adList').querySelectorAll('[data-ok]').forEach(b=>b.onclick=()=>act(b.dataset.ok,true));
     $('adList').querySelectorAll('[data-no]').forEach(b=>b.onclick=()=>act(b.dataset.no,false));
+    // reset to requests tab each open
+    $('adTabReq').classList.add('on');$('adTabTx').classList.remove('on');
+    $('adPaneReq').hidden=false;$('adPaneTx').hidden=true;
+    // transactions tab
+    $('adTabReq').onclick=()=>{
+      $('adTabReq').classList.add('on');$('adTabTx').classList.remove('on');
+      $('adPaneReq').hidden=false;$('adPaneTx').hidden=true;
+    };
+    $('adTabTx').onclick=async()=>{
+      $('adTabTx').classList.add('on');$('adTabReq').classList.remove('on');
+      $('adPaneReq').hidden=true;$('adPaneTx').hidden=false;
+      try{
+        const r=await API.call('/admin/transactions');
+        const KIND={deposit:'dep',withdraw:'wit',vault_in:'vlt',vault_out:'vlt'};
+        const LABEL={deposit:'Deposit',withdraw:'Withdraw',vault_in:'Vault In',vault_out:'Vault Out'};
+        $('adTxList').innerHTML=r.transactions.length? r.transactions.map(x=>
+          `<div class="ad-item">
+             <div class="who">
+               <b><span class="ad-kind ${KIND[x.kind]||'dep'}">${LABEL[x.kind]||x.kind}</span>${x.username}</b>
+               <small>${new Date(x.created).toLocaleString()} &middot; ${x.status}</small>
+             </div>
+             <div class="amt">$${fmt(x.amount)}</div>
+           </div>`).join('') : '<div class="ad-empty">No transactions yet.</div>';
+      }catch(e){$('adTxList').innerHTML='<div class="ad-empty">'+e.message+'</div>'}
+    };
     $('adminMask').classList.add('on');
   };
 

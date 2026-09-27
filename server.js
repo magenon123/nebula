@@ -40,12 +40,14 @@ await db.execute(`CREATE TABLE IF NOT EXISTS users (
   email    TEXT UNIQUE NOT NULL,
   pw_hash  TEXT NOT NULL,
   balance  REAL NOT NULL DEFAULT 0,
+  vault    REAL NOT NULL DEFAULT 0,
   wagered  REAL NOT NULL DEFAULT 0,
   rake     REAL NOT NULL DEFAULT 0,
   claimed  REAL NOT NULL DEFAULT 0,
   is_admin INTEGER NOT NULL DEFAULT 0,
   created  INTEGER NOT NULL
 )`);
+await db.execute(`ALTER TABLE users ADD COLUMN vault REAL NOT NULL DEFAULT 0`).catch(()=>{});
 await db.execute(`CREATE TABLE IF NOT EXISTS requests (
   id      INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
@@ -132,6 +134,7 @@ const adminOnly = (req, res, next) =>
 
 const shape = u => ({
   username: u.username, email: u.email, balance: money(u.balance),
+  vault: money(u.vault || 0),
   wagered: money(u.wagered), rake: Math.floor(u.rake * 100) / 100,
   claimed: money(u.claimed), admin: !!u.is_admin, tier: tierFor(u.wagered).n,
   rate: tierFor(u.wagered).rate
@@ -246,6 +249,34 @@ app.get('/api/requests/mine', auth, async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
+/* --- vault: move funds between play balance and vault --- */
+app.post('/api/vault/deposit', auth, async (req, res) => {
+  try {
+    const amount = money(req.body.amount);
+    if (!(amount > 0)) return res.status(400).json({ error: 'Enter an amount' });
+    if (amount > req.user.balance + 1e-9) return res.status(400).json({ error: 'Not enough balance' });
+    await db.batch([
+      { sql: 'UPDATE users SET balance=balance-?, vault=vault+? WHERE id=?', args: [amount, amount, req.user.id] },
+      { sql: 'INSERT INTO requests (user_id,kind,amount,status,created) VALUES (?,?,?,?,?)', args: [req.user.id, 'vault_in', amount, 'approved', Date.now()] }
+    ], 'write');
+    res.json({ user: shape(await byId(req.user.id)) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/vault/withdraw', auth, async (req, res) => {
+  try {
+    const amount = money(req.body.amount);
+    if (!(amount > 0)) return res.status(400).json({ error: 'Enter an amount' });
+    const u = await byId(req.user.id);
+    if (amount > (u.vault || 0) + 1e-9) return res.status(400).json({ error: 'Not enough in vault' });
+    await db.batch([
+      { sql: 'UPDATE users SET vault=vault-?, balance=balance+? WHERE id=?', args: [amount, amount, req.user.id] },
+      { sql: 'INSERT INTO requests (user_id,kind,amount,status,created) VALUES (?,?,?,?,?)', args: [req.user.id, 'vault_out', amount, 'approved', Date.now()] }
+    ], 'write');
+    res.json({ user: shape(await byId(req.user.id)) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 app.get('/api/admin/requests', auth, adminOnly, async (req, res) => {
   try {
     const r = await db.execute(`SELECT r.id,r.kind,r.amount,r.created,u.username,u.email,u.balance
@@ -266,6 +297,15 @@ app.post('/api/admin/requests/:id', auth, adminOnly, async (req, res) => {
     const pending = await db.execute(`SELECT r.id,r.kind,r.amount,r.created,u.username,u.email,u.balance
       FROM requests r JOIN users u ON u.id=r.user_id WHERE r.status='pending' ORDER BY r.created DESC`);
     res.json({ ok: true, requests: all(pending) });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/admin/transactions', auth, adminOnly, async (req, res) => {
+  try {
+    const r = await db.execute(`SELECT r.id,r.kind,r.amount,r.status,r.created,u.username
+      FROM requests r JOIN users u ON u.id=r.user_id
+      ORDER BY r.created DESC LIMIT 200`);
+    res.json({ transactions: all(r) });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
