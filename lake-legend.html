@@ -412,6 +412,7 @@ const BETS=[0.1,0.2,0.4,0.6,0.8,1,1.5,2,3,4,5,6,8,10,15,20,25,30,40,50];
 const _API=()=>{try{return window.parent._slotAPI}catch(_){return null}};
 function getPBal(){const a=_API();return a?a.bal:0}
 let bi=5, bal=getPBal(), busy=false, feature=null, auto=false, turbo=false;
+const bet=()=>BETS[bi];
 function paint(){ bal=getPBal(); $('bal').textContent=fmt(bal); $('bBet').textContent=fmt(bet());
   const f=feature&&FEAT[feature];
   $('bet').textContent=fmt(r2(bet()*(f?f.cost:1)));
