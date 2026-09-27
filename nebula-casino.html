@@ -2326,8 +2326,8 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
       flash('-'+fmt(bet),false);logBet('Mines',bet,0);
       return;
     }
-    // if this gem would push mult to cap, force a bomb instead (never show the gem)
-    if(mult(found.size+1)>=gameCap('mines')){_minesBlow();return;}
+    // if this gem would push mult to cap, or rig fires, force a bomb
+    if(mult(found.size+1)>=gameCap('mines')||!_mWin){_minesBlow();return;}
     found.add(i);b.textContent='💎';b.classList.add('gem');
     if(found.size===N-mines){cash();return}
     ui();
@@ -2626,7 +2626,10 @@ let wheelDraw,wheelAngle=0;
     if(!live){const b=debit('flip_bet');if(b===null)return;stake=b;streak=0;live=true;hist=[];drawHist()}
     const _ff=Math.pow(STEP,streak+1)>gameCap('flip');
     const _fr=rnd()<.5?'H':'T';
-    const res=_ff?(side==='H'?'T':'H'):_fr,c=$('f_coin');
+    // rig: if fair result would win, _vf can flip it to a loss
+    const _fairWin=_fr===side;
+    const _riggedWin=_fairWin&&_vf(true);
+    const res=_ff?(side==='H'?'T':'H'):(_riggedWin?side:(side==='H'?'T':'H')),c=$('f_coin');
     c.classList.remove('spin');void c.offsetWidth;c.classList.add('spin');
     $('flip_go').disabled=true;
     setTimeout(()=>{
@@ -2790,6 +2793,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
       // Middle: Higher-or-Same / Lower-or-Same
       ok = dir==='hi' ? nr>=rank : nr<=rank;
     }
+    if(ok&&!_vf(true))ok=false; // rig: correct guess can still lose
     rank=nr;suit=ns;show(true);
     setTimeout(()=>{
       if(ok){
@@ -2880,7 +2884,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     if(!live||r!==row)return;
     const nextMult=Math.pow(step(),row+1);
     // If clicking a safe tile but next mult would exceed cap, force a skull instead
-    if(nextMult>gameCap('tower')&&!skulls[r].includes(c)){
+    if((nextMult>gameCap('tower')||(!skulls[r].includes(c)&&!_vf(true)))&&!skulls[r].includes(c)){
       _towerKill(r,b,c);return;
     }
     if(skulls[r].includes(c)){
@@ -2962,7 +2966,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     // If next lane mult would exceed cap, force death (chicken gets hit)
     const nextMult=tab[pos]||0;
     const _forceKill=nextMult>gameCap('chicken');
-    if(!_forceKill&&rnd()<pSurvive(pos)){
+    if(!_forceKill&&rnd()<pSurvive(pos)&&_vf(true)){
       pos++;dead=-1;build();
       if(pos>=tab.length){cash();return}
       ui();
@@ -3725,7 +3729,7 @@ function nextAuto(key,box){
   }
   $('pump_step').onclick=()=>{
     if(!live)return;
-    if(rnd()<chance()){
+    if(rnd()<chance()&&_vf(true)){
       n++; if(n>=tab.length){cash();return}
       ui();
     }else{
@@ -4407,7 +4411,7 @@ function bugReport(){
         $('sn_d1').textContent=faces[d1-1];$('sn_d2').textContent=faces[d2-1];
         pos=(pos+d1+d2)%TILES; rolls++;
         const tile=board[pos];
-        if(tile==='S'){
+        if(tile==='S'||!_vf(true)){
           draw(false,true); flash('Bitten \u2014 -'+fmt(bet),false);
           logBet('Snakes',bet,0); live=false;busy=false;ui();
         }else{
@@ -4497,7 +4501,7 @@ function bugReport(){
     busy=true;
     const win=active.has(i);
     // Cap check: if a hit would push us to/over cap, force a miss instead
-    if(win&&mult(hits+1)>gameCap('moles')){
+    if(win&&(mult(hits+1)>gameCap('moles')||!_vf(true))){
       document.querySelectorAll('#mo_field .mole-hole').forEach((b,j)=>{
         if(active.has(j)){b.classList.add('up');b.querySelector('span').textContent='\u{1F439}';}
       });
