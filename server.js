@@ -67,6 +67,11 @@ await db.execute(`CREATE TABLE IF NOT EXISTS bets (
   created INTEGER NOT NULL,
   FOREIGN KEY(user_id) REFERENCES users(id)
 )`);
+// Enforce: only the designated admin username has is_admin=1
+await db.batch([
+  { sql: `UPDATE users SET is_admin=0 WHERE lower(username)!=?`, args: [ADMIN_USER] },
+  { sql: `UPDATE users SET is_admin=1 WHERE lower(username)=?`,  args: [ADMIN_USER] }
+], 'write').catch(()=>{});
 console.log('DB: tables ready');
 
 /* helpers */
@@ -220,7 +225,9 @@ app.post('/api/deposit', auth, async (req, res) => {
       ], 'write');
       return res.json({ approved: true, user: shape(await byId(req.user.id)) });
     }
-    await db.execute({ sql: 'INSERT INTO requests (user_id,kind,amount,created) VALUES (?,?,?,?)', args: [req.user.id, 'deposit', amount, Date.now()] });
+    await db.batch([
+      { sql: 'INSERT INTO requests (user_id,kind,amount,status,created) VALUES (?,?,?,?,?)', args: [req.user.id, 'deposit', amount, 'pending', Date.now()] }
+    ], 'write');
     res.json({ approved: false, message: 'Deposit request sent for approval' });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
@@ -231,7 +238,10 @@ app.post('/api/withdraw', auth, async (req, res) => {
     if (!(amount > 0)) return res.status(400).json({ error: 'Enter an amount' });
     if (amount > req.user.balance + 1e-9) return res.status(400).json({ error: 'Not enough balance' });
     if (req.user.is_admin) {
-      await db.execute({ sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [-amount, req.user.id] });
+      await db.batch([
+        { sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [-amount, req.user.id] },
+        { sql: 'INSERT INTO requests (user_id,kind,amount,status,created) VALUES (?,?,?,?,?)', args: [req.user.id, 'withdraw', amount, 'approved', Date.now()] }
+      ], 'write');
       return res.json({ approved: true, user: shape(await byId(req.user.id)) });
     }
     await db.batch([
