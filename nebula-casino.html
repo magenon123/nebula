@@ -2100,7 +2100,7 @@ function logBet(game,bet,mult){
         .then(r=>{ API.user=r.user; bal=r.user.balance; paintBal(0); })
         .catch(e=>flash(e.message,false));
     }
-    if(typeof RB!=='undefined'&&!(typeof API!=='undefined'&&API.online))RB.accrue(current,bet);
+    if(typeof RB!=='undefined')RB.accrue(current,bet);
     if(typeof rigTrack==='function'&&['dice','limbo'].includes(current))rigTrack(bet,bet*mult);
     if(typeof STATS!=='undefined'){
       STATS.wagered+=bet; STATS.profit+=net; win?STATS.wins++:STATS.losses++;
