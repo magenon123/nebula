@@ -2648,8 +2648,8 @@ let wheelDraw,wheelAngle=0;
       setTimeout(()=>{co.className='fcoin '+(res==='H'?'h':'t');hist.push(res);drawHist();flash('-'+fmt(stake),false);logBet('Flip',stake,0);live=false;streak=0;$('flip_cash').disabled=false;$('flip_go').disabled=false;ui();},620);
       return;
     }
-    const _flm=_vf(true)?m:0;if(_flm>0){credit(stake*_flm);winBadge(_flm,stake*_flm);flash('+'+fmt(stake*_flm-stake),true);}else flash('Unlucky',false);
-    logBet('Flip',stake,_flm||0);live=false;streak=0;ui();
+    credit(stake*m);winBadge(m,stake*m);flash('+'+fmt(stake*m-stake),true);
+    logBet('Flip',stake,m);live=false;streak=0;ui();
   };
   window._flipAbort=()=>{ if(!live)return; if(streak>0){const m=mult();credit(stake*m);winBadge(m,stake*m);logBet('Flip',stake,m);}else{credit(stake);flash('Bet refunded',true);} live=false;streak=0;ui(); };
   drawHist();ui();
@@ -2823,9 +2823,9 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
   };
   $('hilo_cash').onclick=()=>{
     if(!live||mult<=1)return;
-    const _hm=_vf(true)?Math.min(mult,gameCap('hilo')):0;
-    if(_hm>0){credit(bet*_hm);winBadge(_hm,bet*_hm);flash('+'+fmt(bet*_hm-bet),true);}else flash('Unlucky',false);
-    logBet('Hilo',bet,_hm||0);live=false;mult=1;ui();
+    const _hm=Math.min(mult,gameCap('hilo'));
+    credit(bet*_hm);winBadge(_hm,bet*_hm);flash('+'+fmt(bet*_hm-bet),true);
+    logBet('Hilo',bet,_hm);live=false;mult=1;ui();
   };
   window._hiloAbort=()=>{ if(!live)return; if(mult>1){const m=mult;credit(bet*m);winBadge(m,bet*m);logBet('Hilo',bet,m);}else{credit(bet);flash('Bet refunded',true);} live=false;mult=1;ui(); };
   newCard();show(false);ui();
@@ -2897,9 +2897,9 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     if(!live)return;
     const m=mult();live=false;row=0;
     build();
-    const _tm=_vf(true)?Math.min(m,gameCap('tower')):0;
-    if(_tm>0){credit(bet*_tm);winBadge(_tm,bet*_tm);flash('+'+fmt(bet*_tm-bet),true);}else flash('Unlucky',false);
-    logBet('Dragon Tower',bet,_tm||0);ui();
+    const _tm=Math.min(m,gameCap('tower'));
+    credit(bet*_tm);winBadge(_tm,bet*_tm);flash('+'+fmt(bet*_tm-bet),true);
+    logBet('Dragon Tower',bet,_tm);ui();
   }
   $('tower_diff').onchange=()=>{cfg=CFG[$('tower_diff').value];live=false;row=0;build();ui()};
   $('tower_go').onclick=()=>{
@@ -2974,9 +2974,9 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     if(!live)return;
     const m=mult();live=false;pos=0;dead=-1;
     build();ui();
-    const _cm=_vf(true)?Math.min(m,gameCap('chicken')):0;
-    if(_cm>0){credit(bet*_cm);winBadge(_cm,bet*_cm);flash('+'+fmt(bet*_cm-bet),true);}else flash('Unlucky',false);
-    logBet('Chicken',bet,_cm||0);
+    const _cm=Math.min(m,gameCap('chicken'));
+    credit(bet*_cm);winBadge(_cm,bet*_cm);flash('+'+fmt(bet*_cm-bet),true);
+    logBet('Chicken',bet,_cm);
   }
   $('chicken_cash').onclick=cash;
   $('chicken_diff').onchange=()=>{live=false;pos=0;dead=-1;build();ui()};
@@ -3736,8 +3736,8 @@ function nextAuto(key,box){
   };
   function cash(){
     if(!live)return;
-    const m=mult(); credit(bet*m); flash('+'+fmt(bet*m-bet),true);
-    const _pum=_vf(true)?Math.min(m,10):0;if(_pum>0)credit(bet*_pum);logBet('Pump',bet,_pum||0); live=false;n=0;ui();
+    const m=Math.min(mult(),10);credit(bet*m);winBadge(m,bet*m);flash('+'+fmt(bet*m-bet),true);
+    logBet('Pump',bet,m);live=false;n=0;ui();
   }
   $('pump_cash').onclick=cash;
   $('pump_diff').onchange=()=>{if(!live){n=0;ui()}};
@@ -4386,7 +4386,7 @@ function bugReport(){
     if(!live)return;
     const m=SEDGE*prod;
     live=false;busy=false;draw(false,false);ui();
-    const _sm=_vf(true)?Math.min(m,_CAP):0;if(_sm>0){credit(bet*_sm);winBadge(_sm,bet*_sm);}logBet('Snakes',bet,_sm||0);
+    const _sm=Math.min(m,_CAP);credit(bet*_sm);winBadge(_sm,bet*_sm);logBet('Snakes',bet,_sm);
   }
   $('snakes_roll').onclick=()=>{
     if(!live||busy||rolls>=MAXROLLS)return;
@@ -4525,7 +4525,7 @@ function bugReport(){
   function cash(){
     if(!live)return;
     const m=mult(hits);
-    if(m>=gameCap('moles')||!_vf(true)){
+    if(m>=gameCap('moles')){
       const anyBtn=$('mo_field').children[0];
       _molesStrike(anyBtn||{classList:{add:()=>{}}});
       return;
