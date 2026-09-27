@@ -2694,7 +2694,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
    - 96% RTP: step mult = 0.96 / P(outcome)
    - Skip free; cash out after any win */
 (function(){
-  const HILO_RTP=0.96;
+  const HILO_RTP=0.99;
   let live=false,bet=0,mult=1,rank=0,suit=null,busy=false;
 
   // rank 1=A … 13=K
@@ -4452,7 +4452,7 @@ function bugReport(){
 
 /* ================= MOLES ================= */
 (function(){
-  const HOLES=7, MAXHITS=8, MEDGE=0.98;
+  const HOLES=7, MAXHITS=8, MEDGE=0.99;
   let live=false,bet=0,hits=0,moles=5,busy=false,active=new Set();
   const mult=n=>n<=0?1:MEDGE*Math.pow(HOLES/moles,n);
   const chance=()=>moles/HOLES;
