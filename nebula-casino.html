@@ -396,14 +396,11 @@ select{
 .bets-tabs{display:flex;gap:4px;padding:12px;background:var(--panel)}
 .bets-tabs span{padding:8px 16px;border-radius:99px;font-weight:700;font-size:13px;color:var(--muted)}
 .bets-tabs span.on{background:var(--panel2);color:var(--text)}
-.bets table{width:100%;border-collapse:collapse;table-layout:fixed}
-.bets th{text-align:left;font-size:12px;color:var(--muted);font-weight:700;padding:8px 14px}
-.bets td{padding:8px 14px;font-size:13px;font-weight:600;border-top:1px solid var(--panel2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bets th:nth-child(1),.bets td:nth-child(1){width:22%}
-.bets th:nth-child(2),.bets td:nth-child(2){width:20%;color:var(--muted)}
-.bets th:nth-child(3),.bets td:nth-child(3){width:18%}
-.bets th:nth-child(4),.bets td:nth-child(4){width:18%}
-.bets th:nth-child(5),.bets td:nth-child(5){width:22%;text-align:right}
+.bets table{width:auto;min-width:100%;border-collapse:collapse}
+.bets th{text-align:left;font-size:12px;color:var(--muted);font-weight:700;padding:8px 14px;white-space:nowrap}
+.bets td{padding:8px 14px;font-size:13px;font-weight:600;border-top:1px solid var(--panel2);white-space:nowrap}
+.bets th:last-child,.bets td:last-child{text-align:right}
+.bets td:nth-child(2){color:var(--muted)}
 .bets td.g{color:var(--green)}.bets td.r{color:var(--red)}
 .bets tbody tr{animation:sl .25s}
 @keyframes sl{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
@@ -2115,8 +2112,8 @@ function logBet(game,bet,mult){
       const B=bucket(current);
       B.wagered+=bet; B.profit+=net; win?B.wins++:B.losses++;
       B.series.push(B.profit);
-      if(el('heroBets'))el('heroBets').textContent=(STATS.wins+STATS.losses).toLocaleString();
-      if(el('heroWagered'))el('heroWagered').textContent='$'+fmt(STATS.wagered);
+      if($('heroBets'))$('heroBets').textContent=(STATS.wins+STATS.losses).toLocaleString();
+      if($('heroWagered'))$('heroWagered').textContent='$'+fmt(STATS.wagered);
       if($('spFilter')&&$('spFilter').dataset.n!==String(Object.keys(STATS.byGame).length))buildFilter();
       drawStats();
     }
