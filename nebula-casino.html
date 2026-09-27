@@ -3440,15 +3440,6 @@ const GAMES=[
   };
 })();
 function go(key){
-  if(window._minesAbort)window._minesAbort();
-  if(window._hiloAbort)window._hiloAbort();
-  if(window._towerAbort)window._towerAbort();
-  if(window._chickenAbort)window._chickenAbort();
-  if(window._blackjackAbort)window._blackjackAbort();
-  if(window._pumpAbort)window._pumpAbort();
-  if(window._flipAbort)window._flipAbort();
-  if(window._rpsAbort)window._rpsAbort();
-  if(window._snakesAbort)window._snakesAbort();
   hideBadge();
   const home=key==='home';
   $('lobby').hidden=!home; $('gameWrap').hidden=home;
