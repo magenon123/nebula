@@ -846,7 +846,7 @@ select{
 
 .rb-tier{display:flex;align-items:center;gap:14px;background:var(--panel2);border-radius:8px;padding:14px}
 .rb-badge{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-  font-weight:800;font-size:20px;color:#04140d;background:linear-gradient(150deg,#cd7f32,#a8672a)}
+  font-weight:800;font-size:14px;color:#04140d;background:linear-gradient(150deg,#cd7f32,#a8672a)}
 .rb-badge.silver{background:linear-gradient(150deg,#dfe6ef,#a9b4c4)}
 .rb-badge.gold{background:linear-gradient(150deg,#ffd76a,#e0a824)}
 .rb-badge.plat{background:linear-gradient(150deg,#c9f7ff,#6fd6e8)}
@@ -4928,11 +4928,20 @@ const EDGE_BY_GAME={dice:0.01,limbo:0.01,mines:0.01,plinko:0.01,keno:0.01,
   pump:0.02,rps:0.02,cases:0.01,snakes:0.02,moles:0.02,
 };
 const TIERS=[
-  {n:'Bronze',   min:0,      rate:0.05, cls:''},
-  {n:'Silver',   min:5000,   rate:0.08, cls:'silver'},
-  {n:'Gold',     min:25000,  rate:0.12, cls:'gold'},
-  {n:'Platinum', min:100000, rate:0.16, cls:'plat'},
-  {n:'Diamond',  min:500000, rate:0.20, cls:'diamond'}
+  {n:'Bronze',      min:0,          rate:0.05, cls:'',       label:'B'},
+  {n:'Silver',      min:10000,      rate:0.08, cls:'silver', label:'S'},
+  {n:'Gold',        min:50000,      rate:0.10, cls:'gold',   label:'G'},
+  {n:'Platinum I',  min:100000,     rate:0.12, cls:'plat',   label:'P1'},
+  {n:'Platinum II', min:250000,     rate:0.13, cls:'plat',   label:'P2'},
+  {n:'Platinum III',min:500000,     rate:0.14, cls:'plat',   label:'P3'},
+  {n:'Platinum IV', min:2500000,    rate:0.15, cls:'plat',   label:'P4'},
+  {n:'Platinum V',  min:10000000,   rate:0.16, cls:'plat',   label:'P5'},
+  {n:'Platinum VI', min:25000000,   rate:0.17, cls:'plat',   label:'P6'},
+  {n:'Diamond I',   min:50000000,   rate:0.18, cls:'diamond',label:'D1'},
+  {n:'Diamond II',  min:100000000,  rate:0.19, cls:'diamond',label:'D2'},
+  {n:'Diamond III', min:250000000,  rate:0.20, cls:'diamond',label:'D3'},
+  {n:'Diamond IV',  min:500000000,  rate:0.21, cls:'diamond',label:'D4'},
+  {n:'Diamond V',   min:1000000000, rate:0.22, cls:'diamond',label:'D5'},
 ];
 const RB=(()=>{
   const K='nebulaRake';
@@ -4974,7 +4983,7 @@ const RB=(()=>{
     const r=RB.mine(), t=RB.tierFor(r.wagered);
     const idx=TIERS.indexOf(t), next=TIERS[idx+1];
     $('rbBadge').className='rb-badge '+t.cls;
-    $('rbBadge').textContent=t.n[0];
+    $('rbBadge').textContent=t.label||t.n[0];
     $('rbName').textContent=t.n;
     $('rbSub').textContent='Returns '+(t.rate*100).toFixed(0)+'% of the house edge';
     if(next){
