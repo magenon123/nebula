@@ -3218,7 +3218,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     const back=hands.reduce((a,x)=>a+(x.res==='win'?x.bet*(isBJ(x.cards)&&hands.length===1?2.5:2):x.res==='push'?x.bet:0),0);
     const netMult=round2((back-staked+base)/base);
     if(back>staked)winBadge(netMult,back);
-    logBet('Blackjack',base,back>0?netMult:0);
+    logBet('Blackjack',staked,back>0?round2(back/staked):0);
     flash(msg.join(' / ')+'  '+(back-staked>=0?'+':'')+fmt(back-staked), back>=staked);
     const wraps=[...$('bj_hands').children];
     hands.forEach((hd,i)=>{
