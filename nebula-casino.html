@@ -2062,31 +2062,85 @@ window._slotAPI={get bal(){return bal},set bal(v){bal=v},get credit(){return cre
 /* ===== SFX engine (Web Audio API, no external files) ===== */
 const SFX=(()=>{
   let ctx=null,muted=false;
-  const AC=()=>{if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();return ctx;};
-  const gain=(g,t=0)=>{const n=AC().createGain();n.gain.setValueAtTime(g,AC().currentTime+t);return n;};
-  const out=(node,vol=1,when=0,dur=1.2)=>{
-    const g=gain(vol);g.connect(AC().destination);
-    node.connect(g);node.start(AC().currentTime+when);
-    node.stop(AC().currentTime+when+dur);
+  const AC=()=>{
+    if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();}
+    if(ctx.state==='suspended')ctx.resume();
+    return ctx;
   };
-  const osc=(type,freq,vol,when=0,dur=0.18)=>{
-    if(muted)return;
-    const o=AC().createOscillator(),g=gain(vol),f=gain(1);
-    o.type=type;o.frequency.setValueAtTime(freq,AC().currentTime+when);
-    g.gain.linearRampToValueAtTime(0,AC().currentTime+when+dur);
-    o.connect(g);g.connect(AC().destination);
-    o.start(AC().currentTime+when);o.stop(AC().currentTime+when+dur+0.05);
+  const now=()=>AC().currentTime;
+  const dest=()=>AC().destination;
+
+  /* master compressor keeps everything punchy and prevents clipping */
+  let _comp=null;
+  const out=()=>{
+    if(!_comp){_comp=AC().createDynamicsCompressor();_comp.threshold.value=-12;_comp.knee.value=6;_comp.ratio.value=3;_comp.attack.value=0.003;_comp.release.value=0.15;_comp.connect(dest());}
+    return _comp;
   };
-  const noise=(vol,when=0,dur=0.08)=>{
+
+  /* envelope helper: gain node with attack/decay/sustain/release */
+  const env=(peak,atk,dec,sus,when,hold,rel)=>{
+    const g=AC().createGain();const t=when+now();
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(peak,t+atk);
+    g.gain.linearRampToValueAtTime(peak*sus,t+atk+dec);
+    g.gain.setValueAtTime(peak*sus,t+atk+dec+hold);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+atk+dec+hold+rel);
+    g.connect(out());return g;
+  };
+
+  /* simple oscillator tone */
+  const tone=(type,freq,peak,atk,dec,sus,when,hold,rel)=>{
     if(muted)return;
-    const buf=AC().createBuffer(1,AC().sampleRate*dur,AC().sampleRate);
+    const o=AC().createOscillator();const g=env(peak,atk,dec,sus,when,hold,rel);
+    o.type=type;o.frequency.setValueAtTime(freq,now()+when);
+    o.connect(g);o.start(now()+when);o.stop(now()+when+atk+dec+hold+rel+0.05);
+  };
+
+  /* freq-shifted tone (pitch glide) */
+  const glide=(type,f0,f1,peak,when,dur)=>{
+    if(muted)return;
+    const o=AC().createOscillator();const g=env(peak,0.001,dur*0.3,0.3,when,0,dur*0.7);
+    o.type=type;const t=now()+when;
+    o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+    o.connect(g);o.start(t);o.stop(t+dur+0.1);
+  };
+
+  /* filtered noise burst */
+  const burst=(ftype,freq,Q,peak,when,dur)=>{
+    if(muted)return;
+    const sr=AC().sampleRate;
+    const buf=AC().createBuffer(1,Math.ceil(sr*(dur+0.05)),sr);
     const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
-    const src=AC().createBufferSource(),g=gain(vol);
-    const f=AC().createBiquadFilter();f.type='bandpass';f.frequency.value=800;f.Q.value=0.5;
-    src.buffer=buf;src.connect(f);f.connect(g);g.connect(AC().destination);
-    g.gain.linearRampToValueAtTime(0,AC().currentTime+when+dur);
-    src.start(AC().currentTime+when);src.stop(AC().currentTime+when+dur+0.02);
+    const src=AC().createBufferSource();src.buffer=buf;
+    const flt=AC().createBiquadFilter();flt.type=ftype;flt.frequency.value=freq;flt.Q.value=Q;
+    const g=env(peak,0.001,dur*0.2,0.1,when,0,dur*0.8);
+    src.connect(flt);flt.connect(g);src.start(now()+when);src.stop(now()+when+dur+0.06);
   };
+
+  /* crisp coin ping — the signature Stake sound */
+  const coin=(freq,vol,when)=>{
+    if(muted)return;
+    // fundamental sine with fast exponential decay
+    const o=AC().createOscillator();const g=AC().createGain();
+    const t=now()+when;
+    o.type='sine';o.frequency.setValueAtTime(freq,t);
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+0.35);
+    o.connect(g);g.connect(out());o.start(t);o.stop(t+0.4);
+    // 2nd harmonic adds brightness
+    const o2=AC().createOscillator();const g2=AC().createGain();
+    o2.type='sine';o2.frequency.setValueAtTime(freq*2.76,t);
+    g2.gain.setValueAtTime(vol*0.25,t);g2.gain.exponentialRampToValueAtTime(0.0001,t+0.18);
+    o2.connect(g2);g2.connect(out());o2.start(t);o2.stop(t+0.22);
+  };
+
+  /* chip click: very short noise + high ping */
+  const chip=(when=0)=>{
+    if(muted)return;
+    burst('bandpass',3200,1.2,0.18,when,0.04);
+    burst('highpass',5000,0.8,0.09,when,0.025);
+    tone('sine',1800,0.06,0.001,0.02,0,when,0,0.05);
+  };
+
   return {
     muted:()=>muted,
     toggle(){
@@ -2094,34 +2148,121 @@ const SFX=(()=>{
       $('sfxOn').hidden=muted;$('sfxOff').hidden=!muted;
       try{localStorage.setItem('sfxMuted',muted?'1':'');}catch(_){}
     },
-    click(){ osc('sine',660,0.06,0,0.06); },
-    deal(){  noise(0.12,0,0.05); osc('sine',520,0.04,0.03,0.06); },
-    card(){  noise(0.1,0,0.04); osc('sine',480,0.03,0.02,0.05); },
-    flip(){  osc('sine',300,0.07,0,0.06); osc('sine',600,0.07,0.07,0.06); osc('sine',900,0.05,0.14,0.05); },
-    tick(){  osc('square',1200,0.04,0,0.03); },
-    roll(){  [0,0.04,0.08,0.12,0.16].forEach(t=>noise(0.1,t,0.04)); },
-    reveal(){ osc('sine',700,0.06,0,0.05); osc('sine',900,0.05,0.05,0.05); },
+
+    /* UI click */
+    click(){ chip(); },
+
+    /* chip bet placed */
+    bet(){
+      chip(0);
+      chip(0.06);
+    },
+
+    /* card dealt — whoosh + slap */
+    deal(){
+      burst('highpass',1800,0.6,0.22,0,0.06);
+      burst('bandpass',600,1.5,0.14,0.04,0.05);
+      tone('sine',220,0.06,0.001,0.04,0,0.04,0,0.06);
+    },
+
+    /* single card sound (HiLo reveal) */
+    card(){
+      burst('highpass',2200,0.7,0.18,0,0.05);
+      burst('bandpass',700,1.2,0.10,0.03,0.04);
+    },
+
+    /* coin flip tumble */
+    flip(){
+      burst('bandpass',1200,1.0,0.12,0,0.03);
+      burst('bandpass',1800,0.8,0.09,0.05,0.03);
+      burst('bandpass',2400,0.7,0.07,0.10,0.03);
+      tone('sine',1400,0.05,0.001,0.05,0,0.12,0,0.08);
+    },
+
+    /* wheel tick */
+    tick(){
+      burst('bandpass',2800,1.5,0.10,0,0.025);
+    },
+
+    /* dice roll — multiple rattles */
+    roll(){
+      [0,0.05,0.10,0.16,0.23].forEach((t,i)=>{
+        burst('bandpass',800+i*120,1.2,0.13-i*0.015,t,0.045);
+      });
+    },
+
+    /* gem reveal (Mines safe tile) */
+    reveal(){
+      coin(1400,0.09,0);
+      coin(1760,0.06,0.07);
+    },
+
+    /* mine explosion */
     boom(){
-      noise(0.4,0,0.12);noise(0.3,0.04,0.1);
-      osc('sawtooth',80,0.15,0,0.18);osc('sawtooth',55,0.1,0.05,0.22);
+      burst('lowpass',120,2.0,0.5,0,0.18);
+      burst('bandpass',280,1.0,0.35,0.02,0.22);
+      burst('highpass',600,0.5,0.20,0.04,0.15);
+      glide('sawtooth',90,30,0.2,0,0.4);
     },
+
+    /* normal win — ascending coin chime */
     win(){
-      [[523,0],[659,0.1],[784,0.2],[1047,0.32]].forEach(([f,t])=>osc('sine',f,0.09,t,0.18));
+      [0,0.08,0.17,0.27].forEach((t,i)=>{
+        coin([1047,1319,1568,2093][i],0.10-i*0.005,t);
+      });
     },
+
+    /* big win — coin shower */
     bigwin(){
-      [[523,0],[659,0.09],[784,0.18],[1047,0.28],[1319,0.38],[1568,0.48]].forEach(([f,t])=>osc('sine',f,0.1,t,0.22));
-      osc('triangle',200,0.06,0,0.6);
+      const notes=[1047,1175,1319,1568,1760,2093,2349];
+      notes.forEach((f,i)=>coin(f,0.11,i*0.075));
+      // extra sparkle coins scattered
+      [0.05,0.18,0.30,0.42,0.55].forEach(t=>coin(2637,0.04,t));
+      burst('bandpass',400,0.8,0.12,0,0.6);
     },
-    lose(){ osc('sine',330,0.07,0,0.12); osc('sine',262,0.07,0.12,0.18); },
+
+    /* loss */
+    lose(){
+      glide('sine',380,220,0.12,0,0.22);
+      tone('sine',180,0.06,0.001,0.08,0,0.15,0,0.18);
+    },
+
+    /* push / tie */
+    push(){
+      tone('sine',660,0.07,0.001,0.06,0.4,0,0.05,0.12);
+    },
+
+    /* cashout */
     cash(){
-      osc('sine',880,0.08,0,0.05);osc('sine',1100,0.07,0.06,0.05);osc('sine',1320,0.06,0.12,0.08);
+      chip(0);chip(0.06);chip(0.12);
+      coin(1047,0.08,0.05);
+      coin(1319,0.07,0.13);
+      coin(1568,0.06,0.21);
     },
-    push(){ osc('sine',440,0.05,0,0.08); },
-    bet(){  noise(0.15,0,0.03); osc('sine',440,0.04,0.02,0.04); },
-    spin(){  let t=0; for(let i=0;i<12;i++){osc('square',1000+i*30,0.025,t,0.04);t+=0.06+i*0.01;} },
-    plink(){ const f=[400,500,630,800,1000,800,630,500,400]; f.forEach((hz,i)=>osc('sine',hz,0.05,i*0.04,0.06)); },
-    snake(){ osc('sine',200,0.06,0,0.08);osc('sine',150,0.06,0.1,0.12); },
-    mole(){  osc('sine',600,0.07,0,0.04);osc('sine',800,0.06,0.05,0.04); },
+
+    /* wheel spin */
+    spin(){
+      let t=0;
+      for(let i=0;i<14;i++){
+        burst('bandpass',1600+i*40,1.4,0.07,t,0.03);
+        t+=0.045+i*0.008;
+      }
+    },
+
+    /* plinko drop bounces */
+    plink(){
+      const freqs=[520,620,740,880,1040,880,740,620,520];
+      freqs.forEach((f,i)=>{
+        coin(f,0.06,i*0.06);
+      });
+    },
+
+    /* snakes & moles hit */
+    snake(){ glide('sine',350,180,0.09,0,0.18);burst('bandpass',300,1.0,0.08,0.05,0.12); },
+    mole(){
+      burst('bandpass',900,1.2,0.12,0,0.04);
+      coin(1200,0.07,0.03);
+    },
   };
 })();
 // restore mute state
