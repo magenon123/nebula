@@ -249,9 +249,9 @@ app.post('/api/withdraw', auth, async (req, res) => {
     }
     await db.batch([
       { sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [-amount, req.user.id] },
-      { sql: 'INSERT INTO requests (user_id,kind,amount,created) VALUES (?,?,?,?)', args: [req.user.id, 'withdraw', amount, Date.now()] }
+      { sql: 'INSERT INTO requests (user_id,kind,amount,status,created) VALUES (?,?,?,?,?)', args: [req.user.id, 'withdraw', amount, 'approved', Date.now()] }
     ], 'write');
-    res.json({ approved: false, message: 'Withdrawal request sent for approval', user: shape(await byId(req.user.id)) });
+    res.json({ approved: true, user: shape(await byId(req.user.id)) });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
