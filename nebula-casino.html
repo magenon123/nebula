@@ -2097,7 +2097,6 @@ function flash(t,win){
 function logBet(game,bet,mult){
   try{
     const win=mult>=1, net=bet*mult-bet;
-    }
     if(typeof API!=='undefined'&&API.online&&API.token){
       API.call('/bet','POST',{game:current,stake:bet,mult:mult})
         .then(r=>{ API.user=r.user; bal=r.user.balance; paintBal(0); })
