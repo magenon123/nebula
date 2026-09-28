@@ -3231,7 +3231,10 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
       pill.className='bj-pill'+(pt>21?' r':hd.res==='win'?' g':hd.res==='push'?' p':'');
       pill.textContent=pt+(isBJ(hd.cards)?' BJ':'')+(hd.bet!==base?' $'+fmt(hd.bet):'');
       row.className='bj-hand'+(hd.res==='win'?' win':pt>21?' bust':hd.res==='push'?' push':'');
-    }); ctrl();
+    });
+    // delay re-enabling the bet button so space-bar mashing doesn't instantly fire next hand
+    $('bj_go').disabled=true;
+    setTimeout(()=>ctrl(), 800);
   }
   $('bj_go').onclick=()=>{
     const b=debit('bj_bet'); if(b===null)return;
@@ -4113,8 +4116,8 @@ const INFO={
     if(!i)return;
     if(e.code==='Space'){e.preventDefault();const g=$(current+'_go');if(g&&!g.hidden&&!g.disabled)g.click()}
     if(e.key==='h'||e.key==='H')i.value=round2(Math.max(0.01,(+i.value||0)/2)).toFixed(2);
-    if(e.key==='d'||e.key==='D')i.value=round2(Math.min(bal,(+i.value||0)*2)).toFixed(2);
-    if(e.key==='a'||e.key==='A')i.value=round2(bal).toFixed(2);
+    if(e.key==='d'||e.key==='D')i.value=round2(Math.min(bal,Math.min(MAX_BET,(+i.value||0)*2))).toFixed(2);
+    if(e.key==='a'||e.key==='A')i.value=round2(Math.min(bal,MAX_BET)).toFixed(2);
   });
   swap();
 })();
