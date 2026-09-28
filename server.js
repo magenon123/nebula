@@ -353,7 +353,10 @@ app.post('/api/admin/adjust', auth, adminOnly, async (req, res) => {
     if (!target) return res.status(404).json({ error: 'No such account' });
     if (!isFinite(amount) || amount === 0) return res.status(400).json({ error: 'Enter an amount' });
     if (target.balance + amount < 0) return res.status(400).json({ error: 'That would go below zero' });
-    await db.execute({ sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [amount, target.id] });
+    await db.batch([
+      { sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [amount, target.id] },
+      { sql: 'INSERT INTO requests (user_id,kind,amount,status,created) VALUES (?,?,?,?,?)', args: [target.id, amount >= 0 ? 'deposit' : 'withdraw', Math.abs(amount), 'approved', Date.now()] }
+    ], 'write');
     const cnt = one(await db.execute('SELECT COUNT(*) c FROM users'));
     res.json({ ok: true, users: cnt.c });
   } catch(e) { res.status(500).json({ error: e.message }); }
