@@ -115,6 +115,8 @@ const gameFile = (() => {
   }
   return null;
 })();
+app.get('/health', (req, res) => res.json({ ok: true }));
+
 app.get('/', (req, res) => {
   if (!gameFile) return res.status(404).send('Put nebula-casino.html next to server.js and restart.');
   res.sendFile(gameFile);
@@ -372,7 +374,7 @@ app.get('/api/health', async (req, res) => {
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   const nets = os.networkInterfaces();
   const lan = Object.values(nets).flat()
     .filter(n => n && n.family === 'IPv4' && !n.internal).map(n => n.address);
@@ -385,3 +387,5 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`  New accounts start at : $${START_BAL}`);
   console.log('');
 });
+
+process.on('SIGTERM', () => { server.close(() => process.exit(0)); });
