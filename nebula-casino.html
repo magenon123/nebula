@@ -1188,6 +1188,10 @@ select{
     <button class="hd-icon-btn" id="bellBtn" aria-label="Notifications">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M10 19.17a2.5 2.5 0 0 0 2.5-2.5h-5a2.5 2.5 0 0 0 2.5 2.5m7.5-6.67h-.83V8.33a6.65 6.65 0 0 0-5.03-6.45l.03-.21a1.67 1.67 0 0 0-3.33 0l.02.21a6.7 6.7 0 0 0-5.03 6.45v4.17H2.5a1.67 1.67 0 0 0 0 3.33h15c.92 0 1.67-.75 1.67-1.66 0-.92-.75-1.67-1.67-1.67"/></svg>
     </button>
+    <button class="hd-icon-btn" id="sfxBtn" aria-label="Sound" title="Toggle sound">
+      <svg id="sfxOn" width="20" height="20" viewBox="0 0 24 24" fill="none"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      <svg id="sfxOff" width="20" height="20" viewBox="0 0 24 24" fill="none" hidden><path fill="currentColor" d="M16.5 12A4.5 4.5 0 0 0 14 7.97v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>
+    </button>
     <button class="hd-icon-btn hd-hide-sm" id="usersBtn" aria-label="Sidebar">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M17.5.83h-15C1.58.83.83 1.58.83 2.5v15c0 .92.75 1.67 1.67 1.67h15c.92 0 1.67-.75 1.67-1.67v-15c0-.92-.75-1.67-1.67-1.67m-6.67 15.65c0 .56-.46 1.02-1.01 1.02h-6.3c-.56 0-1.02-.46-1.02-1.02V3.52c0-.56.46-1.02 1.02-1.02h6.3c.55 0 1.01.46 1.01 1.02z"/></svg>
     </button>
@@ -2055,6 +2059,75 @@ const fmt=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDi
 // Expose balance API for slot iframes (window.bal conflicts with id="bal" DOM element)
 window._slotAPI={get bal(){return bal},set bal(v){bal=v},get credit(){return credit},get paintBal(){return paintBal},get round2(){return round2},get logBet(){return logBet}};
 
+/* ===== SFX engine (Web Audio API, no external files) ===== */
+const SFX=(()=>{
+  let ctx=null,muted=false;
+  const AC=()=>{if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();return ctx;};
+  const gain=(g,t=0)=>{const n=AC().createGain();n.gain.setValueAtTime(g,AC().currentTime+t);return n;};
+  const out=(node,vol=1,when=0,dur=1.2)=>{
+    const g=gain(vol);g.connect(AC().destination);
+    node.connect(g);node.start(AC().currentTime+when);
+    node.stop(AC().currentTime+when+dur);
+  };
+  const osc=(type,freq,vol,when=0,dur=0.18)=>{
+    if(muted)return;
+    const o=AC().createOscillator(),g=gain(vol),f=gain(1);
+    o.type=type;o.frequency.setValueAtTime(freq,AC().currentTime+when);
+    g.gain.linearRampToValueAtTime(0,AC().currentTime+when+dur);
+    o.connect(g);g.connect(AC().destination);
+    o.start(AC().currentTime+when);o.stop(AC().currentTime+when+dur+0.05);
+  };
+  const noise=(vol,when=0,dur=0.08)=>{
+    if(muted)return;
+    const buf=AC().createBuffer(1,AC().sampleRate*dur,AC().sampleRate);
+    const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    const src=AC().createBufferSource(),g=gain(vol);
+    const f=AC().createBiquadFilter();f.type='bandpass';f.frequency.value=800;f.Q.value=0.5;
+    src.buffer=buf;src.connect(f);f.connect(g);g.connect(AC().destination);
+    g.gain.linearRampToValueAtTime(0,AC().currentTime+when+dur);
+    src.start(AC().currentTime+when);src.stop(AC().currentTime+when+dur+0.02);
+  };
+  return {
+    muted:()=>muted,
+    toggle(){
+      muted=!muted;
+      $('sfxOn').hidden=muted;$('sfxOff').hidden=!muted;
+      try{localStorage.setItem('sfxMuted',muted?'1':'');}catch(_){}
+    },
+    click(){ osc('sine',660,0.06,0,0.06); },
+    deal(){  noise(0.12,0,0.05); osc('sine',520,0.04,0.03,0.06); },
+    card(){  noise(0.1,0,0.04); osc('sine',480,0.03,0.02,0.05); },
+    flip(){  osc('sine',300,0.07,0,0.06); osc('sine',600,0.07,0.07,0.06); osc('sine',900,0.05,0.14,0.05); },
+    tick(){  osc('square',1200,0.04,0,0.03); },
+    roll(){  [0,0.04,0.08,0.12,0.16].forEach(t=>noise(0.1,t,0.04)); },
+    reveal(){ osc('sine',700,0.06,0,0.05); osc('sine',900,0.05,0.05,0.05); },
+    boom(){
+      noise(0.4,0,0.12);noise(0.3,0.04,0.1);
+      osc('sawtooth',80,0.15,0,0.18);osc('sawtooth',55,0.1,0.05,0.22);
+    },
+    win(){
+      [[523,0],[659,0.1],[784,0.2],[1047,0.32]].forEach(([f,t])=>osc('sine',f,0.09,t,0.18));
+    },
+    bigwin(){
+      [[523,0],[659,0.09],[784,0.18],[1047,0.28],[1319,0.38],[1568,0.48]].forEach(([f,t])=>osc('sine',f,0.1,t,0.22));
+      osc('triangle',200,0.06,0,0.6);
+    },
+    lose(){ osc('sine',330,0.07,0,0.12); osc('sine',262,0.07,0.12,0.18); },
+    cash(){
+      osc('sine',880,0.08,0,0.05);osc('sine',1100,0.07,0.06,0.05);osc('sine',1320,0.06,0.12,0.08);
+    },
+    push(){ osc('sine',440,0.05,0,0.08); },
+    bet(){  noise(0.15,0,0.03); osc('sine',440,0.04,0.02,0.04); },
+    spin(){  let t=0; for(let i=0;i<12;i++){osc('square',1000+i*30,0.025,t,0.04);t+=0.06+i*0.01;} },
+    plink(){ const f=[400,500,630,800,1000,800,630,500,400]; f.forEach((hz,i)=>osc('sine',hz,0.05,i*0.04,0.06)); },
+    snake(){ osc('sine',200,0.06,0,0.08);osc('sine',150,0.06,0.1,0.12); },
+    mole(){  osc('sine',600,0.07,0,0.04);osc('sine',800,0.06,0.05,0.04); },
+  };
+})();
+// restore mute state
+(()=>{try{if(localStorage.getItem('sfxMuted')){SFX.toggle();}}catch(_){}})();
+$('sfxBtn').onclick=()=>SFX.toggle();
+
 function paintBal(dir){
   if(typeof AUTH!=='undefined'&&AUTH.current())AUTH.setBal(bal);
   if(typeof walletRefresh==='function')walletRefresh();
@@ -2084,6 +2157,7 @@ function winBadge(mult, payout, loss=false){
   if(loss) el.classList.add('loss');
   el.classList.add('on');
   _badgeTimer=setTimeout(()=>el.classList.remove('on','loss'), 2800);
+  if(typeof SFX!=='undefined'){mult>=5?SFX.bigwin():SFX.win();}
 }
 function hideBadge(){ clearTimeout(_badgeTimer); $('winBadge').classList.remove('on','loss'); }
 function flash(t,win){
@@ -2095,6 +2169,14 @@ function flash(t,win){
 function logBet(game,bet,mult){
   try{
     const win=mult>=1, net=bet*mult-bet;
+    if(typeof SFX!=='undefined'){
+      if(mult===0)SFX.lose();
+      else if(mult===1)SFX.push();
+      // wins play via winBadge; for non-badge games (dice/limbo/plinko) play here
+      else if(!['keno','wheel','flip','hilo','tower','chicken','blackjack','rps','cases','snakes','moles','mines'].includes(current)){
+        mult>=5?SFX.bigwin():SFX.win();
+      }
+    }
     if(typeof API!=='undefined'&&API.online&&API.token){
       API.call('/bet','POST',{game:current,stake:bet,mult:mult})
         .then(r=>{ API.user=r.user; bal=r.user.balance; paintBal(0); })
@@ -2209,6 +2291,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
   $('dice_go').onclick=()=>{
     if(diceBusy)return;
     const bet=debit('dice_bet'); if(bet===null)return;
+    if(typeof SFX!=='undefined')SFX.roll();
     diceBusy=true; $('dice_go').disabled=true;
     const m=mult(),_fw=(100-over)/100,_aw=(m>=gameCap('dice'))?0:_fw*_gv(),_ok=rnd()<_aw;
     const roll=_ok?over+rnd()*(100-over):rnd()*over,win=roll>over;
@@ -2270,6 +2353,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
     if(lBusy)return;
     const t=Math.max(1.01,parseFloat($('limbo_t').value)||1.01);
     const bet=debit('limbo_bet'); if(bet===null)return;
+    if(typeof SFX!=='undefined')SFX.bet();
     lBusy=true; $('limbo_go').disabled=true;
     const _lc=gameCap('limbo'),_mb=t>=_lc?t-0.02:Infinity,res=Math.min(Math.max(1,(_gv()*EDGE)/(1-rndRigged())),_mb);
     const win=res>=t, out=$('l_out'); out.className='limbo';
@@ -2322,6 +2406,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
     if(bombs.has(i)){
       live=false;
       b.textContent='💣';b.classList.add('bomb');
+      if(typeof SFX!=='undefined')SFX.boom();
       stop(false);  // only show the clicked bomb; leave other mines hidden
       flash('-'+fmt(bet),false);logBet('Mines',bet,0);
       return;
@@ -2329,6 +2414,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
     // if this gem would push mult to cap, or rig fires, force a bomb
     if(mult(found.size+1)>=gameCap('mines')||!_mWin){_minesBlow();return;}
     found.add(i);b.textContent='💎';b.classList.add('gem');
+    if(typeof SFX!=='undefined')SFX.reveal();
     if(found.size===N-mines){cash();return}
     ui();
   }
@@ -2344,10 +2430,12 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
     const m=mult(found.size);
     live=false;
     stop(true);
+    if(typeof SFX!=='undefined')SFX.cash();
     credit(bet*m);winBadge(m,bet*m);logBet('Mines',bet,m);
   }
   $('mines_go').onclick=()=>{
     const b=debit('mines_bet');if(b===null)return;
+    if(typeof SFX!=='undefined')SFX.bet();
     bet=b;mines=+sel.value;bombs=new Set();found=new Set();live=true;_mWin=_vf(true);
     while(bombs.size<mines)bombs.add(Math.floor(rnd()*N));
     build();ui();
@@ -2452,6 +2540,7 @@ let plinkoInit;
   }
   $('plinko_go').onclick=()=>{
     const bet=debit('plinko_bet');if(bet===null)return;
+    if(typeof SFX!=='undefined')SFX.plink();
     const l=L();let pos=0;const xs=[l.cx0];
     for(let r=0;r<l.rows;r++){pos+=rnd()<.5?0:1;xs.push(l.cx0+(pos-(r+1)/2)*l.dx)}
     balls.push({t:0,x:l.cx0,y:l.top,xs,slot:pos,bet,dead:false,set:false});
@@ -2569,6 +2658,7 @@ let wheelDraw,wheelAngle=0;
   $('wheel_go').onclick=()=>{
     if(spin)return;
     const bet=debit('wheel_bet');if(bet===null)return;
+    if(typeof SFX!=='undefined')SFX.spin();
     const v=vals(),n=v.length,idx=pickWheelIndex(v),sa=2*Math.PI/n;
     const target=-Math.PI/2-(idx+.5)*sa;
     const norm=((target-wheelAngle)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
@@ -2624,6 +2714,7 @@ let wheelDraw,wheelAngle=0;
   }
   $('flip_go').onclick=()=>{
     if(!live){const b=debit('flip_bet');if(b===null)return;stake=b;streak=0;live=true;hist=[];drawHist()}
+    if(typeof SFX!=='undefined')SFX.flip();
     const _ff=Math.pow(STEP,streak+1)>gameCap('flip');
     const _fr=rnd()<.5?'H':'T';
     // rig: if fair result would win, _vf can flip it to a loss
@@ -2641,6 +2732,7 @@ let wheelDraw,wheelAngle=0;
     },620);
   };
   $('flip_cash').onclick=()=>{
+    if(typeof SFX!=='undefined')SFX.cash();
     const m=mult();
     // Cap at 25x; also if at/over cap, force the coin to flip wrong
     if(m>=gameCap('flip')){
@@ -2765,6 +2857,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
 
   function guess(dir){
     if(!live||busy)return;
+    if(typeof SFX!=='undefined')SFX.card();
     if(mult>=gameCap('hilo')){// max hilo cap reached — force a losing card naturally
       busy=true;
       // Pick a card that would lose for BOTH directions so it's always wrong
@@ -2827,6 +2920,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
   };
   $('hilo_cash').onclick=()=>{
     if(!live||mult<=1)return;
+    if(typeof SFX!=='undefined')SFX.cash();
     const _hm=Math.min(mult,gameCap('hilo'));
     credit(bet*_hm);winBadge(_hm,bet*_hm);flash('+'+fmt(bet*_hm-bet),true);
     logBet('Hilo',bet,_hm);live=false;mult=1;ui();
@@ -2899,6 +2993,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
   }
   function cash(){
     if(!live)return;
+    if(typeof SFX!=='undefined')SFX.cash();
     const m=mult();live=false;row=0;
     build();
     const _tm=Math.min(m,gameCap('tower'));
@@ -2976,6 +3071,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
   };
   function cash(){
     if(!live)return;
+    if(typeof SFX!=='undefined')SFX.cash();
     const m=mult();live=false;pos=0;dead=-1;
     build();ui();
     const _cm=Math.min(m,gameCap('chicken'));
@@ -3231,6 +3327,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
   }
   $('bj_go').onclick=()=>{
     const b=debit('bj_bet'); if(b===null)return;
+    if(typeof SFX!=='undefined')SFX.deal();
     base=b; if(!deck.length)shoe();
     shownD=0; shownH=[]; holeShown=false;
     concealScores=true; const dealToken=++concealToken;
@@ -3269,6 +3366,7 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
   $('bj_noins').onclick=()=>{ if(insPending){insBet=0;afterInsurance()} };
   $('bj_hit').onclick=()=>{
     const hd=hands[active]; if(!live||!hd||hd.done)return;
+    if(typeof SFX!=='undefined')SFX.deal();
     hd.cards.push(draw());
     if(total(hd.cards)>=21){hd.done=true;active++;render(true);ctrl();setTimeout(nextHand,900)}
     else{render(true);ctrl()}
@@ -3741,6 +3839,7 @@ function nextAuto(key,box){
   };
   function cash(){
     if(!live)return;
+    if(typeof SFX!=='undefined')SFX.cash();
     const m=Math.min(mult(),10);credit(bet*m);winBadge(m,bet*m);flash('+'+fmt(bet*m-bet),true);
     logBet('Pump',bet,m);live=false;n=0;ui();
   }
@@ -3785,6 +3884,7 @@ function nextAuto(key,box){
   $('rps_r').onclick=()=>play('R'); $('rps_p').onclick=()=>play('P'); $('rps_s').onclick=()=>play('S');
   $('rps_rand').onclick=()=>play('RPS'[Math.floor(rnd()*3)]);
   $('rps_cash').onclick=()=>{
+    if(typeof SFX!=='undefined')SFX.cash();
     const m=mult(); credit(bet*m); winBadge(m,bet*m); flash('+'+fmt(bet*m-bet),true);
     logBet('Rock Paper Scissors',bet,m); live=false;streak=0;ui();
   };
@@ -4389,12 +4489,14 @@ function bugReport(){
   }
   function cash(){
     if(!live)return;
+    if(typeof SFX!=='undefined')SFX.cash();
     const m=SEDGE*prod;
     live=false;busy=false;draw(false,false);ui();
     const _sm=Math.min(m,_CAP);credit(bet*_sm);winBadge(_sm,bet*_sm);logBet('Snakes',bet,_sm);
   }
   $('snakes_roll').onclick=()=>{
     if(!live||busy||rolls>=MAXROLLS)return;
+    if(typeof SFX!=='undefined')SFX.roll();
     busy=true;ui();
     const b=makeBoard(pos);
     if(!b){busy=false;ui();flash('Could not build a fair board \u2014 try again',false);return}
@@ -4499,6 +4601,7 @@ function bugReport(){
   }
   function whack(i,btn){
     if(!live||busy)return;
+    if(typeof SFX!=='undefined')SFX.mole();
     busy=true;
     const win=active.has(i);
     // Cap check: if a hit would push us to/over cap, force a miss instead
@@ -4529,6 +4632,7 @@ function bugReport(){
   }
   function cash(){
     if(!live)return;
+    if(typeof SFX!=='undefined')SFX.cash();
     const m=mult(hits);
     if(m>=gameCap('moles')){
       const anyBtn=$('mo_field').children[0];
@@ -4638,6 +4742,7 @@ function bugReport(){
   $('bac_go').onclick=()=>{
     if(busy)return;
     const bet=debit('bac_bet'); if(bet===null)return;
+    if(typeof SFX!=='undefined')SFX.deal();
     busy=true; $('bac_go').disabled=true;
 
     // Reset
