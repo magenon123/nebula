@@ -862,7 +862,7 @@ select{
   font-size:10px;font-weight:800;padding:1px 5px}
 
 
-.us-head,.us-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1.5fr;gap:10px;align-items:center}
+.us-head,.us-row{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr 1fr 1fr 1.5fr;gap:10px;align-items:center}
 .us-head{font-size:12px;color:var(--muted);font-weight:700;padding:0 12px 8px}
 .us-row{background:var(--panel2);border-radius:8px;padding:11px 12px;font-size:13px}
 .us-row b{display:block;font-size:13.5px}
@@ -1085,10 +1085,10 @@ select{
 </div>
 
 <div class="mask" id="usersMask">
-  <div class="wmodal" style="max-width:720px">
+  <div class="wmodal" style="max-width:860px">
     <div class="wm-head"><span class="wm-title">&#128101; Accounts</span><button class="wm-x" id="usClose">&times;</button></div>
     <div class="wm-body">
-      <div class="us-head"><span>Player</span><span>Balance</span><span>Wagered</span><span>Net</span><span>Adjust</span></div>
+      <div class="us-head"><span>Player</span><span>Balance</span><span>Deposited</span><span>Withdrawn</span><span>Wagered</span><span>Net</span><span>Adjust</span></div>
       <div id="usList" class="ad-list"></div>
     </div>
   </div>
@@ -5090,6 +5090,8 @@ const RB=(()=>{
         `<div class="us-row">
            <div><b>${u.username}${u.admin?' \u2605':''}</b><small>${u.email}</small></div>
            <div>$${fmt(u.balance)}</div>
+           <div class="pos">$${fmt(u.deposited)}</div>
+           <div class="neg">$${fmt(u.withdrawn)}</div>
            <div>$${fmt(u.wagered)}</div>
            <div class="${u.net>=0?'pos':'neg'}">${u.net>=0?'+':''}$${fmt(u.net)}</div>
            <div class="us-adj">
