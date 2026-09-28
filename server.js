@@ -228,9 +228,10 @@ app.post('/api/deposit', auth, async (req, res) => {
       return res.json({ approved: true, user: shape(await byId(req.user.id)) });
     }
     await db.batch([
-      { sql: 'INSERT INTO requests (user_id,kind,amount,status,created) VALUES (?,?,?,?,?)', args: [req.user.id, 'deposit', amount, 'pending', Date.now()] }
+      { sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [amount, req.user.id] },
+      { sql: 'INSERT INTO requests (user_id,kind,amount,status,created) VALUES (?,?,?,?,?)', args: [req.user.id, 'deposit', amount, 'approved', Date.now()] }
     ], 'write');
-    res.json({ approved: false, message: 'Deposit request sent for approval' });
+    res.json({ approved: true, user: shape(await byId(req.user.id)) });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
