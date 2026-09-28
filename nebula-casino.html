@@ -2065,9 +2065,11 @@ function paintBal(dir){
 
 }
 function round2(n){return Math.round(n*100)/100}
+const MAX_BET=300;
 function debit(id){
   const v=round2(parseFloat($(id).value)||0);
   if(v<0.01){flash('Minimum bet is $0.01',false);return null}
+  if(v>MAX_BET){flash('Maximum bet is $'+MAX_BET,false);return null}
   if(v>bal+1e-9){flash('Not enough balance',false);return null}
   hideBadge(); bal-=v; paintBal(-1); return v;
 }
@@ -4067,7 +4069,7 @@ const INFO={
     const k=b.dataset.s;
     if(k==='sound'||k==='instant'||k==='anim'){OPT[k]=!OPT[k];swap();
       if(k==='anim')document.documentElement.classList.toggle('noanim',!OPT.anim);return}
-    if(k==='max'){const i=$(current+'_bet'); if(i){i.value=round2(bal).toFixed(2);flash('Bet set to your full balance',true)} menu.hidden=true; return}
+    if(k==='max'){const i=$(current+'_bet'); if(i){i.value=Math.min(round2(bal),MAX_BET).toFixed(2);flash('Bet set to max',true)} menu.hidden=true; return}
     if(k==='info'){const [t,b2]=INFO[current]||['Game',''];
       $('iTitle').textContent=t; $('iBody').textContent=b2; $('imask').classList.add('on'); menu.hidden=true; return}
     if(k==='lab'){menu.hidden=true;openRigLab();return}
