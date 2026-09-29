@@ -1049,8 +1049,8 @@ select{
     <div id="auSignup" hidden>
       <div class="au-f"><label>Username</label><input id="au_user"></div>
       <div class="au-f"><label>Email</label><input type="email" id="au_mail"></div>
-      <div class="au-f"><label>Password <small style="color:var(--muted);font-weight:400">(min 8 chars)</small></label><input type="password" id="au_pw2" autocomplete="new-password" minlength="8"></div>
-      <div class="au-f"><label>Confirm password</label><input type="password" id="au_pw3" autocomplete="new-password" minlength="8"></div>
+      <div class="au-f"><label>Password</label><input type="password" id="au_pw2" autocomplete="new-password"></div>
+      <div class="au-f"><label>Confirm password</label><input type="password" id="au_pw3" autocomplete="new-password"></div>
       <button class="go alt" id="au_up">Create account</button>
     </div>
     <div class="au-msg" id="au_msg"></div>
@@ -4973,7 +4973,6 @@ const AUTH=(()=>{
     const u=$('au_user').value.trim(), m=$('au_mail').value.trim();
     const p=$('au_pw2').value, p2=$('au_pw3').value;
     if(p!==p2)return msg('Passwords do not match');
-    if(p.length<8)return msg('Password must be at least 8 characters');
     if(API.online){
       try{
         const r=await API.call('/register','POST',{username:u,email:m,password:p});
