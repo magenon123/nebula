@@ -2326,7 +2326,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
     if(bombs.has(i)){
       live=false;
       b.textContent='💣';b.classList.add('bomb');
-      stop(false);  // only show the clicked bomb; leave other mines hidden
+      stop(true);
       flash('-'+fmt(bet),false);logBet('Mines',bet,0);
       return;
     }
@@ -2340,7 +2340,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
     // Force a bomb explosion on a safe tile (looks genuine)
     // Does NOT add the tile to bombs — only the fake tile explodes, originals stay hidden
     const _sf=[...Array(N).keys()].filter(i=>!found.has(i)&&!bombs.has(i));
-    if(_sf.length){const _t=_sf[Math.floor(rnd()*_sf.length)];const _b=$('m_grid').children[_t];if(_b){live=false;_b.textContent='💣';_b.classList.add('bomb');stop(false);flash('-'+fmt(bet),false);logBet('Mines',bet,0);return true;}}
+    if(_sf.length){const _t=_sf[Math.floor(rnd()*_sf.length)];const _b=$('m_grid').children[_t];if(_b){live=false;_b.textContent='💣';_b.classList.add('bomb');stop(true);flash('-'+fmt(bet),false);logBet('Mines',bet,0);return true;}}
     return false;
   }
   function cash(){
