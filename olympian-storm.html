@@ -372,7 +372,7 @@ const OLY=(function(){
       const sp=spin(R,fsMode);
       sp.kind=fsMode; left--;
       if(sp.win>0&&sp.orbSum>0)fsMult+=sp.orbSum;
-      let pay=sp.win*(fsMult>0?fsMult:1);
+      let pay=sp.win*(sp.orbSum>0&&fsMult>0?fsMult:1);
       sp.mult=fsMult;
       if(sp.scat>=3){ left+=5; sp.award=5; }
       sp.left=left;
@@ -677,10 +677,6 @@ const OLY=(function(){
         setCoin(sp.mult);
       }
       await wait(1000);
-    } else if(sp.win>0&&sp.mult>1&&sp.orbSum===0){
-      // accumulated multiplier active but no new orbs this spin — show it being applied
-      tumble(`${money(line*b)} x ${sp.mult}`);
-      await wait(fast()?300:800);
     }
     setWin((paidBefore+sp.pay)*b);
     if(sp.award){
