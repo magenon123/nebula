@@ -2366,6 +2366,19 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
   };
   $('mines_cash').onclick=cash;
   sel.onchange=ui; build(); ui();
+  window._minesLive=()=>live;
+  window._minesPickMode=()=>{
+    const g=$('m_grid');g.innerHTML='';
+    for(let i=0;i<N;i++){
+      const b=document.createElement('button');b.className='tile';
+      if(AUTO_PICKS.mines.has(i)){b.classList.add('gem');b.textContent='✓';}
+      b.onclick=()=>{
+        if(AUTO_PICKS.mines.has(i)){AUTO_PICKS.mines.delete(i);b.classList.remove('gem');b.textContent='';}
+        else{AUTO_PICKS.mines.add(i);b.classList.add('gem');b.textContent='✓';}
+      };
+      g.appendChild(b);
+    }
+  };
 })();
 
 /* =========== PLINKO =========== */
@@ -2954,6 +2967,30 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     if(t)t.click();
   };
   window._towerAbort=()=>{ if(!live)return; if(row>0){const m=mult();credit(bet*m);winBadge(m,bet*m);logBet('Dragon Tower',bet,m);}else{credit(bet);flash('Bet refunded',true);} live=false;row=0;build();ui(); };
+  window._towerLive=()=>live;
+  window._towerPickMode=()=>{
+    if(!AUTO_PICKS.towerRows)AUTO_PICKS.towerRows=[];
+    const cur=CFG[$('tower_diff').value];
+    const g=$('t_grid');g.innerHTML='';
+    for(let r=0;r<ROWS;r++){
+      const d=document.createElement('div');d.className='trow live';d.dataset.r=r;
+      for(let c=0;c<cur.c;c++){
+        const b=document.createElement('button');b.className='ttile';b.dataset.c=c;
+        const isPick=(AUTO_PICKS.towerRows[r]===c);
+        if(isPick){b.classList.add('egg');b.style.opacity='1';}
+        b.onclick=()=>{
+          AUTO_PICKS.towerRows[r]=c;
+          d.querySelectorAll('.ttile').forEach((t,ci)=>{
+            t.classList.toggle('egg',ci===c);t.style.opacity=ci===c?'1':'';
+          });
+        };
+        d.appendChild(b);
+      }
+      const m=document.createElement('div');m.className='tmult';
+      m.textContent=Math.pow(step(),r+1).toFixed(2)+'×';d.appendChild(m);
+      g.appendChild(d);
+    }
+  };
   build();ui();
 })();
 
@@ -3670,21 +3707,11 @@ const AUTO_PICKS={mines:new Set(),tower:0,moles:new Set()};
     const pickGame=key==='mines'||key==='tower'||key==='moles';
     // Build step/pick selector HTML
     let pickHtml='';
-    if(key==='mines'){
-      pickHtml=`<div><div class="lbl"><span>Select tiles to click each bet <span style="color:var(--muted);font-weight:400">(none = random)</span></span></div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:6px" id="mines_pick_grid">
-          ${Array.from({length:25},(_,i)=>`<button data-tile="${i}" style="padding:8px 0;background:var(--panel2);border:2px solid transparent;color:var(--text);border-radius:7px;cursor:pointer;font-size:13px">${i+1}</button>`).join('')}
-        </div></div>`;
-    } else if(key==='tower'){
-      pickHtml=`<div><div class="lbl"><span>Column to pick each row <span style="color:var(--muted);font-weight:400">(auto-clamps to difficulty)</span></span></div>
-        <div style="display:flex;gap:7px;margin-top:6px" id="tower_pick_col">
-          ${['1st','2nd','3rd','4th'].map((l,i)=>`<button data-col="${i}" style="flex:1;padding:10px 0;background:var(--panel2);border:2px solid transparent;color:var(--text);border-radius:7px;cursor:pointer;font-size:13px">${l}</button>`).join('')}
-        </div></div>`;
-    } else if(key==='moles'){
-      pickHtml=`<div><div class="lbl"><span>Hole to click each pick <span style="color:var(--muted);font-weight:400">(none = random)</span></span></div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px" id="moles_pick_grid">
-          ${Array.from({length:7},(_,i)=>`<button data-hole="${i}" style="flex:1;min-width:34px;padding:10px 0;background:var(--panel2);border:2px solid transparent;color:var(--text);border-radius:7px;cursor:pointer;font-size:13px">${i+1}</button>`).join('')}
-        </div></div>`;
+    if(pickGame){
+      const hint=key==='mines'?'Click tiles on the board to select them (none = random)':
+        key==='tower'?'Click a cell in each row on the board to set your pick':
+        'Click holes on the board to select (none = random)';
+      pickHtml=`<div style="padding:10px 12px;background:var(--panel2);border-radius:8px;font-size:13px;color:var(--muted);line-height:1.4">👆 ${hint}</div>`;
     } else if(sg){
       pickHtml=`<div><div class="lbl"><span>${key==='chicken'?'Lanes to cross':key==='pump'?'Pumps per round':'Rounds before cashout'} each bet</span></div>
         <div class="inwrap"><input type="number" id="${key}_steps" value="3" min="1" max="${sg.max}"></div></div>`;
@@ -3705,28 +3732,6 @@ const AUTO_PICKS={mines:new Set(),tower:0,moles:new Set()};
         <div class="inwrap"><input type="number" id="${key}_sl" value="0" min="0"><span class="sfx">$</span></div></div>
       <button class="go alt" data-start="${key}">Start Autobet</button>`;
     pane.appendChild(box);
-    // Wire pick grids
-    if(key==='mines'){
-      box.querySelectorAll('#mines_pick_grid button').forEach(b=>b.onclick=()=>{
-        const t=+b.dataset.tile;
-        if(AUTO_PICKS.mines.has(t)){AUTO_PICKS.mines.delete(t);b.style.borderColor='transparent';b.style.color='var(--text)'}
-        else{AUTO_PICKS.mines.add(t);b.style.borderColor='var(--green)';b.style.color='var(--green)'}
-      });
-    } else if(key==='tower'){
-      box.querySelectorAll('#tower_pick_col button').forEach(b=>{
-        b.onclick=()=>{
-          box.querySelectorAll('#tower_pick_col button').forEach(x=>{x.style.borderColor='transparent';x.style.color='var(--text)'});
-          AUTO_PICKS.tower=+b.dataset.col;b.style.borderColor='var(--green)';b.style.color='var(--green)';
-        };
-        if(+b.dataset.col===0){b.style.borderColor='var(--green)';b.style.color='var(--green)'}
-      });
-    } else if(key==='moles'){
-      box.querySelectorAll('#moles_pick_grid button').forEach(b=>b.onclick=()=>{
-        const h=+b.dataset.hole;
-        if(AUTO_PICKS.moles.has(h)){AUTO_PICKS.moles.delete(h);b.style.borderColor='transparent';b.style.color='var(--text)'}
-        else{AUTO_PICKS.moles.add(h);b.style.borderColor='var(--green)';b.style.color='var(--green)'}
-      });
-    }
     box.querySelectorAll('.seg2').forEach(s=>s.querySelectorAll('button').forEach(b=>b.onclick=()=>{
       s.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}));
     box.querySelector('[data-start]').onclick=()=>toggleAuto(key,box);
@@ -3735,8 +3740,14 @@ const AUTO_PICKS={mines:new Set(),tower:0,moles:new Set()};
     const manualBits=[...pane.children].filter(c=>c!==mode&&c!==box);
     // the bet amount must stay reachable in Auto mode, so only hide the action buttons
     const keep=c=>c.querySelector&&c.querySelector('input[id$="_bet"]');
+    const enterPickMode=()=>{
+      if(key==='mines'&&window._minesPickMode)window._minesPickMode();
+      else if(key==='tower'&&window._towerPickMode)window._towerPickMode();
+      else if(key==='moles'&&window._molesPickMode)window._molesPickMode();
+    };
     aBtn.onclick=()=>{mBtn.classList.remove('on');aBtn.classList.add('on');
-      manualBits.forEach(c=>{if(!keep(c))c.hidden=true});box.hidden=false};
+      manualBits.forEach(c=>{if(!keep(c))c.hidden=true});box.hidden=false;
+      enterPickMode();};
     mBtn.onclick=()=>{aBtn.classList.remove('on');mBtn.classList.add('on');
       stopAuto(key);box.hidden=true;manualBits.forEach(c=>c.hidden=false);
       document.querySelectorAll('[hidden][id$="_cash"]').forEach(x=>x.hidden=true)};
@@ -4040,8 +4051,67 @@ let casesIdle;
   ['dice','limbo','keno','wheel','plinko','cases'].forEach(k=>{
     AUTO[k]=cb=>{const before=bal; $(k+'_go').click(); setTimeout(()=>cb(bal-before),D[k])};
   });
-  // step games: start the round, take N steps, then cash out
-  Object.keys(STEP_GAMES).forEach(k=>{
+  // pick games (mines/tower/moles): go button is hidden in auto mode, use direct click + state check
+  AUTO['mines']=cb=>{
+    const before=bal;let done=false,taken=0;
+    const finish=()=>{if(done)return;done=true;clearInterval(t);setTimeout(()=>cb(bal-before),120)};
+    $('mines_go').click(); // direct click bypasses hidden check
+    const t=setInterval(()=>{
+      if(!window._minesLive||!window._minesLive()){if(taken>0)finish();return}
+      const picks=[...AUTO_PICKS.mines];
+      const allTiles=[...$('m_grid').querySelectorAll('.tile')];
+      const available=picks.length
+        ?picks.filter(p=>{const el=allTiles[p];return el&&!el.disabled&&!el.classList.contains('gem')&&!el.classList.contains('bomb');})
+        :null;
+      if(picks.length&&!available.length){const c=$('mines_cash');if(c&&!c.hidden)c.click();finish();return;}
+      if(picks.length&&taken>=picks.length){const c=$('mines_cash');if(c&&!c.hidden)c.click();finish();return;}
+      if(!picks.length){const b=$('mines_rand');if(b&&!b.disabled){b.click();taken++;}else finish();return;}
+      const el=allTiles[available[taken%available.length]];
+      if(el){el.click();taken++;}else finish();
+    },420);
+    setTimeout(finish,30000);
+  };
+  AUTO['tower']=cb=>{
+    const before=bal;let done=false,taken=0;
+    const finish=()=>{if(done)return;done=true;clearInterval(t);setTimeout(()=>cb(bal-before),120)};
+    $('tower_go').click();
+    const want=9; // climb all rows then cash
+    const t=setInterval(()=>{
+      if(!window._towerLive||!window._towerLive()){if(taken>0)finish();return}
+      const row=document.querySelector('#t_grid .trow.live');
+      if(!row){const c=$('tower_cash');if(c&&!c.hidden)c.click();finish();return;}
+      const r=+row.dataset.r;
+      const tiles=row.querySelectorAll('.ttile');
+      const pref=(AUTO_PICKS.towerRows&&AUTO_PICKS.towerRows[r]!=null)?AUTO_PICKS.towerRows[r]:AUTO_PICKS.tower||0;
+      const idx=Math.min(pref,tiles.length-1);
+      tiles[idx].click();taken++;
+      if(taken>=want){setTimeout(()=>{const c=$('tower_cash');if(c&&!c.hidden)c.click();finish();},300);}
+    },420);
+    setTimeout(finish,30000);
+  };
+  AUTO['moles']=cb=>{
+    const before=bal;let done=false,taken=0;
+    const finish=()=>{if(done)return;done=true;clearInterval(t);setTimeout(()=>cb(bal-before),120)};
+    $('moles_go').click();
+    const want=Math.max(1,+(($('moles_steps')||{}).value)||3);
+    const t=setInterval(()=>{
+      if(!window._molesLive||!window._molesLive()){if(taken>0)finish();return}
+      const picks=[...AUTO_PICKS.moles];
+      const allHoles=[...$('mo_field').querySelectorAll('.mole-hole')];
+      const available=picks.length?picks.filter(p=>{const el=allHoles[p];return el&&!el.disabled;}):null;
+      if(picks.length>=1){
+        if(!available||!available.length){setTimeout(()=>{const c=$('moles_cash');if(c&&!c.hidden)c.click();finish();},100);return;}
+        const el=allHoles[available[taken%available.length]];
+        if(el){el.click();taken++;}else finish();
+      } else {
+        const b=$('moles_rand');if(b&&!b.disabled){b.click();taken++;}else finish();
+      }
+      if(taken>=want){setTimeout(()=>{const c=$('moles_cash');if(c&&!c.hidden)c.click();finish();},300);}
+    },420);
+    setTimeout(finish,30000);
+  };
+  // other step games: start the round, take N steps, then cash out
+  Object.keys(STEP_GAMES).filter(k=>k!=='mines'&&k!=='tower'&&k!=='moles').forEach(k=>{
     const cfg=STEP_GAMES[k];
     AUTO[k]=cb=>{
       const before=bal, want=Math.max(1,+($(k+'_steps')||{}).value||3);
@@ -4050,35 +4120,8 @@ let casesIdle;
       if($(k+'_go')&&!$(k+'_go').hidden)$(k+'_go').click();
       const t=setInterval(()=>{
         const cash=$(cfg.cash);
-        if($(k+'_go')&&!$(k+'_go').hidden&&taken>0){finish();return}   // round already ended (lost)
+        if($(k+'_go')&&!$(k+'_go').hidden&&taken>0){finish();return}
         if(taken>=want){ if(cash&&!cash.hidden){cash.click();finish()} else finish(); return }
-        if(k==='mines'){
-          const picks=[...AUTO_PICKS.mines];
-          if(!picks.length){ const b=$('mines_rand'); if(b&&!b.disabled){b.click();taken++} else finish(); return }
-          const allTiles=[...$('m_grid').querySelectorAll('.tile')];
-          const available=picks.filter(p=>{ const el=allTiles[p]; return el&&!el.disabled&&!el.classList.contains('gem')&&!el.classList.contains('bomb'); });
-          if(!available.length){finish();return}
-          const el=allTiles[available[taken%available.length]];
-          if(el){el.click();taken++} else finish();
-          return;
-        }
-        if(k==='tower'){
-          const row=document.querySelector('#t_grid .trow.live');
-          if(row){const tiles=row.querySelectorAll('.ttile');
-            const idx=Math.min(AUTO_PICKS.tower,tiles.length-1);
-            tiles[idx].click();taken++} else finish();
-          return;
-        }
-        if(k==='moles'){
-          const picks=[...AUTO_PICKS.moles];
-          if(!picks.length){ const b=$('moles_rand'); if(b&&!b.disabled){b.click();taken++} else finish(); return }
-          const allHoles=[...$('mo_field').querySelectorAll('.mole-hole')];
-          const available=picks.filter(p=>{ const el=allHoles[p]; return el&&!el.disabled; });
-          if(!available.length){finish();return}
-          const el=allHoles[available[taken%available.length]];
-          if(el){el.click();taken++} else finish();
-          return;
-        }
         const s=$(cfg.step);
         if(s&&!s.disabled&&!s.hidden){s.click();taken++} else finish();
       },420);
@@ -4651,11 +4694,22 @@ function bugReport(){
     bet=b;hits=0;live=true;busy=false;moles=+$('moles_n').value;
     deal();build();ui();
   };
+  window._molesLive=()=>live&&!busy;
+  window._molesPickMode=()=>{
+    const f=$('mo_field');f.innerHTML='';
+    for(let i=0;i<HOLES;i++){
+      const b=document.createElement('button');b.className='mole-hole';
+      b.innerHTML='<span>'+(AUTO_PICKS.moles.has(i)?'🐭':'')+'</span>';
+      if(AUTO_PICKS.moles.has(i))b.classList.add('up');
+      b.onclick=()=>{
+        if(AUTO_PICKS.moles.has(i)){AUTO_PICKS.moles.delete(i);b.classList.remove('up');b.querySelector('span').textContent='';}
+        else{AUTO_PICKS.moles.add(i);b.classList.add('up');b.querySelector('span').textContent='🐭';}
+      };
+      f.appendChild(b);
+    }
+  };
   build();ui();
 })();
-
-
-
 
 
 
