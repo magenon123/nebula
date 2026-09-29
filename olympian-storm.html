@@ -694,26 +694,28 @@ const OLY=(function(){
   }
 
   async function buyScatterDrop(b){
-    const cells=Array.from($('grid').children);
-    const indices=[];
-    while(indices.length<4){const i=Math.floor(rnd()*cells.length);if(!indices.includes(i))indices.push(i);}
     const hasSuperScat=rnd()<0.04;
-    const superCellIdx=hasSuperScat?indices[Math.floor(rnd()*4)]:-1;
-    for(let i=0;i<indices.length;i++){
-      const el=cells[indices[i]];
-      const isS=(indices[i]===superCellIdx);
-      el.innerHTML=isS?SVG['Z']:SVG['S'];
-      el.classList.remove('new');void el.offsetWidth;
-      el.classList.add('new','hit');el.style.animationDuration='400ms';el.style.animationDelay='0ms';
-      await sleep(fast()?70:340);
-    }
-    await sleep(fast()?120:550);
+    // build a grid: regular symbols everywhere + exactly 4 scatters at random positions
+    const g=OLY.spin(rnd,'base').steps[0].grid;
+    // strip any scatters/orbs that landed naturally
+    for(let c=0;c<C;c++)for(let r=0;r<R;r++){if(g[c][r]==='S'||g[c][r]==='Z'||typeof g[c][r]==='object')g[c][r]='blue';}
+    // pick 4 random positions
+    const allPos=[];for(let c=0;c<C;c++)for(let r=0;r<R;r++)allPos.push([c,r]);
+    for(let i=allPos.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[allPos[i],allPos[j]]=[allPos[j],allPos[i]];}
+    const scatPos=allPos.slice(0,4);
+    const superIdx=hasSuperScat?Math.floor(rnd()*4):-1;
+    for(let i=0;i<scatPos.length;i++){const[sc,sr]=scatPos[i];g[sc][sr]=(i===superIdx)?'Z':'S';}
+    // full board drop animation
+    await sleep(render(g,null)+(fast()?0:200));
+    // highlight scatters
+    for(const[sc,sr]of scatPos)at(sc,sr).classList.add('hit');
+    await sleep(fast()?200:700);
     if(hasSuperScat){
-      const sEl=cells[superCellIdx];
+      const[sc,sr]=scatPos[superIdx];const sEl=at(sc,sr);
       sEl.classList.add('glow');bolt(pos(sEl));
-      await sleep(fast()?180:550);
+      await sleep(fast()?180:600);
       credit(100*b);setWin(100*b);msg(`SUPER SCATTER! +${money(100*b)}`);
-      await sleep(fast()?250:700);
+      await sleep(fast()?250:800);
       return 100*b;
     }
     return 0;
