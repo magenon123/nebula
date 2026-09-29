@@ -3659,6 +3659,7 @@ document.addEventListener('click',e=>{
 
 /* ---------- Auto mode ---------- */
 const AUTO={};
+const AUTO_PICKS={mines:new Set(),tower:0,moles:new Set()};
 (function(){
   document.querySelectorAll('.pane').forEach(pane=>{
     const key=pane.dataset.p, mode=pane.querySelector('.mode');
@@ -3666,10 +3667,30 @@ const AUTO={};
     const box=document.createElement('div');
     box.className='auto-box'; box.hidden=true; box.dataset.auto=key;
     const sg=STEP_GAMES[key];
+    const pickGame=key==='mines'||key==='tower'||key==='moles';
+    // Build step/pick selector HTML
+    let pickHtml='';
+    if(key==='mines'){
+      pickHtml=`<div><div class="lbl"><span>Select tiles to click each bet <span style="color:var(--muted);font-weight:400">(none = random)</span></span></div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:6px" id="mines_pick_grid">
+          ${Array.from({length:25},(_,i)=>`<button data-tile="${i}" style="padding:8px 0;background:var(--panel2);border:2px solid transparent;color:var(--text);border-radius:7px;cursor:pointer;font-size:13px">${i+1}</button>`).join('')}
+        </div></div>`;
+    } else if(key==='tower'){
+      pickHtml=`<div><div class="lbl"><span>Column to pick each row <span style="color:var(--muted);font-weight:400">(auto-clamps to difficulty)</span></span></div>
+        <div style="display:flex;gap:7px;margin-top:6px" id="tower_pick_col">
+          ${['1st','2nd','3rd','4th'].map((l,i)=>`<button data-col="${i}" style="flex:1;padding:10px 0;background:var(--panel2);border:2px solid transparent;color:var(--text);border-radius:7px;cursor:pointer;font-size:13px">${l}</button>`).join('')}
+        </div></div>`;
+    } else if(key==='moles'){
+      pickHtml=`<div><div class="lbl"><span>Hole to click each pick <span style="color:var(--muted);font-weight:400">(none = random)</span></span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px" id="moles_pick_grid">
+          ${Array.from({length:7},(_,i)=>`<button data-hole="${i}" style="flex:1;min-width:34px;padding:10px 0;background:var(--panel2);border:2px solid transparent;color:var(--text);border-radius:7px;cursor:pointer;font-size:13px">${i+1}</button>`).join('')}
+        </div></div>`;
+    } else if(sg){
+      pickHtml=`<div><div class="lbl"><span>${key==='chicken'?'Lanes to cross':key==='pump'?'Pumps per round':'Rounds before cashout'} each bet</span></div>
+        <div class="inwrap"><input type="number" id="${key}_steps" value="3" min="1" max="${sg.max}"></div></div>`;
+    }
     box.innerHTML=`
-      ${sg?`<div><div class="lbl"><span>${key==='mines'?'Tiles to pick':key==='tower'?'Rows to climb':
-        key==='chicken'?'Lanes to cross':key==='pump'?'Pumps per round':'Rounds before cashout'} each bet</span></div>
-        <div class="inwrap"><input type="number" id="${key}_steps" value="3" min="1" max="${sg.max}"></div></div>`:''}
+      ${pickHtml}
       <div><div class="lbl"><span>Number of Bets</span></div>
         <div class="inwrap"><input type="number" id="${key}_rounds" value="10" min="0"><span class="sfx">0 = \u221E</span></div></div>
       <div><div class="lbl"><span>On Win</span></div>
@@ -3684,6 +3705,28 @@ const AUTO={};
         <div class="inwrap"><input type="number" id="${key}_sl" value="0" min="0"><span class="sfx">$</span></div></div>
       <button class="go alt" data-start="${key}">Start Autobet</button>`;
     pane.appendChild(box);
+    // Wire pick grids
+    if(key==='mines'){
+      box.querySelectorAll('#mines_pick_grid button').forEach(b=>b.onclick=()=>{
+        const t=+b.dataset.tile;
+        if(AUTO_PICKS.mines.has(t)){AUTO_PICKS.mines.delete(t);b.style.borderColor='transparent';b.style.color='var(--text)'}
+        else{AUTO_PICKS.mines.add(t);b.style.borderColor='var(--green)';b.style.color='var(--green)'}
+      });
+    } else if(key==='tower'){
+      box.querySelectorAll('#tower_pick_col button').forEach(b=>{
+        b.onclick=()=>{
+          box.querySelectorAll('#tower_pick_col button').forEach(x=>{x.style.borderColor='transparent';x.style.color='var(--text)'});
+          AUTO_PICKS.tower=+b.dataset.col;b.style.borderColor='var(--green)';b.style.color='var(--green)';
+        };
+        if(+b.dataset.col===0){b.style.borderColor='var(--green)';b.style.color='var(--green)'}
+      });
+    } else if(key==='moles'){
+      box.querySelectorAll('#moles_pick_grid button').forEach(b=>b.onclick=()=>{
+        const h=+b.dataset.hole;
+        if(AUTO_PICKS.moles.has(h)){AUTO_PICKS.moles.delete(h);b.style.borderColor='transparent';b.style.color='var(--text)'}
+        else{AUTO_PICKS.moles.add(h);b.style.borderColor='var(--green)';b.style.color='var(--green)'}
+      });
+    }
     box.querySelectorAll('.seg2').forEach(s=>s.querySelectorAll('button').forEach(b=>b.onclick=()=>{
       s.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}));
     box.querySelector('[data-start]').onclick=()=>toggleAuto(key,box);
@@ -4009,11 +4052,31 @@ let casesIdle;
         const cash=$(cfg.cash);
         if($(k+'_go')&&!$(k+'_go').hidden&&taken>0){finish();return}   // round already ended (lost)
         if(taken>=want){ if(cash&&!cash.hidden){cash.click();finish()} else finish(); return }
-        if(k==='mines'){ const b=$('mines_rand'); if(b&&!b.disabled){b.click();taken++} else finish(); return }
+        if(k==='mines'){
+          const picks=[...AUTO_PICKS.mines];
+          if(!picks.length){ const b=$('mines_rand'); if(b&&!b.disabled){b.click();taken++} else finish(); return }
+          const allTiles=[...$('m_grid').querySelectorAll('.tile')];
+          const available=picks.filter(p=>{ const el=allTiles[p]; return el&&!el.disabled&&!el.classList.contains('gem')&&!el.classList.contains('bomb'); });
+          if(!available.length){finish();return}
+          const el=allTiles[available[taken%available.length]];
+          if(el){el.click();taken++} else finish();
+          return;
+        }
         if(k==='tower'){
           const row=document.querySelector('#t_grid .trow.live');
           if(row){const tiles=row.querySelectorAll('.ttile');
-            tiles[Math.floor(Math.random()*tiles.length)].click();taken++} else finish();
+            const idx=Math.min(AUTO_PICKS.tower,tiles.length-1);
+            tiles[idx].click();taken++} else finish();
+          return;
+        }
+        if(k==='moles'){
+          const picks=[...AUTO_PICKS.moles];
+          if(!picks.length){ const b=$('moles_rand'); if(b&&!b.disabled){b.click();taken++} else finish(); return }
+          const allHoles=[...$('mo_field').querySelectorAll('.mole-hole')];
+          const available=picks.filter(p=>{ const el=allHoles[p]; return el&&!el.disabled; });
+          if(!available.length){finish();return}
+          const el=allHoles[available[taken%available.length]];
+          if(el){el.click();taken++} else finish();
           return;
         }
         const s=$(cfg.step);
