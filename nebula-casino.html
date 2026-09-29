@@ -895,7 +895,7 @@ select{
   .stage{min-height:380px}
   .content{padding:12px}
 }
-@media(max-width:700px){
+@media(max-width:480px){
   .sidebar{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);transition:transform .2s}
   .sidebar.open{transform:none}
   .scrim.on{display:block;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:55}
@@ -1146,7 +1146,7 @@ select{
 <header>
   <!-- Left: hamburger + logo -->
   <div class="hd-left">
-    <button class="hd-icon-btn" id="burger" onclick="document.getElementById('sidebar').classList.toggle('open')">
+    <button class="hd-icon-btn" id="burger">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill="currentColor" d="M15.83 3.33H4.17a.83.83 0 0 0-.84.84v1.66c0 .46.38.84.84.84h11.66c.46 0 .84-.38.84-.84V4.17a.83.83 0 0 0-.84-.84m.13 5H4.04a.7.7 0 0 0-.7.71v1.92c0 .39.31.7.7.7h11.92a.7.7 0 0 0 .7-.7V9.04a.7.7 0 0 0-.7-.7m-.13 4.99H4.17a.83.83 0 0 0-.84.84v1.66c0 .46.38.84.84.84h11.66c.46 0 .84-.38.84-.84v-1.66a.83.83 0 0 0-.84-.84"/></svg>
     </button>
     <button class="hd-logo-btn" onclick="go('home')" aria-label="Home">
@@ -5112,7 +5112,10 @@ const RB=(()=>{
   const K='nebulaRake';
   const load=()=>{try{return JSON.parse(localStorage.getItem(K))||{}}catch(_){return {}}};
   const save=o=>{try{localStorage.setItem(K,JSON.stringify(o))}catch(_){}};
-  const who=()=>(typeof AUTH!=='undefined'&&AUTH.current())||'guest';
+  const who=()=>{
+    if(typeof API!=='undefined'&&API.user&&API.user.username)return'remote:'+API.user.username;
+    return(typeof AUTH!=='undefined'&&AUTH.current())||'guest';
+  };
   function mine(){
     const all=load(), k=who();
     return all[k]||(all[k]={wagered:0,avail:0,claimed:0});
