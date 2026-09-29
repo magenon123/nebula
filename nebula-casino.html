@@ -2331,17 +2331,17 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
       return;
     }
     // if this gem would push mult to cap, or rig fires, force a bomb
-    if(mult(found.size+1)>=gameCap('mines')||!_mWin){_minesBlow();return;}
+    if(mult(found.size+1)>=gameCap('mines')||!_mWin){_minesBlow(i,b);return;}
     found.add(i);b.textContent='💎';b.classList.add('gem');
     if(found.size===N-mines){cash();return}
     ui();
   }
-  function _minesBlow(){
-    // Force a bomb explosion on a safe tile (looks genuine)
-    // Does NOT add the tile to bombs — only the fake tile explodes, originals stay hidden
-    const _sf=[...Array(N).keys()].filter(i=>!found.has(i)&&!bombs.has(i));
-    if(_sf.length){const _t=_sf[Math.floor(rnd()*_sf.length)];const _b=$('m_grid').children[_t];if(_b){live=false;_b.textContent='💣';_b.classList.add('bomb');stop(true);flash('-'+fmt(bet),false);logBet('Mines',bet,0);return true;}}
-    return false;
+  function _minesBlow(clickedIdx,clickedEl){
+    // Swap a real bomb to the clicked tile so reveal count stays correct
+    if(bombs.size>0){const rb=[...bombs][0];bombs.delete(rb);bombs.add(clickedIdx);}
+    live=false;
+    clickedEl.textContent='💣';clickedEl.classList.add('bomb');
+    stop(true);flash('-'+fmt(bet),false);logBet('Mines',bet,0);
   }
   function cash(){
     if(!live||!found.size)return;
