@@ -756,8 +756,9 @@ const OLY=(function(){
       if(res.capped)await overlay(`<div class="bigwin"><div class="bw gold">MAX WIN</div><div class="bv">${money(win)}</div></div>`,{autoMs:3000});
       else await bigWin(win,b);
     }
-    if(win>0)credit(win);
-    setWin(win); msg(win>0?'':'PLACE YOUR BETS!');
+    const overLimit=b>300||(buy&&cost>2500);
+    if(win>0&&!overLimit)credit(win);
+    setWin(overLimit?0:win); msg((!overLimit&&win>0)?'':'PLACE YOUR BETS!');
     logBet(GAME,cost,win/cost);
     busy=false; skip=false; sync(); idle(true);
     if(auto)setTimeout(()=>{ if(auto&&!busy)play(null) },fast()?250:700);

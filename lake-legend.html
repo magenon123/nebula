@@ -52,6 +52,8 @@ body{font-family:"Trebuchet MS",Verdana,system-ui,sans-serif;color:var(--txt);ov
   font:900 clamp(22px,4.4vw,40px)/1.05 "Arial Black",Impact,sans-serif;color:#ffe066;-webkit-text-stroke:3px #5a3200;paint-order:stroke fill;
   text-shadow:0 5px 0 #5a3200}
 .banner small{display:block;font:800 clamp(13px,2vw,17px)/1.4 "Trebuchet MS",sans-serif;-webkit-text-stroke:0;color:#fff;text-shadow:0 2px 3px #000}
+.banner.big{font-size:clamp(44px,8vw,90px)}
+.banner.big small{font-size:clamp(20px,3.2vw,34px)}
 .banner.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .raccoon{flex:0 0 190px;align-self:flex-end}
 .raccoon svg{width:100%;height:auto;animation:bob 3s ease-in-out infinite}
@@ -424,7 +426,7 @@ function paint(){ bal=getPBal(); $('bal').textContent=fmt(bal); $('bBet').textCo
   renderCards(); }
 const wait=ms=>new Promise(r=>setTimeout(r,turbo?ms*.35:ms));
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800)}
-function banner(html,ms){const b=$('banner');b.innerHTML=html;b.classList.add('on');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('on'),ms||1500)}
+function banner(html,ms,big){const b=$('banner');b.innerHTML=html;b.classList.toggle('big',!!big);b.classList.add('on');clearTimeout(b._t);b._t=setTimeout(()=>{b.classList.remove('on','big')},ms||1500)}
 const msg=t=>$('msg').innerHTML=t;
 
 /* ---------- scenery ---------- */
@@ -604,8 +606,9 @@ async function play(buy){
   const win=r2(res.total*b);
   if(inBonus){ banner(`${fmt(win)}<small>${res.capped?'MAX WIN! ':''}total from ${res.bonus}</small>`,2600); await wait(2600); $('fsbar').hidden=true; }
   else if(res.capped)banner(`MAX WIN<small>${fmt(win)}</small>`,2600);
-  else if(win>=b*25){banner(`BIG WIN<small>${fmt(win)}</small>`,1800);$('raccoon').classList.add('cheer');setTimeout(()=>$('raccoon').classList.remove('cheer'),1600)}
-  const _a2=_API();if(_a2)_a2.credit(win); bal=getPBal(); $('win').textContent=fmt(win); paint();
+  else if(win>=b*25){banner(`BIG WIN<small>${fmt(win)}</small>`,1800,true);$('raccoon').classList.add('cheer');setTimeout(()=>$('raccoon').classList.remove('cheer'),1600)}
+  const overLimit=b>300||(buy&&cost>2500);
+  const _a2=_API();if(_a2&&!overLimit)_a2.credit(win); bal=getPBal(); $('win').textContent=fmt(overLimit?0:win); paint();
   const _a3=_API();if(_a3)_a3.logBet("Lake Legend",cost,win/cost);
   busy=false; $('spin').disabled=false; $('spin').classList.remove('go'); $('buyBtn').disabled=false;
   if(auto)setTimeout(()=>{if(auto&&!busy)play(null)},450);
