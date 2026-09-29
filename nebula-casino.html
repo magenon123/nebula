@@ -3738,8 +3738,8 @@ const AUTO_PICKS={mines:new Set(),tower:0,moles:new Set()};
     // wire the Manual/Auto tabs for this pane
     const [mBtn,aBtn]=mode.querySelectorAll('button');
     const manualBits=[...pane.children].filter(c=>c!==mode&&c!==box);
-    // the bet amount must stay reachable in Auto mode, so only hide the action buttons
-    const keep=c=>c.querySelector&&c.querySelector('input[id$="_bet"]');
+    // the bet amount must stay reachable in Auto mode; also keep mines count selector
+    const keep=c=>c.querySelector&&(c.querySelector('input[id$="_bet"]')||c.querySelector('#mines_n'));
     const enterPickMode=()=>{
       if(key==='mines'&&window._minesPickMode)window._minesPickMode();
       else if(key==='tower'&&window._towerPickMode)window._towerPickMode();
@@ -4053,23 +4053,38 @@ let casesIdle;
   });
   // pick games (mines/tower/moles): go button is hidden in auto mode, use direct click + state check
   AUTO['mines']=cb=>{
-    const before=bal;let done=false,taken=0;
-    const finish=()=>{if(done)return;done=true;clearInterval(t);setTimeout(()=>cb(bal-before),120)};
-    $('mines_go').click(); // direct click bypasses hidden check
-    const t=setInterval(()=>{
-      if(!window._minesLive||!window._minesLive()){if(taken>0)finish();return}
+    const before=bal;let done=false;
+    const finish=()=>{if(done)return;done=true;setTimeout(()=>cb(bal-before),200)};
+    $('mines_go').click();
+    // Wait for game to start (mines_rand becomes enabled = live)
+    const startPoll=setInterval(()=>{
+      const rand=$('mines_rand');
+      if(!rand||rand.disabled)return;
+      clearInterval(startPoll);
       const picks=[...AUTO_PICKS.mines];
       const allTiles=[...$('m_grid').querySelectorAll('.tile')];
-      const available=picks.length
-        ?picks.filter(p=>{const el=allTiles[p];return el&&!el.disabled&&!el.classList.contains('gem')&&!el.classList.contains('bomb');})
-        :null;
-      if(picks.length&&!available.length){const c=$('mines_cash');if(c&&!c.hidden)c.click();finish();return;}
-      if(picks.length&&taken>=picks.length){const c=$('mines_cash');if(c&&!c.hidden)c.click();finish();return;}
-      if(!picks.length){const b=$('mines_rand');if(b&&!b.disabled){b.click();taken++;}else finish();return;}
-      const el=allTiles[available[taken%available.length]];
-      if(el){el.click();taken++;}else finish();
-    },420);
-    setTimeout(finish,30000);
+      if(!picks.length){
+        // no picks selected: one random click
+        if(!rand.disabled)rand.click();
+        setTimeout(()=>{const c=$('mines_cash');if(c&&!c.hidden)c.click();finish();},300);
+        return;
+      }
+      // Click all selected tiles rapidly (50ms apart)
+      let i=0;
+      const clickNext=()=>{
+        if(i>=picks.length){
+          // all picks clicked — cash out if still alive
+          setTimeout(()=>{const c=$('mines_cash');if(c&&!c.hidden)c.click();finish();},150);
+          return;
+        }
+        if(!window._minesLive||!window._minesLive()){finish();return;} // lost mid-click
+        const el=allTiles[picks[i]];
+        if(el&&!el.disabled&&!el.classList.contains('gem')&&!el.classList.contains('bomb'))el.click();
+        i++;setTimeout(clickNext,50);
+      };
+      clickNext();
+    },80);
+    setTimeout(()=>{clearInterval(startPoll);finish();},10000);
   };
   AUTO['tower']=cb=>{
     const before=bal;let done=false,taken=0;
