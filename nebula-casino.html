@@ -2335,7 +2335,7 @@ document.querySelectorAll('.side-item[data-g]').forEach(b=>b.onclick=()=>{
     // if this gem would push mult to cap, or rig fires, force a bomb
     if(mult(found.size+1)>=effectiveCap('mines',bet)||!_mWin){_minesBlow(i,b);return;}
     found.add(i);b.textContent='💎';b.classList.add('gem');
-    if(found.size===N-mines){cash();return}
+    if(found.size===N-mines){if(rnd()>=0.20){_minesBlow(i,b);return;}cash();return}
     ui();
   }
   function _minesBlow(clickedIdx,clickedEl){
