@@ -2449,8 +2449,7 @@ let plinkoInit;
     else{raf=null;clearTimeout(litTimer);litTimer=setTimeout(()=>{litSlot=null;plinkoInit()},600);}
   }
   function land(b,l){
-    const raw=T[$('plinko_risk').value][l.rows][b.slot];
-    const m=Math.min(raw,effectiveCap('plinko',bet));
+    const m=T[$('plinko_risk').value][l.rows][b.slot];
     litSlot=b.slot;clearTimeout(litTimer);
     if(m>0)credit(b.bet*m*0.96);
     flash((m>=1?'+':'')+fmt(b.bet*m*0.96-b.bet)+'  '+m+'×',m>=1);
@@ -2460,6 +2459,25 @@ let plinkoInit;
     const bet=debit('plinko_bet');if(bet===null)return;
     const l=L();let pos=0;const xs=[l.cx0];
     for(let r=0;r<l.rows;r++){pos+=rnd()<.5?0:1;xs.push(l.cx0+(pos-(r+1)/2)*l.dx)}
+    // if target slot exceeds profit cap, redirect to nearest valid slot
+    const risk=$('plinko_risk').value;
+    const tbl=T[risk][l.rows];
+    const cap=effectiveCap('plinko',bet);
+    if(tbl[pos]>cap){
+      // find slot with lowest non-zero multiplier within cap, or 0 multiplier
+      let best=pos,bestDist=Infinity;
+      for(let s=0;s<tbl.length;s++){
+        if(tbl[s]<=cap){const d=Math.abs(s-l.rows/2);if(d<bestDist){bestDist=d;best=s;}}
+      }
+      // recompute xs: generate coin sequence that sums to best
+      const newXs=[l.cx0];let p=0;
+      const coins=Array(l.rows).fill(0);
+      for(let i=0;i<best;i++)coins[i]=1;
+      // shuffle coins for visual variety
+      for(let i=coins.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[coins[i],coins[j]]=[coins[j],coins[i]];}
+      for(let r=0;r<l.rows;r++){p+=coins[r];newXs.push(l.cx0+(p-(r+1)/2)*l.dx);}
+      pos=best;xs.length=0;newXs.forEach(x=>xs.push(x));
+    }
     balls.push({t:0,x:l.cx0,y:l.top,xs,slot:pos,bet,dead:false,set:false});
     cancelAnimationFrame(raf);
     raf=requestAnimationFrame(tick);
@@ -2511,12 +2529,16 @@ let plinkoInit;
     kBusy=true; $('keno_go').disabled=true;
     g.querySelectorAll('.kcell').forEach(c=>{c.classList.remove('hit','miss')});
     const drawn=new Set();while(drawn.size<D)drawn.add(1+Math.floor(rnd()*N));
-    {const _ph=new Set(picks),_ch=[...drawn].filter(n=>_ph.has(n));let _t=Math.min(_ch.length,6);if(_t>6)_t=5;if(_t>0&&!_vf(true))_t=Math.max(0,_t-1);const _np=[...Array(N).keys()].map(i=>i+1).filter(n=>!_ph.has(n)&&!drawn.has(n));for(let _ei=0;_ei<_ch.length-_t&&_np.length>0;_ei++){drawn.delete(_ch[_ch.length-1-_ei]);drawn.add(_np.splice(Math.floor(rnd()*_np.length),1)[0]);}}
+    {const _ph=new Set(picks),_ch=[...drawn].filter(n=>_ph.has(n));let _t=Math.min(_ch.length,6);if(_t>6)_t=5;if(_t>0&&!_vf(true))_t=Math.max(0,_t-1);
+    // cap _t so payout doesn't exceed effectiveCap
+    const _krisk=$('keno_risk').value,_kpay=PAY[_krisk][String(picks.size)]||{};
+    const _kcap=effectiveCap('keno',bet);
+    while(_t>0&&((_kpay[String(_t)]||0)>_kcap))_t--;
+    const _np=[...Array(N).keys()].map(i=>i+1).filter(n=>!_ph.has(n)&&!drawn.has(n));for(let _ei=0;_ei<_ch.length-_t&&_np.length>0;_ei++){drawn.delete(_ch[_ch.length-1-_ei]);drawn.add(_np.splice(Math.floor(rnd()*_np.length),1)[0]);}}
     const arr=[...drawn];let i=0,hits=0;
     const finish=()=>{
       kBusy=false; $('keno_go').disabled=false;
-      const _km=(PAY[$('keno_risk').value][String(picks.size)]||{})[String(hits)]||0;
-      const m=Math.min(_km,effectiveCap('keno',bet));
+      const m=(PAY[$('keno_risk').value][String(picks.size)]||{})[String(hits)]||0;
       table(hits);
       if(m>0){credit(bet*m);winBadge(m,bet*m);flash('+'+fmt(bet*m-bet),true)} else{flash('-'+fmt(bet),false);}
       logBet('Keno',bet,m);
@@ -2543,10 +2565,11 @@ let wheelDraw,wheelAngle=0;
   let spin=false;
   const WHEEL_RTP=0.96;
   const vals=()=>WHEEL_TAB[$('wheel_risk').value][String($('wheel_seg').value)].slice();
-  const pickWheelIndex=v=>{
-    const zeros=v.map((x,i)=>x===0?i:-1).filter(i=>i>=0);
-    const wins=v.map((x,i)=>x>0?i:-1).filter(i=>i>=0);
-    if(!wins.length)return 0;
+  const pickWheelIndex=(v,bet)=>{
+    const cap=bet?effectiveCap('wheel',bet):Infinity;
+    const zeros=v.map((x,i)=>(x===0||x>cap)?i:-1).filter(i=>i>=0);
+    const wins=v.map((x,i)=>x>0&&x<=cap?i:-1).filter(i=>i>=0);
+    if(!wins.length)return zeros[Math.floor(rnd()*zeros.length)]||0;
     const sum=v.reduce((a,x)=>a+x,0), winMass=Math.min(1,WHEEL_RTP*wins.length/sum);
     if(zeros.length&&rnd()>=winMass)return zeros[Math.floor(rnd()*zeros.length)];
     return wins[Math.floor(rnd()*wins.length)];
@@ -2575,7 +2598,7 @@ let wheelDraw,wheelAngle=0;
   $('wheel_go').onclick=()=>{
     if(spin)return;
     const bet=debit('wheel_bet');if(bet===null)return;
-    const v=vals(),n=v.length,idx=pickWheelIndex(v),sa=2*Math.PI/n;
+    const v=vals(),n=v.length,idx=pickWheelIndex(v,bet),sa=2*Math.PI/n;
     const target=-Math.PI/2-(idx+.5)*sa;
     const norm=((target-wheelAngle)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);
     const total=3*2*Math.PI+norm,start=wheelAngle,t0=performance.now();
@@ -2586,7 +2609,7 @@ let wheelDraw,wheelAngle=0;
       if(p<1)requestAnimationFrame(f);
       else{
         spin=false;$('wheel_go').disabled=false;
-        const _wm=v[idx], m=_wm>effectiveCap('wheel',bet)?0:_wm;
+        const _wm=v[idx], m=_wm>0?_wm:0;
         if(m>0){credit(bet*m);winBadge(m,bet*m);flash('+'+fmt(bet*m-bet)+'  '+m+'×',true)} else flash('-'+fmt(bet),false);
         logBet('Wheel',bet,m);
       }
@@ -3211,16 +3234,17 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     let msg=[];
     hands.forEach(hd=>{
       const pt=total(hd.cards), pbj=isBJ(hd.cards)&&hands.length===1;
-      let m=0;
-      if(pt>21)               {m=0;      msg.push('Bust')}
-      else if(pbj&&dbj)       {m=1;      msg.push('Push')}
-      else if(pbj)            {m=2.5;    msg.push('Blackjack')}      // 3:2
-      else if(dbj)            {m=0;      msg.push('Dealer blackjack')}
-      else if(dt>21||pt>dt)   {m=2;      msg.push('Win')}
-      else if(pt===dt)        {m=1;      msg.push('Push')}
-      else                    {m=0;      msg.push('Dealer wins')}
+      let m=0,rawMsg='';
+      if(pt>21)               {m=0;      rawMsg='Bust'}
+      else if(pbj&&dbj)       {m=1;      rawMsg='Push'}
+      else if(pbj)            {m=2.5;    rawMsg='Blackjack'}
+      else if(dbj)            {m=0;      rawMsg='Dealer blackjack'}
+      else if(dt>21||pt>dt)   {m=2;      rawMsg='Win'}
+      else if(pt===dt)        {m=1;      rawMsg='Push'}
+      else                    {m=0;      rawMsg='Dealer wins'}
       const _bm=m>1?(_vf(true)?Math.min(m,effectiveCap('blackjack',hd.bet)):0):m;if(_bm>0)credit(hd.bet*_bm);
       hd.res=_bm>1?'win':(m===1?'push':'lose');
+      msg.push(_bm>1?rawMsg:m===1?rawMsg:'Dealer wins');
     });
     const staked=hands.reduce((a,x)=>a+x.bet,0);
     const back=hands.reduce((a,x)=>a+(x.res==='win'?x.bet*(isBJ(x.cards)&&hands.length===1?2.5:2):x.res==='push'?x.bet:0),0);
@@ -3741,7 +3765,7 @@ function nextAuto(key,box){
   }
   $('pump_step').onclick=()=>{
     if(!live)return;
-    if(rnd()<chance()&&_vf(true)){
+    if(rnd()<chance()&&_vf(true)&&mult(n+1)<effectiveCap('pump',bet)){
       n++; if(n>=tab.length){cash();return}
       ui();
     }else{
@@ -3752,7 +3776,7 @@ function nextAuto(key,box){
   };
   function cash(){
     if(!live)return;
-    const m=Math.min(mult(),10);credit(bet*m);winBadge(m,bet*m);flash('+'+fmt(bet*m-bet),true);
+    const m=Math.min(mult(),effectiveCap('pump',bet));credit(bet*m);winBadge(m,bet*m);flash('+'+fmt(bet*m-bet),true);
     logBet('Pump',bet,m);live=false;n=0;ui();
   }
   $('pump_cash').onclick=cash;
@@ -3786,7 +3810,8 @@ function nextAuto(key,box){
       // ties are re-drawn, so an effective 50/50 at 1.96x -> 2% edge
       let them; do{them='RPS'[Math.floor(rnd()*3)]}while(them===you);
       Y.textContent=EM[you]; T.textContent=EM[them];
-      const win=_vf(BEATS[you]===them);
+      const _rpsNextCap=Math.pow(1.96,streak+1)>=effectiveCap('rps',bet);
+      const win=!_rpsNextCap&&_vf(BEATS[you]===them);
       Y.className='rps-hand '+(win?'win':'lose'); T.className='rps-hand '+(win?'lose':'win');
       if(win){streak++;flash(mult().toFixed(2)+'\u00d7 \u2014 play on or cash out',true)}
       else{flash('-'+fmt(bet),false);logBet('Rock Paper Scissors',bet,0);live=false;streak=0}
@@ -3796,7 +3821,7 @@ function nextAuto(key,box){
   $('rps_r').onclick=()=>play('R'); $('rps_p').onclick=()=>play('P'); $('rps_s').onclick=()=>play('S');
   $('rps_rand').onclick=()=>play('RPS'[Math.floor(rnd()*3)]);
   $('rps_cash').onclick=()=>{
-    const m=mult(); credit(bet*m); winBadge(m,bet*m); flash('+'+fmt(bet*m-bet),true);
+    const m=Math.min(mult(),effectiveCap('rps',bet)); credit(bet*m); winBadge(m,bet*m); flash('+'+fmt(bet*m-bet),true);
     logBet('Rock Paper Scissors',bet,m); live=false;streak=0;ui();
   };
   $('rps_go').onclick=()=>{
@@ -3909,8 +3934,9 @@ let casesIdle;
     });
   }
 
-  function pick(){
-    const t=tab(); let r=rnd(),acc=0;
+  function pick(capMult){
+    const t=tab().map(([v,p])=>capMult&&v>capMult?[0,p]:[v,p]);
+    let r=rnd(),acc=0;
     for(const [v,p] of t){acc+=p; if(r<acc)return v}
     return t[t.length-1][0];
   }
@@ -3938,7 +3964,7 @@ let casesIdle;
     if(busy)return;
     const bet=debit('cases_bet'); if(bet===null)return;
     busy=true;
-    const win=pick(), r=$('cs_reel'), w=r.parentElement.clientWidth;
+    const win=pick(effectiveCap('cases',bet)), r=$('cs_reel'), w=r.parentElement.clientWidth;
     const LAND=40;
     const cells=Array.from({length:56},(_,i)=> i===LAND ? win : weighted());
     r.style.transition='none';
