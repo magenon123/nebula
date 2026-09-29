@@ -693,6 +693,32 @@ const OLY=(function(){
     else if(sp.pay>0&&!sp.award) msg('');
   }
 
+  async function buyScatterDrop(b){
+    const cells=Array.from($('grid').children);
+    const indices=[];
+    while(indices.length<4){const i=Math.floor(rnd()*cells.length);if(!indices.includes(i))indices.push(i);}
+    const hasSuperScat=rnd()<0.04;
+    const superCellIdx=hasSuperScat?indices[Math.floor(rnd()*4)]:-1;
+    for(let i=0;i<indices.length;i++){
+      const el=cells[indices[i]];
+      const isS=(indices[i]===superCellIdx);
+      el.innerHTML=isS?SVG['Z']:SVG['S'];
+      el.classList.remove('new');void el.offsetWidth;
+      el.classList.add('new','hit');el.style.animationDuration='400ms';el.style.animationDelay='0ms';
+      await sleep(fast()?70:340);
+    }
+    await sleep(fast()?120:550);
+    if(hasSuperScat){
+      const sEl=cells[superCellIdx];
+      sEl.classList.add('glow');bolt(pos(sEl));
+      await sleep(fast()?180:550);
+      credit(100*b);setWin(100*b);msg(`SUPER SCATTER! +${money(100*b)}`);
+      await sleep(fast()?250:700);
+      return 100*b;
+    }
+    return 0;
+  }
+
   async function play(buy){
     if(busy||!$('ov').hidden)return;
     const b=bet();
@@ -705,8 +731,12 @@ const OLY=(function(){
     const res=OLY.play(rnd,{ante:!buy&&anteOn,buy});
     let paid=0, fsCount=0;
     if(buy){
+      const superBonus=await buyScatterDrop(b);
       mode(true); setCoin(0); $('fsLeft').textContent=15;
-      await congrats('',15,buy==='super'?'SUPER FREE SPINS':'FREE SPINS',buy==='super'?'EVERY MULTIPLIER IS 10x OR MORE':'');
+      const buyNote=buy==='super'?'EVERY MULTIPLIER IS 10x OR MORE':'';
+      const superNote=superBonus>0?`SUPER SCATTER! +${money(superBonus)}`:'';
+      const note=[buyNote,superNote].filter(Boolean).join(' · ');
+      await congrats('',15,buy==='super'?'SUPER FREE SPINS':'FREE SPINS',note);
     }
     for(const sp of res.spins){
       if(sp.kind!=='base'&&!inFs){ mode(true); setCoin(0); }
