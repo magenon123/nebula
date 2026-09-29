@@ -2787,19 +2787,23 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     busy=true;ui();
     const ch=dir==='hi'?hiChance(rank):loChance(rank);
     const step=HILO_RTP/ch;
-    const nr=1+Math.floor(rnd()*13), ns=randSuit();
+    let nr=1+Math.floor(rnd()*13), ns=randSuit();
     let ok;
     if(rank===1){
-      // Ace: hi = Higher (nr>1), lo = Same (nr===1)
       ok = dir==='hi' ? nr>1 : nr===1;
     }else if(rank===13){
-      // King: hi button is Same (nr===13), lo = Lower (nr<13)
       ok = dir==='hi' ? nr===13 : nr<13;
     }else{
-      // Middle: Higher-or-Same / Lower-or-Same
       ok = dir==='hi' ? nr>=rank : nr<=rank;
     }
-    if(ok&&!_vf(true))ok=false; // rig: correct guess can still lose
+    if(ok&&!_vf(true)){
+      // Pick a card that actually loses so the result makes visual sense
+      if(rank===1){nr=1;} // ace: only ace loses on hi
+      else if(rank===13){nr=dir==='hi'?1+Math.floor(rnd()*12):13;} // king
+      else if(dir==='hi'){nr=rank>1?1+Math.floor(rnd()*(rank-1)):1;} // lower than rank
+      else{nr=rank<13?rank+1+Math.floor(rnd()*(13-rank)):13;} // higher than rank
+      ok=false;
+    }
     rank=nr;suit=ns;show(true);
     setTimeout(()=>{
       if(ok){
@@ -2877,11 +2881,9 @@ const randSuit=()=>SUITS[Math.floor(rnd()*4)];
     $('tower_go').hidden=live;mark();
   }
   function _towerKill(r,b,c){
-    // Redirect click to a skull tile — looks genuine
-    const skullC=skulls[r][0];
-    const skullB=document.querySelector(`#t_grid .trow[data-r="${r}"] .ttile:nth-child(${skullC+1})`);
-    const bc=skullC,bb=skullB||b;
-    bb.textContent='💀';bb.classList.add('skull','reveal');
+    // Swap a real skull to the clicked tile so the loss looks genuine
+    if(skulls[r].length>0){const old=skulls[r][0];skulls[r]=skulls[r].map(s=>s===old?c:s);}
+    b.textContent='💀';b.classList.add('skull','reveal');
     document.querySelectorAll(`#t_grid .trow[data-r="${r}"] .ttile`).forEach((t,i)=>{
       if(!skulls[r].includes(i)&&!t.textContent)t.textContent='🥚';});
     flash('-'+fmt(bet),false);logBet('Dragon Tower',bet,0);live=false;row=0;ui();
@@ -4422,6 +4424,7 @@ function bugReport(){
         pos=(pos+d1+d2)%TILES; rolls++;
         const tile=board[pos];
         if(tile==='S'||!_vf(true)){
+          if(tile!=='S')board[pos]='S'; // swap to snake so board looks correct
           draw(false,true); flash('Bitten \u2014 -'+fmt(bet),false);
           logBet('Snakes',bet,0); live=false;busy=false;ui();
         }else{
@@ -4690,7 +4693,7 @@ function bugReport(){
             const mult=winner===side?MULT[side]:(winner==='tie'&&side!=='tie'?1:0);
         if(payout>bet)flash('+'+fmt(payout-bet)+'  '+MULT[side]+'×',true);
         else if(payout===bet)flash('Push — bet returned',true);
-        else flash(lbl+' wins',false);
+        else flash(payout===0&&rawPayout>bet?'Better luck next time':lbl+' wins',false);
         logBet('Baccarat',bet,mult);
         busy=false; $('bac_go').disabled=false;
       }
