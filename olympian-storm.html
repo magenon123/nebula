@@ -677,6 +677,10 @@ const OLY=(function(){
         setCoin(sp.mult);
       }
       await wait(1000);
+    } else if(sp.win>0&&sp.mult>1&&sp.orbSum===0){
+      // accumulated multiplier active but no new orbs this spin — show it being applied
+      tumble(`${money(line*b)} x ${sp.mult}`);
+      await wait(fast()?300:800);
     }
     setWin((paidBefore+sp.pay)*b);
     if(sp.award){
