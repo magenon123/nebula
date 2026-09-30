@@ -730,7 +730,7 @@ const OLY=(function(){
     const _a=_API();if(_a){_a.bal=_a.round2(_a.bal-cost);_a.paintBal(-1);}
     bal=getBal(); paintBal();
     busy=true; skip=false; idle(false); sync(); setWin(0); msg('GOOD LUCK!');
-    const overLimit=buy&&(b>=25||cost>=2500);
+    const overLimit=buy&&cost>=2500;
     let res;
     if(overLimit){
       let tries=0;

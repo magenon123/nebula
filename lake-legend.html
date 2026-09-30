@@ -610,7 +610,7 @@ async function play(buy){
   if(cost>bal+1e-9){toast('Not enough balance');auto=false;$('autoBtn').classList.remove('on');return}
   busy=true; $('spin').disabled=true; $('spin').classList.add('go'); $('buyBtn').disabled=true;
   const _a=_API();if(_a){_a.bal=_a.round2(_a.bal-cost);_a.paintBal(-1);}; bal=getPBal(); paint(); $('win').textContent=fmt(0);
-  const overLimit=buy&&(b>=25||cost>=2500);
+  const overLimit=buy&&cost>=2500;
   let res;
   if(overLimit){
     let tries=0;
