@@ -289,7 +289,7 @@ const LL=(function(){
           if(x.t!=='coin'&&!isB)return;
           let mm=0; clov.forEach(g=>{if(g.t==='goldc'||near(x,g))mm+=g.v});
           if(!mm)return;
-          if(isB){ x.m=(x.m>1?x.m:0)+mm; x.v=r2((x.raw||0)*x.m); }   // bucket multipliers add up and cover everything it holds
+          if(isB&&(x.raw||0)>0){ x.m=(x.m>1?x.m:0)+mm; x.v=r2((x.raw||0)*x.m); }   // bucket multipliers add up and cover everything it holds
           else x.v=r2(x.v*mm);
           tg.push({c:x.c,r:x.r,v:x.v,m:x.m});
         });
@@ -607,7 +607,7 @@ async function play(buy){
   if(inBonus){ banner(`${fmt(win)}<small>${res.capped?'MAX WIN! ':''}total from ${res.bonus}</small>`,2600); await wait(2600); $('fsbar').hidden=true; }
   else if(res.capped)banner(`MAX WIN<small>${fmt(win)}</small>`,2600);
   else if(win>=b*25){banner(`BIG WIN<small>${fmt(win)}</small>`,1800,true);$('raccoon').classList.add('cheer');setTimeout(()=>$('raccoon').classList.remove('cheer'),1600)}
-  const overLimit=b>300||(buy&&cost>2500);
+  const overLimit=b>2000||(buy&&cost>2500);
   const _a2=_API();if(_a2&&!overLimit)_a2.credit(win); bal=getPBal(); $('win').textContent=fmt(overLimit?0:win); paint();
   const _a3=_API();if(_a3)_a3.logBet("Lake Legend",cost,win/cost);
   busy=false; $('spin').disabled=false; $('spin').classList.remove('go'); $('buyBtn').disabled=false;
