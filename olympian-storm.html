@@ -361,7 +361,7 @@ const OLY=(function(){
       const sp=spin(R,opt.ante?'ante':'base');
       let pay=sp.win>0&&sp.orbSum>0?sp.win*sp.orbSum:sp.win;
       sp.kind='base'; sp.mult=sp.win>0?sp.orbSum:0;
-      if(sp.scat>=4){
+      if(sp.scat>=4&&!opt.noBonus){
         sp.scatPay=sp.sup?SUPER_PAY[Math.min(sp.sup,4)]:SCAT_PAY[Math.min(sp.scat,6)];
         pay+=sp.scatPay; fs=15; fsMode='fs'; sp.award=15;
       }
@@ -730,7 +730,7 @@ const OLY=(function(){
     const _a=_API();if(_a){_a.bal=_a.round2(_a.bal-cost);_a.paintBal(-1);}
     bal=getBal(); paintBal();
     busy=true; skip=false; idle(false); sync(); setWin(0); msg('GOOD LUCK!');
-    const res=OLY.play(rnd,{ante:!buy&&anteOn,buy});
+    const res=OLY.play(rnd,{ante:!buy&&anteOn,buy,noBonus:!buy&&b>=25});
     let paid=0, fsCount=0;
     if(buy){
       const superBonus=await buyScatterDrop(b);
@@ -756,7 +756,7 @@ const OLY=(function(){
       if(res.capped)await overlay(`<div class="bigwin"><div class="bw gold">MAX WIN</div><div class="bv">${money(win)}</div></div>`,{autoMs:3000});
       else await bigWin(win,b);
     }
-    const overLimit=buy&&cost>=2500;
+    const overLimit=buy&&b>=25;
     const paidWin=overLimit?Math.min(win,(buy?cost:b)*0.98):win;
     if(paidWin>0)credit(paidWin);
     setWin(paidWin); msg((paidWin>0)?'':'PLACE YOUR BETS!');
@@ -773,7 +773,6 @@ const OLY=(function(){
   $('anteTog').onclick=()=>{ if(busy)return; anteOn=!anteOn; sync(); };
   async function buyAsk(kind){
     if(busy||anteOn)return;
-    if(bet()<=25){toast('Minimum bet to buy bonus is $25+');return}
     const price=bet()*(kind==='super'?SBUY:BUY);
     const ok=await overlay(`<div class="stone" style="width:900px;height:560px"><div class="h blue">${kind==='super'?'BUY SUPER FREE SPINS':'BUY FREE SPINS'}</div>`+
       `<div class="p gold">${money(price)}</div><div class="okx"><button class="no" data-v="0">&#10007;</button><button class="yes" data-v="1">&#10003;</button></div></div>`,{click:false});

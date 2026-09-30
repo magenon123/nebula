@@ -379,7 +379,7 @@ const LL=(function(){
       while(mode==='trout'&&sp.win===0&&++tries<300);
       sp.kind='base';
       const pay=sp.win+(sp.act?sp.act.pay:0);
-      if(sp.scat>=3){ bonus=BONUS[Math.min(sp.scat,5)]; sp.award=bonus; }
+      if(sp.scat>=3&&!opt.noBonus){ bonus=BONUS[Math.min(sp.scat,5)]; sp.award=bonus; }
       if(add(sp,pay))return {spins,total,capped};
     }
     if(bonus){
@@ -574,7 +574,7 @@ async function play(buy){
   if(cost>bal+1e-9){toast('Not enough balance');auto=false;$('autoBtn').classList.remove('on');return}
   busy=true; $('spin').disabled=true; $('spin').classList.add('go'); $('buyBtn').disabled=true;
   const _a=_API();if(_a){_a.bal=_a.round2(_a.bal-cost);_a.paintBal(-1);}; bal=getPBal(); paint(); $('win').textContent=fmt(0);
-  const res=LL.play(rnd,{buy:mode});
+  const res=LL.play(rnd,{buy:mode,noBonus:!mode&&b>=25});
   let paid=0,inBonus=false;
   if(buy==='ice'||buy==='wet'){ /* straight into the bonus */ }
   for(const sp of res.spins){
@@ -607,7 +607,7 @@ async function play(buy){
   if(inBonus){ banner(`${fmt(win)}<small>${res.capped?'MAX WIN! ':''}total from ${res.bonus}</small>`,2600); await wait(2600); $('fsbar').hidden=true; }
   else if(res.capped)banner(`MAX WIN<small>${fmt(win)}</small>`,2600);
   else if(win>=b*25){banner(`BIG WIN<small>${fmt(win)}</small>`,1800,true);$('raccoon').classList.add('cheer');setTimeout(()=>$('raccoon').classList.remove('cheer'),1600)}
-  const overLimit=buy&&cost>=2500;
+  const overLimit=buy&&b>=25;
   const paidWin=overLimit?Math.min(win,(buy?cost:b)*0.98):win;
   const _a2=_API();if(_a2&&paidWin>0)_a2.credit(paidWin); bal=getPBal(); $('win').textContent=fmt(paidWin); paint();
   const _a3=_API();if(_a3)_a3.logBet("Lake Legend",cost,win/cost);
@@ -635,7 +635,6 @@ function renderCards(){
 }
 $('buyBtn').onclick=()=>{
   if(busy)return;
-  if(bet()<=25){toast('Minimum $25 bet to buy bonus');return}
   if(feature){ feature=null; paint(); toast('Featurespins turned off'); return }   // acts as the off switch while one is active
   $('buyMask').classList.add('on');
 };
