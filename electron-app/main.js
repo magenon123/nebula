@@ -36,40 +36,38 @@ function createMainWindow() {
   mainWin.loadURL(CASINO_URL);
   mainWin.setMenuBarVisibility(false);
 
-  // intercept clicks on Gates of Olympus and Le Fisherman cards
+  // debug: intercept ALL clicks and show what gets clicked
   mainWin.webContents.on('did-finish-load', () => {
     mainWin.webContents.executeJavaScript(`
       (function(){
-        function hookCard(el, key) {
-          const card = el.closest('a') || el.closest('[class*="game"]') || el.closest('[class*="card"]') || el.closest('[class*="slot"]') || el.parentElement;
-          if(card && !card.__nebulaDemoHooked){
-            card.__nebulaDemoHooked = true;
-            card.addEventListener('click', function(e){
-              e.preventDefault();
-              e.stopPropagation();
-              document.title = '__LAUNCH__' + key;
-              setTimeout(function(){ document.title = 'Nebula Casino'; }, 500);
-            }, true);
+        document.addEventListener('click', function(e){
+          const el = e.target;
+          let info = 'clicked: ' + el.tagName + '\\ntext: ' + el.textContent.trim().slice(0,80);
+          let p = el;
+          for(let i=0;i<5;i++){
+            if(!p) break;
+            if(p.href) { info += '\\nhref: ' + p.href; break; }
+            p = p.parentElement;
           }
-        }
-
-        function scanAll() {
-          const all = document.querySelectorAll('*');
-          for(const el of all){
-            const txt = el.textContent.trim().toLowerCase();
-            if(!el.__nebulaDemoHooked){
-              if(txt.includes('gates of olympus') && txt.length < 60) hookCard(el, 'gates');
-              if(txt.includes('le fisherman') && txt.length < 40) hookCard(el, 'fisherman');
-            }
-          }
-        }
-
-        scanAll();
-        const obs = new MutationObserver(function(){ scanAll(); });
-        obs.observe(document.body, { childList: true, subtree: true });
-        setInterval(scanAll, 2000);
+          document.title = '__DEBUG__' + encodeURIComponent(info);
+          setTimeout(function(){ document.title = 'Nebula Casino'; }, 1000);
+        }, true);
       })();
     `);
+  });
+
+  mainWin.webContents.on('will-navigate', (e, url) => {
+    console.log('will-navigate:', url);
+    if (!url.startsWith('https://nebula-4ggz.onrender.com')) {
+      e.preventDefault();
+      mainWin.webContents.executeJavaScript(`alert('Navigation intercepted:\\n' + ${JSON.stringify(url)})`);
+    }
+  });
+
+  mainWin.webContents.setWindowOpenHandler(({ url }) => {
+    console.log('window.open:', url);
+    mainWin.webContents.executeJavaScript(`alert('Popup intercepted:\\n' + ${JSON.stringify(url)})`);
+    return { action: 'deny' };
   });
 
   mainWin.webContents.on('page-title-updated', (e, title) => {
@@ -77,6 +75,10 @@ function createMainWindow() {
       const key = title.replace('__LAUNCH__', '');
       e.preventDefault();
       launchGame(key);
+    } else if (title.startsWith('__DEBUG__')) {
+      e.preventDefault();
+      const info = decodeURIComponent(title.replace('__DEBUG__', ''));
+      mainWin.webContents.executeJavaScript(`alert(${JSON.stringify(info)})`);
     }
   });
 }
