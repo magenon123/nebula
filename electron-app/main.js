@@ -36,38 +36,23 @@ function createMainWindow() {
   mainWin.loadURL(CASINO_URL);
   mainWin.setMenuBarVisibility(false);
 
-  // debug: intercept ALL clicks and show what gets clicked
+  // intercept SPA navigation to detect game URLs
   mainWin.webContents.on('did-finish-load', () => {
     mainWin.webContents.executeJavaScript(`
       (function(){
-        document.addEventListener('click', function(e){
-          const el = e.target;
-          let info = 'clicked: ' + el.tagName + '\\ntext: ' + el.textContent.trim().slice(0,80);
-          let p = el;
-          for(let i=0;i<5;i++){
-            if(!p) break;
-            if(p.href) { info += '\\nhref: ' + p.href; break; }
-            p = p.parentElement;
-          }
-          document.title = '__DEBUG__' + encodeURIComponent(info);
+        const orig = history.pushState.bind(history);
+        history.pushState = function(state, title, url) {
+          orig(state, title, url);
+          document.title = '__URL__' + encodeURIComponent(url || location.href);
           setTimeout(function(){ document.title = 'Nebula Casino'; }, 1000);
-        }, true);
+        };
       })();
     `);
   });
 
-  mainWin.webContents.on('will-navigate', (e, url) => {
-    console.log('will-navigate:', url);
-    if (!url.startsWith('https://nebula-4ggz.onrender.com')) {
-      e.preventDefault();
-      mainWin.webContents.executeJavaScript(`alert('Navigation intercepted:\\n' + ${JSON.stringify(url)})`);
-    }
-  });
-
-  mainWin.webContents.setWindowOpenHandler(({ url }) => {
-    console.log('window.open:', url);
-    mainWin.webContents.executeJavaScript(`alert('Popup intercepted:\\n' + ${JSON.stringify(url)})`);
-    return { action: 'deny' };
+  mainWin.webContents.on('did-navigate-in-page', (e, url) => {
+    const path = url.replace('https://nebula-4ggz.onrender.com', '');
+    mainWin.webContents.executeJavaScript(`alert('URL changed to:\\n' + ${JSON.stringify(path)})`);
   });
 
   mainWin.webContents.on('page-title-updated', (e, title) => {
@@ -75,10 +60,10 @@ function createMainWindow() {
       const key = title.replace('__LAUNCH__', '');
       e.preventDefault();
       launchGame(key);
-    } else if (title.startsWith('__DEBUG__')) {
+    } else if (title.startsWith('__URL__')) {
       e.preventDefault();
-      const info = decodeURIComponent(title.replace('__DEBUG__', ''));
-      mainWin.webContents.executeJavaScript(`alert(${JSON.stringify(info)})`);
+      const url = decodeURIComponent(title.replace('__URL__', ''));
+      mainWin.webContents.executeJavaScript(`alert('SPA navigated to:\\n' + ${JSON.stringify(url)})`);
     }
   });
 }
