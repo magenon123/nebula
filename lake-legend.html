@@ -307,9 +307,13 @@ const LL=(function(){
       });
       if(!src.length)continue;
       b.raw=r2((b.raw||0)+src.reduce((a,x)=>a+x.v,0)); b.v=r2(b.raw*(b.m||1));
+      // clovers in the bucket's area get swept away (no value added)
+      const swept=[];
+      board.forEach(x=>{if((x.t==='green'||x.t==='goldc')&&(b.t==='gbucket'||near(x,b)))swept.push(x)});
       src.forEach(x=>{board.delete(K(x.c,x.r));const qi=queue.indexOf(x);if(qi>=0)queue.splice(qi,1)});
-      acts.push({a:'collect',bucket:{c:b.c,r:b.r,t:b.t,m:b.m},from:src.map(x=>({c:x.c,r:x.r,v:x.v,t:x.t})),total:b.v});
-      put(src.map(x=>[x.c,x.r]));                 // collected squares refill
+      swept.forEach(x=>board.delete(K(x.c,x.r)));
+      acts.push({a:'collect',bucket:{c:b.c,r:b.r,t:b.t,m:b.m},from:[...src,...swept].map(x=>({c:x.c,r:x.r,v:x.v,t:x.t})),total:b.v});
+      put([...src,...swept].map(x=>[x.c,x.r]));   // collected + swept squares refill
     }
     let pay=0; board.forEach(x=>{if(x.t==='coin'||x.t==='bucket'||x.t==='gbucket')pay+=x.v});
     return {acts,pay:r2(pay)};
