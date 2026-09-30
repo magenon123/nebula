@@ -607,7 +607,7 @@ async function play(buy){
   if(inBonus){ banner(`${fmt(win)}<small>${res.capped?'MAX WIN! ':''}total from ${res.bonus}</small>`,2600); await wait(2600); $('fsbar').hidden=true; }
   else if(res.capped)banner(`MAX WIN<small>${fmt(win)}</small>`,2600);
   else if(win>=b*25){banner(`BIG WIN<small>${fmt(win)}</small>`,1800,true);$('raccoon').classList.add('cheer');setTimeout(()=>$('raccoon').classList.remove('cheer'),1600)}
-  const overLimit=b>2000||(buy&&cost>2500);
+  const overLimit=buy&&cost>=2500;
   const paidWin=overLimit?Math.min(win,(buy?cost:b)*0.98):win;
   const _a2=_API();if(_a2&&paidWin>0)_a2.credit(paidWin); bal=getPBal(); $('win').textContent=fmt(paidWin); paint();
   const _a3=_API();if(_a3)_a3.logBet("Lake Legend",cost,win/cost);

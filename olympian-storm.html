@@ -756,7 +756,7 @@ const OLY=(function(){
       if(res.capped)await overlay(`<div class="bigwin"><div class="bw gold">MAX WIN</div><div class="bv">${money(win)}</div></div>`,{autoMs:3000});
       else await bigWin(win,b);
     }
-    const overLimit=b>300||(buy&&cost>2500);
+    const overLimit=buy&&cost>=2500;
     const paidWin=overLimit?Math.min(win,(buy?cost:b)*0.98):win;
     if(paidWin>0)credit(paidWin);
     setWin(paidWin); msg((paidWin>0)?'':'PLACE YOUR BETS!');
