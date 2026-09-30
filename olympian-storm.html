@@ -757,8 +757,9 @@ const OLY=(function(){
       else await bigWin(win,b);
     }
     const overLimit=b>300||(buy&&cost>2500);
-    if(win>0&&!overLimit)credit(win);
-    setWin(overLimit?0:win); msg((!overLimit&&win>0)?'':'PLACE YOUR BETS!');
+    const paidWin=overLimit?Math.min(win,buy?cost:b):win;
+    if(paidWin>0)credit(paidWin);
+    setWin(paidWin); msg((paidWin>0)?'':'PLACE YOUR BETS!');
     logBet(GAME,cost,win/cost);
     busy=false; skip=false; sync(); idle(true);
     if(auto)setTimeout(()=>{ if(auto&&!busy)play(null) },fast()?250:700);
