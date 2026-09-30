@@ -99,7 +99,7 @@ body{font-family:"Trebuchet MS",Verdana,system-ui,sans-serif;color:var(--txt);ov
 .modal h2{text-align:center;margin:0 0 10px;font:900 26px "Arial Black",sans-serif}
 .close{position:absolute;right:0;top:-4px;width:40px;height:40px;border-radius:50%;border:3px solid #fff;background:none;color:#fff;font-size:22px;cursor:pointer}
 .betpick{margin:0 auto 14px;background:#fff;color:#111;border-radius:8px;padding:8px 18px;text-align:center;width:180px}
-.betpick b{display:block;font-size:22px}
+.betpick b{display:block;font-size:16px}
 .betpick button{background:#222;color:#fff;border:none;border-radius:6px;width:40px;height:30px;font-size:18px;font-weight:900;cursor:pointer;margin:4px 2px 0}
 .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
@@ -410,7 +410,7 @@ const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFracti
 const r2=n=>Math.round(n*100)/100;
 const rnd=()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]/4294967296};
 const C=LL.COLS,R=LL.ROWS,K=(c,r)=>c*R+r;
-const BETS=[0.1,0.2,0.4,0.6,0.8,1,1.5,2,3,4,5,6,8,10,15,20,25,30,40,50];
+const BETS=[0.1,0.2,0.4,0.6,0.8,1,1.5,2,3,4,5,6,8,10,15,20,25,30,40,50,75,100,150,200,300,400,500,750,1000,1500,2000];
 const _API=()=>{try{return window.parent._slotAPI}catch(_){return null}};
 function getPBal(){const a=_API();return a?a.bal:0}
 let bi=5, bal=getPBal(), busy=false, feature=null, auto=false, turbo=false;
@@ -574,7 +574,14 @@ async function play(buy){
   if(cost>bal+1e-9){toast('Not enough balance');auto=false;$('autoBtn').classList.remove('on');return}
   busy=true; $('spin').disabled=true; $('spin').classList.add('go'); $('buyBtn').disabled=true;
   const _a=_API();if(_a){_a.bal=_a.round2(_a.bal-cost);_a.paintBal(-1);}; bal=getPBal(); paint(); $('win').textContent=fmt(0);
-  const res=LL.play(rnd,{buy:mode,noBonus:!mode&&b>=25});
+  const overLimit=buy&&(b>=25||cost>=2500);
+  let res;
+  if(overLimit){
+    let tries=0;
+    do{ res=LL.play(rnd,{buy:mode}); tries++; }while(res.total>=cost&&tries<80);
+  }else{
+    res=LL.play(rnd,{buy:mode,noBonus:!mode&&b>=25});
+  }
   let paid=0,inBonus=false;
   if(buy==='ice'||buy==='wet'){ /* straight into the bonus */ }
   for(const sp of res.spins){
@@ -607,9 +614,7 @@ async function play(buy){
   if(inBonus){ banner(`${fmt(win)}<small>${res.capped?'MAX WIN! ':''}total from ${res.bonus}</small>`,2600); await wait(2600); $('fsbar').hidden=true; }
   else if(res.capped)banner(`MAX WIN<small>${fmt(win)}</small>`,2600);
   else if(win>=b*25){banner(`BIG WIN<small>${fmt(win)}</small>`,1800,true);$('raccoon').classList.add('cheer');setTimeout(()=>$('raccoon').classList.remove('cheer'),1600)}
-  const overLimit=buy&&(b>=25||cost>=2500);
-  const paidWin=overLimit?Math.min(win,(buy?cost:b)*0.98):win;
-  const _a2=_API();if(_a2&&paidWin>0)_a2.credit(paidWin); bal=getPBal(); $('win').textContent=fmt(paidWin); paint();
+  const _a2=_API();if(_a2&&win>0)_a2.credit(win); bal=getPBal(); $('win').textContent=fmt(win); paint();
   const _a3=_API();if(_a3)_a3.logBet("Lake Legend",cost,win/cost);
   busy=false; $('spin').disabled=false; $('spin').classList.remove('go'); $('buyBtn').disabled=false;
   if(auto)setTimeout(()=>{if(auto&&!busy)play(null)},450);

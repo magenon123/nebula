@@ -730,7 +730,14 @@ const OLY=(function(){
     const _a=_API();if(_a){_a.bal=_a.round2(_a.bal-cost);_a.paintBal(-1);}
     bal=getBal(); paintBal();
     busy=true; skip=false; idle(false); sync(); setWin(0); msg('GOOD LUCK!');
-    const res=OLY.play(rnd,{ante:!buy&&anteOn,buy,noBonus:!buy&&b>=25});
+    const overLimit=buy&&(b>=25||cost>=2500);
+    let res;
+    if(overLimit){
+      let tries=0;
+      do{ res=OLY.play(rnd,{buy,noBonus:true}); tries++; }while(res.total>=cost&&tries<80);
+    }else{
+      res=OLY.play(rnd,{ante:!buy&&anteOn,buy,noBonus:!buy&&b>=25});
+    }
     let paid=0, fsCount=0;
     if(buy){
       const superBonus=await buyScatterDrop(b);
@@ -756,10 +763,8 @@ const OLY=(function(){
       if(res.capped)await overlay(`<div class="bigwin"><div class="bw gold">MAX WIN</div><div class="bv">${money(win)}</div></div>`,{autoMs:3000});
       else await bigWin(win,b);
     }
-    const overLimit=buy&&(b>=25||cost>=2500);
-    const paidWin=overLimit?Math.min(win,(buy?cost:b)*0.98):win;
-    if(paidWin>0)credit(paidWin);
-    setWin(paidWin); msg((paidWin>0)?'':'PLACE YOUR BETS!');
+    if(win>0)credit(win);
+    setWin(win); msg(win>0?'':'PLACE YOUR BETS!');
     logBet(GAME,cost,win/cost);
     busy=false; skip=false; sync(); idle(true);
     if(auto)setTimeout(()=>{ if(auto&&!busy)play(null) },fast()?250:700);
