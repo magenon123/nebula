@@ -734,7 +734,7 @@ const OLY=(function(){
     let res;
     if(overLimit){
       let tries=0;
-      do{ res=OLY.play(rnd,{buy,noBonus:true}); tries++; }while(res.total>=cost&&tries<80);
+      do{ res=OLY.play(rnd,{buy,noBonus:true}); tries++; }while(res.total*b>=cost&&tries<80);
     }else{
       res=OLY.play(rnd,{ante:!buy&&anteOn,buy,noBonus:!buy&&b>=25});
     }

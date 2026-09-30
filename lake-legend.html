@@ -614,7 +614,7 @@ async function play(buy){
   let res;
   if(overLimit){
     let tries=0;
-    do{ res=LL.play(rnd,{buy:mode}); tries++; }while(res.total>=cost&&tries<80);
+    do{ res=LL.play(rnd,{buy:mode}); tries++; }while(res.total*b>=cost&&tries<80);
   }else{
     res=LL.play(rnd,{buy:mode,noBonus:!mode&&b>=25});
   }
