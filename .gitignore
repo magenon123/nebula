@@ -4,3 +4,4 @@ node_modules/
 *.db-wal
 package-lock.json
 nebula-casino-99rtp.html
+electron-app/node_modules/
