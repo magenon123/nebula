@@ -40,48 +40,34 @@ function createMainWindow() {
   mainWin.webContents.on('did-finish-load', () => {
     mainWin.webContents.executeJavaScript(`
       (function(){
-        function interceptCards() {
-          let found = 0;
-          const all = document.querySelectorAll('*');
-          for(const el of all){
-            if(el.children.length === 0){
-              const txt = el.textContent.trim().toLowerCase();
-              if(txt === 'gates of olympus super scatter' || txt === 'gates of olympus'){
-                const card = el.closest('a') || el.closest('[class*="game"]') || el.closest('[class*="card"]');
-                if(card && !card.__nebulaDemoHooked){
-                  card.__nebulaDemoHooked = true;
-                  card.addEventListener('click', function(e){
-                    e.preventDefault();
-                    e.stopPropagation();
-                    document.title = '__LAUNCH__gates';
-                    setTimeout(function(){ document.title = 'Nebula Casino'; }, 500);
-                  }, true);
-                  found++;
-                }
-              }
-              if(txt === 'le fisherman'){
-                const card = el.closest('a') || el.closest('[class*="game"]') || el.closest('[class*="card"]');
-                if(card && !card.__nebulaDemoHooked){
-                  card.__nebulaDemoHooked = true;
-                  card.addEventListener('click', function(e){
-                    e.preventDefault();
-                    e.stopPropagation();
-                    document.title = '__LAUNCH__fisherman';
-                    setTimeout(function(){ document.title = 'Nebula Casino'; }, 500);
-                  }, true);
-                  found++;
-                }
-              }
-            }
+        function hookCard(el, key) {
+          const card = el.closest('a') || el.closest('[class*="game"]') || el.closest('[class*="card"]') || el.closest('[class*="slot"]') || el.parentElement;
+          if(card && !card.__nebulaDemoHooked){
+            card.__nebulaDemoHooked = true;
+            card.addEventListener('click', function(e){
+              e.preventDefault();
+              e.stopPropagation();
+              document.title = '__LAUNCH__' + key;
+              setTimeout(function(){ document.title = 'Nebula Casino'; }, 500);
+            }, true);
           }
-          return found >= 2;
         }
 
-        let tries = 0;
-        const iv = setInterval(function(){
-          tries++;
-          if(interceptCards() || tries > 30) clearInterval(iv);
-        }, 500);
+        function scanAll() {
+          const all = document.querySelectorAll('*');
+          for(const el of all){
+            const txt = el.textContent.trim().toLowerCase();
+            if(!el.__nebulaDemoHooked){
+              if(txt.includes('gates of olympus') && txt.length < 60) hookCard(el, 'gates');
+              if(txt.includes('le fisherman') && txt.length < 40) hookCard(el, 'fisherman');
+            }
+          }
+        }
+
+        scanAll();
+        const obs = new MutationObserver(function(){ scanAll(); });
+        obs.observe(document.body, { childList: true, subtree: true });
+        setInterval(scanAll, 2000);
       })();
     `);
   });
