@@ -99,7 +99,7 @@ body{font-family:"Trebuchet MS",Verdana,system-ui,sans-serif;color:var(--txt);ov
 .modal h2{text-align:center;margin:0 0 10px;font:900 26px "Arial Black",sans-serif}
 .close{position:absolute;right:0;top:-4px;width:40px;height:40px;border-radius:50%;border:3px solid #fff;background:none;color:#fff;font-size:22px;cursor:pointer}
 .betpick{margin:0 auto 14px;background:#fff;color:#111;border-radius:8px;padding:8px 18px;text-align:center;width:180px}
-.betpick b{display:block;font-size:16px}
+.betpick b{display:block;font-size:13px}
 .betpick button{background:#222;color:#fff;border:none;border-radius:6px;width:40px;height:30px;font-size:18px;font-weight:900;cursor:pointer;margin:4px 2px 0}
 .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
@@ -427,6 +427,34 @@ function paint(){ bal=getPBal(); $('bal').textContent=fmt(bal); $('bBet').textCo
 const wait=ms=>new Promise(r=>setTimeout(r,turbo?ms*.35:ms));
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800)}
 function banner(html,ms,big){const b=$('banner');b.innerHTML=html;b.classList.toggle('big',!!big);b.classList.add('on');clearTimeout(b._t);b._t=setTimeout(()=>{b.classList.remove('on','big')},ms||1500)}
+function countWin(target,{big=false,label='',holdMs=1200}={}){
+  return new Promise(res=>{
+    if(target<=0){res();return;}
+    const el=$('banner');
+    el.classList.toggle('big',big);
+    el.classList.add('on');
+    const dur=turbo?400:Math.min(2800,600+Math.sqrt(target)*18);
+    const start=performance.now();
+    let skip=false;
+    const finish=()=>{
+      el.innerHTML=`${fmt(target)}${label?`<small>${label}</small>`:''}`;
+      document.removeEventListener('click',onSkip);
+      clearTimeout(el._t);
+      el._t=setTimeout(()=>{el.classList.remove('on','big');res();},holdMs);
+    };
+    const onSkip=()=>{skip=true;finish();};
+    document.addEventListener('click',onSkip,{once:true});
+    const step=now=>{
+      if(skip)return;
+      const t=Math.min(1,(now-start)/dur);
+      const ease=1-(1-t)*(1-t);
+      const cur=Math.round(ease*target*100)/100;
+      el.innerHTML=`${fmt(cur)}${label?`<small>${label}</small>`:''}`;
+      if(t<1){requestAnimationFrame(step);}else{skip=true;finish();}
+    };
+    requestAnimationFrame(step);
+  });
+}
 const msg=t=>$('msg').innerHTML=t;
 
 /* ---------- scenery ---------- */
@@ -611,9 +639,9 @@ async function play(buy){
     }
   }
   const win=r2(res.total*b);
-  if(inBonus){ banner(`${fmt(win)}<small>${res.capped?'MAX WIN! ':''}total from ${res.bonus}</small>`,2600); await wait(2600); $('fsbar').hidden=true; }
-  else if(res.capped)banner(`MAX WIN<small>${fmt(win)}</small>`,2600);
-  else if(win>=b*25){banner(`BIG WIN<small>${fmt(win)}</small>`,1800,true);$('raccoon').classList.add('cheer');setTimeout(()=>$('raccoon').classList.remove('cheer'),1600)}
+  if(inBonus){ await countWin(win,{big:true,label:`${res.capped?'MAX WIN · ':''}total from ${res.bonus}`,holdMs:1200}); $('fsbar').hidden=true; }
+  else if(res.capped){ await countWin(win,{big:true,label:'MAX WIN',holdMs:1200}); }
+  else if(win>=b*25){ $('raccoon').classList.add('cheer');setTimeout(()=>$('raccoon').classList.remove('cheer'),1600); await countWin(win,{big:true,label:'BIG WIN',holdMs:1000}); }
   const _a2=_API();if(_a2&&win>0)_a2.credit(win); bal=getPBal(); $('win').textContent=fmt(win); paint();
   const _a3=_API();if(_a3)_a3.logBet("Lake Legend",cost,win/cost);
   busy=false; $('spin').disabled=false; $('spin').classList.remove('go'); $('buyBtn').disabled=false;
