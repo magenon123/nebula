@@ -635,6 +635,7 @@ function renderCards(){
 }
 $('buyBtn').onclick=()=>{
   if(busy)return;
+  if(bet()<=25){toast('Minimum $25 bet to buy bonus');return}
   if(feature){ feature=null; paint(); toast('Featurespins turned off'); return }   // acts as the off switch while one is active
   $('buyMask').classList.add('on');
 };

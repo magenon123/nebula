@@ -773,6 +773,7 @@ const OLY=(function(){
   $('anteTog').onclick=()=>{ if(busy)return; anteOn=!anteOn; sync(); };
   async function buyAsk(kind){
     if(busy||anteOn)return;
+    if(bet()<=25){toast('Minimum bet to buy bonus is $25+');return}
     const price=bet()*(kind==='super'?SBUY:BUY);
     const ok=await overlay(`<div class="stone" style="width:900px;height:560px"><div class="h blue">${kind==='super'?'BUY SUPER FREE SPINS':'BUY FREE SPINS'}</div>`+
       `<div class="p gold">${money(price)}</div><div class="okx"><button class="no" data-v="0">&#10007;</button><button class="yes" data-v="1">&#10003;</button></div></div>`,{click:false});
