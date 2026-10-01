@@ -6,7 +6,7 @@ const CASINO_URL = 'https://nebula-4ggz.onrender.com';
 const DEMO_GAMES = {
   gates: {
     name: 'Gates of Olympus',
-    url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?stylename=demo_clienthub&lang=en&cur=USD&websiteUrl=https%3A%2F%2Fclienthub.pragmaticplay.com%2F&gcpif=4963&gameSymbol=vs20olympgold&jurisdiction=99'
+    url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur=USD&gameSymbol=vs20olympgold&jurisdiction=99&stylename=demo_clienthub&websiteUrl=https%3A%2F%2Fwww.pragmaticplay.com'
   },
   fisherman: {
     name: 'Le Fisherman',
@@ -141,15 +141,18 @@ function startBalanceTracking() {
 
   gameWin.webContents.executeJavaScript(`
     (function(){
+      let best = null;
       const all = document.querySelectorAll('*');
       for(const el of all){
-        if(el.children.length === 0){
+        if(el.children.length === 0 && el.getBoundingClientRect().width > 0){
           const txt = el.textContent.trim().replace(/[^0-9.]/g,'');
           const n = parseFloat(txt);
-          if(!isNaN(n) && n >= 100 && n <= 100000 && el.getBoundingClientRect().width > 0) return n;
+          if(!isNaN(n) && n >= 100 && n <= 100000){
+            if(best === null || n > best) best = n;
+          }
         }
       }
-      return null;
+      return best;
     })()
   `).then(val => {
     if (val && val > 0) {
@@ -166,15 +169,18 @@ function startBalanceTracking() {
     try {
       const demoBal = await gameWin.webContents.executeJavaScript(`
         (function(){
+          let best = null;
           const all = document.querySelectorAll('*');
           for(const el of all){
-            if(el.children.length === 0){
+            if(el.children.length === 0 && el.getBoundingClientRect().width > 0){
               const txt = el.textContent.trim().replace(/[^0-9.,]/g,'').replace(',','.');
               const n = parseFloat(txt);
-              if(!isNaN(n) && n >= 0 && n <= 100000 && el.getBoundingClientRect().width > 0) return n;
+              if(!isNaN(n) && n >= 1 && n <= 100000){
+                if(best === null || n > best) best = n;
+              }
             }
           }
-          return null;
+          return best;
         })()
       `);
 
