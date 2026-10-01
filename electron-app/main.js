@@ -145,10 +145,12 @@ function startBalanceTracking() {
       const all = document.querySelectorAll('*');
       for(const el of all){
         if(el.children.length === 0 && el.getBoundingClientRect().width > 0){
-          const txt = el.textContent.trim().replace(/[^0-9.]/g,'');
-          const n = parseFloat(txt);
-          if(!isNaN(n) && n >= 100 && n <= 100000){
-            if(best === null || n > best) best = n;
+          const txt = el.textContent.trim();
+          if(/^[\\d,]+\\.\\d{2}$/.test(txt)){
+            const n = parseFloat(txt.replace(/,/g,''));
+            if(!isNaN(n) && n >= 100 && n <= 200000){
+              if(best === null || n > best) best = n;
+            }
           }
         }
       }
@@ -173,10 +175,12 @@ function startBalanceTracking() {
           const all = document.querySelectorAll('*');
           for(const el of all){
             if(el.children.length === 0 && el.getBoundingClientRect().width > 0){
-              const txt = el.textContent.trim().replace(/[^0-9.,]/g,'').replace(',','.');
-              const n = parseFloat(txt);
-              if(!isNaN(n) && n >= 1 && n <= 100000){
-                if(best === null || n > best) best = n;
+              const txt = el.textContent.trim();
+              if(/^[\\d,]+\\.\\d{2}$/.test(txt)){
+                const n = parseFloat(txt.replace(/,/g,''));
+                if(!isNaN(n) && n >= 0 && n <= 200000){
+                  if(best === null || n > best) best = n;
+                }
               }
             }
           }
