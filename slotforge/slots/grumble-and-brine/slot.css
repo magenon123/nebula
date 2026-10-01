@@ -239,3 +239,4 @@
 #barR.hot{background:linear-gradient(#4a1f2c,#220e16);box-shadow:inset 0 0 0 3px var(--acc2),0 0 26px rgba(255,111,125,.7),0 8px 0 rgba(0,0,0,.4)}
 #barR.hot #betV{color:#ff9aa4;text-shadow:0 0 16px #ff4a5e,2px 3px 0 var(--ink)}
 #barR.hot #betLbl{color:#ffb8c0}
+.quote{margin-top:46px}
