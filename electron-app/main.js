@@ -14,9 +14,10 @@ const DEMO_GAMES = {
   }
 };
 
+const DEMO_START_BALANCE = 100000; // Pragmatic Play gives 100k demo credits
+
 let mainWin, gameWin;
 let nebulaBalance = 0;
-let demoStartBalance = 0;
 let conversionRate = 0;
 let balancePoller = null;
 let lastDemoBalance = 0;
@@ -129,9 +130,8 @@ async function launchGame(gameKey) {
   gameWin.setMenuBarVisibility(false);
   gameWin.loadURL(game.url);
 
-  demoStartBalance = 0;
-  conversionRate = 0;
-  lastDemoBalance = 0;
+  conversionRate = nebulaBalance / DEMO_START_BALANCE;
+  lastDemoBalance = DEMO_START_BALANCE;
 
   gameWin.webContents.on('did-finish-load', () => {
     setTimeout(() => startBalanceTracking(), 4000);
@@ -146,34 +146,11 @@ async function launchGame(gameKey) {
 function startBalanceTracking() {
   if (!gameWin) return;
 
-  gameWin.webContents.executeJavaScript(`
-    (function(){
-      let best = null;
-      const all = document.querySelectorAll('*');
-      for(const el of all){
-        if(el.children.length === 0 && el.getBoundingClientRect().width > 0){
-          const txt = el.textContent.trim();
-          if(/^[\\d,]+\\.\\d{2}$/.test(txt)){
-            const n = parseFloat(txt.replace(/,/g,''));
-            if(!isNaN(n) && n >= 100 && n <= 200000){
-              if(best === null || n > best) best = n;
-            }
-          }
-        }
-      }
-      return best;
-    })()
-  `).then(val => {
-    if (val && val > 0) {
-      demoStartBalance = val;
-      lastDemoBalance = val;
-      conversionRate = nebulaBalance / val;
-    }
-  });
+  // conversionRate already set from known 100k start balance
 
   balancePoller = setInterval(async () => {
     if (!gameWin) { stopBalanceTracking(); return; }
-    if (!demoStartBalance || !conversionRate) return;
+    if (!conversionRate) return;
 
     try {
       const demoBal = await gameWin.webContents.executeJavaScript(`
@@ -182,12 +159,10 @@ function startBalanceTracking() {
           const all = document.querySelectorAll('*');
           for(const el of all){
             if(el.children.length === 0 && el.getBoundingClientRect().width > 0){
-              const txt = el.textContent.trim();
-              if(/^[\\d,]+\\.\\d{2}$/.test(txt)){
-                const n = parseFloat(txt.replace(/,/g,''));
-                if(!isNaN(n) && n >= 0 && n <= 200000){
-                  if(best === null || n > best) best = n;
-                }
+              const txt = el.textContent.trim().replace(/[,\\s]/g,'');
+              const n = parseFloat(txt);
+              if(!isNaN(n) && n >= 0 && n <= 200000 && txt.length > 0){
+                if(best === null || n > best) best = n;
               }
             }
           }
@@ -205,7 +180,7 @@ function startBalanceTracking() {
         return;
       }
 
-      const dropped = (demoStartBalance - demoBal) * conversionRate;
+      const dropped = (DEMO_START_BALANCE - demoBal) * conversionRate;
       if (dropped > nebulaBalance) {
         stopBalanceTracking();
         gameWin && gameWin.close();
