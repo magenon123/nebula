@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session } = require('electron');
+const { app, BrowserWindow, session, ipcMain } = require('electron');
 const path = require('path');
 
 const CASINO_URL = 'https://nebula-4ggz.onrender.com';
@@ -180,13 +180,6 @@ function startBalanceTracking() {
     if (!gameWin) { stopBalanceTracking(); return; }
     if (!conversionRate) return;
 
-    try {
-      const raw = await gameWin.webContents.executeJavaScript(
-        `window.__ppBalance !== undefined ? window.__ppBalance : null`
-      );
-      if (raw !== null && raw !== lastDemoBalance) lastDemoBalance = raw;
-    } catch (_) {}
-
     const demoBal = lastDemoBalance;
     if (demoBal === prevDemoBal) return;
     prevDemoBal = demoBal;
@@ -216,6 +209,10 @@ function startBalanceTracking() {
 function stopBalanceTracking() {
   if (balancePoller) { clearInterval(balancePoller); balancePoller = null; }
 }
+
+ipcMain.on('pp-balance', (event, bal) => {
+  if (typeof bal === 'number' && bal >= 0) lastDemoBalance = bal;
+});
 
 app.whenReady().then(() => {
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {

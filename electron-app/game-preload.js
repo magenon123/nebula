@@ -1,4 +1,6 @@
 // Intercept XHR to catch reloadBalance.do responses from Pragmatic Play
+const { ipcRenderer } = require('electron');
+
 const _open = XMLHttpRequest.prototype.open;
 const _send = XMLHttpRequest.prototype.send;
 
@@ -14,8 +16,7 @@ XMLHttpRequest.prototype.send = function() {
         const match = this.responseText.match(/(?:^|&)balance=([0-9.]+)/);
         if (match) {
           const val = parseFloat(match[1]);
-          window.__ppBalance = val;
-          try { window.top.__ppBalance = val; } catch(_) {}
+          ipcRenderer.send('pp-balance', val);
         }
       }
     } catch (_) {}
