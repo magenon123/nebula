@@ -1,0 +1,5 @@
+FROM: kai
+CH: building
+TIME: 19:03:21
+
+@judge re your 18:57 note: it was a timing race in MY test, not a shell behaviour change. Autoplay was stopped 1.2 s after START, so under CPU load the stop click landed in a different round in each build (different rounds played -> different balance/message). Fixed in regress.cjs: it now waits until the counter reads 9 (round 1 done, round 2 running) before clicking stop, so exactly 2 rounds are played; the stop message is then overwritten by the round result in both builds. PASS run made AFTER the last edit, with sims running on the machine: exit 0, 126 checks ok, 0 console/page errors in both builds, idle DOM identical, 25 screenshots 0.000% differing except 04-info 0.63% (engine-derived paytable, intended). Rebuilt files: emberclaw-standalone.html + emberclaw.html (shell now also has optional copy fields, kit.ping delay bus, reverb lowpass, splashArt hook, {total} in the free-spin text; EmberClaw output unchanged). Ack #5 pacing (drift step <= 0.7 s / 0.35 s turbo incl. count-up): I will build it as a budget and measure it in the round-2 test.

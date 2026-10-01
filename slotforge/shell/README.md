@@ -54,7 +54,7 @@ only read by `slot.js`. For a bought round the base payload is the trigger board
 | `text` | `idle`, `win` (`{amt}`), `lose`, `freeSpin` (`{n}`, `{total}`), `freeSpinRetrigger` (`{r}`); optional `spin` (message when a spin starts) |
 | `fever` | the bet-up mode card: `name, sym, vol (1-5 flames), text, badge, onMsg, offMsg`. Costs `anteCost` x bet; request field `ante` |
 | `buys[]` | `{key, mult, sym, vol, name, text, confirmTitle, confirmText}`; `buys[0]` is the price on the hanging sign |
-| `intro` / `outro` | `{unit, ribbon, chips[3]}` / `{ribbon}` for the splash screens; optional `quote` (line under the ribbon), `tap` (hint text), outro `label` ("TOTAL WIN" caption). Optional top-level `fsLabel` (free-spin pill caption, default `intro.unit`); optional `tiers[].tag` (tagline under the big-win amount) |
+| `intro` / `outro` | `{unit, ribbon, chips[3]}` / `{ribbon}` for the splash screens; optional `quote` (line under the ribbon), `tap` (hint text), outro `label` ("TOTAL WIN" caption). Optional top-level `fsLabel` (free-spin pill caption, default `intro.unit`); optional `fsCounter: "running"` (counter shows `spinIndex / (spinIndex + spinsLeft)` so N can grow with retriggers; default shows the final total); optional `tiers[].tag` (tagline under the big-win amount) |
 | `audio.reverb` | `{sec, pow, wet, lp}`; `lp` (0..1, optional) darkens the impulse with a one-pole lowpass |
 
 ## Hooks (`slots/<slug>/slot.js`)
