@@ -5,7 +5,7 @@ eng = open('emberclaw-engine.js').read()
 eng = eng.replace("import crypto from 'crypto';\n", "")
 eng = re.sub(r'^export ', '', eng, flags=re.M)
 eng = re.sub(r"function cryptoRng\(\) \{.*?\n\}", "function cryptoRng() { const a = new Uint32Array(2); crypto.getRandomValues(a); return (a[0] * 2 ** 21 + (a[1] >>> 11)) / 2 ** 53; }", eng, flags=re.S)
-eng = eng.replace("playSpin", "engineSpin")  # the page has its own playSpin renderer
+eng = eng.replace("playSpin", "engineSpin").replace("NAMES", "ENGINE_NAMES")  # avoid clashes with page globals
 local = '''
 /* ---- STANDALONE MODE: the server engine is embedded and runs locally with play money. ---- */
 const START_BALANCE = 1000;
