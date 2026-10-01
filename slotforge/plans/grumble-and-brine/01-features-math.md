@@ -160,7 +160,7 @@ Current Strip above the reels lights the lane of each Jelly; each Drift plays th
 - A mid-bonus cap hit ends the bonus immediately (section 9).
 
 ### 5.4 Outcome shape (8-dive start, 1.2M-round sample)
-~ 26% of Dive Tickets return over 100x, ~0.65% over 1,000x, ~0.007% hit the 7,500x cap. See 10.3 for the full table.
+~ 26% of Dive Tickets return over 100x, ~0.6% over 1,000x, ~0.01% (1 in 10,300) hit the 7,500x cap. See 10.2.
 
 ---------------------------------------------------------------------
 ## 6. Bonus Buy and Deep Pressure
@@ -170,14 +170,14 @@ All three use **the same Deep Dive** (same bonus table); only the start state or
 | name (UI) | key | cost | start state | target E[bonus] |
 |---|---|---|---|---|
 | **Dive Ticket** (standard buy) | `dive` | **100x** bet | the 3-Buoy start: 8 dives, Tide 0 | ~96 x |
-| **Abyss Pass** (premium buy) | `abyss` | **500x** bet | 5-Buoy start: **12 dives**, Tide starts at **2** (max stays 3), a guaranteed Jelly on **every** dive, and Jellies land **1.22x** as often in the dives (`bonus.jellyFactor`, premium only: this is the only second bonus table, as the judge allows) | ~481 x |
+| **Abyss Pass** (premium buy) | `abyss` | **500x** bet | 5-Buoy start: **12 dives**, Tide starts at **2** (max stays 3), a guaranteed Jelly on **every** dive, and Jellies land **1.25x** as often in the dives (`bonus.jellyFactor`, premium only: this is the only second bonus table, as the judge allows) | ~481 x |
 
 - A bought round first plays the **trigger spin**: `initialGrid` shows 3 Buoys (Dive Ticket) or 5 Buoys (Abyss Pass) on random cells, **no Jelly, no winning ways, no scatter pay** (rejection-sample non-Buoy cells until the grid has zero ways wins), `cascadeSteps: []`, `basePayout: 0`; then the intro splash. The trigger spin pays 0, so the maths is unchanged.
 - Dive Ticket and Abyss Pass cannot be combined with Deep Pressure.
 
 ### 6.1 Deep Pressure ("Fever" mode, bet-up)
-- **Cost: 2x bet** (the stake shown as total bet), **Deep Dive about 3.1x as likely** (1 in ~76 instead of 1 in 245): the opening-grid Buoy probability is `anteScatterP` = 0.0342 (instead of 0.0222). Nothing else changes: same Jelly rates, same pay table, same bonus (judge rule: ONE bonus).
-- RTP algebra (judge's form): let `Rb` = base-game-only return per bet, `S` = bonus contribution per bet in the normal game (`S = E_nat / F`), `M` = bonus likelihood multiplier. Return per total bet = `(Rb' + M x S') / N` with `N = 2`. With `Rb` ~ 56.5%, `S` ~ 40% the break-even is `M = 1 + (N x 0.962 - 0.962 x ... )`: solving `(Rb + M S)/2 = 0.962` gives `M = (1.924 - Rb)/S = (1.924 - 0.565)/0.40 = 3.4`. Two effects make the real M a little smaller than 3.4 (more 4-5 Buoy triggers raise E[bonus] a little: 10.6% instead of 6.7% of triggers; extra Buoys also pay 2x/10x/50x scatter pay): the simulation lands at M = 3.1 (`anteScatterP` = 0.0342). That is the number to tune; see 10.2 for the measured result.
+- **Cost: 2x bet** (the stake shown as total bet), **Deep Dive about 3.3x as likely** (1 in ~75 instead of 1 in 245): the opening-grid Buoy probability is `anteScatterP` = 0.0342 (instead of 0.0222). Nothing else changes: same Jelly rates, same pay table, same bonus (judge rule: ONE bonus).
+- RTP algebra (judge's form). Let `Rb` = base-game-only return per bet (56.6%), `S = E_nat / F` = bonus contribution per bet (97.1 / 245 = 39.6%), so the normal RTP is `Rb + S` = 96.2%. In Deep Pressure the player pays `N = 2` per round and gets `Rb' + M x S'`, where `M` is the bonus likelihood multiplier. Break-even at RTP 0.962: `(Rb' + M S') / N = 0.962`, i.e. `M = (N x 0.962 - Rb') / S'`. Plugging in the first-order values (Rb' = Rb = 56.6%, S' = S) gives `M = (1.924 - 0.566) / 0.396 = 3.43`. Two second-order effects: the extra Buoys raise 4/5-Buoy triggers from 6.7% to 10.6% of triggers (so E[bonus] rises 99.8 vs 97.1) and add scatter pay (Rb' = 59.0 per bet instead of 56.6), which reduce the needed M to `(1.924 - 0.590) / (0.396 x 99.8/97.1) = 3.28`. The simulation agrees: `anteScatterP = 0.0342` gives M = 3.3 (1 in 74.7 vs 1 in 244.7) and RTP 96.1% per total bet, measured over 3M rounds. rin tunes `anteScatterP` to land 96.0-96.5% with the decomposition `Rb' + P_ante x E[bonus]`.
 
 ---------------------------------------------------------------------
 ## 7. Modes summary
@@ -192,10 +192,10 @@ All three use **the same Deep Dive** (same bonus table); only the start state or
 ---------------------------------------------------------------------
 ## 8. Volatility and hit-frequency targets
 
-- Hit frequency (round pays > 0, incl. scatter pay): **26% (target band 22-28%)**. About 21% of rounds are wins smaller than the bet (<1x), ~5.3% pay 1x-5x, ~1.3% pay 5x-10x, ~0.9% pay 10x-25x, ~0.5% pay 25x-100x, 0.14% pay 100x+, 1 in ~40,000 pays 1,000x+.
+- Hit frequency (round pays > 0, incl. scatter pay): **26% (target band 22-28%)**. Measured split of all rounds: 17.3% win less than the bet (<1x), 6.2% pay 1x-5x, 1.3% pay 5x-10x, 0.84% pay 10x-25x, 0.48% pay 25x-100x, 0.14% pay 100x-999x, 0.003% (1 in ~34,000) pay 1,000x or more.
 - Volatility: standard deviation of a round's return ~ 12-16 x bet (heavy tail, 2M-round runs wobble by +-1 RTP point, so the judge's 4 x 2M seed check is required). High volatility.
 - Bonus frequency: 1 in 245 natural (1 in ~76 in Deep Pressure).
-- Max win: **7,500x** (`CFG.maxWin`). Reached in the simulator about once per 1-2 million bonus-heavy rounds (see tables).
+- Max win: **7,500x** (`CFG.maxWin`). Reached in the simulator about once per 1.3 million normal rounds (see 10.2).
 
 ---------------------------------------------------------------------
 ## 9. Max win and cap behaviour
@@ -214,15 +214,24 @@ All three use **the same Deep Dive** (same bonus table); only the start state or
 | Base-game ways wins incl. Drift chains and Buoy scatter pay | ~56.5% |
 | Deep Dive (1 in 245 x E[natural bonus] ~ 98x) | ~40.0% |
 | **Total normal** | **96.2-96.5%** |
-| Deep Pressure (per 2x total bet): Rb' ~ 29.4 per total bet + bonus ~ 66.5 | ~96% per total bet |
+| Deep Pressure (per 2x total bet): Rb' 29.5 + bonus 66.5 per total bet | ~96% per total bet |
 | Dive Ticket: E[8-dive bonus] / 100 | ~96% |
 | Abyss Pass: E[12-dive premium bonus] / 500 | ~96% |
 
-The four numbers the judge asked for: **F = 245** (natural trigger 1-in-245), **E8 ~ 96** (Dive Ticket bonus), **E_nat ~ 98** (natural average, slightly higher because 4/5-Buoy triggers get 10/12 dives), **M = 3.1** (Deep Pressure at 2x).
+The four numbers the judge asked for: **F = 245** (natural trigger 1-in-245), **E8 = 95.7** (Dive Ticket bonus), **E_nat ~ 97-99** (natural average, slightly higher because 4/5-Buoy triggers get 10/12 dives), **M = 3.3** (Deep Pressure at 2x; 1 in 74.7).
 
 ### 10.2 Measured (prototype sim, seeded; mean of several 1M-round seeds per mode)
 
-@@RESULTS@@
+| mode | rounds (seeds x rounds) | RTP per unit staked | decomposition / notes |
+|---|---|---|---|
+| Normal | 4 x 1M | seeds 98.2, 95.7, 97.1, 97.4: **mean 97.1** (single-seed s.d. ~1.4) | Rb = 56.6% (very stable, 56.1-57.2); bonus 1 in 244.7; E[natural bonus] measured 99.2 (+-2.5), derived from the Dive Ticket sample 97.1; decomposition 56.6 + 97.1/245 = **96.2%**. Hit 26.3%. |
+| Deep Pressure (per 2x) | 3 x 1M | 96.2, 94.7, 97.2: **mean 96.1** | Rb' = 29.5 per total bet (59 per bet); bonus 1 in 74.7 (M = 3.3 measured vs normal 244.7); E[bonus] 99.8 (higher because 4-5 Buoy triggers are 10% of triggers). Hit 26.5%. |
+| Dive Ticket (per 100x) | 2 x 800k | 95.5, 95.9: **mean 95.7** | E[8-dive bonus] = 95.7x; 25.7% return >= 100x; 0.59% >= 1,000x; cap hit in 1 of ~10,300 tickets. |
+| Abyss Pass (per 500x) | 4 x 500k | 96.4, 96.4, 96.4, 96.3: **mean 96.4** | E[bonus] = 481.9x; 84.4% return >= 100x (i.e. >= 20% of the price), 8.9% return >= 1,000x, cap hit in 1 of ~930 passes. Very low spread between seeds because the cap clips the tail. |
+
+Honest reading: the normal-game direct estimate (97.1 +-0.7 over 4M rounds) is about 0.9 above the decomposition (96.2); the decomposition is the better estimate because Rb is precise and E[bonus] comes from 1.6M bonus plays. rin's 4 x 2M run settles it; if the true normal RTP is above 96.5, lower `bonus.jellyP` by ~1% (or raise F by lowering `scatterP` to 0.0220); the Dive Ticket and Abyss Pass move with `bonus.jellyP` too, so re-tune `buy.abyss.jellyFactor` afterwards. The prototype simulator is meant to be within ~1 point; the engine's own simulator is the authority.
+
+Tails (normal game, 4M rounds): P(>= 1,000x) = 29.8 per million (1 in 33,600); 7,500x cap hit 3 times in 4M rounds (1 in 1.3M); Deep Pressure cap hits 4 in 3M. Standard deviation per round: 12-18 x bet (seed dependent).
 
 ### 10.3 Notes
 - A single 1M run swings by about +-1.5 RTP points (bonus tail); do not trust one seed.
@@ -321,7 +330,7 @@ The bought trigger spin: `initialGrid` with 3 or 5 Buoys, `cascadeSteps: []`, `s
 | `bonus.guaranteeEvery` | 3 | guaranteed Jelly on dives 1, 4, 7, ... |
 | `bonus.guaranteeReels` | [3,4] | 0-based reels the guaranteed Jelly may land on |
 | `buy.dive` | {cost:100, buoys:3, tide:0} | standard buy |
-| `buy.abyss` | {cost:500, buoys:5, tide:2, tideMax:3, jellyFactor:1.22, guaranteeEvery:1} | premium buy; `jellyFactor` multiplies `bonus.jellyP` for this buy only |
+| `buy.abyss` | {cost:500, buoys:5, tide:2, tideMax:3, jellyFactor:1.25, guaranteeEvery:1} | premium buy; `jellyFactor` multiplies `bonus.jellyP` for this buy only |
 
 Tuning order for rin: (1) `anteScatterP` and `buy.abyss.jellyFactor` are the knobs that move Deep Pressure and Abyss Pass without touching the others; (2) `bonus.jellyP` moves E[bonus] (and with it the Dive Ticket, which must stay ~96.2x); (3) `scatterP` moves F; (4) `pay` table for the base share. Re-run the decomposition after every change.
 
@@ -330,11 +339,11 @@ Tuning order for rin: (1) `anteScatterP` and `buy.abyss.jellyFactor` are the kno
 
 All with a seeded RNG, >= 2M rounds x 4 seeds per mode, plus the decomposition.
 1. **RTP:** normal, Deep Pressure (per total bet), Dive Ticket (per 100x), Abyss Pass (per 500x): each point estimate **96.0-96.5%**, 95% CI upper bound < 97.0%.
-2. **Decomposition (normal):** Rb (base game only incl. scatter pay) ~ 56.5% +- 1.5; P(trigger) ~ 1/245; E[natural bonus] from >= 2M bonus plays; Rb + P x E = RTP. Same decomposition for Deep Pressure: M = P_ante / P_normal ~ 3.1.
+2. **Decomposition (normal):** Rb (base game only incl. scatter pay) ~ 56.5% +- 1.5; P(trigger) ~ 1/245; E[natural bonus] from >= 2M bonus plays; Rb + P x E = RTP. Same decomposition for Deep Pressure: M = P_ante / P_normal ~ 3.3.
 3. **One bonus:** the dive code path and tables are identical for natural, Deep Pressure and Dive Ticket (assert in the test: same function, same config object); only Abyss Pass overrides `jellyFactor`, `tide`, `guaranteeEvery`.
 4. **Dive Ticket:** E[8-dive bonus] in 95.5-97.0x. **Abyss Pass:** E in 475-485x.
 5. **Hit frequency (normal):** 22-28% (expect ~26%).
-6. **Cap:** observed; no round ever exceeds 7,500x; `capped` true exactly then; report P(>=1000x) (expect ~1 in 40k) and cap hits per 10M rounds (expect ~5-10 normal).
+6. **Cap:** observed; no round ever exceeds 7,500x; `capped` true exactly then; report P(>=1000x) (expect ~1 in 34k) and cap hits per 10M rounds (expect ~5-10 normal).
 7. **Bounds:** max drifts per spin <= 4; dives <= 40; total steps per round bounded; every number finite.
 8. **Round structure:** `tools/check-round.js` on 100k rounds per mode and on live responses; bought rounds have a trigger spin with 3/5 Buoys, no wins, no scatter pay, `cascadeSteps: []`.
 9. **Rule tests (unit):** reel-1 Jelly starts runs for every symbol present on reel 2-3 only with a real symbol; Jelly-only run pays 0; two Jellies on one reel add; counts multiply across reels; Old Boot / Tin Can pay nothing for 3; Tide gain = number of Jellies that left; guaranteed Jelly on dives 1,4,7; retrigger 2 -> +3, 3+ -> +6; cap truncation; deterministic replay by seed; a Jelly starting on reel 5 causes 4 drifts and its values are v, v+1, ..., v+4.
@@ -344,6 +353,6 @@ All with a seeded RNG, >= 2M rounds x 4 seeds per mode, plus the decomposition.
 ## 14. Copy corrections for leo (rules text)
 - Info rule 3 must read: "DRIFT: if a Jelly is on the board, every Jelly drifts one reel to the left, grows by 1, and the other symbols respin. Each respin is paid. A Jelly leaves the board after it has been paid on reel 1." (no win required).
 - Jelly values ADD within a reel. Tide: "each Jelly that leaves the board raises the Tide (max +3) and new Jellies start bigger".
-- Deep Pressure card: "Costs 2x bet. Deep Dives about 3x as likely." (numbers from the engine).
+- Deep Pressure card: "Costs 2x bet. Deep Dives about 3.3x as likely." (numbers from the engine).
 - Abyss Pass card: "The premium ticket: 12 dives, the Tide starts at +2, a Jelly on every dive and more Jellies."
 - Dive Ticket card: "Skip the sifting: 8 free dives at once."
