@@ -175,22 +175,23 @@ async function launchGame(gameKey) {
     }
   `;
 
-  // Inject into every frame (including iframes) as they load
-  gameWin.webContents.on('frame-created', (e, frame) => {
-    frame.once('dom-ready', () => {
-      frame.executeJavaScript(XHR_INJECT).catch(() => {});
-    });
-  });
+  function injectAllFrames() {
+    try {
+      gameWin.webContents.executeJavaScript(XHR_INJECT).catch(() => {});
+      const injectFrame = (frame) => {
+        try { frame.executeJavaScript(XHR_INJECT).catch(() => {}); } catch(_) {}
+        try { for (const child of frame.frames) injectFrame(child); } catch(_) {}
+      };
+      injectFrame(gameWin.webContents.mainFrame);
+    } catch(_) {}
+  }
 
   gameWin.webContents.on('did-finish-load', () => {
-    // Also inject into main frame and all existing frames
-    gameWin.webContents.executeJavaScript(XHR_INJECT).catch(() => {});
-    try {
-      for (const frame of gameWin.webContents.mainFrame.frames) {
-        frame.executeJavaScript(XHR_INJECT).catch(() => {});
-      }
-    } catch(_) {}
-    setTimeout(() => startBalanceTracking(), 4000);
+    setTimeout(() => { injectAllFrames(); startBalanceTracking(); }, 3000);
+  });
+
+  gameWin.webContents.on('did-frame-finish-load', () => {
+    setTimeout(() => injectAllFrames(), 500);
   });
 
   gameWin.on('closed', async () => {
