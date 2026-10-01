@@ -24,3 +24,7 @@ Agents: read this before every design or build decision. The lead keeps it updat
 - **Many bet sizes** (low stakes to super high stakes) with a quick-pick grid.
 - Symbols fall in **row by row** from above. Turbo, paytable/info screen, sound toggle, fullscreen.
 - Server-authoritative math. Offline single-file build the owner can download and open in a browser.
+
+## Math (owner decision)
+- **Every mode of every slot must return 96.0-96.5% RTP**, proven by seeded simulation with confidence margins (see reviews/01-acceptance.md). An RTP at or above 100% (or a buy that is far from fair) is a blocking bug, never "good enough".
+- EmberClaw's math was found to be wrong (base ~100.8%, 100x buy ~65%, 500x buy ~99%). The owner wants it **fixed to 96.0-96.5% in every mode** (it is the same slot, not a new one), before more slots are built.
