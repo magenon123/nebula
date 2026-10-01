@@ -13,7 +13,7 @@ Evidence method (lesson from EmberClaw, whose 600k-round seeds missed the true ~
 - A3. **Targets, every mode** (base, bet-up "Deep Pressure", Dive Ticket ~100x, Abyss Pass ~500x):
   point estimate (decomposition or pooled) in **96.0-96.5%**, and the 95% CI upper bound **< 97.0%**. No seed above 100%.
 - A4. Base hit frequency (any base win > 0) **22-28%** pooled.
-- A5. High volatility: base-mode sd per round >= 15x bet (EmberClaw ~22x). Report P(win >= 100x), P(>= 1000x).
+- A5. High volatility: base-mode sd per round >= 13x bet AND P(win >= 1000x) >= 1 in 50,000, pooled over >= 8M base rounds (amended 18:58 by judge DECISION; was 15x). Report P(>= 100x) too.
 - A6. Max win cap **5,000-10,000x**, enforced on the whole round (base + bonus, buys too); cap must be reached in sims (report cap hits per 10M rounds), and no round ever exceeds it (`check-round.js`).
 - A7. **One bonus**: natural trigger, bet-up and Dive Ticket play the identical bonus definition. Only Abyss Pass may change the start state. No mode-specific symbol tables for the bonus.
 - A8. Bet-up: cost N and "bonus M x likelier": measured trigger-rate ratio within +/-5% of the stated M; RTP via `M = 1 + (N-1)*RTP/S` shown in the plan.

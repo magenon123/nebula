@@ -188,3 +188,9 @@ button:disabled{cursor:not-allowed}
 .bbc button.gd{background:linear-gradient(#ffd23a,#e8a010);color:#2b1b12;text-shadow:none}
 .bbc button.off{background:linear-gradient(#7a655a,#4e3d34)}
 .bbc button.go:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
+
+/* optional copy blocks (only present when a slot.json provides them) */
+.quote{margin-top:18px;max-width:640px;text-align:center;font-family:var(--toon);font-size:26px;letter-spacing:1px;color:#fff;text-shadow:2px 3px 0 var(--ink)}
+#bigTag{margin-top:8px;text-align:center;font-family:var(--toon);font-size:clamp(20px,3vw,34px);color:#fff;text-shadow:2px 3px 0 var(--ink)}
+.splashArt{position:relative;z-index:3}
+.splashArt:empty{display:none}

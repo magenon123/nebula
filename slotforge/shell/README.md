@@ -51,11 +51,11 @@ only read by `slot.js`. For a bought round the base payload is the trigger board
 | `scatterSym` | symbol id of the bonus symbol (Bonus Buy sign, intro gems) |
 | `char` | `{el:'char', states:[...], bonusClass:'bonusmode'}`: id of the character element, the state classes that `S.char()` toggles, class set during the bonus |
 | `tiers[]` | big-win tiers `{min (x bet), name, lv 1..4}`; `autoBigLv`: tier level at which "stop on big win" triggers |
-| `text` | `idle`, `win` (`{amt}`), `lose`, `freeSpin` (`{n}`), `freeSpinRetrigger` (`{r}`) |
+| `text` | `idle`, `win` (`{amt}`), `lose`, `freeSpin` (`{n}`, `{total}`), `freeSpinRetrigger` (`{r}`); optional `spin` (message when a spin starts) |
 | `fever` | the bet-up mode card: `name, sym, vol (1-5 flames), text, badge, onMsg, offMsg`. Costs `anteCost` x bet; request field `ante` |
 | `buys[]` | `{key, mult, sym, vol, name, text, confirmTitle, confirmText}`; `buys[0]` is the price on the hanging sign |
-| `intro` / `outro` | `{unit, ribbon, chips[3]}` / `{ribbon}` for the splash screens |
-| `audio.reverb` | `{sec, pow, wet}` |
+| `intro` / `outro` | `{unit, ribbon, chips[3]}` / `{ribbon}` for the splash screens; optional `quote` (line under the ribbon), `tap` (hint text), outro `label` ("TOTAL WIN" caption). Optional top-level `fsLabel` (free-spin pill caption, default `intro.unit`); optional `tiers[].tag` (tagline under the big-win amount) |
+| `audio.reverb` | `{sec, pow, wet, lp}`; `lp` (0..1, optional) darkens the impulse with a one-pole lowpass |
 
 ## Hooks (`slots/<slug>/slot.js`)
 ```js
@@ -67,7 +67,8 @@ SlotShell.boot(SLOT_CFG, S => { ...slot state...; return { ...hooks }; });
 | hook | required | called when / contract |
 |---|---|---|
 | `sfx(kit)` | yes | once, lazily, on first sound. Returns the recipe object. `kit = {ctx, out, bus, env, osc, noise, metal, st, T0, bed}`. **Required names:** `ui hit spin bonus outro big(level 1-4) tick(k 0..1) feverOn`; add any others you call yourself |
-| `ambience(kit)` | no | return `kit.bed({lowpass, gain, level, loopSec, crack:{...}})` (or your own `{start(), stop()}`) for the bed that starts on first click |
+| `ambience(kit)` | no | return `kit.bed({lowpass, gain, level, loopSec, crack:{...}})` or your own `{start(), stop(), bonus?(on)}` for the bed that starts on first click (`bonus(on)` is called at bonus start/end). `kit.ping({time, fb, lp, wet})` returns a feedback-delay send node (sonar/echo) |
+| `splashArt(kind)` | no | `'intro'`/`'outro'`: HTML string for a portrait block (`#introArt` / `#outroArt`, class `splashArt`) inserted at the top of the splash screens |
 | `init(S)` | yes | after the shell DOM is built: build the grid/side panel/paytable |
 | `paintIdle()` | yes | first paint of the board |
 | `roundStart()` | yes | at spin start (reset the side mechanic) |
