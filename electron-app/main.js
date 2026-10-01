@@ -36,36 +36,25 @@ function createMainWindow() {
   mainWin.loadURL(CASINO_URL);
   mainWin.setMenuBarVisibility(false);
 
-  // intercept clicks on game buttons using data-go attribute
+  // intercept clicks on Olympian Storm (Gates demo) and Lake Legend (Le Fisherman demo)
   mainWin.webContents.on('did-finish-load', () => {
     mainWin.webContents.executeJavaScript(`
       (function(){
-        function hookButtons() {
-          document.querySelectorAll('button[data-go]').forEach(function(btn){
-            if(btn.__nebulaDemoHooked) return;
-            const slug = btn.getAttribute('data-go') || '';
-            if(slug.includes('gates') || slug.includes('olympus') || slug.includes('scatter')){
-              btn.__nebulaDemoHooked = true;
-              btn.addEventListener('click', function(e){
-                e.preventDefault(); e.stopPropagation();
-                document.title = '__LAUNCH__gates';
-                setTimeout(function(){ document.title = 'Nebula Casino'; }, 500);
-              }, true);
-            }
-            if(slug.includes('fisherman') || slug.includes('fish')){
-              btn.__nebulaDemoHooked = true;
-              btn.addEventListener('click', function(e){
-                e.preventDefault(); e.stopPropagation();
-                document.title = '__LAUNCH__fisherman';
-                setTimeout(function(){ document.title = 'Nebula Casino'; }, 500);
-              }, true);
-            }
-          });
-        }
-        hookButtons();
-        const obs = new MutationObserver(hookButtons);
-        obs.observe(document.body, { childList: true, subtree: true });
-        setInterval(hookButtons, 2000);
+        // override the go() function to intercept game launches
+        const origGo = window.go;
+        window.go = function(slug) {
+          if(slug === 'olympian-storm') {
+            document.title = '__LAUNCH__gates';
+            setTimeout(function(){ document.title = 'Nebula Casino'; }, 500);
+            return;
+          }
+          if(slug === 'lake-legend') {
+            document.title = '__LAUNCH__fisherman';
+            setTimeout(function(){ document.title = 'Nebula Casino'; }, 500);
+            return;
+          }
+          if(origGo) origGo(slug);
+        };
       })();
     `);
   });
