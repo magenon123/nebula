@@ -9,8 +9,8 @@ const DEMO_GAMES = {
     url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur=USD&gameSymbol=vs20olympgold&jurisdiction=99&stylename=demo_clienthub&websiteUrl=https%3A%2F%2Fwww.pragmaticplay.com'
   },
   fisherman: {
-    name: 'Le Fisherman',
-    url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur=USD&gameSymbol=vs10fishin&jurisdiction=99&stylename=demo_clienthub&websiteUrl=https%3A%2F%2Fwww.pragmaticplay.com'
+    name: 'Gates of Olympus',
+    url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur=USD&gameSymbol=vs20olympgold&jurisdiction=99&stylename=demo_clienthub&websiteUrl=https%3A%2F%2Fwww.pragmaticplay.com'
   }
 };
 
