@@ -29,3 +29,11 @@ Known gaps vs. the design doc: the bonus share is ~20% rather than 29%, and Buy 
 (Pre-Heated is worth ~8x a standard bonus but priced at 5x, so a richer bonus would make Pre-Heated player-positive).
 "Doubled scatter weight" gives ~1-in-45, not 1-in-140; ante uses ~1.3x scatter weight to hit 1-in-140
 (the doc also says 1-in-180 in one place).
+
+## Shared slot layout (use for every new slot)
+`emberclaw.html` marks the reusable "SHELL" pieces. Keep them in the same place in every slot:
+- **Left of the board:** Bonus Buy card (two buy buttons, each opens a confirm popup) and the Double Chance / ante switch.
+- **Bottom bar:** balance (left); bet `-` / bet / `+`, round spin button, Auto and Turbo (centre); win and free-spin win (right).
+- **Top right:** sound, info, fullscreen. Bonus intro/outro screens are "tap anywhere to continue".
+- **Right of the board:** slot-specific side panel (here: the Forge Core meter).
+Sounds are synthesised in `makeSfx()` (no audio files).
