@@ -155,14 +155,35 @@ function startBalanceTracking() {
     try {
       const demoBal = await gameWin.webContents.executeJavaScript(`
         (function(){
-          let best = null;
+          // look for element containing $ followed by a number near "CREDIT"
           const all = document.querySelectorAll('*');
           for(const el of all){
             if(el.children.length === 0 && el.getBoundingClientRect().width > 0){
-              const txt = el.textContent.trim().replace(/[,\\s]/g,'');
-              const n = parseFloat(txt);
-              if(!isNaN(n) && n >= 0 && n <= 200000 && txt.length > 0){
-                if(best === null || n > best) best = n;
+              const txt = el.textContent.trim();
+              if(/^\\$[\\d,]+\\.\\d{2}$/.test(txt)){
+                // check if a nearby element says CREDIT
+                let p = el.parentElement;
+                for(let i=0;i<4;i++){
+                  if(!p) break;
+                  if(p.textContent.toUpperCase().includes('CREDIT')){
+                    const n = parseFloat(txt.replace(/[\\$,]/g,''));
+                    if(!isNaN(n) && n >= 0) return n;
+                  }
+                  p = p.parentElement;
+                }
+              }
+            }
+          }
+          // fallback: find largest dollar amount
+          let best = null;
+          for(const el of all){
+            if(el.children.length === 0 && el.getBoundingClientRect().width > 0){
+              const txt = el.textContent.trim();
+              if(/^\\$[\\d,]+\\.\\d{2}$/.test(txt)){
+                const n = parseFloat(txt.replace(/[\\$,]/g,''));
+                if(!isNaN(n) && n >= 0 && n <= 200000){
+                  if(best === null || n > best) best = n;
+                }
               }
             }
           }
