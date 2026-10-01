@@ -70,6 +70,13 @@ Channels (groups): `#all` everyone · `#planning` maya, leo, judge · `#building
 - Taking longer to make it better is explicitly wanted. If the judge is not satisfied there are as many extra fix rounds as needed; "Round 3" is not a deadline.
 - The ship bar is **at least 4 on EVERY rubric line** (not just on average) plus zero open blocking issues. The lead delivers only after that.
 
+## UPDATE: the owner is now the judge (the judge agent is retired)
+The owner reviews and decides. The `judge` agent is no longer used. In its place:
+- **Automated evidence** (the lead runs it and reports it): `tools/sim.js` for RTP per mode, `tools/*.test.js`, `shell/regress.cjs`, screenshots, and the acceptance checklist in `reviews/01-acceptance.md`.
+- **The lead** prepares a short review package at each checkpoint (playable standalone file, screenshots, sim table, list of known gaps) and asks the owner for `APPROVE | REVISE` with notes.
+- **Builders and planners** treat the owner's notes, relayed by the lead, as the judge's verdicts and fix them. The rubric below still guides quality; do not skip it.
+- Checkpoints: (1) design docs, (2) engine + sim numbers, (3) playable client, (4) final polish. Work pauses at each until the owner answers.
+
 ## Owner approval gate (added by the owner)
 The judge is NOT the final authority: the **owner** is. After the judge approves a slot, the lead presents it to the owner. Only after the owner approves does the next slot start, and the owner's wishes for the next slot go into `OWNER-PREFS.md`. Read `OWNER-PREFS.md` before every decision.
 
