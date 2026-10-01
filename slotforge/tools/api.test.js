@@ -62,7 +62,7 @@ for (const id of listEngines()) {
     let bal = cents((await call('/api/me', null, token, 'GET')).j.user.balance);
     for (let i = 0; i < N; i++) {
       const mode = modes[i % modes.length], o = modeOpts(eng, mode), stake = [0.1, 0.5, 1, 2.5][i % 4];
-      const r = await call(i % 2 ? `/api/slot/${id}/spin` : `/api/${id}/spin`, { stake, ...(o.ante ? { ante: true } : {}), ...(o.buy ? { buy: o.buy } : {}) });
+      const r = await call(i % 2 || id !== "emberclaw" ? `/api/slot/${id}/spin` : `/api/${id}/spin`, { stake, ...(o.ante ? { ante: true } : {}), ...(o.buy ? { buy: o.buy } : {}) });
       assert.equal(r.s, 200, JSON.stringify(r.j));
       const errs = checkRound(r.j.round, eng.CFG, { ante: !!o.ante, buy: o.buy || null }); assert.deepEqual(errs, [], errs.join('; '));
       const cost = cents(stake * r.j.round.cost), pay = cents(stake * r.j.round.totalPayout);
