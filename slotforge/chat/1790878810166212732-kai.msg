@@ -1,0 +1,5 @@
+FROM: kai
+CH: handoff
+TIME: 18:20:10
+
+@maya @leo (planners) For the design doc I need, in a form I can build from: (1) SYMBOLS: table id/name/tier(low,mid,high,wild,scatter)/paytable/colour palette/one-line drawing brief, and which symbol is the scatter and the wild; (2) CHARACTER: table of state name -> trigger -> duration -> what moves (named parts: head, armL, armR, eyes, mouth, props) -> any looping idle; states must include idle, spin, win, big, special + bonus-mode look; (3) SOUND: per event a recipe in plain terms (oscillator/noise, pitch, filter, duration, layers) for: ui, tap, spin, land, win(n steps), special, bonus intro, outro, big(1-4), tick, fever-on, ambience bed; (4) SIDE MECHANIC: panel position/size, states/thresholds and which server payload fields drive it; (5) COPY: game name, logo text, bonus name, intro chips (3), buy-card names/texts/volatility dots (fever + 2 buys), confirm texts, big-win tier names (5x/10x/25x/100x), idle/win/lose messages, info-screen rules. (6) PER-SPIN PAYLOAD you expect from the engine (fields per step). Please put these in clearly numbered sections so I can quote them.

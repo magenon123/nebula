@@ -1,0 +1,76 @@
+<svg id="scene" width="1600" height="900" viewBox="0 0 1600 900">
+ <defs>
+  <linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="900"><stop offset="0" stop-color="#07040a"/><stop offset=".3" stop-color="#1c0b18"/><stop offset=".55" stop-color="#5a1f1c"/><stop offset=".78" stop-color="#b8461a"/><stop offset="1" stop-color="#ff9a3a"/></linearGradient>
+  <radialGradient id="horizon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb04a" stop-opacity=".85"/><stop offset=".4" stop-color="#ff6a1a" stop-opacity=".4"/><stop offset="1" stop-color="#ff4a0a" stop-opacity="0"/></radialGradient>
+  <linearGradient id="farM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3040"/><stop offset="1" stop-color="#2c1522"/></linearGradient>
+  <linearGradient id="volcG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2028"/><stop offset=".55" stop-color="#1e0f15"/><stop offset="1" stop-color="#0d0709"/></linearGradient>
+  <linearGradient id="nearM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241218"/><stop offset="1" stop-color="#0a0507"/></linearGradient>
+  <linearGradient id="lavaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9a2a"/><stop offset=".5" stop-color="#e0480c"/><stop offset="1" stop-color="#7a1604"/></linearGradient>
+  <linearGradient id="flowG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd25a"/><stop offset="1" stop-color="#ff5a14"/></linearGradient>
+  <linearGradient id="crystalG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset=".5" stop-color="#ff9a2a"/><stop offset="1" stop-color="#c8400a"/></linearGradient>
+  <!-- volumetric smoke: layered fractal noise, alpha-keyed -->
+  <filter id="smoke" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0045 .011" numOctaves="5" seed="12"/><feColorMatrix type="matrix" values="0 0 0 0 .12  0 0 0 0 .05  0 0 0 0 .09  1.7 0 0 0 -.62" result="s"/><feGaussianBlur in="s" stdDeviation="6"/></filter>
+  <filter id="smokeLit" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".005 .013" numOctaves="4" seed="31"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 .4  0 0 0 0 .1  1.8 0 0 0 -.95" result="s"/><feGaussianBlur in="s" stdDeviation="9"/></filter>
+  <!-- rock surface: lit noise, multiplied over the shape colour -->
+  <filter id="rock" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".03 .045" numOctaves="5" seed="3" result="n"/><feDiffuseLighting in="n" lighting-color="#8a6252" surfaceScale="4.5" diffuseConstant=".75"><feDistantLight azimuth="215" elevation="52"/></feDiffuseLighting><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 .55"/></filter>
+  <filter id="veins" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0065 .032" numOctaves="4" seed="8"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 .62  0 0 0 0 .12  8 0 0 0 -4.3"/></filter>
+  <filter id="glowB" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14"/></filter>
+  <filter id="glowS" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+  <filter id="haze" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.2"/></filter>
+  <clipPath id="lakeClip"><path d="M-400 812 Q-100 786 220 806 Q560 830 860 808 Q1180 786 1500 812 Q1740 826 2000 806 V920 H-400Z"/></clipPath>
+  <clipPath id="volcClip"><path d="M180 760 L400 380 Q440 312 486 306 L640 306 Q690 312 724 380 L1000 760Z"/></clipPath>
+ </defs>
+ <rect x="-1500" y="-1200" width="4600" height="3200" fill="url(#sky)"/>
+ <ellipse cx="800" cy="560" rx="1000" ry="330" fill="url(#horizon)"/>
+ <ellipse cx="560" cy="330" rx="240" ry="150" fill="url(#horizon)" opacity=".8"/>
+ <!-- ash clouds, dark body lit from below -->
+ <rect x="-300" y="-120" width="2200" height="760" filter="url(#smoke)"/>
+ <rect x="-300" y="120" width="2200" height="560" filter="url(#smokeLit)" opacity=".28" style="mix-blend-mode:screen"/>
+ <!-- far ridge, hazy -->
+ <g filter="url(#haze)">
+  <path d="M-400 560 L-120 500 L120 430 L330 508 L470 440 L560 392 L640 340 L720 400 L800 450 L1000 546 L1180 470 L1330 530 L1500 460 L1700 520 L2000 540 V900 H-400Z" fill="url(#farM)"/>
+ </g>
+ <!-- volcano -->
+ <path d="M180 760 L400 380 Q440 312 486 306 L640 306 Q690 312 724 380 L1000 760Z" fill="url(#volcG)"/>
+ <g clip-path="url(#volcClip)"><rect x="150" y="290" width="900" height="500" filter="url(#rock)"/></g>
+ <path d="M724 380 L1000 760 L840 760 L700 480Z" fill="#000" opacity=".35"/>
+ <!-- crater glow + lava flows -->
+ <ellipse cx="563" cy="312" rx="120" ry="34" fill="#ff7a1a" filter="url(#glowB)" opacity=".9"/>
+ <path d="M452 316 Q500 296 563 300 Q630 296 676 316 Q640 330 563 332 Q490 330 452 316Z" fill="#ffc24a"/>
+ <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M520 330 Q500 400 530 460 Q552 520 520 590 Q508 650 530 740" stroke="#ff6a14" stroke-width="22" filter="url(#glowS)" opacity=".85"/>
+  <path d="M520 330 Q500 400 530 460 Q552 520 520 590 Q508 650 530 740" stroke="url(#flowG)" stroke-width="9"/>
+  <path d="M626 330 Q646 390 624 440 Q612 500 640 560" stroke="#ff6a14" stroke-width="16" filter="url(#glowS)" opacity=".8"/>
+  <path d="M626 330 Q646 390 624 440 Q612 500 640 560" stroke="url(#flowG)" stroke-width="6"/>
+ </g>
+ <!-- eruption plume -->
+ <g filter="url(#glowB)" opacity=".85"><ellipse cx="548" cy="250" rx="70" ry="60" fill="#3a1a1c"/><ellipse cx="600" cy="170" rx="90" ry="70" fill="#2a1216"/><ellipse cx="660" cy="80" rx="120" ry="80" fill="#1c0b10"/></g>
+ <ellipse cx="560" cy="262" rx="60" ry="40" fill="#ff7a1a" filter="url(#glowB)" opacity=".5" style="mix-blend-mode:screen"/>
+ <!-- right peak -->
+ <path d="M1000 780 L1230 500 Q1262 468 1302 496 L1600 780Z" fill="url(#nearM)"/>
+ <g><clipPath id="rpClip"><path d="M1000 780 L1230 500 Q1262 468 1302 496 L1600 780Z"/></clipPath><g clip-path="url(#rpClip)"><rect x="980" y="460" width="640" height="340" filter="url(#rock)"/></g></g>
+ <!-- left cliff -->
+ <path d="M-400 920 V560 L-120 560 L60 452 Q130 420 182 476 L262 610 L330 650 L346 780 L310 920Z" fill="url(#nearM)"/>
+ <clipPath id="lcClip"><path d="M-400 920 V560 L-120 560 L60 452 Q130 420 182 476 L262 610 L330 650 L346 780 L310 920Z"/></clipPath>
+ <g clip-path="url(#lcClip)"><rect x="-420" y="420" width="800" height="520" filter="url(#rock)"/></g>
+ <path d="M60 452 Q130 420 182 476 L262 610" fill="none" stroke="#ff8a3a" stroke-width="3" opacity=".55" filter="url(#glowS)"/>
+ <!-- glowing crystals -->
+ <g filter="url(#glowS)" opacity=".8"><path d="M252 660 L276 590 L300 660Z M290 668 L318 566 L344 668Z M226 668 L240 622 L258 668Z" fill="#ff9a2a"/></g>
+ <g><path d="M252 660 L276 590 L300 660Z" fill="url(#crystalG)"/><path d="M290 668 L318 566 L344 668Z" fill="url(#crystalG)"/><path d="M226 668 L240 622 L258 668Z" fill="url(#crystalG)"/>
+  <path d="M276 590 L284 660 M318 566 L328 668" stroke="#fff3c0" stroke-width="2" opacity=".6"/></g>
+ <!-- ledge for the smith -->
+ <path d="M1080 920 L1100 790 Q1150 774 1210 796 L1600 774 L2000 774 V920Z" fill="url(#nearM)"/>
+ <clipPath id="ldClip"><path d="M1080 920 L1100 790 Q1150 774 1210 796 L1600 774 L2000 774 V920Z"/></clipPath>
+ <g clip-path="url(#ldClip)"><rect x="1060" y="760" width="960" height="180" filter="url(#rock)"/></g>
+ <path d="M1100 790 Q1150 774 1210 796 L1600 774 L2000 774" fill="none" stroke="#ff8a3a" stroke-width="3" opacity=".5" filter="url(#glowS)"/>
+ <!-- lava lake -->
+ <path d="M-400 812 Q-100 786 220 806 Q560 830 860 808 Q1180 786 1500 812 Q1740 826 2000 806 V920 H-400Z" fill="#240804"/>
+ <g clip-path="url(#lakeClip)"><rect x="-420" y="770" width="2460" height="150" filter="url(#veins)"/>
+  <rect x="-420" y="860" width="2460" height="60" fill="#ff5a14" opacity=".35" filter="url(#glowB)"/></g>
+ <path d="M-400 812 Q-100 786 220 806 Q560 830 860 808 Q1180 786 1500 812 Q1740 826 2000 806" fill="none" stroke="#ff9a3a" stroke-width="6" opacity=".7" filter="url(#glowS)"/>
+ <!-- chains behind the frame -->
+ <g stroke-linecap="round"><path d="M520 -400 V130" stroke="#000" stroke-width="12" opacity=".5" transform="translate(4 3)"/><path d="M1080 -400 V130" stroke="#000" stroke-width="12" opacity=".5" transform="translate(4 3)"/>
+  <path d="M520 -400 V130" stroke="#8a8d96" stroke-width="9" stroke-dasharray="15 6"/><path d="M1080 -400 V130" stroke="#8a8d96" stroke-width="9" stroke-dasharray="15 6"/>
+  <path d="M520 -400 V130" stroke="#c9ccd4" stroke-width="3" stroke-dasharray="15 18"/><path d="M1080 -400 V130" stroke="#c9ccd4" stroke-width="3" stroke-dasharray="15 18"/></g>
+</svg>
+<div class="heatwash"></div>

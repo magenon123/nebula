@@ -1,0 +1,323 @@
+'use strict';
+/* SlotForge shell: shared logic for every Nebula slot. See shell/README.md for the hook API.
+ *
+ *   SlotShell.boot(SLOT_CFG, S => ({ ...hooks }))
+ *
+ * `SLOT_CFG` is slots/<slug>/slot.json (injected by build-standalone.py). The factory receives the shell API `S` and returns the
+ * slot's hooks. Pure renderer: the server returns the whole round; nothing here computes an outcome.
+ * In the standalone build a global `SLOT_ENGINE` ({playRound, CFG}) exists and the shell plays against it locally (play money).
+ */
+const SlotShell = (() => {
+const $ = id => document.getElementById(id);
+const store = { get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+const fmt = n => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const betLbl = n => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
+
+function boot(cfg, factory) {
+const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : null;   // standalone build: engine embedded, play money
+const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, BUYS = cfg.buys || [], P = cfg.storage || cfg.id;
+let hooks = {};
+let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, busy = false, balance = 0, STAGE_S = 1;
+let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false);
+let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
+const T = () => turbo ? .45 : 1;
+const wait = ms => sleep(ms * T());
+
+/* the 1600x900 stage is scaled to fit the window */
+function fit() { STAGE_S = Math.min(innerWidth / 1600, innerHeight / 900); $('stage').style.setProperty('--s', STAGE_S); }
+addEventListener('resize', fit); fit();
+
+/* ---------- audio: everything is synthesised, nothing is sampled. The shell owns the primitives; the slot owns the recipes ---------- */
+function makeKit(ctx, out) {
+  const sr = ctx.sampleRate, rvc = (cfg.audio && cfg.audio.reverb) || { sec: 1.7, pow: 2.8, wet: .28 };
+  const nb = ctx.createBuffer(1, sr * 2, sr), nd = nb.getChannelData(0);
+  for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  // room reverb: decaying noise impulse
+  const rv = ctx.createConvolver(), ib = ctx.createBuffer(2, Math.floor(sr * rvc.sec), sr);
+  for (let c = 0; c < 2; c++) { const d = ib.getChannelData(c); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, rvc.pow); }
+  rv.buffer = ib; const wet = ctx.createGain(); wet.gain.value = rvc.wet; rv.connect(wet).connect(out);
+  const bus = ctx.createGain(); bus.connect(out); bus.connect(rv);
+  const env = (t, a, peak, d) => { const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(.0002, peak), t + a); g.gain.exponentialRampToValueAtTime(.0001, t + a + d); return g; };
+  const osc = (type, f, t, d, peak, a = .004, to, dest = bus) => { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + d); o.connect(env(t, a, peak, d)).connect(dest); o.start(t); o.stop(t + a + d + .05); };
+  const noise = (t, d, peak, type, f1, f2, q = 1, a = .002) => { const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; const f = ctx.createBiquadFilter(); f.type = type; f.frequency.setValueAtTime(f1, t); if (f2) f.frequency.exponentialRampToValueAtTime(f2, t + d); f.Q.value = q; s.connect(f).connect(env(t, a, peak, d)).connect(bus); s.start(t, Math.random()); s.stop(t + a + d + .05); };
+  const metal = (f, t, d, peak, R = [1, 2.756, 5.404, 8.933]) => R.forEach((r, i) => osc('sine', f * r, t, d / (1 + i * .7), peak / (1 + i * 1.1), .002));
+  const st = n => Math.pow(2, n / 12);
+  const T0 = () => ctx.currentTime + .005;
+  /* ambience bed: looping filtered noise + random crackles. o = {lowpass, gain, level, loopSec, crack:{gain:[min,range], f:[min,range], q, every:[min,range], len:[min,range]}} */
+  const bed = (o = {}) => {
+    const c = ctx, k = Object.assign({ lowpass: 170, gain: .5, level: .02, loopSec: 3 }, o), ck = Object.assign({ gain: [.025, .05], f: [2500, 4500], q: 3, every: [120, 900], len: [.03, .05] }, o.crack);
+    let nodes = null, timer = 0;
+    return {
+      start() { if (timer) return; const s = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * k.loopSec, c.sampleRate), d = b.getChannelData(0); let l = 0;
+        for (let i = 0; i < d.length; i++) { l = (l + (Math.random() * 2 - 1) * k.level) / 1.02; d[i] = l * 3; }
+        s.buffer = b; s.loop = true; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = k.lowpass; const g = c.createGain(); g.gain.value = k.gain; s.connect(f).connect(g).connect(out); s.start(); nodes = { s, g };
+        const crack = () => { if (!nodes) return; const t = c.currentTime, n = c.createBufferSource(); n.buffer = b; const q = c.createBiquadFilter(); q.type = 'bandpass'; q.frequency.value = ck.f[0] + Math.random() * ck.f[1]; q.Q.value = ck.q;
+          const e = c.createGain(); e.gain.setValueAtTime(.0001, t); e.gain.exponentialRampToValueAtTime(ck.gain[0] + Math.random() * ck.gain[1], t + .004); e.gain.exponentialRampToValueAtTime(.0001, t + ck.len[0] + Math.random() * ck.len[1]); n.connect(q).connect(e).connect(out); n.start(t, Math.random() * 2); n.stop(t + .12); timer = setTimeout(crack, ck.every[0] + Math.random() * ck.every[1]); };
+        crack(); },
+      stop() { clearTimeout(timer); timer = 0; if (nodes) { try { nodes.s.stop(); } catch {} nodes = null; } }
+    };
+  };
+  return { ctx, out, bus, env, osc, noise, metal, st, T0, bed };
+}
+let ac, master, recipes, ambCtl = null;
+function audio() {
+  if (!recipes) { ac = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; master = ac.createGain(); master.gain.value = .9; master.connect(comp).connect(ac.destination);
+    const kit = makeKit(ac, master); recipes = hooks.sfx(kit); if (hooks.ambience) ambCtl = hooks.ambience(kit); }
+  if (ac.state === 'suspended') ac.resume(); return recipes;
+}
+const sfx = new Proxy({}, { get: (_, k) => (...a) => { if (!soundOn) return; try { audio()[k](...a); } catch {} } });
+const amb = {
+  start() { if (!soundOn) return; try { audio(); if (ambCtl) ambCtl.start(); } catch {} },
+  stop() { if (ambCtl) ambCtl.stop(); }
+};
+addEventListener('pointerdown', () => amb.start(), { once: true });
+
+/* ---------- particles (restrained: small ambient sparks + event bursts) ---------- */
+const cv = $('fx'), cx = cv.getContext('2d'); let parts = [];
+function size() { cv.width = innerWidth; cv.height = innerHeight; } size(); addEventListener('resize', size);
+function embers(n, x = innerWidth / 2, y = innerHeight / 2, gold) {
+  for (let i = 0; i < n; i++) parts.push({ x, y, vx: (Math.random() - .5) * 9, vy: -Math.random() * 8 - 1, l: 60 + Math.random() * 60, s: 2 + Math.random() * 3.5, g: .14, c: gold ? 1 : 0 });
+}
+function coins(n) { for (let i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, l: 200, s: 6 + Math.random() * 6, g: .05, c: 1 }); }
+function ambient() {
+  if (parts.length > 120) return;
+  if (Math.random() < .12 + (hooks.ambientBoost ? hooks.ambientBoost() : 0)) parts.push({ x: Math.random() * innerWidth, y: innerHeight + 6, vx: (Math.random() - .5) * .6, vy: -(.5 + Math.random() * 1.1), l: 260 + Math.random() * 160, s: 1.2 + Math.random() * 2, g: -.001, w: Math.random() * 6, c: 0 });
+}
+const defColor = (p, a) => `rgba(255,255,255,${a})`;
+(function loop() {
+  cx.clearRect(0, 0, cv.width, cv.height); ambient();
+  parts = parts.filter(p => p.l-- > 0 && p.y > -30 && p.y < innerHeight + 30);
+  const col = hooks.particleColor || defColor;
+  for (const p of parts) {
+    p.x += p.vx + (p.w ? Math.sin((p.l + p.w * 40) / 25) * .4 : 0); p.y += p.vy; p.vy += p.g;
+    const a = Math.min(1, p.l / 70); cx.fillStyle = col(p, a);
+    cx.fillRect(p.x, p.y, p.s, p.s);
+  }
+  requestAnimationFrame(loop);
+})();
+const shake = big => { const a = $('shaker'); a.classList.remove('shake', 'shake2'); void a.offsetWidth; a.classList.add(big ? 'shake2' : 'shake'); };
+const flash = () => { const f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); };
+const say = (t, hl) => { $('msg').textContent = t; $('msg').classList.toggle('hl', !!hl); };
+
+/* ---------- character controller: one CSS class per state on #char (states are animated in slot.css) ---------- */
+let charT;
+const cc = cfg.char || { el: 'char', states: ['swing', 'win', 'big', 'boom'], bonusClass: 'bonusmode' };
+function char(name, ms) {
+  const c = $(cc.el); c.classList.remove(...cc.states); void c.getBoundingClientRect(); c.classList.add(name);
+  clearTimeout(charT); charT = setTimeout(() => c.classList.remove(name), ms);
+}
+
+/* count a number up (click to skip) */
+function countUp(el, to, ms, from = 0, onTick) {
+  return new Promise(res => { const t0 = performance.now(); skipBig = false; let lt = 0;
+    (function f(t) { if (onTick && t - lt > 75) { lt = t; onTick(Math.min(1, (t - t0) / ms)); }
+      const k = skipBig ? 1 : Math.min(1, (t - t0) / ms); el.textContent = fmt(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+      k < 1 ? requestAnimationFrame(f) : res(); })(t0); });
+}
+/* floating "+$x.xx" pop at a screen point, inside #fxl (the board's fx layer) */
+function pop(sx, sy, text, layer = $('fxl')) {
+  const g = layer.getBoundingClientRect(), e = document.createElement('div'); e.className = 'pop'; e.textContent = text;
+  e.style.left = ((sx - g.left) / STAGE_S) + 'px'; e.style.top = ((sy - g.top) / STAGE_S) + 'px'; layer.append(e); setTimeout(() => e.remove(), 1200);
+}
+
+/* ---------- API client: server round, or the embedded engine with play money (standalone) ---------- */
+const API = location.origin.startsWith('http') ? '' : 'http://localhost:3000';
+const TOKEN = LOCAL ? null : localStorage.getItem('stakeToken');
+const _r2 = n => Math.round(n * 100) / 100;
+let wallet = 0;
+if (LOCAL) { try { wallet = Number(localStorage.getItem(cfg.walletKey) || cfg.startBalance || 1000); } catch { wallet = cfg.startBalance || 1000; } if (!(wallet >= 0.1)) wallet = cfg.startBalance || 1000; }
+const webRng = () => { const a = new Uint32Array(2); crypto.getRandomValues(a); return (a[0] * 2 ** 21 + (a[1] >>> 11)) / 2 ** 53; };
+async function api(body) {
+  if (LOCAL) {
+    const stake = _r2(body.stake), buy = body.buy || null;
+    const round = LOCAL.playRound(webRng, { ante: !!body.ante, buy });
+    const cost = _r2(stake * round.cost), payout = _r2(stake * round.totalPayout);
+    if (cost > wallet + 1e-9) throw new Error('Not enough balance (clear site data to reset play money)');
+    wallet = _r2(wallet - cost + payout); try { localStorage.setItem(cfg.walletKey, wallet); } catch {}
+    return { round, stake, cost, payout, user: { balance: wallet } };
+  }
+  const r = await fetch(API + cfg.api, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
+  const j = await r.json(); if (!r.ok) throw new Error(j.error || 'Spin failed'); return j;
+}
+function syncParent(u) { try { const a = parent !== window && parent._slotAPI; if (a) { a.bal = u.balance; a.paintBal(0); } } catch {} }
+
+/* ---------- modals ---------- */
+const openM = id => { $(id).hidden = false; }, closeM = id => { $(id).hidden = true; };
+document.querySelectorAll('.modal [data-close]').forEach(b => b.onclick = () => closeM(b.closest('.modal').id));
+document.querySelectorAll('.modal').forEach(m => m.addEventListener('mousedown', e => { if (e.target === m && m.id !== 'introM' && m.id !== 'outroM') { m.id === 'confirm' ? closeBuy(false) : closeM(m.id); } }));
+/* tap anywhere (or Space/Enter) to continue; ignores taps for the first 450ms so a stray click can't skip it */
+function tapWait(id, autoMs, minMs = 450) { return new Promise(res => { const m = $(id); openM(id); const t0 = performance.now(); let done = false;
+  const fin = () => { if (done) return; done = true; closeM(id); m.removeEventListener('click', onc); removeEventListener('keydown', onk); res(); };
+  const onc = () => { if (performance.now() - t0 > minMs) { sfx.hit(); fin(); } };
+  const onk = e => { if ((e.code === 'Space' || e.code === 'Enter') && performance.now() - t0 > minMs) { e.preventDefault(); sfx.hit(); fin(); } };
+  m.addEventListener('click', onc); addEventListener('keydown', onk); if (autoMs) setTimeout(fin, autoMs); }); }
+
+/* ---------- big win overlay ---------- */
+const tierOf = x => cfg.tiers.find(t => x >= t.min) || null;
+async function bigWin(x, amt) {
+  const t = tierOf(x); if (!t) return null;
+  const lv = t.lv;
+  $('bigT').textContent = t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET';
+  $('big').classList.add('show'); char('big', 3300); shake(lv > 2); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
+  sfx.big(lv);
+  await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => sfx.tick(k)), sleep(20000)]);
+  await sleep(auto.left > 0 ? 700 : 1500 + lv * 300);
+  $('big').classList.remove('show'); return t.name;
+}
+$('big').onclick = () => { skipBig = true; };
+
+/* ---------- the round ---------- */
+function setBusy(b) {
+  busy = b; ['m', 'p', 'buyOpen', 'menuBtn'].forEach(id => $(id).disabled = b); $('spin').disabled = b && auto.left <= 0;
+  $('bAuto').disabled = b && auto.left <= 0; $('spin').classList.toggle('busy', b && auto.left <= 0);
+}
+async function go(buy) {
+  if (busy) return; setBusy(true); sfx.spin(); closeMenu();
+  $('win').textContent = fmt(0); $('fsBox').hidden = true;
+  const stake = BETS[bi]; let out = { payout: 0, bonus: false, tier: null };
+  try {
+    hooks.roundStart();
+    let j;
+    try { [j] = await Promise.all([api({ stake, ante: buy ? false : ante, buy }), hooks.clearBoard()]); }
+    catch (e) { hooks.restoreBoard(); throw e; }
+    const R = j.round; let run = 0;
+    balance = j.user.balance - j.payout;  // show the stake leaving now, the win as it lands
+    $('bal').textContent = fmt(balance);
+    const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b); } };
+    run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
+    if (R.bonusTriggered) {
+      out.bonus = true;
+      await hooks.showTrigger(R); sfx.bonus(); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
+      $('introN').textContent = R.bonus.startSpins; await tapWait('introM', auto.left > 0 ? 1800 : 0);
+      $('fsBox').hidden = false; $(cc.el).classList.add(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(true);
+      let total = R.bonus.spins.length;
+      for (const sp of R.bonus.spins) {
+        $('fs').textContent = `${sp.spinIndex} / ${total}` + (sp.retrigger ? '  +' + sp.retrigger : ''); say(tpl(cfg.text.freeSpin, { n: sp.spinIndex }) + (sp.retrigger ? tpl(cfg.text.freeSpinRetrigger, { r: sp.retrigger }) : ''), !!sp.retrigger);
+        await hooks.clearBoard();
+        run = await hooks.playSpin(sp, run, ctx); await wait(300);
+      }
+      $('fsBox').hidden = true; $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); $('outroV').textContent = fmt(0);
+      openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
+      await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);
+      await tapWait('outroM', auto.left > 0 ? 1500 : 0);
+    }
+    $('win').textContent = fmt(j.payout); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user);
+    out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
+    out.tier = await bigWin(R.totalPayout, j.payout);
+  } catch (e) { say(e.message); out.err = true; }
+  setBusy(false); refreshUi(); return out;
+}
+
+/* ---------- autoplay ---------- */
+async function runAuto() {
+  while (auto.left > 0) {
+    refreshUi(); const o = await go(null);
+    if (o.err) break;
+    auto.left--;
+    if ((o.bonus && auto.stopFeat) || (o.tier && auto.stopBig && cfg.tiers.find(t => t.name === o.tier).lv >= cfg.autoBigLv)) break;
+    if (BETS[bi] * (ante ? ANTE_COST : 1) > balance + 1e-9) { say('Not enough balance — autoplay stopped.'); break; }
+    await wait(450);
+  }
+  auto.left = 0; refreshUi();
+}
+const AUTO_N = [10, 25, 50, 100];
+$('autoOpts').innerHTML = AUTO_N.map(n => `<button class="opt${n === 25 ? ' sel' : ''}" data-n="${n}">${n}</button>`).join('');
+$('autoOpts').onclick = e => { const b = e.target.closest('.opt'); if (!b) return; auto.pickN = +b.dataset.n; [...$('autoOpts').children].forEach(x => x.classList.toggle('sel', x === b)); };
+$('swFeat').onclick = () => { auto.stopFeat = !auto.stopFeat; $('swFeat').classList.toggle('on', auto.stopFeat); };
+$('swBig').onclick = () => { auto.stopBig = !auto.stopBig; $('swBig').classList.toggle('on', auto.stopBig); };
+$('bAuto').onclick = () => { if (auto.left > 0) { auto.left = 0; refreshUi(); return; } if (!busy) openM('autoM'); };
+$('autoGo').onclick = () => { closeM('autoM'); auto.left = auto.pickN; runAuto(); };
+
+/* ---------- bonus buy screen + confirmation ---------- */
+let pendingBuy = null;
+function askBuy(kind) {
+  if (busy) return; const b = BUYS.find(x => x.key === kind), cost = BETS[bi] * b.mult; pendingBuy = kind;
+  $('cTitle').textContent = b.confirmTitle; $('cDesc').textContent = b.confirmText; $('cCost').textContent = fmt(cost); $('cCost').style.fontSize = fmt(cost).length > 10 ? '38px' : '';
+  const short = cost > balance + 1e-9; $('cWarn').textContent = short ? 'Not enough balance.' : ''; $('cYes').disabled = short;
+  openM('confirm');
+}
+function closeBuy(ok) { if (ok) { sfx.hit(); ante = false; refreshUi(); } const k = pendingBuy; pendingBuy = null; closeM('confirm'); if (ok && k) go(k); }
+$('cYes').onclick = () => closeBuy(true);
+$('cNo').onclick = () => closeBuy(false);
+$('buyOpen').onclick = () => { if (busy) return; sfx.ui(); refreshUi(); openM('buyM'); };
+$('bbM').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
+$('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
+
+function refreshUi() {
+  const s = BETS[bi], risk = s * (ante ? ANTE_COST : 1); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
+  $('barR').classList.toggle('hot', ante); $('betLbl').textContent = ante ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !ante; $('buyPrice').textContent = fmt(s * BUYS[0].mult);
+  const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
+  $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
+  BUYS.forEach((b, i) => fitTxt($('p' + (i + 1)), fmt(s * b.mult), 34, '23px'));
+  $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante);
+  $('bAuto').classList.toggle('on', auto.left > 0);
+  $('spinCnt').hidden = !(auto.left > 0); $('spinCnt').textContent = auto.left; $('spin').querySelector('svg').style.visibility = auto.left > 0 ? 'hidden' : '';
+  $('bTurbo').classList.toggle('on', turbo); $('bTurbo').querySelector('i').textContent = turbo ? 'ON' : 'OFF'; $('turboBadge').hidden = !turbo;
+  $('bSnd').classList.toggle('on', soundOn); $('bSnd').querySelector('i').textContent = soundOn ? 'ON' : 'OFF';
+  document.body.style.setProperty('--spd', T());
+}
+function openBets() {
+  if (busy) return; sfx.ui();
+  $('betGrid').innerHTML = BETS.map((v, i) => `<button class="opt${i === bi ? ' sel' : ''}" data-i="${i}">${betLbl(v)}</button>`).join('');
+  openM('betM');
+}
+$('betGrid').onclick = e => { const o = e.target.closest('.opt'); if (!o) return; sfx.ui(); bi = +o.dataset.i; refreshUi(); closeM('betM'); };
+$('betV').onclick = openBets;
+$('m').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
+$('p').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
+$('spin').onclick = () => { if (auto.left > 0) { auto.left = 0; sfx.ui(); refreshUi(); say('Autoplay stopping after this spin'); return; } go(null); };
+/* hamburger menu */
+const closeMenu = () => { $('menu').hidden = true; };
+$('menuBtn').onclick = e => { e.stopPropagation(); sfx.ui(); $('menu').hidden = !$('menu').hidden; };
+document.addEventListener('click', e => { if (!e.target.closest('#menu') && !e.target.closest('#menuBtn')) closeMenu(); });
+$('bTurbo').onclick = () => { sfx.ui(); turbo = !turbo; store.set(P + '_turbo', turbo); refreshUi(); };
+$('bSnd').onclick = () => { soundOn = !soundOn; store.set(P + '_snd', soundOn); soundOn ? (amb.start(), sfx.ui()) : amb.stop(); refreshUi(); };
+$('bInfo').onclick = () => { closeMenu(); openM('infoM'); };
+$('bFs').onclick = () => { closeMenu(); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch {} };
+addEventListener('keydown', e => {
+  if (e.code === 'Escape') { for (const m of ['confirm', 'buyM', 'autoM', 'infoM']) if (!$(m).hidden) { m === 'confirm' ? closeBuy(false) : closeM(m); return; } closeMenu(); }
+  if (document.querySelector('.modal:not([hidden])')) return;
+  if (e.code === 'Space') { e.preventDefault(); if (!busy) go(null); }
+});
+
+/* ---------- static UI generated from slot.json ---------- */
+const sym = id => `<svg viewBox="0 0 64 64"><use href="#s${id}"/></svg>`;
+document.title = cfg.title + (LOCAL ? ' (offline demo)' : '');
+$('authName').textContent = cfg.logoText;
+$('buyOpen').querySelector('svg').innerHTML = `<use href="#s${cfg.scatterSym}"/>`;
+$('feverBadge').textContent = cfg.fever.badge;
+const bigTier = cfg.tiers.find(t => t.lv === cfg.autoBigLv); $('swBigTxt').textContent = `Stop on a big win (${bigTier.min}x+)`;
+$('bbRow').innerHTML =
+  `<div class="bbc"><div class="med">${sym(cfg.fever.sym)}</div><h3>${cfg.fever.name}</h3><p>${cfg.fever.text}</p><div class="vol" data-n="${cfg.fever.vol}"><span>VOLATILITY</span></div><div class="price" id="pa">${ANTE_COST}x BET</div><button class="go or" id="ante">ACTIVATE</button></div>` +
+  BUYS.map((b, i) => `<div class="bbc"><div class="med">${sym(b.sym)}</div><h3>${b.name}</h3><p>${b.text}</p><div class="vol" data-n="${b.vol}"><span>VOLATILITY</span></div><div class="price" id="p${i + 1}">$${b.mult}.00</div><button class="go gd" id="buy${i + 1}">BUY</button></div>`).join('');
+document.querySelectorAll('.vol').forEach(v => { for (let i = 1; i <= 5; i++) v.insertAdjacentHTML('beforeend', `<i class="${i <= +v.dataset.n ? 'on' : ''}"></i>`); });
+BUYS.forEach((b, i) => { $('buy' + (i + 1)).onclick = () => { closeM('buyM'); askBuy(b.key); }; });
+$('ante').onclick = () => { sfx.ui(); ante = !ante; refreshUi(); closeM('buyM'); if (ante) { say(cfg.fever.onMsg, true); sfx.feverOn(); } else say(cfg.fever.offMsg); };
+$('introGems').innerHTML = [1, 2, 3].map(() => `<div class="g">${sym(cfg.scatterSym)}</div>`).join('');
+$('introLbl').textContent = cfg.intro.unit; $('introRibbon').textContent = cfg.intro.ribbon;
+$('introChips').innerHTML = cfg.intro.chips.map(c => `<span>${c}</span>`).join('');
+$('outroRibbon').textContent = cfg.outro.ribbon;
+
+/* ---------- the API handed to the slot ---------- */
+const S = {
+  cfg, $, store, fmt, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
+  scale: () => STAGE_S, bet: () => BETS[bi], isTurbo: () => turbo, isBusy: () => busy, local: !!LOCAL,
+  skipCount: () => { skipBig = true; }
+};
+hooks = factory(S) || {};
+for (const k of ['sfx', 'init', 'paintIdle', 'roundStart', 'clearBoard', 'restoreBoard', 'playSpin', 'showTrigger'])
+  if (typeof hooks[k] !== 'function') throw new Error('slot is missing hook: ' + k);
+hooks.init(S);
+hooks.paintIdle();
+refreshUi();
+say(cfg.text.idle + (LOCAL ? ' (Play-money demo)' : ''));
+if (LOCAL) { balance = wallet; $('bal').textContent = fmt(balance); }
+else if (!TOKEN) $('auth').hidden = false;
+else fetch(API + '/api/me', { headers: { authorization: 'Bearer ' + TOKEN } }).then(r => r.json())
+  .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); } else $('auth').hidden = false; });
+}
+return { boot, $, store, fmt, betLbl, sleep };
+})();

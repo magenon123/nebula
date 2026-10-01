@@ -208,33 +208,45 @@ app.post('/api/bet', auth, async (req, res) => {
 });
 
 
-/* ---------------- EmberClaw: server-authoritative slot ---------------- */
-app.post('/api/emberclaw/spin', auth, async (req, res) => {
+/* ===== SLOTFORGE SLOT ROUTES START ===== (owner: rin; engines live in slotforge/engines/, see ENGINE-API.md) */
+import { getEngine } from './slotforge/engines/index.js';
+
+const hasOwn = (o, k) => Object.prototype.hasOwnProperty.call(o || {}, k);
+
+/* One generic, server-authoritative spin for every registered slot engine. */
+async function slotSpin(slotId, req, res) {
   try {
+    const eng = getEngine(slotId);
+    if (!eng) return res.status(404).json({ error: 'Unknown slot' });
+    const C = eng.CFG;
     const stake = money(req.body.stake);
     const ante  = !!req.body.ante;
     const buy   = req.body.buy ? String(req.body.buy) : null;
-    if (!EC.bets.includes(stake)) return res.status(400).json({ error: 'Invalid bet size' });
-    if (buy && !EC.buy[buy]) return res.status(400).json({ error: 'Unknown bonus buy' });
+    if (!C.bets.includes(stake)) return res.status(400).json({ error: 'Invalid bet size' });
+    if (buy && !hasOwn(C.buy, buy)) return res.status(400).json({ error: 'Unknown bonus buy' });
+    if (ante && !C.anteCost) return res.status(400).json({ error: 'This slot has no ante mode' });
     if (buy && ante) return res.status(400).json({ error: 'Ante cannot be combined with Buy Bonus' });
 
-    const round = playRound(cryptoRng, { ante, buy });
+    const round = eng.playRound(eng.cryptoRng, { ante, buy });
     const cost = money(stake * round.cost);
     const payout = money(stake * round.totalPayout);
 
     // atomic debit: only succeeds if the balance still covers the cost
     const d = await db.execute({ sql: 'UPDATE users SET balance=balance-? WHERE id=? AND balance>=?', args: [cost, req.user.id, cost - 1e-9] });
     if (!d.rowsAffected) return res.status(400).json({ error: 'Not enough balance' });
-    const rake = cost * (EDGE.emberclaw ?? 0.04) * tierFor(req.user.wagered).rate;
+    const rake = cost * (C.rakeEdge ?? EDGE[slotId] ?? 0.04) * tierFor(req.user.wagered).rate;
     await db.batch([
       { sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [payout, req.user.id] },
       { sql: 'UPDATE users SET wagered=wagered+?, rake=rake+? WHERE id=?', args: [cost, rake, req.user.id] },
-      { sql: 'INSERT INTO bets (user_id,game,stake,mult,payout,created) VALUES (?,?,?,?,?,?)', args: [req.user.id, 'emberclaw', cost, payout / cost, payout, Date.now()] }
+      { sql: 'INSERT INTO bets (user_id,game,stake,mult,payout,created) VALUES (?,?,?,?,?,?)', args: [req.user.id, slotId, cost, payout / cost, payout, Date.now()] }
     ], 'write');
 
     res.json({ round, stake, cost, payout, user: shape(await byId(req.user.id)) });
   } catch (e) { res.status(500).json({ error: e.message }); }
-});
+}
+app.post('/api/slot/:id/spin', auth, (req, res) => slotSpin(req.params.id, req, res));
+app.post('/api/emberclaw/spin', auth, (req, res) => slotSpin('emberclaw', req, res));   // legacy path, same handler
+/* ===== SLOTFORGE SLOT ROUTES END ===== */
 
 app.post('/api/rakeback/claim', auth, async (req, res) => {
   try {

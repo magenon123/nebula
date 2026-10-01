@@ -1,14 +1,11 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>EmberClaw: Molten Reforge</title>
+<title>EmberClaw: Molten Reforge (offline demo)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Roboto:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-/* SlotForge shell CSS: everything shared by every slot (see shell/README.md). Per-slot art/colours go in slots/<slug>/slot.css. */
-:root{--ink:#1d0f09;--ui:Roboto,system-ui,'Segoe UI',Arial,sans-serif;--toon:'Luckiest Guy',Impact,'Arial Black',sans-serif;--spd:1;--heat:0;--gold:#ffc83a;--accent:#f26b0f;
-  /* theme tokens: a slot re-skins the shell by overriding these in slot.css (:root{...}) */
-  --rivet:#c9a15a;--bevel:#7a5238;--muted:#b79a82;--rim:#6e4a36;--panel1:#34231c;--panel2:#1c100c;--hover:#2a1a14;--txt:#e3d0b8;--btn:#3a251c;--gold2:#ffd36a;--acc1:#ff8a2a;--acc2:#e0500a}
+:root{--ink:#1d0f09;--ui:Roboto,system-ui,'Segoe UI',Arial,sans-serif;--toon:'Luckiest Guy',Impact,'Arial Black',sans-serif;--spd:1;--heat:0;--gold:#ffc83a;--accent:#f26b0f}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;height:100%;overflow:hidden;background:#1a0a12;font-family:var(--ui);color:#fff;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
@@ -20,7 +17,6 @@ button:disabled{cursor:not-allowed}
 #flash.go{animation:flash .7s ease-out}
 @keyframes flash{0%{opacity:.9}100%{opacity:0}}
 
-
 /* the whole game lives on a fixed 1600x900 stage that is scaled to fit, so every slot has identical placement */
 #shaker{position:fixed;inset:0;overflow:hidden}
 #shaker.shake{animation:shake .45s}#shaker.shake2{animation:shake 1s}
@@ -28,176 +24,6 @@ button:disabled{cursor:not-allowed}
 #stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%;transform:translate(-50%,-50%) scale(var(--s,1))}
 #stage>*{position:absolute}
 #scene{left:0;top:0;overflow:visible;pointer-events:none}
-
-/* shared keyframes used by shell and slot art */
-@keyframes wob{to{transform:scale(1.07) rotate(3deg)}}
-@keyframes flick{from{transform:scale(.85,.9)}to{transform:scale(1.1,1.25)}}
-.pop{position:absolute;transform:translate(-50%,-50%);padding:4px 16px;border-radius:99px;border:4px solid var(--ink);font-family:var(--toon);font-size:30px;color:var(--ink);background:var(--gold);animation:popup 1.1s ease-out forwards;white-space:nowrap;box-shadow:0 4px 0 rgba(0,0,0,.4)}
-@keyframes popup{0%{transform:translate(-50%,-30%) scale(.4);opacity:0}18%{transform:translate(-50%,-50%) scale(1.12);opacity:1}100%{transform:translate(-50%,-160%) scale(1);opacity:0}}
-
-/* ---------- bottom bar (SHELL: identical in every slot) ---------- */
-#buyOpen{left:40px;top:150px;width:184px;height:270px;transform-origin:50% -150px;animation:sway 5.5s ease-in-out infinite}
-@keyframes sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
-#buyOpen .ch{position:absolute;top:-400px;width:10px;height:480px;background:repeating-linear-gradient(180deg,#9a9ea8 0 12px,#3a3d46 12px 15px);border-radius:5px;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
-#buyOpen .ch.l{left:26px}#buyOpen .ch.r{right:26px}
-#buyOpen .plq{position:absolute;left:0;top:80px;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding-top:14px;border-radius:12px 12px 22px 22px;background:radial-gradient(circle at 14px 14px,#d9b56a 4.5px,transparent 5.5px),radial-gradient(circle at calc(100% - 14px) 14px,#d9b56a 4.5px,transparent 5.5px),linear-gradient(#3a2a22,#1a0f0b);border:5px solid var(--ink);box-shadow:inset 0 0 0 3px #b8742a,0 0 22px rgba(255,120,30,.55),0 8px 0 rgba(0,0,0,.45);filter:url(#roughU);transition:.15s}
-#buyOpen:hover:not(:disabled) .plq{box-shadow:inset 0 0 0 3px #ffb02e,0 0 34px rgba(255,140,30,.9),0 8px 0 rgba(0,0,0,.45);transform:translateY(-3px)}
-#buyOpen svg{width:84px;height:84px;overflow:visible;filter:drop-shadow(0 4px 0 rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(255,70,130,.8));animation:wob 2s ease-in-out infinite alternate}
-#buyOpen b{font-family:var(--toon);font-weight:400;font-size:34px;line-height:.95;letter-spacing:1px;text-align:center;color:var(--gold);text-shadow:2px 3px 0 var(--ink)}
-#buyOpen em{margin-top:8px;font-style:normal;font-family:var(--toon);font-size:22px;color:#fff;background:var(--ink);padding:2px 14px 0;border-radius:20px;border:3px solid var(--bevel)}
-#buyOpen:disabled{filter:saturate(.4) brightness(.7);animation:none}
-#barL{left:150px;top:782px;width:700px;height:92px;background:radial-gradient(circle at 14px 14px,var(--rivet) 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),var(--rivet) 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) 14px,var(--rivet) 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) calc(100% - 14px),var(--rivet) 4px,transparent 5px),linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-left:0;border-radius:0 18px 12px 0;display:flex;align-items:center;gap:30px;padding-left:24px;box-shadow:inset 0 0 0 3px var(--rim),0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
-#menuBtn{width:54px;height:54px;display:grid;place-items:center;border-radius:12px}
-#menuBtn:hover{background:var(--hover)}
-#menuBtn svg{width:42px;height:42px;fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round}
-.fld label{display:block;font-size:14px;font-weight:900;color:var(--muted);letter-spacing:2px}
-.fld .v{font-family:var(--toon);font-size:35px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
-.fld .v.gold{color:var(--gold)}
-#barR{left:880px;top:782px;width:380px;height:92px;background:radial-gradient(circle at 14px 14px,var(--rivet) 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),var(--rivet) 4px,transparent 5px),linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-radius:12px 0 0 18px;border-right:0;padding:12px 0 0 28px;box-shadow:inset 0 0 0 3px var(--rim),0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
-#betV{font-family:var(--toon);font-size:31px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
-#betBar{position:absolute;left:0;bottom:0;height:7px;background:#fff;border-radius:0 4px 0 0;transition:width .2s}
-#chev{position:absolute;right:92px;top:8px;width:56px;height:76px;display:flex;flex-direction:column;justify-content:space-between}
-#chev{pointer-events:none}
-#chev button{pointer-events:auto;height:34px;display:grid;place-items:center;border-radius:8px}
-#chev button:hover:not(:disabled){background:var(--hover)}
-#chev button:disabled{opacity:.35}
-#chev svg{width:34px;height:20px;fill:none;stroke:#cfc3b8;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
-#spin{left:1198px;top:752px;width:140px;height:140px;border-radius:50%;background:#14100f;border:7px solid #fff;box-shadow:0 0 0 5px var(--ink),0 8px 0 5px rgba(0,0,0,.4);display:grid;place-items:center;transition:transform .12s}
-#spin:hover:not(:disabled){transform:scale(1.04)}
-#spin:active:not(:disabled){transform:scale(.96)}
-#spin svg{width:84px;height:84px;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
-#spin.busy svg{animation:rot .9s linear infinite}
-#spin:disabled{border-color:#8a8078}
-#spin:disabled svg{stroke:#8a8078}
-@keyframes rot{to{transform:rotate(360deg)}}
-#spin .cnt{position:absolute;width:64px;height:64px;border-radius:15px;background:#fff;color:#14100f;font-family:var(--toon);font-size:40px;line-height:1;padding-top:5px;display:grid;place-items:center;box-shadow:0 0 0 4px rgba(255,255,255,.25)}
-#bAuto{left:1362px;top:800px;width:68px;height:68px;border-radius:50%;background:linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);display:grid;place-items:center;box-shadow:inset 0 0 0 3px var(--rim),0 5px 0 rgba(0,0,0,.35);filter:url(#roughU)}
-#bAuto svg{width:36px;height:36px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
-#bAuto:hover:not(:disabled){background:var(--hover)}
-#bAuto.on{background:var(--accent)}
-#bAuto:disabled{opacity:.5}
-#turboBadge{left:1290px;top:732px;padding:2px 12px;border-radius:99px;background:var(--accent);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px}
-#barR.hot{border-color:var(--ink);background:radial-gradient(circle at 14px 14px,var(--gold2) 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),var(--gold2) 4px,transparent 5px),linear-gradient(#5a2210,#2a0e06);box-shadow:inset 0 0 0 3px #ff8a1a,0 0 26px rgba(255,100,20,.8),0 7px 0 rgba(0,0,0,.4);animation:hotp 1.6s ease-in-out infinite}
-@keyframes hotp{50%{box-shadow:inset 0 0 0 3px #ffb02e,0 0 40px rgba(255,120,20,1),0 7px 0 rgba(0,0,0,.4)}}
-#barR.hot #betV{color:#ffb02e;text-shadow:0 0 16px #ff6a00,2px 3px 0 var(--ink)}
-#barR.hot #betLbl{color:#ffb070}
-#feverBadge{left:1075px;top:732px;padding:2px 12px;border-radius:99px;background:linear-gradient(var(--acc1),#d8400a);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px;box-shadow:0 0 18px rgba(255,100,20,.8)}
-#msg{left:540px;top:728px;width:520px;height:42px;display:flex;align-items:center;justify-content:center;font-family:var(--toon);font-size:25px;letter-spacing:1px;color:#fff;text-shadow:2px 2px 0 var(--ink),-2px 2px 0 var(--ink),2px -2px 0 var(--ink),-2px -2px 0 var(--ink)}
-#msg.hl{color:var(--gold)}
-#fsBox{filter:url(#roughU);left:36px;top:34px;padding:8px 22px 8px 56px;border-radius:14px;background:var(--ink);border:4px solid var(--accent);font-family:var(--toon);font-size:30px;color:#fff;animation:pillin .35s ease-out}
-#fsBox::before{content:"FS";position:absolute;left:8px;top:5px;width:38px;height:38px;border-radius:50%;background:var(--gold);color:var(--ink);display:grid;place-items:center;font-size:18px;border:3px solid #7a4a00}
-#fsBox small{display:block;font-family:var(--ui);font-size:11px;font-weight:900;letter-spacing:2px;color:#b8a89a;margin-bottom:-2px}
-@keyframes pillin{from{transform:translateY(-12px);opacity:0}}
-#menu{left:154px;top:560px;width:230px;padding:10px;background:linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px var(--rim),0 8px 0 rgba(0,0,0,.4);z-index:20;filter:url(#roughU)}
-#menu button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:11px 12px;border-radius:9px;font-size:17px;font-weight:700}
-#menu button:hover{background:var(--hover)}
-#menu i{font-style:normal;font-size:13px;font-weight:900;letter-spacing:1px;padding:2px 9px;border-radius:99px;background:#3a2a24;color:#b8a89a}
-#menu button.on i{background:var(--accent);color:#fff}
-
-/* ---------- overlays ---------- */
-.modal{position:fixed;inset:0;z-index:80;background:rgba(10,4,6,.8);display:flex;align-items:center;justify-content:center;padding:16px}
-.modal.tap{cursor:pointer}
-.mbox{position:relative;width:min(94vw,460px);max-height:92vh;padding:50px 28px 26px;margin-top:34px;border-radius:16px 12px 18px 11px;background:radial-gradient(circle at 18px 18px,var(--rivet) 5px,transparent 6px),radial-gradient(circle at calc(100% - 18px) 18px,var(--rivet) 5px,transparent 6px),radial-gradient(circle at 18px calc(100% - 18px),var(--rivet) 5px,transparent 6px),radial-gradient(circle at calc(100% - 18px) calc(100% - 18px),var(--rivet) 5px,transparent 6px),linear-gradient(180deg,#3b2820,#22140f);color:#f4e4cf;border:5px solid var(--ink);box-shadow:inset 0 0 0 3px var(--bevel),inset 0 0 40px rgba(0,0,0,.5),0 12px 0 rgba(0,0,0,.4);text-align:center;animation:mpop .22s ease-out;filter:url(#roughU)}
-.mbox.wide{width:min(94vw,760px);text-align:left;overflow:auto}
-@keyframes mpop{from{transform:translateY(14px) scale(.96);opacity:0}}
-.mbox h2{position:absolute;left:50%;top:-30px;transform:translateX(-50%) rotate(-1.5deg);margin:0;padding:7px 30px 4px;background:var(--accent);border:5px solid var(--ink);border-radius:8px;font-family:var(--toon);font-weight:400;font-size:30px;color:#fff;text-shadow:2px 3px 0 var(--ink);white-space:nowrap;letter-spacing:1px;box-shadow:0 5px 0 rgba(0,0,0,.4)}
-.mbox.wide h2{position:static;display:inline-block;transform:rotate(-1deg);margin:0 0 14px}
-.mbox p{margin:8px 0;font-size:15px;line-height:1.5;color:var(--txt);font-weight:500}
-.mbox .x{position:absolute;right:10px;top:8px;width:34px;height:34px;border-radius:50%;font-size:24px;line-height:1;background:var(--ink);color:#fff;border:3px solid var(--bevel)}
-.big-n{font-family:var(--toon);font-size:60px;margin:10px 0;color:var(--gold);text-shadow:3px 4px 0 var(--ink)}
-.big-n small{display:block;font-family:var(--ui);font-size:12px;letter-spacing:3px;color:var(--muted);font-weight:900;text-shadow:none}
-.row2{display:flex;gap:10px;margin-top:16px}
-.btn{flex:1;padding:13px 16px;border-radius:10px;font-size:15px;font-weight:900;letter-spacing:1px;background:var(--btn);color:#fff;border:4px solid var(--ink);box-shadow:inset 0 0 0 2px var(--bevel),0 4px 0 rgba(0,0,0,.4)}
-.btn:hover:not(:disabled){filter:brightness(1.25)}
-.btn.pri{background:var(--accent)}
-.btn:disabled{opacity:.4}
-.tapHint{margin-top:22px;font-size:15px;font-weight:900;letter-spacing:4px;color:var(--gold);text-shadow:2px 2px 0 var(--ink);animation:blink 1.4s ease-in-out infinite}
-@keyframes blink{50%{opacity:.3}}
-#cWarn{color:#ff8a78;min-height:18px;font-size:13px;font-weight:700}
-.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
-.opt{padding:12px 0;border-radius:10px;background:var(--btn);border:4px solid var(--ink);box-shadow:inset 0 0 0 2px var(--bevel);font-weight:900;font-size:17px;color:#fff}
-.opt.sel{background:var(--accent);color:#fff}
-.srow{display:flex;justify-content:space-between;align-items:center;margin:12px 0;font-size:15px;font-weight:700;text-align:left}
-.sw{width:52px;height:28px;flex:none;border-radius:99px;background:#5a4338;border:3px solid var(--ink);position:relative}
-.sw::after{content:"";position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--ink);transition:.2s}
-.sw.on{background:var(--accent)}.sw.on::after{left:26px}
-.pt{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0 14px}
-.pt th{font-size:11px;letter-spacing:1.5px;color:var(--muted);text-align:right;padding:4px 8px;font-weight:900}
-.pt th:first-child{text-align:left}
-.pt td{padding:5px 8px;text-align:right;border-top:2px solid #4a3328;font-variant-numeric:tabular-nums;font-weight:700}
-.pt td:first-child{text-align:left}.pt .nm{display:flex;align-items:center;gap:10px}
-.pt svg{width:38px;height:38px;flex:none;background:#27160f;border-radius:8px;padding:2px}
-.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.rules div{padding:12px;border-radius:10px;background:#2a1913;border:3px solid #4a3328}
-.rules b{display:block;font-family:var(--toon);font-weight:400;font-size:20px;color:var(--gold);margin-bottom:4px}
-.rules span{font-size:13.5px;line-height:1.5;color:var(--txt);font-weight:500}
-.modal.splash{flex-direction:column;overflow:hidden;background:radial-gradient(circle,rgba(90,32,8,.985),rgba(8,3,4,.99))}
-.rays{position:absolute;width:170vmax;height:170vmax;left:50%;top:50%;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(rgba(255,170,40,.2) 0 7deg,transparent 7deg 20deg);-webkit-mask:radial-gradient(circle,#000 4%,transparent 52%);mask:radial-gradient(circle,#000 4%,transparent 52%);animation:rot 50s linear infinite}
-.sp{position:relative;display:flex;flex-direction:column;align-items:center;padding:0 20px}
-.gems{display:flex;justify-content:center;position:relative;z-index:4;height:120px;margin-bottom:-34px}
-.gems .g{animation:gemin .85s cubic-bezier(.3,1.4,.5,1) backwards}
-.gems .g:nth-child(1){animation-delay:.05s}.gems .g:nth-child(2){animation-delay:.3s;margin:-20px -6px 0}.gems .g:nth-child(3){animation-delay:.55s}
-.gems svg{width:134px;height:134px;overflow:visible;filter:drop-shadow(0 7px 0 rgba(0,0,0,.5)) drop-shadow(0 0 16px rgba(255,80,140,.7))}
-.gems .g:nth-child(1) svg{transform:rotate(-15deg)}.gems .g:nth-child(3) svg{transform:rotate(15deg)}
-@keyframes gemin{from{transform:translateY(-700px) rotate(240deg);opacity:0}}
-.medalWrap{position:relative;z-index:2}
-.medalWrap .fire{position:absolute;left:-30px;right:-30px;top:-86px;height:150px;overflow:visible}
-.fire path{transform-box:fill-box;transform-origin:50% 100%;animation:flick .55s ease-in-out infinite alternate}
-.fire path:nth-child(2n){animation-duration:.4s}.fire path:nth-child(3n){animation-duration:.68s}
-.medal{position:relative;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#ffbc3a,var(--acc2) 58%,#8a1f06);border:12px solid var(--ink);box-shadow:inset 0 0 0 7px var(--gold2),inset 0 0 0 12px var(--ink),0 14px 0 rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;filter:url(#roughU);animation:bigin .7s .15s cubic-bezier(.2,1.4,.4,1) backwards}
-.medal .mtop{font-weight:900;letter-spacing:5px;font-size:15px;color:#ffe9b8;text-shadow:2px 2px 0 var(--ink)}
-.medal .mnum{font-family:var(--toon);font-size:170px;line-height:.9;color:#fff;-webkit-text-stroke:11px var(--ink);paint-order:stroke fill;text-shadow:0 9px 0 var(--ink);margin-top:14px}
-.medal .mlbl{font-family:var(--toon);font-size:42px;color:var(--gold);-webkit-text-stroke:7px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);margin-top:2px}
-.medal.wide{width:min(86vw,640px);height:250px;border-radius:84px}
-.medal.wide .mnum{font-size:clamp(70px,10vw,124px);margin-top:6px}
-.ribbon{position:relative;z-index:5;margin-top:-44px;padding:14px 64px 8px;background:linear-gradient(var(--acc1),var(--acc2));border:7px solid var(--ink);border-radius:6px;font-family:var(--toon);font-size:clamp(40px,5.6vw,66px);line-height:1;color:#fff;text-shadow:3px 5px 0 var(--ink);transform:rotate(-2deg);box-shadow:inset 0 0 0 3px rgba(255,255,255,.3),0 9px 0 rgba(0,0,0,.45);filter:url(#roughU);animation:bigin .6s .3s cubic-bezier(.2,1.4,.4,1) backwards;white-space:nowrap}
-.ribbon::before,.ribbon::after{content:"";position:absolute;top:16px;width:70px;height:100%;background:#a83a08;border:7px solid var(--ink);z-index:-1}
-.ribbon::before{left:-56px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,28% 50%)}.ribbon::after{right:-56px;clip-path:polygon(0 0,100% 0,72% 50%,100% 100%,0 100%)}
-.chips{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;justify-content:center;max-width:720px}
-.chips span{padding:9px 14px 7px;background:var(--ink);border:3px solid var(--bevel);border-radius:10px;font-weight:900;font-size:13px;letter-spacing:1.5px;color:#ffe3b0;transform:rotate(-.8deg)}
-.chips span:nth-child(2n){transform:rotate(.9deg)}
-.betgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.betgrid .opt{padding:10px 0;font-size:15px}
-#betV{cursor:pointer;display:inline-block}
-#big{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(60,20,8,.82),rgba(0,0,0,.92));opacity:0;pointer-events:none;transition:opacity .3s;cursor:pointer}
-#big.show{opacity:1;pointer-events:auto}
-#bigT{font-family:var(--toon);font-size:clamp(46px,9vw,120px);letter-spacing:4px;color:var(--gold);-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 8px 0 var(--ink);animation:bigin .6s cubic-bezier(.2,1.4,.4,1)}
-@keyframes bigin{from{transform:scale(.2) rotate(-8deg);opacity:0}}
-#bigA{font-family:var(--toon);font-size:clamp(46px,9vw,110px);color:#fff;-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 7px 0 var(--ink)}
-#bigX{font-size:18px;color:var(--gold);font-weight:900;letter-spacing:3px;margin-top:10px}
-#auth{position:fixed;inset:0;z-index:90;background:#1a0a12;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--toon)}
-
-/* bonus buy screen: hand-cut iron plaques with a medallion on top */
-.modal.bb{flex-direction:column;justify-content:flex-start;padding-top:26px;background:radial-gradient(circle at 50% 30%,rgba(60,22,10,.92),rgba(8,3,4,.97));overflow:auto}
-.bbT{position:relative;margin:0 0 20px;padding:8px 44px 4px;background:var(--accent);border:5px solid var(--ink);border-radius:8px;font-family:var(--toon);font-weight:400;font-size:44px;letter-spacing:2px;color:#fff;text-shadow:3px 4px 0 var(--ink);transform:rotate(-1.2deg);box-shadow:0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
-.bbX{position:absolute;right:26px;top:22px;width:50px;height:50px;border-radius:50%;border:5px solid var(--ink);background:var(--btn);box-shadow:inset 0 0 0 2px var(--bevel);font-size:30px;line-height:1;color:#fff}
-.bbX:hover{background:var(--accent)}
-.bbBet{display:flex;align-items:center;gap:18px;padding:8px 18px;margin-bottom:46px;background:linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px var(--rim),0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
-.bbBet small{display:block;font-size:12px;font-weight:900;letter-spacing:3px;color:var(--muted);text-align:center}
-.bbBet b{display:block;font-family:var(--toon);font-weight:400;font-size:40px;text-align:center;text-shadow:2px 3px 0 var(--ink);min-width:150px}
-.bbBet button{width:46px;height:46px;border-radius:50%;background:var(--accent);border:4px solid var(--ink);font-family:var(--toon);font-size:28px;line-height:1;color:#fff;text-shadow:2px 2px 0 var(--ink)}
-.bbBet button:hover:not(:disabled){filter:brightness(1.15)}
-.bbRow{display:flex;gap:30px;flex-wrap:wrap;justify-content:center;max-width:1200px;padding:0 10px 30px}
-.bbc{position:relative;width:252px;padding:62px 18px 18px;text-align:center;background:radial-gradient(circle at 16px 16px,var(--rivet) 4.5px,transparent 5.5px),radial-gradient(circle at calc(100% - 16px) 16px,var(--rivet) 4.5px,transparent 5.5px),linear-gradient(180deg,#3d2a21,#21130e);border:5px solid var(--ink);border-radius:16px 11px 17px 12px;box-shadow:inset 0 0 0 3px var(--bevel),inset 0 -30px 40px rgba(0,0,0,.35),0 10px 0 rgba(0,0,0,.45);filter:url(#roughU)}
-.bbc:nth-child(1){transform:rotate(-1.4deg)}.bbc:nth-child(2){transform:rotate(.7deg) translateY(-8px)}.bbc:nth-child(3){transform:rotate(-.6deg)}
-.bbc .med{position:absolute;left:50%;top:-52px;width:108px;height:108px;margin-left:-54px;border-radius:50%;background:radial-gradient(circle,#ff9a2a,#a83a0a 75%);border:6px solid var(--ink);box-shadow:inset 0 0 0 3px var(--gold2),0 6px 0 rgba(0,0,0,.4);display:grid;place-items:center}
-.bbc .med svg{width:78px;height:78px;overflow:visible;filter:drop-shadow(0 3px 0 rgba(0,0,0,.5))}
-.bbc h3{margin:0 0 6px;font-family:var(--toon);font-weight:400;font-size:28px;line-height:1.05;letter-spacing:1px;color:var(--gold);text-shadow:2px 3px 0 var(--ink)}
-.bbc p{margin:0 4px;font-size:14px;line-height:1.4;min-height:96px;font-weight:500;color:var(--txt)}
-.vol{display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0 12px;font-size:11px;font-weight:900;letter-spacing:2px;color:var(--muted)}
-.vol i{width:14px;height:18px;background:#4a3228;clip-path:polygon(50% 0,80% 32%,100% 62%,84% 100%,16% 100%,0 62%,22% 32%)}
-.vol i.on{background:linear-gradient(#ffd23a,#ff5a14)}
-.vol span{margin-right:6px}
-.price#pa{font-size:26px;padding-top:5px}
-.price{display:inline-block;margin-bottom:14px;padding:2px 24px 0;border-radius:30px;background:var(--ink);border:3px solid var(--bevel);font-family:var(--toon);font-size:34px;letter-spacing:1px;color:var(--gold)}
-.bbc button.go{display:block;width:100%;padding:11px 0 8px;border-radius:10px;border:5px solid var(--ink);font-family:var(--toon);font-size:30px;letter-spacing:2px;color:#fff;text-shadow:2px 3px 0 var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35),0 5px 0 rgba(0,0,0,.45)}
-.bbc button.or{background:linear-gradient(var(--acc1),var(--acc2))}
-.bbc button.gd{background:linear-gradient(#ffd23a,#e8a010);color:#2b1b12;text-shadow:none}
-.bbc button.off{background:linear-gradient(#7a655a,#4e3d34)}
-.bbc button.go:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
-
-/* EmberClaw slot CSS: scene wash, frame/grid/cells, Forge Core (side mechanic), Brann (character). The shell CSS loads first.
-   NOTE: the eyes use the shell's @keyframes blink (the original file had two 'blink' keyframes and the later, opacity one won; kept identical). */
 .heatwash{left:-1500px;top:-1000px;width:4600px;height:2900px;pointer-events:none;background:radial-gradient(60% 50% at 50% 100%,rgba(255,80,10,calc(var(--heat)*.025)),transparent 70%);transition:background .6s}
 
 /* ---------- logo / frame ---------- */
@@ -214,6 +40,7 @@ button:disabled{cursor:not-allowed}
 .cell.wild svg.g{animation:wob 1.5s ease-in-out infinite alternate}
 .cell.scatter{background:radial-gradient(circle,#6a1840,#2b140c 75%)}
 .cell.scatter svg.g{animation:wob 1.9s ease-in-out infinite alternate}
+@keyframes wob{to{transform:scale(1.07) rotate(3deg)}}
 .cell .m{position:absolute;right:4px;bottom:4px;min-width:34px;text-align:center;padding:1px 6px;border-radius:99px;border:3px solid var(--ink);font-family:var(--toon);font-size:19px;color:var(--ink);background:var(--gold);z-index:3}
 .cell.scat svg.g{animation:scatp .55s ease-in-out infinite alternate;filter:drop-shadow(0 0 14px #ff4a8a)}
 @keyframes scatp{to{transform:scale(1.22) rotate(6deg)}}
@@ -230,6 +57,8 @@ button:disabled{cursor:not-allowed}
 .cell.reforged::after{content:"";position:absolute;inset:-8%;border-radius:50%;border:5px solid #ffd36a;animation:ring .8s ease-out forwards}
 @keyframes refo{0%{filter:brightness(4);transform:scale(.3) rotate(-120deg)}60%{filter:brightness(2);transform:scale(1.25)}}
 @keyframes ring{from{transform:scale(.4);opacity:1}to{transform:scale(1.9);opacity:0}}
+.pop{position:absolute;transform:translate(-50%,-50%);padding:4px 16px;border-radius:99px;border:4px solid var(--ink);font-family:var(--toon);font-size:30px;color:var(--ink);background:var(--gold);animation:popup 1.1s ease-out forwards;white-space:nowrap;box-shadow:0 4px 0 rgba(0,0,0,.4)}
+@keyframes popup{0%{transform:translate(-50%,-30%) scale(.4);opacity:0}18%{transform:translate(-50%,-50%) scale(1.12);opacity:1}100%{transform:translate(-50%,-160%) scale(1);opacity:0}}
 
 /* ---------- forge core (game-specific, hangs left of the frame) ---------- */
 #core{left:318px;top:150px;width:112px;height:560px}
@@ -262,8 +91,10 @@ button:disabled{cursor:not-allowed}
 #cArmL{transform-origin:314px 300px;animation:armL 3.4s ease-in-out infinite}
 @keyframes armL{50%{transform:rotate(3deg)}}
 #cEyes{transform-box:fill-box;transform-origin:center;animation:blink 4.6s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.08)}}
 #cFlames path{transform-box:fill-box;transform-origin:50% 100%;animation:flick .5s ease-in-out infinite alternate}
 #cFlames path:nth-child(2){animation-duration:.37s}#cFlames path:nth-child(3){animation-duration:.61s}
+@keyframes flick{from{transform:scale(.85,.9)}to{transform:scale(1.1,1.25)}}
 #cMouth,#cHot{opacity:0}
 #cMouth{transition:opacity .1s}
 #cHot{transition:opacity .3s}
@@ -298,9 +129,169 @@ button:disabled{cursor:not-allowed}
 #char.boom #cArmL{animation:pumpL .9s ease-in-out}
 #cBrows{transition:transform .15s}
 
+/* ---------- bottom bar (SHELL: identical in every slot) ---------- */
+#buyOpen{left:40px;top:150px;width:184px;height:270px;transform-origin:50% -150px;animation:sway 5.5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+#buyOpen .ch{position:absolute;top:-400px;width:10px;height:480px;background:repeating-linear-gradient(180deg,#9a9ea8 0 12px,#3a3d46 12px 15px);border-radius:5px;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+#buyOpen .ch.l{left:26px}#buyOpen .ch.r{right:26px}
+#buyOpen .plq{position:absolute;left:0;top:80px;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding-top:14px;border-radius:12px 12px 22px 22px;background:radial-gradient(circle at 14px 14px,#d9b56a 4.5px,transparent 5.5px),radial-gradient(circle at calc(100% - 14px) 14px,#d9b56a 4.5px,transparent 5.5px),linear-gradient(#3a2a22,#1a0f0b);border:5px solid var(--ink);box-shadow:inset 0 0 0 3px #b8742a,0 0 22px rgba(255,120,30,.55),0 8px 0 rgba(0,0,0,.45);filter:url(#roughU);transition:.15s}
+#buyOpen:hover:not(:disabled) .plq{box-shadow:inset 0 0 0 3px #ffb02e,0 0 34px rgba(255,140,30,.9),0 8px 0 rgba(0,0,0,.45);transform:translateY(-3px)}
+#buyOpen svg{width:84px;height:84px;overflow:visible;filter:drop-shadow(0 4px 0 rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(255,70,130,.8));animation:wob 2s ease-in-out infinite alternate}
+#buyOpen b{font-family:var(--toon);font-weight:400;font-size:34px;line-height:.95;letter-spacing:1px;text-align:center;color:var(--gold);text-shadow:2px 3px 0 var(--ink)}
+#buyOpen em{margin-top:8px;font-style:normal;font-family:var(--toon);font-size:22px;color:#fff;background:var(--ink);padding:2px 14px 0;border-radius:20px;border:3px solid #7a5238}
+#buyOpen:disabled{filter:saturate(.4) brightness(.7);animation:none}
+#barL{left:150px;top:782px;width:700px;height:92px;background:radial-gradient(circle at 14px 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),#c9a15a 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) calc(100% - 14px),#c9a15a 4px,transparent 5px),linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-left:0;border-radius:0 18px 12px 0;display:flex;align-items:center;gap:30px;padding-left:24px;box-shadow:inset 0 0 0 3px #6e4a36,0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+#menuBtn{width:54px;height:54px;display:grid;place-items:center;border-radius:12px}
+#menuBtn:hover{background:#2a1a14}
+#menuBtn svg{width:42px;height:42px;fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round}
+.fld label{display:block;font-size:14px;font-weight:900;color:#b79a82;letter-spacing:2px}
+.fld .v{font-family:var(--toon);font-size:35px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
+.fld .v.gold{color:var(--gold)}
+#barR{left:880px;top:782px;width:380px;height:92px;background:radial-gradient(circle at 14px 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),#c9a15a 4px,transparent 5px),linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-radius:12px 0 0 18px;border-right:0;padding:12px 0 0 28px;box-shadow:inset 0 0 0 3px #6e4a36,0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+#betV{font-family:var(--toon);font-size:31px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
+#betBar{position:absolute;left:0;bottom:0;height:7px;background:#fff;border-radius:0 4px 0 0;transition:width .2s}
+#chev{position:absolute;right:92px;top:8px;width:56px;height:76px;display:flex;flex-direction:column;justify-content:space-between}
+#chev{pointer-events:none}
+#chev button{pointer-events:auto;height:34px;display:grid;place-items:center;border-radius:8px}
+#chev button:hover:not(:disabled){background:#2a1a14}
+#chev button:disabled{opacity:.35}
+#chev svg{width:34px;height:20px;fill:none;stroke:#cfc3b8;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+#spin{left:1198px;top:752px;width:140px;height:140px;border-radius:50%;background:#14100f;border:7px solid #fff;box-shadow:0 0 0 5px var(--ink),0 8px 0 5px rgba(0,0,0,.4);display:grid;place-items:center;transition:transform .12s}
+#spin:hover:not(:disabled){transform:scale(1.04)}
+#spin:active:not(:disabled){transform:scale(.96)}
+#spin svg{width:84px;height:84px;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+#spin.busy svg{animation:rot .9s linear infinite}
+#spin:disabled{border-color:#8a8078}
+#spin:disabled svg{stroke:#8a8078}
+@keyframes rot{to{transform:rotate(360deg)}}
+#spin .cnt{position:absolute;width:64px;height:64px;border-radius:15px;background:#fff;color:#14100f;font-family:var(--toon);font-size:40px;line-height:1;padding-top:5px;display:grid;place-items:center;box-shadow:0 0 0 4px rgba(255,255,255,.25)}
+#bAuto{left:1362px;top:800px;width:68px;height:68px;border-radius:50%;background:linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);display:grid;place-items:center;box-shadow:inset 0 0 0 3px #6e4a36,0 5px 0 rgba(0,0,0,.35);filter:url(#roughU)}
+#bAuto svg{width:36px;height:36px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#bAuto:hover:not(:disabled){background:#2a1a14}
+#bAuto.on{background:var(--accent)}
+#bAuto:disabled{opacity:.5}
+#turboBadge{left:1290px;top:732px;padding:2px 12px;border-radius:99px;background:var(--accent);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px}
+#barR.hot{border-color:var(--ink);background:radial-gradient(circle at 14px 14px,#ffd36a 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),#ffd36a 4px,transparent 5px),linear-gradient(#5a2210,#2a0e06);box-shadow:inset 0 0 0 3px #ff8a1a,0 0 26px rgba(255,100,20,.8),0 7px 0 rgba(0,0,0,.4);animation:hotp 1.6s ease-in-out infinite}
+@keyframes hotp{50%{box-shadow:inset 0 0 0 3px #ffb02e,0 0 40px rgba(255,120,20,1),0 7px 0 rgba(0,0,0,.4)}}
+#barR.hot #betV{color:#ffb02e;text-shadow:0 0 16px #ff6a00,2px 3px 0 var(--ink)}
+#barR.hot #betLbl{color:#ffb070}
+#feverBadge{left:1075px;top:732px;padding:2px 12px;border-radius:99px;background:linear-gradient(#ff8a2a,#d8400a);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px;box-shadow:0 0 18px rgba(255,100,20,.8)}
+#msg{left:540px;top:728px;width:520px;height:42px;display:flex;align-items:center;justify-content:center;font-family:var(--toon);font-size:25px;letter-spacing:1px;color:#fff;text-shadow:2px 2px 0 var(--ink),-2px 2px 0 var(--ink),2px -2px 0 var(--ink),-2px -2px 0 var(--ink)}
+#msg.hl{color:var(--gold)}
+#fsBox{filter:url(#roughU);left:36px;top:34px;padding:8px 22px 8px 56px;border-radius:14px;background:var(--ink);border:4px solid var(--accent);font-family:var(--toon);font-size:30px;color:#fff;animation:pillin .35s ease-out}
+#fsBox::before{content:"FS";position:absolute;left:8px;top:5px;width:38px;height:38px;border-radius:50%;background:var(--gold);color:var(--ink);display:grid;place-items:center;font-size:18px;border:3px solid #7a4a00}
+#fsBox small{display:block;font-family:var(--ui);font-size:11px;font-weight:900;letter-spacing:2px;color:#b8a89a;margin-bottom:-2px}
+@keyframes pillin{from{transform:translateY(-12px);opacity:0}}
+#menu{left:154px;top:560px;width:230px;padding:10px;background:linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px #6e4a36,0 8px 0 rgba(0,0,0,.4);z-index:20;filter:url(#roughU)}
+#menu button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:11px 12px;border-radius:9px;font-size:17px;font-weight:700}
+#menu button:hover{background:#2a1a14}
+#menu i{font-style:normal;font-size:13px;font-weight:900;letter-spacing:1px;padding:2px 9px;border-radius:99px;background:#3a2a24;color:#b8a89a}
+#menu button.on i{background:var(--accent);color:#fff}
+
+/* ---------- overlays ---------- */
+.modal{position:fixed;inset:0;z-index:80;background:rgba(10,4,6,.8);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal.tap{cursor:pointer}
+.mbox{position:relative;width:min(94vw,460px);max-height:92vh;padding:50px 28px 26px;margin-top:34px;border-radius:16px 12px 18px 11px;background:radial-gradient(circle at 18px 18px,#c9a15a 5px,transparent 6px),radial-gradient(circle at calc(100% - 18px) 18px,#c9a15a 5px,transparent 6px),radial-gradient(circle at 18px calc(100% - 18px),#c9a15a 5px,transparent 6px),radial-gradient(circle at calc(100% - 18px) calc(100% - 18px),#c9a15a 5px,transparent 6px),linear-gradient(180deg,#3b2820,#22140f);color:#f4e4cf;border:5px solid var(--ink);box-shadow:inset 0 0 0 3px #7a5238,inset 0 0 40px rgba(0,0,0,.5),0 12px 0 rgba(0,0,0,.4);text-align:center;animation:mpop .22s ease-out;filter:url(#roughU)}
+.mbox.wide{width:min(94vw,760px);text-align:left;overflow:auto}
+@keyframes mpop{from{transform:translateY(14px) scale(.96);opacity:0}}
+.mbox h2{position:absolute;left:50%;top:-30px;transform:translateX(-50%) rotate(-1.5deg);margin:0;padding:7px 30px 4px;background:var(--accent);border:5px solid var(--ink);border-radius:8px;font-family:var(--toon);font-weight:400;font-size:30px;color:#fff;text-shadow:2px 3px 0 var(--ink);white-space:nowrap;letter-spacing:1px;box-shadow:0 5px 0 rgba(0,0,0,.4)}
+.mbox.wide h2{position:static;display:inline-block;transform:rotate(-1deg);margin:0 0 14px}
+.mbox p{margin:8px 0;font-size:15px;line-height:1.5;color:#e3d0b8;font-weight:500}
+.mbox .x{position:absolute;right:10px;top:8px;width:34px;height:34px;border-radius:50%;font-size:24px;line-height:1;background:var(--ink);color:#fff;border:3px solid #7a5238}
+.big-n{font-family:var(--toon);font-size:60px;margin:10px 0;color:var(--gold);text-shadow:3px 4px 0 var(--ink)}
+.big-n small{display:block;font-family:var(--ui);font-size:12px;letter-spacing:3px;color:#b79a82;font-weight:900;text-shadow:none}
+.row2{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;padding:13px 16px;border-radius:10px;font-size:15px;font-weight:900;letter-spacing:1px;background:#3a251c;color:#fff;border:4px solid var(--ink);box-shadow:inset 0 0 0 2px #7a5238,0 4px 0 rgba(0,0,0,.4)}
+.btn:hover:not(:disabled){filter:brightness(1.25)}
+.btn.pri{background:var(--accent)}
+.btn:disabled{opacity:.4}
+.tapHint{margin-top:22px;font-size:15px;font-weight:900;letter-spacing:4px;color:var(--gold);text-shadow:2px 2px 0 var(--ink);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{50%{opacity:.3}}
+#cWarn{color:#ff8a78;min-height:18px;font-size:13px;font-weight:700}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.opt{padding:12px 0;border-radius:10px;background:#3a251c;border:4px solid var(--ink);box-shadow:inset 0 0 0 2px #7a5238;font-weight:900;font-size:17px;color:#fff}
+.opt.sel{background:var(--accent);color:#fff}
+.srow{display:flex;justify-content:space-between;align-items:center;margin:12px 0;font-size:15px;font-weight:700;text-align:left}
+.sw{width:52px;height:28px;flex:none;border-radius:99px;background:#5a4338;border:3px solid var(--ink);position:relative}
+.sw::after{content:"";position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--ink);transition:.2s}
+.sw.on{background:var(--accent)}.sw.on::after{left:26px}
+.pt{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0 14px}
+.pt th{font-size:11px;letter-spacing:1.5px;color:#b79a82;text-align:right;padding:4px 8px;font-weight:900}
+.pt th:first-child{text-align:left}
+.pt td{padding:5px 8px;text-align:right;border-top:2px solid #4a3328;font-variant-numeric:tabular-nums;font-weight:700}
+.pt td:first-child{text-align:left}.pt .nm{display:flex;align-items:center;gap:10px}
+.pt svg{width:38px;height:38px;flex:none;background:#27160f;border-radius:8px;padding:2px}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rules div{padding:12px;border-radius:10px;background:#2a1913;border:3px solid #4a3328}
+.rules b{display:block;font-family:var(--toon);font-weight:400;font-size:20px;color:var(--gold);margin-bottom:4px}
+.rules span{font-size:13.5px;line-height:1.5;color:#e3d0b8;font-weight:500}
+.modal.splash{flex-direction:column;overflow:hidden;background:radial-gradient(circle,rgba(90,32,8,.985),rgba(8,3,4,.99))}
+.rays{position:absolute;width:170vmax;height:170vmax;left:50%;top:50%;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(rgba(255,170,40,.2) 0 7deg,transparent 7deg 20deg);-webkit-mask:radial-gradient(circle,#000 4%,transparent 52%);mask:radial-gradient(circle,#000 4%,transparent 52%);animation:rot 50s linear infinite}
+.sp{position:relative;display:flex;flex-direction:column;align-items:center;padding:0 20px}
+.gems{display:flex;justify-content:center;position:relative;z-index:4;height:120px;margin-bottom:-34px}
+.gems .g{animation:gemin .85s cubic-bezier(.3,1.4,.5,1) backwards}
+.gems .g:nth-child(1){animation-delay:.05s}.gems .g:nth-child(2){animation-delay:.3s;margin:-20px -6px 0}.gems .g:nth-child(3){animation-delay:.55s}
+.gems svg{width:134px;height:134px;overflow:visible;filter:drop-shadow(0 7px 0 rgba(0,0,0,.5)) drop-shadow(0 0 16px rgba(255,80,140,.7))}
+.gems .g:nth-child(1) svg{transform:rotate(-15deg)}.gems .g:nth-child(3) svg{transform:rotate(15deg)}
+@keyframes gemin{from{transform:translateY(-700px) rotate(240deg);opacity:0}}
+.medalWrap{position:relative;z-index:2}
+.medalWrap .fire{position:absolute;left:-30px;right:-30px;top:-86px;height:150px;overflow:visible}
+.fire path{transform-box:fill-box;transform-origin:50% 100%;animation:flick .55s ease-in-out infinite alternate}
+.fire path:nth-child(2n){animation-duration:.4s}.fire path:nth-child(3n){animation-duration:.68s}
+.medal{position:relative;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#ffbc3a,#e0500a 58%,#8a1f06);border:12px solid var(--ink);box-shadow:inset 0 0 0 7px #ffd36a,inset 0 0 0 12px var(--ink),0 14px 0 rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;filter:url(#roughU);animation:bigin .7s .15s cubic-bezier(.2,1.4,.4,1) backwards}
+.medal .mtop{font-weight:900;letter-spacing:5px;font-size:15px;color:#ffe9b8;text-shadow:2px 2px 0 var(--ink)}
+.medal .mnum{font-family:var(--toon);font-size:170px;line-height:.9;color:#fff;-webkit-text-stroke:11px var(--ink);paint-order:stroke fill;text-shadow:0 9px 0 var(--ink);margin-top:14px}
+.medal .mlbl{font-family:var(--toon);font-size:42px;color:var(--gold);-webkit-text-stroke:7px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);margin-top:2px}
+.medal.wide{width:min(86vw,640px);height:250px;border-radius:84px}
+.medal.wide .mnum{font-size:clamp(70px,10vw,124px);margin-top:6px}
+.ribbon{position:relative;z-index:5;margin-top:-44px;padding:14px 64px 8px;background:linear-gradient(#ff8a2a,#e0500a);border:7px solid var(--ink);border-radius:6px;font-family:var(--toon);font-size:clamp(40px,5.6vw,66px);line-height:1;color:#fff;text-shadow:3px 5px 0 var(--ink);transform:rotate(-2deg);box-shadow:inset 0 0 0 3px rgba(255,255,255,.3),0 9px 0 rgba(0,0,0,.45);filter:url(#roughU);animation:bigin .6s .3s cubic-bezier(.2,1.4,.4,1) backwards;white-space:nowrap}
+.ribbon::before,.ribbon::after{content:"";position:absolute;top:16px;width:70px;height:100%;background:#a83a08;border:7px solid var(--ink);z-index:-1}
+.ribbon::before{left:-56px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,28% 50%)}.ribbon::after{right:-56px;clip-path:polygon(0 0,100% 0,72% 50%,100% 100%,0 100%)}
+.chips{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;justify-content:center;max-width:720px}
+.chips span{padding:9px 14px 7px;background:var(--ink);border:3px solid #7a5238;border-radius:10px;font-weight:900;font-size:13px;letter-spacing:1.5px;color:#ffe3b0;transform:rotate(-.8deg)}
+.chips span:nth-child(2n){transform:rotate(.9deg)}
+.betgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.betgrid .opt{padding:10px 0;font-size:15px}
+#betV{cursor:pointer;display:inline-block}
+#big{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(60,20,8,.82),rgba(0,0,0,.92));opacity:0;pointer-events:none;transition:opacity .3s;cursor:pointer}
+#big.show{opacity:1;pointer-events:auto}
+#bigT{font-family:var(--toon);font-size:clamp(46px,9vw,120px);letter-spacing:4px;color:var(--gold);-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 8px 0 var(--ink);animation:bigin .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes bigin{from{transform:scale(.2) rotate(-8deg);opacity:0}}
+#bigA{font-family:var(--toon);font-size:clamp(46px,9vw,110px);color:#fff;-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 7px 0 var(--ink)}
+#bigX{font-size:18px;color:var(--gold);font-weight:900;letter-spacing:3px;margin-top:10px}
+#auth{position:fixed;inset:0;z-index:90;background:#1a0a12;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--toon)}
+
+/* bonus buy screen: hand-cut iron plaques with a medallion on top */
+.modal.bb{flex-direction:column;justify-content:flex-start;padding-top:26px;background:radial-gradient(circle at 50% 30%,rgba(60,22,10,.92),rgba(8,3,4,.97));overflow:auto}
+.bbT{position:relative;margin:0 0 20px;padding:8px 44px 4px;background:var(--accent);border:5px solid var(--ink);border-radius:8px;font-family:var(--toon);font-weight:400;font-size:44px;letter-spacing:2px;color:#fff;text-shadow:3px 4px 0 var(--ink);transform:rotate(-1.2deg);box-shadow:0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+.bbX{position:absolute;right:26px;top:22px;width:50px;height:50px;border-radius:50%;border:5px solid var(--ink);background:#3a251c;box-shadow:inset 0 0 0 2px #7a5238;font-size:30px;line-height:1;color:#fff}
+.bbX:hover{background:var(--accent)}
+.bbBet{display:flex;align-items:center;gap:18px;padding:8px 18px;margin-bottom:46px;background:linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px #6e4a36,0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+.bbBet small{display:block;font-size:12px;font-weight:900;letter-spacing:3px;color:#b79a82;text-align:center}
+.bbBet b{display:block;font-family:var(--toon);font-weight:400;font-size:40px;text-align:center;text-shadow:2px 3px 0 var(--ink);min-width:150px}
+.bbBet button{width:46px;height:46px;border-radius:50%;background:var(--accent);border:4px solid var(--ink);font-family:var(--toon);font-size:28px;line-height:1;color:#fff;text-shadow:2px 2px 0 var(--ink)}
+.bbBet button:hover:not(:disabled){filter:brightness(1.15)}
+.bbRow{display:flex;gap:30px;flex-wrap:wrap;justify-content:center;max-width:1200px;padding:0 10px 30px}
+.bbc{position:relative;width:252px;padding:62px 18px 18px;text-align:center;background:radial-gradient(circle at 16px 16px,#c9a15a 4.5px,transparent 5.5px),radial-gradient(circle at calc(100% - 16px) 16px,#c9a15a 4.5px,transparent 5.5px),linear-gradient(180deg,#3d2a21,#21130e);border:5px solid var(--ink);border-radius:16px 11px 17px 12px;box-shadow:inset 0 0 0 3px #7a5238,inset 0 -30px 40px rgba(0,0,0,.35),0 10px 0 rgba(0,0,0,.45);filter:url(#roughU)}
+.bbc:nth-child(1){transform:rotate(-1.4deg)}.bbc:nth-child(2){transform:rotate(.7deg) translateY(-8px)}.bbc:nth-child(3){transform:rotate(-.6deg)}
+.bbc .med{position:absolute;left:50%;top:-52px;width:108px;height:108px;margin-left:-54px;border-radius:50%;background:radial-gradient(circle,#ff9a2a,#a83a0a 75%);border:6px solid var(--ink);box-shadow:inset 0 0 0 3px #ffd36a,0 6px 0 rgba(0,0,0,.4);display:grid;place-items:center}
+.bbc .med svg{width:78px;height:78px;overflow:visible;filter:drop-shadow(0 3px 0 rgba(0,0,0,.5))}
+.bbc h3{margin:0 0 6px;font-family:var(--toon);font-weight:400;font-size:28px;line-height:1.05;letter-spacing:1px;color:var(--gold);text-shadow:2px 3px 0 var(--ink)}
+.bbc p{margin:0 4px;font-size:14px;line-height:1.4;min-height:96px;font-weight:500;color:#e3d0b8}
+.vol{display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0 12px;font-size:11px;font-weight:900;letter-spacing:2px;color:#b79a82}
+.vol i{width:14px;height:18px;background:#4a3228;clip-path:polygon(50% 0,80% 32%,100% 62%,84% 100%,16% 100%,0 62%,22% 32%)}
+.vol i.on{background:linear-gradient(#ffd23a,#ff5a14)}
+.vol span{margin-right:6px}
+.price#pa{font-size:26px;padding-top:5px}
+.price{display:inline-block;margin-bottom:14px;padding:2px 24px 0;border-radius:30px;background:var(--ink);border:3px solid #7a5238;font-family:var(--toon);font-size:34px;letter-spacing:1px;color:var(--gold)}
+.bbc button.go{display:block;width:100%;padding:11px 0 8px;border-radius:10px;border:5px solid var(--ink);font-family:var(--toon);font-size:30px;letter-spacing:2px;color:#fff;text-shadow:2px 3px 0 var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35),0 5px 0 rgba(0,0,0,.45)}
+.bbc button.or{background:linear-gradient(#ff8a2a,#e0500a)}
+.bbc button.gd{background:linear-gradient(#ffd23a,#e8a010);color:#2b1b12;text-shadow:none}
+.bbc button.off{background:linear-gradient(#7a655a,#4e3d34)}
+.bbc button.go:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
 </style></head><body>
 
-<!-- ============ shared defs (wobble filters, hatch patterns) + this slot's symbols ============ -->
+<!-- ============ symbol artwork: hand-inked cartoon style (thick outline, flat colours, solid shading) ============ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
  <!-- hand-inked wobble: displaces every edge a hair so nothing is a perfect vector line -->
  <filter id="roughS" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter>
@@ -311,7 +302,6 @@ button:disabled{cursor:not-allowed}
  <pattern id="hatchC" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(38)"><line x1="0" y1="0" x2="0" y2="8" stroke="#1d0f09" stroke-width="2.6" opacity=".38"/></pattern>
  <pattern id="hatchL" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="12" stroke="#1d0f09" stroke-width="3" opacity=".4"/></pattern>
  <pattern id="dots" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.7" fill="#1d0f09" opacity=".2"/></pattern>
-
  <symbol id="s0" viewBox="0 0 64 64"><g filter="url(#roughS)"><!-- iron shard -->
   <path d="M7 45 L15 27 L27 39 L22 57 L8 55Z" fill="#7c889e" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
   <path d="M15 27 L22 38 L11 47Z" fill="#a5b1c6"/>
@@ -383,12 +373,11 @@ button:disabled{cursor:not-allowed}
   <path d="M54 6 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#fff" stroke="#1d0f09" stroke-width="1.6" stroke-linejoin="round"/>
   <rect x="21" y="42" width="22" height="16" rx="4" fill="#ffc83a" stroke="#1d0f09" stroke-width="3"/>
   <text x="32" y="55" text-anchor="middle" font-size="13" fill="#1d0f09" font-family="Luckiest Guy,Impact,Arial Black">FS</text></g></symbol>
-
 </defs></svg>
 
 <div id="shaker"><div id="stage">
 
-<!-- ============ per-slot art (slots/<slug>/*.html) ============ -->
+<!-- ============ scene: cartoon volcano forge ============ -->
 <svg id="scene" width="1600" height="900" viewBox="0 0 1600 900">
  <defs>
   <linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="900"><stop offset="0" stop-color="#07040a"/><stop offset=".3" stop-color="#1c0b18"/><stop offset=".55" stop-color="#5a1f1c"/><stop offset=".78" stop-color="#b8461a"/><stop offset="1" stop-color="#ff9a3a"/></linearGradient>
@@ -466,6 +455,7 @@ button:disabled{cursor:not-allowed}
 </svg>
 <div class="heatwash"></div>
 
+<!-- ============ logo ============ -->
 <svg id="logo" viewBox="0 0 660 150" filter="url(#roughC)">
  <defs><linearGradient id="lgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2a0"/><stop offset=".5" stop-color="#ffb02e"/><stop offset="1" stop-color="#ee4a0c"/></linearGradient></defs>
  <g font-family="Luckiest Guy,Impact,Arial Black,sans-serif" text-anchor="middle" stroke-linejoin="round">
@@ -487,6 +477,7 @@ button:disabled{cursor:not-allowed}
 </svg>
 <div id="frame"><div id="grid"></div><div id="fxl"></div></div>
 
+<!-- ============ character: Brann the smith ============ -->
 <div id="char"><svg viewBox="0 0 480 500">
  <ellipse cx="250" cy="488" rx="190" ry="14" fill="#000" opacity=".35"/>
  <g id="anvil" filter="url(#roughC)">
@@ -559,23 +550,24 @@ button:disabled{cursor:not-allowed}
  </g>
 </svg></div>
 
+<!-- ============ forge core (game-specific) ============ -->
 <div id="core"><i class="chain a"></i><i class="chain b"></i>
  <div id="perks"><div class="perk" id="pk9">9<small>DETONATE</small></div><div class="perk" id="pk6">6<small>REFORGE</small></div><div class="perk" id="pk3">3<small>HEATED</small></div></div>
  <div id="tube"></div>
  <div id="heatBox"><div id="heatV">0</div><small>HEAT</small></div></div>
 
-
-<!-- ============ shell: message line, free-spin counter, badges, bonus-buy sign, bottom bar, menu ============ -->
-<div id="msg"></div>
+<div id="msg">Strike the anvil. (Play-money demo)</div>
 <div id="fsBox" hidden><small>FREE SPINS</small><span id="fs">0</span></div>
-<div id="turboBadge" hidden>TURBO</div><div id="feverBadge" hidden></div>
-<button id="buyOpen" title="Bonus buy"><i class="ch l"></i><i class="ch r"></i><span class="plq"><svg viewBox="0 0 64 64"></svg><b>BONUS<br>BUY</b><em id="buyPrice">$100.00</em></span></button>
+<div id="turboBadge" hidden>TURBO</div><div id="feverBadge" hidden>FORGE FEVER ×3</div>
+
+<!-- ============ shell: bottom bar (same in every slot) ============ -->
+<button id="buyOpen" title="Bonus buy"><i class="ch l"></i><i class="ch r"></i><span class="plq"><svg viewBox="0 0 64 64"><use href="#s8"/></svg><b>BONUS<br>BUY</b><em id="buyPrice">$100.00</em></span></button>
 <div id="barL">
   <button id="menuBtn" title="Menu"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
   <div class="fld"><label>BALANCE</label><div class="v" id="bal">–</div></div>
   <div class="fld"><label>WIN</label><div class="v gold" id="win">$0.00</div></div>
 </div>
-<div id="barR"><label id="betLbl" style="font-size:14px;font-weight:900;color:var(--muted);display:block;letter-spacing:2px">BET</label><div id="betV"><span id="bet">$1.00</span></div><div id="betBar"></div>
+<div id="barR"><label id="betLbl" style="font-size:14px;font-weight:900;color:#b79a82;display:block;letter-spacing:2px">BET</label><div id="betV"><span id="bet">$1.00</span></div><div id="betBar"></div>
   <div id="chev"><button id="p" title="Raise bet"><svg viewBox="0 0 34 20"><path d="M4 16 L17 4 L30 16"/></svg></button><button id="m" title="Lower bet"><svg viewBox="0 0 34 20"><path d="M4 4 L17 16 L30 4"/></svg></button></div></div>
 <button id="spin" title="Spin (Space)"><svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-3-6.5"/><path d="M20.5 3.5v5.5h-5.5"/></svg><span class="cnt" id="spinCnt" hidden></span></button>
 <button id="bAuto" title="Autoplay"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
@@ -588,14 +580,18 @@ button:disabled{cursor:not-allowed}
 
 </div></div>
 <div id="grain"></div><canvas id="fx"></canvas><div id="flash"></div>
-<div id="auth" hidden><div><h1 id="authName"></h1><p style="font-family:var(--ui)">Sign in to Nebula first, then reopen this game.</p></div></div>
+<div id="auth" hidden><div><h1>EMBERCLAW</h1><p style="font-family:var(--ui)">Sign in to Nebula first, then reopen this game.</p></div></div>
 <div id="big"><div id="bigT"></div><div id="bigA"></div><div id="bigX"></div></div>
 
-<!-- bonus buy screen (cards are generated from slot.json: fever + buys) -->
+<!-- bonus buy screen -->
 <div class="modal bb" id="buyM" hidden>
   <h2 class="bbT">BONUS BUY</h2><button class="bbX" data-close>×</button>
   <div class="bbBet"><button id="bbM">−</button><div><small>YOUR BET</small><b id="bbBet">$1.00</b></div><button id="bbP">+</button></div>
-  <div class="bbRow" id="bbRow"></div>
+  <div class="bbRow">
+    <div class="bbc"><div class="med"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div><h3>Forge Fever</h3><p>Each spin costs 3x your bet, but the bonus game is 5 times more likely to trigger!</p><div class="vol" data-n="3"><span>VOLATILITY</span></div><div class="price" id="pa">3x BET</div><button class="go or" id="ante">ACTIVATE</button></div>
+    <div class="bbc"><div class="med"><svg viewBox="0 0 64 64"><use href="#s6"/></svg></div><h3>The Reforging</h3><p>10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.</p><div class="vol" data-n="4"><span>VOLATILITY</span></div><div class="price" id="p1">$100.00</div><button class="go gd" id="buy1">BUY</button></div>
+    <div class="bbc"><div class="med"><svg viewBox="0 0 64 64"><use href="#s7"/></svg></div><h3>Pre-Heated</h3><p>The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.</p><div class="vol" data-n="5"><span>VOLATILITY</span></div><div class="price" id="p2">$500.00</div><button class="go gd" id="buy2">BUY</button></div>
+  </div>
 </div>
 <!-- buy confirm -->
 <div class="modal" id="confirm" hidden><div class="mbox">
@@ -611,21 +607,21 @@ button:disabled{cursor:not-allowed}
   <button class="x" data-close>×</button><h2>AUTOPLAY</h2><p>Number of automatic spins</p>
   <div class="opts" id="autoOpts"></div>
   <div class="srow"><span>Stop when a bonus triggers</span><button class="sw on" id="swFeat"></button></div>
-  <div class="srow"><span id="swBigTxt">Stop on a big win</span><button class="sw" id="swBig"></button></div>
+  <div class="srow"><span>Stop on a big win (25x+)</span><button class="sw" id="swBig"></button></div>
   <div class="row2"><button class="btn" data-close>CANCEL</button><button class="btn pri" id="autoGo">START</button></div>
 </div></div>
 <!-- bonus intro / outro: tap anywhere -->
 <div class="modal tap splash" id="introM" hidden><div class="rays"></div><div class="sp">
-  <div class="gems" id="introGems"></div>
-  <div class="medalWrap">    <div class="medal"><div class="mnum"><span id="introN">10</span></div><div class="mlbl" id="introLbl">FREE SPINS</div></div></div>
-  <div class="ribbon" id="introRibbon"></div>
-  <div class="chips" id="introChips"></div>
+  <div class="gems"><div class="g"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div><div class="g"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div><div class="g"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div></div>
+  <div class="medalWrap">    <div class="medal"><div class="mnum"><span id="introN">10</span></div><div class="mlbl">FREE SPINS</div></div></div>
+  <div class="ribbon">THE REFORGING</div>
+  <div class="chips"><span>THE CORE KEEPS ITS HEAT</span><span>EVERY 3RD SPIN: GUARANTEED DETONATION</span><span>2+ GEMS: +4 SPINS</span></div>
   <div class="tapHint">TAP ANYWHERE TO START</div></div></div>
 <div class="modal tap splash" id="outroM" hidden><div class="rays"></div><div class="sp">
-  <div class="ribbon" style="margin:0 0 -40px" id="outroRibbon">BONUS COMPLETE</div>
+  <div class="ribbon" style="margin:0 0 -40px">BONUS COMPLETE</div>
   <div class="medalWrap"><div class="medal wide"><div class="mtop">TOTAL WIN</div><div class="mnum"><span id="outroV">$0.00</span></div></div></div>
   <div class="tapHint" style="margin-top:34px">TAP ANYWHERE TO CONTINUE</div></div></div>
-<!-- info: title from slot.json, body = slots/<slug>/info.html -->
+<!-- info -->
 <div class="modal" id="infoM" hidden><div class="mbox wide">
   <button class="x" data-close>×</button><h2>EMBERCLAW · MOLTEN REFORGE</h2>
   <p>6×5 cluster pays. Match 5 or more symbols touching horizontally or vertically. Winning clusters shatter and new symbols fall in. Max win 9,500x.</p>
@@ -636,349 +632,257 @@ button:disabled{cursor:not-allowed}
     <div><b>THE REFORGING</b><span>3+ Forgefire Gems start 10 free spins. The Core never resets between spins. Every 3rd spin starts with a guaranteed detonation. 2+ Gems add 4 spins.</span></div>
     <div><b>BONUS BUY &amp; FORGE FEVER</b><span>Buy the bonus for 100x, or Pre-Heated (Core at 6) for 500x. Forge Fever makes every spin cost 3x your bet, and the bonus becomes 5 times more likely to trigger.</span></div>
   </div>
-
 </div></div>
 <script>
 'use strict';
-/* ---- slot config (slots/emberclaw/slot.json) ---- */
-const SLOT_CFG = {"id": "emberclaw", "title": "EmberClaw: Molten Reforge", "logoText": "EMBERCLAW", "infoTitle": "EMBERCLAW · MOLTEN REFORGE", "api": "/api/emberclaw/spin", "engineSource": "emberclaw-engine.js", "storage": "ec", "walletKey": "emberclawWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 9500, "anteCost": 3, "scatterSym": 8, "char": {"el": "char", "states": ["swing", "win", "big", "boom"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "LEGENDARY", "lv": 4}, {"min": 25, "name": "FORGED", "lv": 3}, {"min": 10, "name": "MOLTEN", "lv": 2}, {"min": 5, "name": "SPARK", "lv": 1}], "autoBigLv": 3, "text": {"idle": "Strike the anvil.", "win": "YOU FORGED {amt}", "lose": "Cold iron. Strike again.", "freeSpin": "Free spin {n}", "freeSpinRetrigger": "  ·  +{r} SPINS!"}, "fever": {"name": "Forge Fever", "sym": 8, "vol": 3, "text": "Each spin costs 3x your bet, but the bonus game is 5 times more likely to trigger!", "badge": "FORGE FEVER ×3", "onMsg": "FORGE FEVER ON · 5x BONUS CHANCE", "offMsg": "Forge Fever off"}, "buys": [{"key": "standard", "mult": 100, "sym": 6, "vol": 4, "name": "The Reforging", "text": "10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.", "confirmTitle": "THE REFORGING", "confirmText": "Skip straight to 10 free spins. The Forge Core heat carries over between spins."}, {"key": "preheated", "mult": 500, "sym": 7, "vol": 5, "name": "Pre-Heated", "text": "The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.", "confirmTitle": "PRE-HEATED", "confirmText": "10 free spins with the Forge Core already at 6 heat: you start with a reforged Wild and the Core primed."}], "intro": {"unit": "FREE SPINS", "ribbon": "THE REFORGING", "chips": ["THE CORE KEEPS ITS HEAT", "EVERY 3RD SPIN: GUARANTEED DETONATION", "2+ GEMS: +4 SPINS"]}, "outro": {"ribbon": "BONUS COMPLETE"}, "audio": {"reverb": {"sec": 1.7, "pow": 2.8, "wet": 0.28}}};
-/* ---- shell ---- */
-/* SlotForge shell: shared logic for every Nebula slot. See shell/README.md for the hook API.
- *
- *   SlotShell.boot(SLOT_CFG, S => ({ ...hooks }))
- *
- * `SLOT_CFG` is slots/<slug>/slot.json (injected by build-standalone.py). The factory receives the shell API `S` and returns the
- * slot's hooks. Pure renderer: the server returns the whole round; nothing here computes an outcome.
- * In the standalone build a global `SLOT_ENGINE` ({playRound, CFG}) exists and the shell plays against it locally (play money).
- */
-const SlotShell = (() => {
-const $ = id => document.getElementById(id);
-const store = { get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
-const fmt = n => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const betLbl = n => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2));
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
+/* EMBERCLAW: Molten Reforge — server-side game engine.
+ * Pure functions: no I/O, RNG injected. The client only animates what this returns. */
 
-function boot(cfg, factory) {
-const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : null;   // standalone build: engine embedded, play money
-const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, BUYS = cfg.buys || [], P = cfg.storage || cfg.id;
-let hooks = {};
-let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, busy = false, balance = 0, STAGE_S = 1;
-let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false);
+const ROWS = 5, COLS = 6;
+const SYM = { IRON:0, COPPER:1, SILVER:2, HAMMER:3, TONGS:4, BLADE:5, CROWN:6, WILD:7, SCATTER:8 };
+const ENGINE_NAMES = ['Iron Shard','Copper Ingot','Silver Chain','Molten Hammer','Rune-Etched Tongs',
+  'Dragonbone Blade','Crown of Cinders','Ember Core Sigil','Forgefire Gem'];
+const LOW_MAX = SYM.SILVER;
+
+/* paytable: multiplier of bet per cluster size bucket [5-7, 8-9, 10-12, 13+] */
+const PAYTABLE = [
+  [0.10, 0.25, 0.5, 1.5], [0.15, 0.3, 0.6, 1.75], [0.2, 0.4, 0.8, 2],
+  [0.4, 1, 2.5, 6], [0.6, 1.5, 3.5, 9],
+  [1.5, 4, 10, 25], [3, 8, 20, 50]
+];
+const bucket = n => (n >= 13 ? 3 : n >= 10 ? 2 : n >= 8 ? 1 : 0);
+
+/* tunable math (see emberclaw-sim.js) */
+const CFG = {
+  weights: [11, 14, 13, 17, 18, 26, 29],   // refill + initial symbol weights
+  bonusWeights: [10, 10, 10, 14, 18, 22, 22], // leaner table during The Reforging (heat persists, so wilds snowball)
+  bonusFlatCap: 8,                        // in The Reforging the flat bonus stacks once per 3 heat, up to this many tiers
+  scatterP: 0.01027,                      // per-cell scatter chance on the initial grid (~1 in 280)
+  anteScatterP: 0.018557,                // Forge Fever: scatter weight raised so the bonus is ~5x as likely (~1 in 56)
+  payScale: 1.055,                        // global payout trim applied to every cluster win (RTP calibration)
+  heatFlat: 0.75,                         // heat >= 3: every cluster pays this flat bonus (spec said 0.5x; raised while tuning RTP)
+  maxWin: 9500,
+  freeSpins: 10, retriggerSpins: 4, retriggerMin: 2, maxBonusSpins: 100, maxSteps: 60,
+  bets: [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000],
+  buy: { standard: { cost: 100, heat: 0 }, preheated: { cost: 500, heat: 6 } },
+  anteCost: 3,                            // Forge Fever costs 3x the bet
+  anteBonusWeights: [7.75, 7.75, 7.75, 14, 18.25, 22.25, 22.25], // Forge Fever bonuses use a richer table so the 3x price still returns ~96%
+};
+
+function cryptoRng() { const a = new Uint32Array(2); crypto.getRandomValues(a); return (a[0] * 2 ** 21 + (a[1] >>> 11)) / 2 ** 53; }
+
+const newGrid = fill => Array.from({ length: ROWS }, () => Array(COLS).fill(fill));
+const clone = g => g.map(r => r.slice());
+
+function pickSymbol(rng, W = CFG.weights) {
+  let t = 0; for (const w of W) t += w;
+  let x = rng() * t;
+  for (let i = 0; i < W.length; i++) { x -= W[i]; if (x < 0) return i; }
+  return W.length - 1;
+}
+
+function initialGrid(rng, scatterP, W) {
+  const g = newGrid(0);
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
+    g[r][c] = rng() < scatterP ? SYM.SCATTER : pickSymbol(rng, W);
+  return g;
+}
+
+/* cluster detection: orthogonal adjacency, wilds join every cluster they touch */
+function findClusters(g, wm) {
+  const out = [];
+  for (let s = 0; s <= SYM.CROWN; s++) {
+    const seen = newGrid(false);
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      if (seen[r][c] || g[r][c] !== s) continue;       // start only from a real symbol
+      const cells = [], st = [[r, c]]; seen[r][c] = true;
+      let real = 0;
+      while (st.length) {
+        const [y, x] = st.pop(); cells.push([y, x]);
+        if (g[y][x] === s) real++;
+        for (const [dy, dx] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+          const ny = y + dy, nx = x + dx;
+          if (ny < 0 || nx < 0 || ny >= ROWS || nx >= COLS || seen[ny][nx]) continue;
+          const v = g[ny][nx];
+          if (v === s || v === SYM.WILD) { seen[ny][nx] = true; st.push([ny, nx]); }
+        }
+      }
+      if (cells.length >= 5 && real > 0) {
+        let mult = 0, wilds = 0;   // multiple wilds in a cluster add their multipliers
+        for (const [y, x] of cells) if (g[y][x] === SYM.WILD) { mult += wm[y][x]; wilds++; }
+        if (!wilds) mult = 1;
+        out.push({ symbol: s, size: cells.length, cells, wilds, wildMult: mult });
+      }
+    }
+  }
+  return out;
+}
+
+function reforge(g, wm, rng, mult = 1) {
+  const cand = [];
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (g[r][c] <= LOW_MAX) cand.push([r, c]);
+  if (!cand.length) return null;
+  const [r, c] = cand[Math.floor(rng() * cand.length)];
+  const was = g[r][c]; g[r][c] = SYM.WILD; wm[r][c] = mult;
+  return { r, c, was, mult };
+}
+
+/* Heat thresholds on the 9-notch Core: 3 = passive flat bonus, 6 = reforge, 9 = detonation.
+ * Each of reforge / detonation fires at most once per spin sequence (`fired`), even if bonus heat keeps climbing. */
+function heatEvents(from, to, g, wm, rng, fired) {
+  const ev = [];
+  for (let h = from + 1; h <= to; h++) {
+    const k = h % 9;
+    if (k === 6 && !fired.reforge) {
+      fired.reforge = true;
+      const f = reforge(g, wm, rng); if (f) ev.push({ type: 'reforge', heat: h, cells: [f] });
+    } else if (k === 0 && !fired.detonate) { fired.detonate = true; ev.push(detonate(g, wm, rng, h)); }
+  }
+  return ev;
+}
+function detonate(g, wm, rng, heat, forced = false) {
+  const doubled = [];
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
+    if (g[r][c] === SYM.WILD) { wm[r][c] *= 2; doubled.push({ r, c, mult: wm[r][c] }); }
+  const f = reforge(g, wm, rng);
+  return { type: 'detonate', heat, forced, doubled, cells: f ? [f] : [] };
+}
+const wildList = (g, wm) => {
+  const o = [];
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (g[r][c] === SYM.WILD) o.push({ r, c, mult: wm[r][c] });
+  return o;
+};
+
+/* One spin = initial grid + full cascade chain. heat0 is the Core heat carried in. */
+function engineSpin(rng, { heat0 = 0, ante = false, forceDetonate = false, noScatter = false, inBonus = false, weights = CFG.weights } = {}) {
+  let g = initialGrid(rng, noScatter ? 0 : ante ? CFG.anteScatterP : CFG.scatterP, weights);
+  const wm = newGrid(1);
+  const out = { initialGrid: clone(g), startHeat: heat0, openingEvents: [], cascadeSteps: [], totalPayout: 0, scatters: 0 };
+  for (const row of g) for (const v of row) if (v === SYM.SCATTER) out.scatters++;
+
+  let heat = heat0;
+  // carried-in heat (pre-heated / persisted) already past thresholds on the fresh board
+  const fired = { reforge: false, detonate: false };
+  if (heat >= 6) out.openingEvents.push(...heatEvents(0, 6, g, wm, rng, fired));
+  if (heat >= 9) out.openingEvents.push(...heatEvents(6, 9, g, wm, rng, fired));
+  if (forceDetonate) { fired.detonate = true; out.openingEvents.push(detonate(g, wm, rng, heat, true)); }
+  out.openingGrid = clone(g); out.openingWilds = wildList(g, wm);
+
+  let total = 0;
+  for (let step = 0; step < CFG.maxSteps; step++) {
+    const clusters = findClusters(g, wm);
+    if (!clusters.length) break;
+    const tiers = heat < 3 ? 0 : inBonus ? Math.min(Math.floor(heat / 3), CFG.bonusFlatCap) : 1;
+    let payout = 0, wildClusters = 0;
+    const cleared = [], cl = [];
+    for (const k of clusters) {
+      const base = PAYTABLE[k.symbol][bucket(k.size)] + tiers * CFG.heatFlat;
+      const pay = base * k.wildMult * CFG.payScale;
+      payout += pay; if (k.wilds) wildClusters++;
+      cl.push({ symbol: k.symbol, size: k.size, payout: pay, wildMult: k.wildMult, cells: k.cells.map(([r, c]) => ({ r, c })) });
+      for (const [r, c] of k.cells) if (g[r][c] !== SYM.WILD && !cleared.some(q => q.r === r && q.c === c))
+        cleared.push({ r, c, sym: g[r][c] });
+    }
+    if (total + payout >= CFG.maxWin) { payout = CFG.maxWin - total; out.capped = true; }
+    total += payout;
+
+    for (const q of cleared) g[q.r][q.c] = -1;
+    const newCells = [];
+    for (const q of cleared) { const s = pickSymbol(rng, weights); g[q.r][q.c] = s; newCells.push({ r: q.r, c: q.c, sym: s }); }
+
+    const prev = heat; heat += 1 + wildClusters;
+    const reforgeEvents = out.capped ? [] : heatEvents(prev, heat, g, wm, rng, fired);
+    out.cascadeSteps.push({
+      clusters: cl, clearedCells: cleared, payout, newCells, coreHeat: heat, reforgeEvents,
+      wilds: wildList(g, wm), grid: clone(g)
+    });
+    if (out.capped) break;
+  }
+  out.totalPayout = total; out.endHeat = heat;
+  return out;
+}
+
+/* Full round: base spin (+ whole bonus if triggered). Payouts are in multiples of the base bet. */
+/* A bought bonus first plays a visible trigger spin: a board that lands n Forgefire Gems and pays nothing. */
+function triggerGrid(rng, n) {
+  let g;
+  for (let tries = 0; tries < 300; tries++) {
+    g = initialGrid(rng, 0, CFG.weights);
+    const used = [];
+    while (used.length < n) { const r = Math.floor(rng() * ROWS), c = Math.floor(rng() * COLS); if (!used.some(q => q[0] === r && q[1] === c)) used.push([r, c]); }
+    used.forEach(([r, c]) => { g[r][c] = SYM.SCATTER; });
+    if (!findClusters(g, newGrid(1)).length) break;
+  }
+  return g;
+}
+
+function playRound(rng, { ante = false, buy = null } = {}) {
+  const bonusFrom = (startHeat, bw = CFG.bonusWeights) => {
+    const spins = []; let heat = startHeat, left = CFG.freeSpins, n = 0, total = 0, awarded = CFG.freeSpins;
+    while (left > 0 && n < CFG.maxBonusSpins && total < CFG.maxWin) {
+      n++; left--;
+      const s = engineSpin(rng, { heat0: heat, forceDetonate: n % 3 === 0, weights: bw, inBonus: true });
+      s.spinIndex = n; heat = s.endHeat; total += s.totalPayout;
+      if (s.scatters >= CFG.retriggerMin) { left += CFG.retriggerSpins; awarded += CFG.retriggerSpins; s.retrigger = CFG.retriggerSpins; }
+      s.spinsLeft = left;
+      spins.push(s);
+    }
+    return { spins, totalPayout: Math.min(total, CFG.maxWin), freeSpinsAwarded: awarded, startSpins: CFG.freeSpins, endHeat: heat };
+  };
+
+  if (buy) {
+    const b = CFG.buy[buy];
+    const bonus = bonusFrom(b.heat);
+    return { cost: b.cost, initialGrid: triggerGrid(rng, buy === 'preheated' ? 4 : 3), cascadeSteps: [], baseSpin: null, bonus, bonusTriggered: true,
+      freeSpinsAwarded: bonus.freeSpinsAwarded, totalPayout: bonus.totalPayout, bought: buy };
+  }
+  const base = engineSpin(rng, { ante });
+  const trig = base.scatters >= 3;
+  let bonus = null, total = base.totalPayout;
+  if (trig) { bonus = bonusFrom(0, ante ? CFG.anteBonusWeights : CFG.bonusWeights); total = Math.min(CFG.maxWin, total + bonus.totalPayout); }
+  return {
+    cost: ante ? CFG.anteCost : 1,
+    initialGrid: base.initialGrid, openingEvents: base.openingEvents, openingGrid: base.openingGrid,
+    cascadeSteps: base.cascadeSteps, basePayout: base.totalPayout,
+    totalPayout: total, bonusTriggered: trig, freeSpinsAwarded: trig ? bonus.freeSpinsAwarded : 0,
+    bonus, capped: !!base.capped || total >= CFG.maxWin
+  };
+}
+
+/* ---- STANDALONE MODE: the server engine is embedded and runs locally with play money. ---- */
+const START_BALANCE = 1000;
+let wallet = Number(localStorage.getItem('emberclawWallet') || START_BALANCE);
+if (!(wallet >= 0.1)) wallet = START_BALANCE;
+const _r2 = n => Math.round(n * 100) / 100;
+async function api(body) {
+  const stake = _r2(body.stake), buy = body.buy || null;
+  const round = playRound(cryptoRng, { ante: !!body.ante, buy });
+  const cost = _r2(stake * round.cost), payout = _r2(stake * round.totalPayout);
+  if (cost > wallet + 1e-9) throw new Error('Not enough balance (clear site data to reset play money)');
+  wallet = _r2(wallet - cost + payout); localStorage.setItem('emberclawWallet', wallet);
+  return { round, stake, cost, payout, user: { balance: wallet } };
+}
+/* Pure renderer: the server returns the whole cascade sequence; nothing here computes an outcome. */
+const $ = id => document.getElementById(id);
+const TIER = ['low','low','low','mid','mid','high','high','wild','scatter'];
+const NAMES = ['Iron Shard','Copper Ingot','Silver Chain','Molten Hammer','Rune-Etched Tongs','Dragonbone Blade','Crown of Cinders'];
+const PT = [[.1,.25,.5,1.5],[.15,.3,.6,1.75],[.2,.4,.8,2],[.4,1,2.5,6],[.6,1.5,3.5,9],[1.5,4,10,25],[3,8,20,50]];  // display only
+const BETS = [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000];  // keep in sync with CFG.bets on the server
+const betLbl = n => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2));
+const store = { get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+const ANTE_COST = 3;  // Forge Fever multiplier, keep in sync with CFG.anteCost on the server
+let bi = BETS.indexOf(1), ante = false, busy = false, balance = 0, lastGrid = null, lastWilds = [], STAGE_S = 1;
+let soundOn = store.get('ec_snd', true), turbo = store.get('ec_turbo', false);
 let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
 const T = () => turbo ? .45 : 1;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 const wait = ms => sleep(ms * T());
+const fmt = n => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 /* the 1600x900 stage is scaled to fit the window */
 function fit() { STAGE_S = Math.min(innerWidth / 1600, innerHeight / 900); $('stage').style.setProperty('--s', STAGE_S); }
 addEventListener('resize', fit); fit();
 
-/* ---------- audio: everything is synthesised, nothing is sampled. The shell owns the primitives; the slot owns the recipes ---------- */
-function makeKit(ctx, out) {
-  const sr = ctx.sampleRate, rvc = (cfg.audio && cfg.audio.reverb) || { sec: 1.7, pow: 2.8, wet: .28 };
-  const nb = ctx.createBuffer(1, sr * 2, sr), nd = nb.getChannelData(0);
-  for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
-  // room reverb: decaying noise impulse
-  const rv = ctx.createConvolver(), ib = ctx.createBuffer(2, Math.floor(sr * rvc.sec), sr);
-  for (let c = 0; c < 2; c++) { const d = ib.getChannelData(c); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, rvc.pow); }
-  rv.buffer = ib; const wet = ctx.createGain(); wet.gain.value = rvc.wet; rv.connect(wet).connect(out);
-  const bus = ctx.createGain(); bus.connect(out); bus.connect(rv);
-  const env = (t, a, peak, d) => { const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(.0002, peak), t + a); g.gain.exponentialRampToValueAtTime(.0001, t + a + d); return g; };
-  const osc = (type, f, t, d, peak, a = .004, to, dest = bus) => { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + d); o.connect(env(t, a, peak, d)).connect(dest); o.start(t); o.stop(t + a + d + .05); };
-  const noise = (t, d, peak, type, f1, f2, q = 1, a = .002) => { const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; const f = ctx.createBiquadFilter(); f.type = type; f.frequency.setValueAtTime(f1, t); if (f2) f.frequency.exponentialRampToValueAtTime(f2, t + d); f.Q.value = q; s.connect(f).connect(env(t, a, peak, d)).connect(bus); s.start(t, Math.random()); s.stop(t + a + d + .05); };
-  const metal = (f, t, d, peak, R = [1, 2.756, 5.404, 8.933]) => R.forEach((r, i) => osc('sine', f * r, t, d / (1 + i * .7), peak / (1 + i * 1.1), .002));
-  const st = n => Math.pow(2, n / 12);
-  const T0 = () => ctx.currentTime + .005;
-  /* ambience bed: looping filtered noise + random crackles. o = {lowpass, gain, level, loopSec, crack:{gain:[min,range], f:[min,range], q, every:[min,range], len:[min,range]}} */
-  const bed = (o = {}) => {
-    const c = ctx, k = Object.assign({ lowpass: 170, gain: .5, level: .02, loopSec: 3 }, o), ck = Object.assign({ gain: [.025, .05], f: [2500, 4500], q: 3, every: [120, 900], len: [.03, .05] }, o.crack);
-    let nodes = null, timer = 0;
-    return {
-      start() { if (timer) return; const s = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * k.loopSec, c.sampleRate), d = b.getChannelData(0); let l = 0;
-        for (let i = 0; i < d.length; i++) { l = (l + (Math.random() * 2 - 1) * k.level) / 1.02; d[i] = l * 3; }
-        s.buffer = b; s.loop = true; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = k.lowpass; const g = c.createGain(); g.gain.value = k.gain; s.connect(f).connect(g).connect(out); s.start(); nodes = { s, g };
-        const crack = () => { if (!nodes) return; const t = c.currentTime, n = c.createBufferSource(); n.buffer = b; const q = c.createBiquadFilter(); q.type = 'bandpass'; q.frequency.value = ck.f[0] + Math.random() * ck.f[1]; q.Q.value = ck.q;
-          const e = c.createGain(); e.gain.setValueAtTime(.0001, t); e.gain.exponentialRampToValueAtTime(ck.gain[0] + Math.random() * ck.gain[1], t + .004); e.gain.exponentialRampToValueAtTime(.0001, t + ck.len[0] + Math.random() * ck.len[1]); n.connect(q).connect(e).connect(out); n.start(t, Math.random() * 2); n.stop(t + .12); timer = setTimeout(crack, ck.every[0] + Math.random() * ck.every[1]); };
-        crack(); },
-      stop() { clearTimeout(timer); timer = 0; if (nodes) { try { nodes.s.stop(); } catch {} nodes = null; } }
-    };
-  };
-  return { ctx, out, bus, env, osc, noise, metal, st, T0, bed };
-}
-let ac, master, recipes, ambCtl = null;
-function audio() {
-  if (!recipes) { ac = new (window.AudioContext || window.webkitAudioContext)();
-    const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; master = ac.createGain(); master.gain.value = .9; master.connect(comp).connect(ac.destination);
-    const kit = makeKit(ac, master); recipes = hooks.sfx(kit); if (hooks.ambience) ambCtl = hooks.ambience(kit); }
-  if (ac.state === 'suspended') ac.resume(); return recipes;
-}
-const sfx = new Proxy({}, { get: (_, k) => (...a) => { if (!soundOn) return; try { audio()[k](...a); } catch {} } });
-const amb = {
-  start() { if (!soundOn) return; try { audio(); if (ambCtl) ambCtl.start(); } catch {} },
-  stop() { if (ambCtl) ambCtl.stop(); }
-};
-addEventListener('pointerdown', () => amb.start(), { once: true });
-
-/* ---------- particles (restrained: small ambient sparks + event bursts) ---------- */
-const cv = $('fx'), cx = cv.getContext('2d'); let parts = [];
-function size() { cv.width = innerWidth; cv.height = innerHeight; } size(); addEventListener('resize', size);
-function embers(n, x = innerWidth / 2, y = innerHeight / 2, gold) {
-  for (let i = 0; i < n; i++) parts.push({ x, y, vx: (Math.random() - .5) * 9, vy: -Math.random() * 8 - 1, l: 60 + Math.random() * 60, s: 2 + Math.random() * 3.5, g: .14, c: gold ? 1 : 0 });
-}
-function coins(n) { for (let i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, l: 200, s: 6 + Math.random() * 6, g: .05, c: 1 }); }
-function ambient() {
-  if (parts.length > 120) return;
-  if (Math.random() < .12 + (hooks.ambientBoost ? hooks.ambientBoost() : 0)) parts.push({ x: Math.random() * innerWidth, y: innerHeight + 6, vx: (Math.random() - .5) * .6, vy: -(.5 + Math.random() * 1.1), l: 260 + Math.random() * 160, s: 1.2 + Math.random() * 2, g: -.001, w: Math.random() * 6, c: 0 });
-}
-const defColor = (p, a) => `rgba(255,255,255,${a})`;
-(function loop() {
-  cx.clearRect(0, 0, cv.width, cv.height); ambient();
-  parts = parts.filter(p => p.l-- > 0 && p.y > -30 && p.y < innerHeight + 30);
-  const col = hooks.particleColor || defColor;
-  for (const p of parts) {
-    p.x += p.vx + (p.w ? Math.sin((p.l + p.w * 40) / 25) * .4 : 0); p.y += p.vy; p.vy += p.g;
-    const a = Math.min(1, p.l / 70); cx.fillStyle = col(p, a);
-    cx.fillRect(p.x, p.y, p.s, p.s);
-  }
-  requestAnimationFrame(loop);
-})();
-const shake = big => { const a = $('shaker'); a.classList.remove('shake', 'shake2'); void a.offsetWidth; a.classList.add(big ? 'shake2' : 'shake'); };
-const flash = () => { const f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); };
-const say = (t, hl) => { $('msg').textContent = t; $('msg').classList.toggle('hl', !!hl); };
-
-/* ---------- character controller: one CSS class per state on #char (states are animated in slot.css) ---------- */
-let charT;
-const cc = cfg.char || { el: 'char', states: ['swing', 'win', 'big', 'boom'], bonusClass: 'bonusmode' };
-function char(name, ms) {
-  const c = $(cc.el); c.classList.remove(...cc.states); void c.getBoundingClientRect(); c.classList.add(name);
-  clearTimeout(charT); charT = setTimeout(() => c.classList.remove(name), ms);
-}
-
-/* count a number up (click to skip) */
-function countUp(el, to, ms, from = 0, onTick) {
-  return new Promise(res => { const t0 = performance.now(); skipBig = false; let lt = 0;
-    (function f(t) { if (onTick && t - lt > 75) { lt = t; onTick(Math.min(1, (t - t0) / ms)); }
-      const k = skipBig ? 1 : Math.min(1, (t - t0) / ms); el.textContent = fmt(from + (to - from) * (1 - Math.pow(1 - k, 3)));
-      k < 1 ? requestAnimationFrame(f) : res(); })(t0); });
-}
-/* floating "+$x.xx" pop at a screen point, inside #fxl (the board's fx layer) */
-function pop(sx, sy, text, layer = $('fxl')) {
-  const g = layer.getBoundingClientRect(), e = document.createElement('div'); e.className = 'pop'; e.textContent = text;
-  e.style.left = ((sx - g.left) / STAGE_S) + 'px'; e.style.top = ((sy - g.top) / STAGE_S) + 'px'; layer.append(e); setTimeout(() => e.remove(), 1200);
-}
-
-/* ---------- API client: server round, or the embedded engine with play money (standalone) ---------- */
-const API = location.origin.startsWith('http') ? '' : 'http://localhost:3000';
-const TOKEN = LOCAL ? null : localStorage.getItem('stakeToken');
-const _r2 = n => Math.round(n * 100) / 100;
-let wallet = 0;
-if (LOCAL) { try { wallet = Number(localStorage.getItem(cfg.walletKey) || cfg.startBalance || 1000); } catch { wallet = cfg.startBalance || 1000; } if (!(wallet >= 0.1)) wallet = cfg.startBalance || 1000; }
-const webRng = () => { const a = new Uint32Array(2); crypto.getRandomValues(a); return (a[0] * 2 ** 21 + (a[1] >>> 11)) / 2 ** 53; };
-async function api(body) {
-  if (LOCAL) {
-    const stake = _r2(body.stake), buy = body.buy || null;
-    const round = LOCAL.playRound(webRng, { ante: !!body.ante, buy });
-    const cost = _r2(stake * round.cost), payout = _r2(stake * round.totalPayout);
-    if (cost > wallet + 1e-9) throw new Error('Not enough balance (clear site data to reset play money)');
-    wallet = _r2(wallet - cost + payout); try { localStorage.setItem(cfg.walletKey, wallet); } catch {}
-    return { round, stake, cost, payout, user: { balance: wallet } };
-  }
-  const r = await fetch(API + cfg.api, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
-  const j = await r.json(); if (!r.ok) throw new Error(j.error || 'Spin failed'); return j;
-}
-function syncParent(u) { try { const a = parent !== window && parent._slotAPI; if (a) { a.bal = u.balance; a.paintBal(0); } } catch {} }
-
-/* ---------- modals ---------- */
-const openM = id => { $(id).hidden = false; }, closeM = id => { $(id).hidden = true; };
-document.querySelectorAll('.modal [data-close]').forEach(b => b.onclick = () => closeM(b.closest('.modal').id));
-document.querySelectorAll('.modal').forEach(m => m.addEventListener('mousedown', e => { if (e.target === m && m.id !== 'introM' && m.id !== 'outroM') { m.id === 'confirm' ? closeBuy(false) : closeM(m.id); } }));
-/* tap anywhere (or Space/Enter) to continue; ignores taps for the first 450ms so a stray click can't skip it */
-function tapWait(id, autoMs, minMs = 450) { return new Promise(res => { const m = $(id); openM(id); const t0 = performance.now(); let done = false;
-  const fin = () => { if (done) return; done = true; closeM(id); m.removeEventListener('click', onc); removeEventListener('keydown', onk); res(); };
-  const onc = () => { if (performance.now() - t0 > minMs) { sfx.hit(); fin(); } };
-  const onk = e => { if ((e.code === 'Space' || e.code === 'Enter') && performance.now() - t0 > minMs) { e.preventDefault(); sfx.hit(); fin(); } };
-  m.addEventListener('click', onc); addEventListener('keydown', onk); if (autoMs) setTimeout(fin, autoMs); }); }
-
-/* ---------- big win overlay ---------- */
-const tierOf = x => cfg.tiers.find(t => x >= t.min) || null;
-async function bigWin(x, amt) {
-  const t = tierOf(x); if (!t) return null;
-  const lv = t.lv;
-  $('bigT').textContent = t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET';
-  $('big').classList.add('show'); char('big', 3300); shake(lv > 2); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
-  sfx.big(lv);
-  await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => sfx.tick(k)), sleep(20000)]);
-  await sleep(auto.left > 0 ? 700 : 1500 + lv * 300);
-  $('big').classList.remove('show'); return t.name;
-}
-$('big').onclick = () => { skipBig = true; };
-
-/* ---------- the round ---------- */
-function setBusy(b) {
-  busy = b; ['m', 'p', 'buyOpen', 'menuBtn'].forEach(id => $(id).disabled = b); $('spin').disabled = b && auto.left <= 0;
-  $('bAuto').disabled = b && auto.left <= 0; $('spin').classList.toggle('busy', b && auto.left <= 0);
-}
-async function go(buy) {
-  if (busy) return; setBusy(true); sfx.spin(); closeMenu();
-  $('win').textContent = fmt(0); $('fsBox').hidden = true;
-  const stake = BETS[bi]; let out = { payout: 0, bonus: false, tier: null };
-  try {
-    hooks.roundStart();
-    let j;
-    try { [j] = await Promise.all([api({ stake, ante: buy ? false : ante, buy }), hooks.clearBoard()]); }
-    catch (e) { hooks.restoreBoard(); throw e; }
-    const R = j.round; let run = 0;
-    balance = j.user.balance - j.payout;  // show the stake leaving now, the win as it lands
-    $('bal').textContent = fmt(balance);
-    const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b); } };
-    run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
-    if (R.bonusTriggered) {
-      out.bonus = true;
-      await hooks.showTrigger(R); sfx.bonus(); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
-      $('introN').textContent = R.bonus.startSpins; await tapWait('introM', auto.left > 0 ? 1800 : 0);
-      $('fsBox').hidden = false; $(cc.el).classList.add(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(true);
-      let total = R.bonus.spins.length;
-      for (const sp of R.bonus.spins) {
-        $('fs').textContent = `${sp.spinIndex} / ${total}` + (sp.retrigger ? '  +' + sp.retrigger : ''); say(tpl(cfg.text.freeSpin, { n: sp.spinIndex }) + (sp.retrigger ? tpl(cfg.text.freeSpinRetrigger, { r: sp.retrigger }) : ''), !!sp.retrigger);
-        await hooks.clearBoard();
-        run = await hooks.playSpin(sp, run, ctx); await wait(300);
-      }
-      $('fsBox').hidden = true; $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); $('outroV').textContent = fmt(0);
-      openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
-      await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);
-      await tapWait('outroM', auto.left > 0 ? 1500 : 0);
-    }
-    $('win').textContent = fmt(j.payout); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user);
-    out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
-    out.tier = await bigWin(R.totalPayout, j.payout);
-  } catch (e) { say(e.message); out.err = true; }
-  setBusy(false); refreshUi(); return out;
-}
-
-/* ---------- autoplay ---------- */
-async function runAuto() {
-  while (auto.left > 0) {
-    refreshUi(); const o = await go(null);
-    if (o.err) break;
-    auto.left--;
-    if ((o.bonus && auto.stopFeat) || (o.tier && auto.stopBig && cfg.tiers.find(t => t.name === o.tier).lv >= cfg.autoBigLv)) break;
-    if (BETS[bi] * (ante ? ANTE_COST : 1) > balance + 1e-9) { say('Not enough balance — autoplay stopped.'); break; }
-    await wait(450);
-  }
-  auto.left = 0; refreshUi();
-}
-const AUTO_N = [10, 25, 50, 100];
-$('autoOpts').innerHTML = AUTO_N.map(n => `<button class="opt${n === 25 ? ' sel' : ''}" data-n="${n}">${n}</button>`).join('');
-$('autoOpts').onclick = e => { const b = e.target.closest('.opt'); if (!b) return; auto.pickN = +b.dataset.n; [...$('autoOpts').children].forEach(x => x.classList.toggle('sel', x === b)); };
-$('swFeat').onclick = () => { auto.stopFeat = !auto.stopFeat; $('swFeat').classList.toggle('on', auto.stopFeat); };
-$('swBig').onclick = () => { auto.stopBig = !auto.stopBig; $('swBig').classList.toggle('on', auto.stopBig); };
-$('bAuto').onclick = () => { if (auto.left > 0) { auto.left = 0; refreshUi(); return; } if (!busy) openM('autoM'); };
-$('autoGo').onclick = () => { closeM('autoM'); auto.left = auto.pickN; runAuto(); };
-
-/* ---------- bonus buy screen + confirmation ---------- */
-let pendingBuy = null;
-function askBuy(kind) {
-  if (busy) return; const b = BUYS.find(x => x.key === kind), cost = BETS[bi] * b.mult; pendingBuy = kind;
-  $('cTitle').textContent = b.confirmTitle; $('cDesc').textContent = b.confirmText; $('cCost').textContent = fmt(cost); $('cCost').style.fontSize = fmt(cost).length > 10 ? '38px' : '';
-  const short = cost > balance + 1e-9; $('cWarn').textContent = short ? 'Not enough balance.' : ''; $('cYes').disabled = short;
-  openM('confirm');
-}
-function closeBuy(ok) { if (ok) { sfx.hit(); ante = false; refreshUi(); } const k = pendingBuy; pendingBuy = null; closeM('confirm'); if (ok && k) go(k); }
-$('cYes').onclick = () => closeBuy(true);
-$('cNo').onclick = () => closeBuy(false);
-$('buyOpen').onclick = () => { if (busy) return; sfx.ui(); refreshUi(); openM('buyM'); };
-$('bbM').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
-$('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
-
-function refreshUi() {
-  const s = BETS[bi], risk = s * (ante ? ANTE_COST : 1); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
-  $('barR').classList.toggle('hot', ante); $('betLbl').textContent = ante ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !ante; $('buyPrice').textContent = fmt(s * BUYS[0].mult);
-  const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
-  $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
-  BUYS.forEach((b, i) => fitTxt($('p' + (i + 1)), fmt(s * b.mult), 34, '23px'));
-  $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante);
-  $('bAuto').classList.toggle('on', auto.left > 0);
-  $('spinCnt').hidden = !(auto.left > 0); $('spinCnt').textContent = auto.left; $('spin').querySelector('svg').style.visibility = auto.left > 0 ? 'hidden' : '';
-  $('bTurbo').classList.toggle('on', turbo); $('bTurbo').querySelector('i').textContent = turbo ? 'ON' : 'OFF'; $('turboBadge').hidden = !turbo;
-  $('bSnd').classList.toggle('on', soundOn); $('bSnd').querySelector('i').textContent = soundOn ? 'ON' : 'OFF';
-  document.body.style.setProperty('--spd', T());
-}
-function openBets() {
-  if (busy) return; sfx.ui();
-  $('betGrid').innerHTML = BETS.map((v, i) => `<button class="opt${i === bi ? ' sel' : ''}" data-i="${i}">${betLbl(v)}</button>`).join('');
-  openM('betM');
-}
-$('betGrid').onclick = e => { const o = e.target.closest('.opt'); if (!o) return; sfx.ui(); bi = +o.dataset.i; refreshUi(); closeM('betM'); };
-$('betV').onclick = openBets;
-$('m').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
-$('p').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
-$('spin').onclick = () => { if (auto.left > 0) { auto.left = 0; sfx.ui(); refreshUi(); say('Autoplay stopping after this spin'); return; } go(null); };
-/* hamburger menu */
-const closeMenu = () => { $('menu').hidden = true; };
-$('menuBtn').onclick = e => { e.stopPropagation(); sfx.ui(); $('menu').hidden = !$('menu').hidden; };
-document.addEventListener('click', e => { if (!e.target.closest('#menu') && !e.target.closest('#menuBtn')) closeMenu(); });
-$('bTurbo').onclick = () => { sfx.ui(); turbo = !turbo; store.set(P + '_turbo', turbo); refreshUi(); };
-$('bSnd').onclick = () => { soundOn = !soundOn; store.set(P + '_snd', soundOn); soundOn ? (amb.start(), sfx.ui()) : amb.stop(); refreshUi(); };
-$('bInfo').onclick = () => { closeMenu(); openM('infoM'); };
-$('bFs').onclick = () => { closeMenu(); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch {} };
-addEventListener('keydown', e => {
-  if (e.code === 'Escape') { for (const m of ['confirm', 'buyM', 'autoM', 'infoM']) if (!$(m).hidden) { m === 'confirm' ? closeBuy(false) : closeM(m); return; } closeMenu(); }
-  if (document.querySelector('.modal:not([hidden])')) return;
-  if (e.code === 'Space') { e.preventDefault(); if (!busy) go(null); }
-});
-
-/* ---------- static UI generated from slot.json ---------- */
-const sym = id => `<svg viewBox="0 0 64 64"><use href="#s${id}"/></svg>`;
-document.title = cfg.title + (LOCAL ? ' (offline demo)' : '');
-$('authName').textContent = cfg.logoText;
-$('buyOpen').querySelector('svg').innerHTML = `<use href="#s${cfg.scatterSym}"/>`;
-$('feverBadge').textContent = cfg.fever.badge;
-const bigTier = cfg.tiers.find(t => t.lv === cfg.autoBigLv); $('swBigTxt').textContent = `Stop on a big win (${bigTier.min}x+)`;
-$('bbRow').innerHTML =
-  `<div class="bbc"><div class="med">${sym(cfg.fever.sym)}</div><h3>${cfg.fever.name}</h3><p>${cfg.fever.text}</p><div class="vol" data-n="${cfg.fever.vol}"><span>VOLATILITY</span></div><div class="price" id="pa">${ANTE_COST}x BET</div><button class="go or" id="ante">ACTIVATE</button></div>` +
-  BUYS.map((b, i) => `<div class="bbc"><div class="med">${sym(b.sym)}</div><h3>${b.name}</h3><p>${b.text}</p><div class="vol" data-n="${b.vol}"><span>VOLATILITY</span></div><div class="price" id="p${i + 1}">$${b.mult}.00</div><button class="go gd" id="buy${i + 1}">BUY</button></div>`).join('');
-document.querySelectorAll('.vol').forEach(v => { for (let i = 1; i <= 5; i++) v.insertAdjacentHTML('beforeend', `<i class="${i <= +v.dataset.n ? 'on' : ''}"></i>`); });
-BUYS.forEach((b, i) => { $('buy' + (i + 1)).onclick = () => { closeM('buyM'); askBuy(b.key); }; });
-$('ante').onclick = () => { sfx.ui(); ante = !ante; refreshUi(); closeM('buyM'); if (ante) { say(cfg.fever.onMsg, true); sfx.feverOn(); } else say(cfg.fever.offMsg); };
-$('introGems').innerHTML = [1, 2, 3].map(() => `<div class="g">${sym(cfg.scatterSym)}</div>`).join('');
-$('introLbl').textContent = cfg.intro.unit; $('introRibbon').textContent = cfg.intro.ribbon;
-$('introChips').innerHTML = cfg.intro.chips.map(c => `<span>${c}</span>`).join('');
-$('outroRibbon').textContent = cfg.outro.ribbon;
-
-/* ---------- the API handed to the slot ---------- */
-const S = {
-  cfg, $, store, fmt, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
-  scale: () => STAGE_S, bet: () => BETS[bi], isTurbo: () => turbo, isBusy: () => busy, local: !!LOCAL,
-  skipCount: () => { skipBig = true; }
-};
-hooks = factory(S) || {};
-for (const k of ['sfx', 'init', 'paintIdle', 'roundStart', 'clearBoard', 'restoreBoard', 'playSpin', 'showTrigger'])
-  if (typeof hooks[k] !== 'function') throw new Error('slot is missing hook: ' + k);
-hooks.init(S);
-hooks.paintIdle();
-refreshUi();
-say(cfg.text.idle + (LOCAL ? ' (Play-money demo)' : ''));
-if (LOCAL) { balance = wallet; $('bal').textContent = fmt(balance); }
-else if (!TOKEN) $('auth').hidden = false;
-else fetch(API + '/api/me', { headers: { authorization: 'Bearer ' + TOKEN } }).then(r => r.json())
-  .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); } else $('auth').hidden = false; });
-}
-return { boot, $, store, fmt, betLbl, sleep };
-})();
-
-/* ---- slot: emberclaw ---- */
-/* EmberClaw slot module: the only EmberClaw-specific client logic. The shell (shell/slot-shell.js) calls these hooks.
- * Pure renderer: the server returns every cascade; nothing here computes an outcome.
- * Round payload (slot-defined part): initialGrid, openingGrid?, openingEvents?, cascadeSteps[{clusters,clearedCells,payout,newCells,coreHeat,reforgeEvents,wilds,grid}];
- * bonus.spins[] have the same shape plus spinIndex / retrigger. */
-SlotShell.boot(SLOT_CFG, S => {
-const { $, sfx, wait, T, say, shake, flash, embers, char, pop, fmt } = S;
-const TIER = ['low','low','low','mid','mid','high','high','wild','scatter'];
-const NAMES = ['Iron Shard','Copper Ingot','Silver Chain','Molten Hammer','Rune-Etched Tongs','Dragonbone Blade','Crown of Cinders'];
-const PT = [[.1,.25,.5,1.5],[.15,.3,.6,1.75],[.2,.4,.8,2],[.4,1,2.5,6],[.6,1.5,3.5,9],[1.5,4,10,25],[3,8,20,50]];  // display only
-let lastGrid = null, lastWilds = [];
-
-/* ---------- the board ---------- */
 const cells = [];
 for (let i = 0; i < 30; i++) { const d = document.createElement('div'); d.className = 'cell'; $('grid').append(d); cells.push(d); }
 const at = (r, c) => cells[r * 6 + c];
@@ -999,7 +903,7 @@ async function dropOut() {
   await wait(4 * 55 + 430);
 }
 
-/* ---------- Forge Core (side mechanic) ---------- */
+/* Forge Core meter */
 const tube = $('tube');
 for (let i = 1; i <= 9; i++) { const e = document.createElement('i'); e.dataset.n = i; tube.append(e); }
 let heatNow = 0;
@@ -1010,14 +914,115 @@ function setHeat(h) {
   $('pk3').classList.toggle('on', h >= 3); $('pk6').classList.toggle('on', h >= 6); $('pk9').classList.toggle('on', h >= 9);
 }
 
-/* ---------- the smith ---------- */
+/* ---------- audio: everything is synthesised (anvil, stone, glass, lava, horn), nothing is sampled ---------- */
+function makeSfx(ctx, out) {
+  const sr = ctx.sampleRate;
+  const nb = ctx.createBuffer(1, sr * 2, sr), nd = nb.getChannelData(0);
+  for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  // cavern reverb: decaying noise impulse
+  const rv = ctx.createConvolver(), ib = ctx.createBuffer(2, Math.floor(sr * 1.7), sr);
+  for (let c = 0; c < 2; c++) { const d = ib.getChannelData(c); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2.8); }
+  rv.buffer = ib; const wet = ctx.createGain(); wet.gain.value = .28; rv.connect(wet).connect(out);
+  const bus = ctx.createGain(); bus.connect(out); bus.connect(rv);
+  const env = (t, a, peak, d) => { const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(.0002, peak), t + a); g.gain.exponentialRampToValueAtTime(.0001, t + a + d); return g; };
+  const osc = (type, f, t, d, peak, a = .004, to, dest = bus) => { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + d); o.connect(env(t, a, peak, d)).connect(dest); o.start(t); o.stop(t + a + d + .05); };
+  const noise = (t, d, peak, type, f1, f2, q = 1, a = .002) => { const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; const f = ctx.createBiquadFilter(); f.type = type; f.frequency.setValueAtTime(f1, t); if (f2) f.frequency.exponentialRampToValueAtTime(f2, t + d); f.Q.value = q; s.connect(f).connect(env(t, a, peak, d)).connect(bus); s.start(t, Math.random()); s.stop(t + a + d + .05); };
+  const metal = (f, t, d, peak, R = [1, 2.756, 5.404, 8.933]) => R.forEach((r, i) => osc('sine', f * r, t, d / (1 + i * .7), peak / (1 + i * 1.1), .002));
+  const st = n => Math.pow(2, n / 12);
+  const T0 = () => ctx.currentTime + .005;
+  const anvil = (p = 1, pitch = 1, t = T0()) => { metal(360 * pitch, t, 1.1, .2 * p); noise(t, .06, .22 * p, 'bandpass', 3200, 1800, 1.2); osc('sine', 78 * pitch, t, .16, .32 * p, .002, 46 * pitch); };
+  const horn = (t, d, peak, base = 55) => [1, 1.5, 2, 3].forEach((m, i) => [-7, 7].forEach(c => {
+    const o = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = env(t, d * .45, peak / (1 + i * .5), d * .55);
+    o.type = 'sawtooth'; o.frequency.value = base * m; o.detune.value = c; f.type = 'lowpass'; f.frequency.setValueAtTime(220, t); f.frequency.exponentialRampToValueAtTime(1100, t + d * .5); f.Q.value = 1.4;
+    o.connect(f).connect(g).connect(bus); o.start(t); o.stop(t + d + .1); }));
+  return {
+    anvil: (p, pitch) => anvil(p, pitch),
+    hit: () => { const t = T0(); anvil(.55, 1.05, t); },
+    ui: () => { const t = T0(); osc('triangle', 330, t, .07, .16, .002, 220); noise(t, .035, .1, 'bandpass', 2400, 0, 2); },
+    swing: () => { const t = T0(); noise(t, .22, .2, 'bandpass', 350, 1700, .8, .04); osc('sine', 120, t, .2, .16, .02, 70); },
+    drop: () => { const t = T0(); noise(t, .5, .16, 'bandpass', 2600, 280, .7, .03); },
+    land: r => { const t = T0(); osc('sine', 96, t, .14, .24, .002, 48); noise(t, .07, .18, 'lowpass', 600, 0); if (r === 4) metal(240, t, .35, .05); },
+    shatter: () => { const t = T0(); noise(t, .28, .26, 'highpass', 2600, 6000, .7); noise(t, .16, .26, 'lowpass', 1000, 200); for (let i = 0; i < 6; i++) osc('sine', 1800 + Math.random() * 3600, t + i * .028 + Math.random() * .02, .14, .035, .001); },
+    win: n => { const t = T0(), sc = [0, 2, 4, 7, 9, 12, 14, 16], f = 440 * st(sc[Math.min(n, 7)]); metal(f, t, 1.0, .13); osc('triangle', f / 2, t, .5, .08); noise(t, .08, .04, 'highpass', 5000, 0); },
+    heat: h => { const t = T0(); metal(260 * st(h * 1.6), t, .55, .12, [1, 2.01, 3.02]); noise(t, .25, .08, 'bandpass', 3500 + h * 300, 7000, 1.5, .03); },
+    reforge: () => { const t = T0(); anvil(1.05, 1.12, t); noise(t + .05, .7, .1, 'bandpass', 2200, 6500, 2.5, .05); osc('sine', 500, t + .05, .55, .06, .05, 2000); },
+    boom: () => { const t = T0(); osc('sine', 120, t, 1.3, .6, .003, 26); noise(t, 1.5, .34, 'lowpass', 2200, 90, .8); noise(t, .14, .3, 'highpass', 1500, 0); anvil(1, .8, t + .02); noise(t + .1, 1.0, .08, 'bandpass', 3000, 7000, 2, .1); },
+    bonus: () => { const t = T0(); horn(t, 2.2, .075); [0, .36, .72].forEach((d, i) => anvil(.9, [.9, 1, 1.19][i], t + d)); [0, 4, 7, 12].forEach((n, i) => metal(330 * st(n), t + 1 + i * .08, 1.6, .07)); osc('sine', 60, t, 1.8, .3, .01, 40); },
+    outro: () => { const t = T0(); [0, 4, 7, 12, 16].forEach((n, i) => metal(392 * st(n), t + i * .13, 1.3, .1)); horn(t, 1.6, .045, 82.5); },
+    big: lv => { const t = T0(); for (let i = 0; i < lv; i++) anvil(.9, 1 + i * .06, t + i * .28); horn(t, 1.6 + lv * .5, .06 + lv * .012, 55 * st(lv)); [0, 4, 7, 12, 16, 19, 24].slice(0, 3 + lv).forEach((n, i) => metal(440 * st(n), t + .3 + i * .1, 1.2, .08)); osc('sine', 60, t, 1.2, .35, .01, 36); },
+    scatter: n => { const t = T0(), f = 660 * st([0, 4, 7, 12][Math.min(n, 3)]); metal(f, t, 1.3, .13); osc('triangle', f / 2, t, .5, .07); noise(t, .35, .06, 'highpass', 7000, 0); },
+    tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .12, .001); noise(t, .02, .08, 'highpass', 6000, 0); }
+  };
+}
+let ac, master, sfxO, ambNodes = null;
+function S() {
+  if (!sfxO) { ac = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; master = ac.createGain(); master.gain.value = .9; master.connect(comp).connect(ac.destination);
+    sfxO = makeSfx(ac, master); }
+  if (ac.state === 'suspended') ac.resume(); return sfxO;
+}
+const sfx = new Proxy({}, { get: (_, k) => (...a) => { if (!soundOn) return; try { S()[k](...a); } catch {} } });
+/* low forge ambience: a quiet lava rumble with random ember crackles */
+const amb = {
+  timer: 0,
+  start() { if (this.timer || !soundOn) return; try { S(); const c = ac, s = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * 3, c.sampleRate), d = b.getChannelData(0); let l = 0;
+      for (let i = 0; i < d.length; i++) { l = (l + (Math.random() * 2 - 1) * .02) / 1.02; d[i] = l * 3; }
+      s.buffer = b; s.loop = true; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 170; const g = c.createGain(); g.gain.value = .5; s.connect(f).connect(g).connect(master); s.start(); ambNodes = { s, g };
+      const crack = () => { if (!ambNodes) return; const t = c.currentTime, n = c.createBufferSource(); n.buffer = b; const q = c.createBiquadFilter(); q.type = 'bandpass'; q.frequency.value = 2500 + Math.random() * 4500; q.Q.value = 3;
+        const e = c.createGain(); e.gain.setValueAtTime(.0001, t); e.gain.exponentialRampToValueAtTime(.025 + Math.random() * .05, t + .004); e.gain.exponentialRampToValueAtTime(.0001, t + .03 + Math.random() * .05); n.connect(q).connect(e).connect(master); n.start(t, Math.random() * 2); n.stop(t + .12); this.timer = setTimeout(crack, 120 + Math.random() * 900); };
+      crack(); } catch {} },
+  stop() { clearTimeout(this.timer); this.timer = 0; if (ambNodes) { try { ambNodes.s.stop(); } catch {} ambNodes = null; } }
+};
+addEventListener('pointerdown', () => amb.start(), { once: true });
+
+/* ---------- particles (restrained: small ambient embers + event bursts) ---------- */
+const cv = $('fx'), cx = cv.getContext('2d'); let parts = [];
+function size() { cv.width = innerWidth; cv.height = innerHeight; } size(); addEventListener('resize', size);
+function embers(n, x = innerWidth / 2, y = innerHeight / 2, gold) {
+  for (let i = 0; i < n; i++) parts.push({ x, y, vx: (Math.random() - .5) * 9, vy: -Math.random() * 8 - 1, l: 60 + Math.random() * 60, s: 2 + Math.random() * 3.5, g: .14, c: gold ? 1 : 0 });
+}
+function coins(n) { for (let i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, l: 200, s: 6 + Math.random() * 6, g: .05, c: 1 }); }
+function ambient() {
+  if (parts.length > 120) return;
+  if (Math.random() < .12 + heatNow * .02) parts.push({ x: Math.random() * innerWidth, y: innerHeight + 6, vx: (Math.random() - .5) * .6, vy: -(.5 + Math.random() * 1.1), l: 260 + Math.random() * 160, s: 1.2 + Math.random() * 2, g: -.001, w: Math.random() * 6, c: 0 });
+}
+(function loop() {
+  cx.clearRect(0, 0, cv.width, cv.height); ambient();
+  parts = parts.filter(p => p.l-- > 0 && p.y > -30 && p.y < innerHeight + 30);
+  for (const p of parts) {
+    p.x += p.vx + (p.w ? Math.sin((p.l + p.w * 40) / 25) * .4 : 0); p.y += p.vy; p.vy += p.g;
+    const a = Math.min(1, p.l / 70); cx.fillStyle = p.c ? `rgba(255,${190 + (p.l % 50)},60,${a})` : `rgba(255,${100 + Math.min(120, p.l)},20,${a})`;
+    cx.fillRect(p.x, p.y, p.s, p.s);
+  }
+  requestAnimationFrame(loop);
+})();
+const shake = big => { const a = $('shaker'); a.classList.remove('shake', 'shake2'); void a.offsetWidth; a.classList.add(big ? 'shake2' : 'shake'); };
+const flash = () => { const f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); };
+const say = (t, hl) => { $('msg').textContent = t; $('msg').classList.toggle('hl', !!hl); };
+
+/* ---------- the smith: reacts to everything that happens on the board ---------- */
+let charT;
+function char(name, ms) {
+  const c = $('char'); c.classList.remove('swing', 'win', 'big', 'boom'); void c.getBoundingClientRect(); c.classList.add(name);
+  clearTimeout(charT); charT = setTimeout(() => c.classList.remove(name), ms);
+}
 function sparks() { const r = $('hotspot').getBoundingClientRect(); embers(22, r.left, r.top, true); }
 function smithStrike() { char('swing', 1000 * T()); setTimeout(() => { sparks(); sfx.anvil(.8, 1); }, 600 * T()); }
-function popAt(cluster, amount) {
-  let sx = 0, sy = 0;
-  cluster.cells.forEach(c => { const b = at(c.r, c.c).getBoundingClientRect(); sx += b.left + b.width / 2; sy += b.top + b.height / 2; });
-  const n = cluster.cells.length; pop(sx / n, sy / n, '+' + fmt(amount));
+
+/* count a number up (click to skip) */
+function countUp(el, to, ms, from = 0, onTick) {
+  return new Promise(res => { const t0 = performance.now(); skipBig = false; let lt = 0;
+    (function f(t) { if (onTick && t - lt > 75) { lt = t; onTick(Math.min(1, (t - t0) / ms)); }
+      const k = skipBig ? 1 : Math.min(1, (t - t0) / ms); el.textContent = fmt(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+      k < 1 ? requestAnimationFrame(f) : res(); })(t0); });
 }
+function popAt(cluster, amount) {
+  const g = $('fxl').getBoundingClientRect(); let sx = 0, sy = 0;
+  cluster.cells.forEach(c => { const b = at(c.r, c.c).getBoundingClientRect(); sx += b.left + b.width / 2; sy += b.top + b.height / 2; });
+  const n = cluster.cells.length, e = document.createElement('div'); e.className = 'pop'; e.textContent = '+' + fmt(amount);
+  e.style.left = ((sx / n - g.left) / STAGE_S) + 'px'; e.style.top = ((sy / n - g.top) / STAGE_S) + 'px'; $('fxl').append(e); setTimeout(() => e.remove(), 1200);
+}
+
 
 async function playEvents(events) {
   for (const e of events || []) {
@@ -1029,8 +1034,7 @@ async function playEvents(events) {
 }
 
 /* step through one spin's cascade sequence */
-async function playSpin(sp, runningFrom, ctx) {
-  const stake = ctx.stake, onWin = ctx.onWin;
+async function playSpin(sp, runningFrom, stake, onWin) {
   smithStrike();
   paint(sp.initialGrid); dropAll(); sfx.drop(); for (let r = 4; r >= 0; r--) setTimeout(() => sfx.land(r), ((4 - r) * 95 + 330) * T()); await wait(1000);
   if (sp.openingGrid && sp.openingEvents && sp.openingEvents.length) { paint(sp.openingGrid, sp.openingWilds); await playEvents(sp.openingEvents); }
@@ -1052,6 +1056,72 @@ async function playSpin(sp, runningFrom, ctx) {
   return run;
 }
 
+function tierOf(x) { return x >= 100 ? 'LEGENDARY' : x >= 25 ? 'FORGED' : x >= 10 ? 'MOLTEN' : x >= 5 ? 'SPARK' : null; }
+async function bigWin(x, amt) {
+  const t = tierOf(x); if (!t) return null;
+  const lv = { SPARK: 1, MOLTEN: 2, FORGED: 3, LEGENDARY: 4 }[t];
+  $('bigT').textContent = t + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET';
+  $('big').classList.add('show'); char('big', 3300); shake(lv > 2); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
+  sfx.big(lv);
+  await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => sfx.tick(k)), sleep(20000)]);
+  await sleep(auto.left > 0 ? 700 : 1500 + lv * 300);
+  $('big').classList.remove('show'); return t;
+}
+$('big').onclick = () => { skipBig = true; };
+
+/* modal helpers */
+const openM = id => { $(id).hidden = false; }, closeM = id => { $(id).hidden = true; };
+document.querySelectorAll('.modal [data-close]').forEach(b => b.onclick = () => closeM(b.closest('.modal').id));
+document.querySelectorAll('.modal').forEach(m => m.addEventListener('mousedown', e => { if (e.target === m && m.id !== 'introM' && m.id !== 'outroM') { m.id === 'confirm' ? closeBuy(false) : closeM(m.id); } }));
+/* tap anywhere (or Space/Enter) to continue; ignores taps for the first 450ms so a stray click can't skip it */
+function tapWait(id, autoMs, minMs = 450) { return new Promise(res => { const m = $(id); openM(id); const t0 = performance.now(); let done = false;
+  const fin = () => { if (done) return; done = true; closeM(id); m.removeEventListener('click', onc); removeEventListener('keydown', onk); res(); };
+  const onc = () => { if (performance.now() - t0 > minMs) { sfx.hit(); fin(); } };
+  const onk = e => { if ((e.code === 'Space' || e.code === 'Enter') && performance.now() - t0 > minMs) { e.preventDefault(); sfx.hit(); fin(); } };
+  m.addEventListener('click', onc); addEventListener('keydown', onk); if (autoMs) setTimeout(fin, autoMs); }); }
+
+function setBusy(b) {
+  busy = b; ['m', 'p', 'buyOpen', 'menuBtn'].forEach(id => $(id).disabled = b); $('spin').disabled = b && auto.left <= 0;
+  $('bAuto').disabled = b && auto.left <= 0; $('spin').classList.toggle('busy', b && auto.left <= 0);
+}
+
+async function go(buy) {
+  if (busy) return; setBusy(true); sfx.swing(); closeMenu();
+  $('win').textContent = fmt(0); $('fsBox').hidden = true;
+  const stake = BETS[bi]; let out = { payout: 0, bonus: false, tier: null };
+  try {
+    setHeat(0);
+    let j;
+    try { [j] = await Promise.all([api({ stake, ante: buy ? false : ante, buy }), dropOut()]); }
+    catch (e) { if (lastGrid) paint(lastGrid, lastWilds); throw e; }
+    const R = j.round; let run = 0;
+    balance = j.user.balance - j.payout;  // show the stake leaving now, the win as it lands
+    $('bal').textContent = fmt(balance);
+    const live = (a, b) => { $('win').textContent = fmt(b); };
+    run = await playSpin({ initialGrid: R.initialGrid, openingGrid: R.openingGrid, openingEvents: R.openingEvents, openingWilds: [], cascadeSteps: R.cascadeSteps, startHeat: 0 }, 0, stake, live);
+    if (R.bonusTriggered) {
+      out.bonus = true;
+      await showScatters(); sfx.bonus(); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
+      $('introN').textContent = R.bonus.startSpins; await tapWait('introM', auto.left > 0 ? 1800 : 0);
+      $('fsBox').hidden = false; $('char').classList.add('bonusmode');
+      let total = R.bonus.spins.length;
+      for (const sp of R.bonus.spins) {
+        $('fs').textContent = `${sp.spinIndex} / ${total}` + (sp.retrigger ? '  +' + sp.retrigger : ''); say(`Free spin ${sp.spinIndex}` + (sp.retrigger ? `  ·  +${sp.retrigger} SPINS!` : ''), !!sp.retrigger);
+        await dropOut();
+        run = await playSpin(sp, run, stake, live); await wait(300);
+      }
+      $('fsBox').hidden = true; $('char').classList.remove('bonusmode'); $('outroV').textContent = fmt(0);
+      openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
+      await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);
+      await tapWait('outroM', auto.left > 0 ? 1500 : 0);
+    }
+    $('win').textContent = fmt(j.payout); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user);
+    out.payout = j.payout; say(j.payout > 0 ? `YOU FORGED ${fmt(j.payout)}` : 'Cold iron. Strike again.', j.payout > 0);
+    out.tier = await bigWin(R.totalPayout, j.payout);
+  } catch (e) { say(e.message); out.err = true; }
+  setBusy(false); refreshUi(); return out;
+}
+
 /* the Forgefire Gems that triggered the bonus pulse on the board before the splash */
 async function showScatters() {
   const g = [...cells].filter(d => d.classList.contains('scatter'));
@@ -1060,54 +1130,93 @@ async function showScatters() {
   g.forEach((d, i) => setTimeout(() => sfx.scatter(i), i * 260 * T())); await wait(260 * g.length + 1000);
 }
 
-/* paytable (info screen) */
+/* ---------- autoplay ---------- */
+async function runAuto() {
+  while (auto.left > 0) {
+    refreshUi(); const o = await go(null);
+    if (o.err) break;
+    auto.left--;
+    if ((o.bonus && auto.stopFeat) || (o.tier === 'FORGED' || o.tier === 'LEGENDARY') && auto.stopBig) break;
+    if (BETS[bi] * (ante ? ANTE_COST : 1) > balance + 1e-9) { say('Not enough balance — autoplay stopped.'); break; }
+    await wait(450);
+  }
+  auto.left = 0; refreshUi();
+}
+const AUTO_N = [10, 25, 50, 100];
+$('autoOpts').innerHTML = AUTO_N.map(n => `<button class="opt${n === 25 ? ' sel' : ''}" data-n="${n}">${n}</button>`).join('');
+$('autoOpts').onclick = e => { const b = e.target.closest('.opt'); if (!b) return; auto.pickN = +b.dataset.n; [...$('autoOpts').children].forEach(x => x.classList.toggle('sel', x === b)); };
+$('swFeat').onclick = () => { auto.stopFeat = !auto.stopFeat; $('swFeat').classList.toggle('on', auto.stopFeat); };
+$('swBig').onclick = () => { auto.stopBig = !auto.stopBig; $('swBig').classList.toggle('on', auto.stopBig); };
+$('bAuto').onclick = () => { if (auto.left > 0) { auto.left = 0; refreshUi(); return; } if (!busy) openM('autoM'); };
+$('autoGo').onclick = () => { closeM('autoM'); auto.left = auto.pickN; runAuto(); };
+
+/* ---------- bonus buy screen + confirmation ---------- */
+const BUYS = {
+  standard: { title: 'THE REFORGING', mult: 100, desc: 'Skip straight to 10 free spins. The Forge Core heat carries over between spins.' },
+  preheated: { title: 'PRE-HEATED', mult: 500, desc: '10 free spins with the Forge Core already at 6 heat: you start with a reforged Wild and the Core primed.' }
+};
+let pendingBuy = null;
+function askBuy(kind) {
+  if (busy) return; const b = BUYS[kind], cost = BETS[bi] * b.mult; pendingBuy = kind;
+  $('cTitle').textContent = b.title; $('cDesc').textContent = b.desc; $('cCost').textContent = fmt(cost); $('cCost').style.fontSize = fmt(cost).length > 10 ? '38px' : '';
+  const short = cost > balance + 1e-9; $('cWarn').textContent = short ? 'Not enough balance.' : ''; $('cYes').disabled = short;
+  openM('confirm');
+}
+function closeBuy(ok) { if (ok) { sfx.hit(); ante = false; refreshUi(); } const k = pendingBuy; pendingBuy = null; closeM('confirm'); if (ok && k) go(k); }
+$('cYes').onclick = () => closeBuy(true);
+$('cNo').onclick = () => closeBuy(false);
+$('buyOpen').onclick = () => { if (busy) return; sfx.ui(); refreshUi(); openM('buyM'); };
+$('buy1').onclick = () => { closeM('buyM'); askBuy('standard'); };
+$('buy2').onclick = () => { closeM('buyM'); askBuy('preheated'); };
+$('ante').onclick = () => { sfx.ui(); ante = !ante; refreshUi(); closeM('buyM'); if (ante) { say('FORGE FEVER ON · 5x BONUS CHANCE', true); sfx.heat(6); } else say('Forge Fever off'); };
+$('bbM').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
+$('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
+
+function syncParent(u) { try { const a = parent !== window && parent._slotAPI; if (a) { a.bal = u.balance; a.paintBal(0); } } catch {} }
+function refreshUi() {
+  const s = BETS[bi], risk = s * (ante ? ANTE_COST : 1); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
+  $('barR').classList.toggle('hot', ante); $('betLbl').textContent = ante ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !ante; $('buyPrice').textContent = fmt(s * 100);
+  const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
+  $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
+  fitTxt($('p1'), fmt(s * 100), 34, '23px'); fitTxt($('p2'), fmt(s * 500), 34, '23px');
+  $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante);
+  $('bAuto').classList.toggle('on', auto.left > 0);
+  $('spinCnt').hidden = !(auto.left > 0); $('spinCnt').textContent = auto.left; $('spin').querySelector('svg').style.visibility = auto.left > 0 ? 'hidden' : '';
+  $('bTurbo').classList.toggle('on', turbo); $('bTurbo').querySelector('i').textContent = turbo ? 'ON' : 'OFF'; $('turboBadge').hidden = !turbo;
+  $('bSnd').classList.toggle('on', soundOn); $('bSnd').querySelector('i').textContent = soundOn ? 'ON' : 'OFF';
+  document.body.style.setProperty('--spd', T());
+}
+function openBets() {
+  if (busy) return; sfx.ui();
+  $('betGrid').innerHTML = BETS.map((v, i) => `<button class="opt${i === bi ? ' sel' : ''}" data-i="${i}">${betLbl(v)}</button>`).join('');
+  openM('betM');
+}
+$('betGrid').onclick = e => { const o = e.target.closest('.opt'); if (!o) return; sfx.ui(); bi = +o.dataset.i; refreshUi(); closeM('betM'); };
+$('betV').onclick = openBets;
+$('m').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
+$('p').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
+$('spin').onclick = () => { if (auto.left > 0) { auto.left = 0; sfx.ui(); refreshUi(); say('Autoplay stopping after this spin'); return; } go(null); };
+/* hamburger menu */
+const closeMenu = () => { $('menu').hidden = true; };
+$('menuBtn').onclick = e => { e.stopPropagation(); sfx.ui(); $('menu').hidden = !$('menu').hidden; };
+document.addEventListener('click', e => { if (!e.target.closest('#menu') && !e.target.closest('#menuBtn')) closeMenu(); });
+$('bTurbo').onclick = () => { sfx.ui(); turbo = !turbo; store.set('ec_turbo', turbo); refreshUi(); };
+$('bSnd').onclick = () => { soundOn = !soundOn; store.set('ec_snd', soundOn); soundOn ? (amb.start(), sfx.ui()) : amb.stop(); refreshUi(); };
+$('bInfo').onclick = () => { closeMenu(); openM('infoM'); };
+$('bFs').onclick = () => { closeMenu(); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch {} };
+addEventListener('keydown', e => {
+  if (e.code === 'Escape') { for (const m of ['confirm', 'buyM', 'autoM', 'infoM']) if (!$(m).hidden) { m === 'confirm' ? closeBuy(false) : closeM(m); return; } closeMenu(); }
+  if (document.querySelector('.modal:not([hidden])')) return;
+  if (e.code === 'Space') { e.preventDefault(); if (!busy) go(null); }
+});
+
+/* paytable */
 $('ptab').innerHTML = '<tr><th>SYMBOL</th><th>5-7</th><th>8-9</th><th>10-12</th><th>13+</th></tr>' +
   [6, 5, 4, 3, 2, 1, 0].map(i => `<tr><td><div class="nm"><svg viewBox="0 0 64 64"><use href="#s${i}"/></svg>${NAMES[i]}</div></td>${PT[i].map(v => `<td>${v}x</td>`).join('')}</tr>`).join('') +
   `<tr><td><div class="nm"><svg viewBox="0 0 64 64"><use href="#s7"/></svg>Ember Core Sigil (Wild)</div></td><td colspan="4">Substitutes for all symbols</td></tr><tr><td><div class="nm"><svg viewBox="0 0 64 64"><use href="#s8"/></svg>Forgefire Gem (Scatter)</div></td><td colspan="4">3+ trigger The Reforging</td></tr>`;
 
-return {
-  /* synthesised sounds: anvil, stone, glass, lava, horn. Required names: ui hit spin bonus outro big tick feverOn */
-  sfx(kit) {
-    const { ctx, bus, env, osc, noise, metal, st, T0 } = kit;
-    const anvil = (p = 1, pitch = 1, t = T0()) => { metal(360 * pitch, t, 1.1, .2 * p); noise(t, .06, .22 * p, 'bandpass', 3200, 1800, 1.2); osc('sine', 78 * pitch, t, .16, .32 * p, .002, 46 * pitch); };
-    const horn = (t, d, peak, base = 55) => [1, 1.5, 2, 3].forEach((m, i) => [-7, 7].forEach(c => {
-      const o = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = env(t, d * .45, peak / (1 + i * .5), d * .55);
-      o.type = 'sawtooth'; o.frequency.value = base * m; o.detune.value = c; f.type = 'lowpass'; f.frequency.setValueAtTime(220, t); f.frequency.exponentialRampToValueAtTime(1100, t + d * .5); f.Q.value = 1.4;
-      o.connect(f).connect(g).connect(bus); o.start(t); o.stop(t + d + .1); }));
-    const R = {
-      anvil: (p, pitch) => anvil(p, pitch),
-      hit: () => { const t = T0(); anvil(.55, 1.05, t); },
-      ui: () => { const t = T0(); osc('triangle', 330, t, .07, .16, .002, 220); noise(t, .035, .1, 'bandpass', 2400, 0, 2); },
-      spin: () => { const t = T0(); noise(t, .22, .2, 'bandpass', 350, 1700, .8, .04); osc('sine', 120, t, .2, .16, .02, 70); },
-      drop: () => { const t = T0(); noise(t, .5, .16, 'bandpass', 2600, 280, .7, .03); },
-      land: r => { const t = T0(); osc('sine', 96, t, .14, .24, .002, 48); noise(t, .07, .18, 'lowpass', 600, 0); if (r === 4) metal(240, t, .35, .05); },
-      shatter: () => { const t = T0(); noise(t, .28, .26, 'highpass', 2600, 6000, .7); noise(t, .16, .26, 'lowpass', 1000, 200); for (let i = 0; i < 6; i++) osc('sine', 1800 + Math.random() * 3600, t + i * .028 + Math.random() * .02, .14, .035, .001); },
-      win: n => { const t = T0(), sc = [0, 2, 4, 7, 9, 12, 14, 16], f = 440 * st(sc[Math.min(n, 7)]); metal(f, t, 1.0, .13); osc('triangle', f / 2, t, .5, .08); noise(t, .08, .04, 'highpass', 5000, 0); },
-      heat: h => { const t = T0(); metal(260 * st(h * 1.6), t, .55, .12, [1, 2.01, 3.02]); noise(t, .25, .08, 'bandpass', 3500 + h * 300, 7000, 1.5, .03); },
-      reforge: () => { const t = T0(); anvil(1.05, 1.12, t); noise(t + .05, .7, .1, 'bandpass', 2200, 6500, 2.5, .05); osc('sine', 500, t + .05, .55, .06, .05, 2000); },
-      boom: () => { const t = T0(); osc('sine', 120, t, 1.3, .6, .003, 26); noise(t, 1.5, .34, 'lowpass', 2200, 90, .8); noise(t, .14, .3, 'highpass', 1500, 0); anvil(1, .8, t + .02); noise(t + .1, 1.0, .08, 'bandpass', 3000, 7000, 2, .1); },
-      bonus: () => { const t = T0(); horn(t, 2.2, .075); [0, .36, .72].forEach((d, i) => anvil(.9, [.9, 1, 1.19][i], t + d)); [0, 4, 7, 12].forEach((n, i) => metal(330 * st(n), t + 1 + i * .08, 1.6, .07)); osc('sine', 60, t, 1.8, .3, .01, 40); },
-      outro: () => { const t = T0(); [0, 4, 7, 12, 16].forEach((n, i) => metal(392 * st(n), t + i * .13, 1.3, .1)); horn(t, 1.6, .045, 82.5); },
-      big: lv => { const t = T0(); for (let i = 0; i < lv; i++) anvil(.9, 1 + i * .06, t + i * .28); horn(t, 1.6 + lv * .5, .06 + lv * .012, 55 * st(lv)); [0, 4, 7, 12, 16, 19, 24].slice(0, 3 + lv).forEach((n, i) => metal(440 * st(n), t + .3 + i * .1, 1.2, .08)); osc('sine', 60, t, 1.2, .35, .01, 36); },
-      scatter: n => { const t = T0(), f = 660 * st([0, 4, 7, 12][Math.min(n, 3)]); metal(f, t, 1.3, .13); osc('triangle', f / 2, t, .5, .07); noise(t, .35, .06, 'highpass', 7000, 0); },
-      tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .12, .001); noise(t, .02, .08, 'highpass', 6000, 0); }
-    };
-    R.feverOn = () => R.heat(6);
-    return R;
-  },
-  /* low forge ambience: a quiet lava rumble with random ember crackles */
-  ambience: kit => kit.bed({ lowpass: 170, gain: .5, level: .02, loopSec: 3 }),
-  ambientBoost: () => heatNow * .02,
-  particleColor: (p, a) => p.c ? `rgba(255,${190 + (p.l % 50)},60,${a})` : `rgba(255,${100 + Math.min(120, p.l)},20,${a})`,
-  init() {},
-  paintIdle() { paint(Array.from({ length: 5 }, (_, r) => Array.from({ length: 6 }, (_, c) => (r * 2 + c) % 7))); dropAll(); },
-  roundStart: () => setHeat(0),
-  clearBoard: dropOut,
-  restoreBoard() { if (lastGrid) paint(lastGrid, lastWilds); },
-  baseSpin: R => ({ initialGrid: R.initialGrid, openingGrid: R.openingGrid, openingEvents: R.openingEvents, openingWilds: [], cascadeSteps: R.cascadeSteps, startHeat: 0 }),
-  playSpin,
-  showTrigger: showScatters
-};
-});
-
+document.querySelectorAll('.vol').forEach(v => { for (let i = 1; i <= 5; i++) v.insertAdjacentHTML('beforeend', `<i class="${i <= +v.dataset.n ? 'on' : ''}"></i>`); });
+paint(Array.from({ length: 5 }, (_, r) => Array.from({ length: 6 }, (_, c) => (r * 2 + c) % 7))); dropAll();
+refreshUi();
+balance = wallet; $('bal').textContent = fmt(balance);
 </script></body></html>

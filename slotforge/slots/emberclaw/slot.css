@@ -1,0 +1,101 @@
+/* EmberClaw slot CSS: scene wash, frame/grid/cells, Forge Core (side mechanic), Brann (character). The shell CSS loads first.
+   NOTE: the eyes use the shell's @keyframes blink (the original file had two 'blink' keyframes and the later, opacity one won; kept identical). */
+.heatwash{left:-1500px;top:-1000px;width:4600px;height:2900px;pointer-events:none;background:radial-gradient(60% 50% at 50% 100%,rgba(255,80,10,calc(var(--heat)*.025)),transparent 70%);transition:background .6s}
+
+/* ---------- logo / frame ---------- */
+#logo{left:470px;top:6px;width:660px;height:150px;overflow:visible;filter:drop-shadow(0 6px 0 rgba(0,0,0,.4))}
+#frameArt{left:448px;top:128px;width:704px;height:594px;overflow:visible}
+#frame{left:470px;top:150px;width:660px;height:550px}
+#grid{position:relative;display:grid;grid-template-columns:repeat(6,110px);grid-template-rows:repeat(5,110px);width:660px;height:550px;overflow:hidden;background:#1b100c}
+#grid.focus .cell:not(.hit):not(.shatter){opacity:.35;filter:saturate(.4) brightness(.75);transition:.25s}
+#fxl{left:0;top:0;width:660px;height:550px;pointer-events:none;z-index:6;overflow:visible}
+.cell{position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,196,130,.13);background:#27160f}
+.cell:nth-child(2n){background:#2b1a12}
+.cell svg.g{position:absolute;left:6%;top:6%;width:88%;height:88%;overflow:visible;filter:drop-shadow(0 4px 0 rgba(0,0,0,.55))}
+.cell.wild{background:radial-gradient(circle,#7a2a0a,#2b140c 75%)}
+.cell.wild svg.g{animation:wob 1.5s ease-in-out infinite alternate}
+.cell.scatter{background:radial-gradient(circle,#6a1840,#2b140c 75%)}
+.cell.scatter svg.g{animation:wob 1.9s ease-in-out infinite alternate}
+.cell .m{position:absolute;right:4px;bottom:4px;min-width:34px;text-align:center;padding:1px 6px;border-radius:99px;border:3px solid var(--ink);font-family:var(--toon);font-size:19px;color:var(--ink);background:var(--gold);z-index:3}
+.cell.scat svg.g{animation:scatp .55s ease-in-out infinite alternate;filter:drop-shadow(0 0 14px #ff4a8a)}
+@keyframes scatp{to{transform:scale(1.22) rotate(6deg)}}
+.cell.hit{z-index:2;background:radial-gradient(circle,#8a5410,#2b140c 80%)}
+.cell.hit svg.g{animation:hitg .5s ease-in-out infinite alternate}
+@keyframes hitg{to{transform:scale(1.13)}}
+.cell.shatter{animation:shatter calc(.34s*var(--spd)) forwards}
+@keyframes shatter{40%{transform:scale(1.25);filter:brightness(2.2)}100%{transform:scale(.2) rotate(18deg);opacity:0}}
+.cell.drop{animation:drop calc(.55s*var(--spd)) cubic-bezier(.3,1.25,.5,1) backwards;animation-delay:var(--dl,0ms)}
+@keyframes drop{from{transform:translateY(-560%);opacity:0}22%{opacity:1}}
+.cell.out{animation:out calc(.42s*var(--spd)) cubic-bezier(.6,0,1,.6) forwards;animation-delay:var(--dl,0ms)}
+@keyframes out{to{transform:translateY(560%);opacity:0}}
+.cell.reforged{animation:refo .9s}
+.cell.reforged::after{content:"";position:absolute;inset:-8%;border-radius:50%;border:5px solid #ffd36a;animation:ring .8s ease-out forwards}
+@keyframes refo{0%{filter:brightness(4);transform:scale(.3) rotate(-120deg)}60%{filter:brightness(2);transform:scale(1.25)}}
+@keyframes ring{from{transform:scale(.4);opacity:1}to{transform:scale(1.9);opacity:0}}
+
+/* ---------- forge core (game-specific, hangs left of the frame) ---------- */
+#core{left:318px;top:150px;width:112px;height:560px}
+#core .chain{position:absolute;top:-160px;width:10px;height:200px;background:repeating-linear-gradient(180deg,#8a8f9c 0 12px,var(--ink) 12px 15px);border:3px solid var(--ink);border-radius:5px}
+#core .chain.a{left:22px}#core .chain.b{left:70px}
+#tube{filter:url(#roughU);position:absolute;left:18px;top:34px;width:72px;height:450px;border-radius:36px;background:#2a1814;border:6px solid var(--ink);padding:7px;display:flex;flex-direction:column-reverse;gap:4px;box-shadow:inset 0 0 0 3px #6e5d58,0 6px 0 rgba(0,0,0,.4)}
+#tube i{flex:1;border-radius:9px;background:#3f2a22;border:2px solid #1d0f09;transition:background .3s}
+#tube i.on{background:linear-gradient(#ffe066,#ff7a1a 60%,#d8350a);box-shadow:0 0 12px #ff7a1a}
+#tube i.pulse{animation:segp .8s ease-out}
+@keyframes segp{0%{filter:brightness(3);transform:scaleX(1.2)}100%{filter:none;transform:none}}
+#perks{position:absolute;left:-96px;top:34px;width:104px;height:450px;text-align:right}
+#perks .perk{position:absolute;right:0;transform:translateY(50%)}
+#pk3{bottom:27.8%}#pk6{bottom:61.1%}#pk9{bottom:94.4%}
+.perk{font-family:var(--toon);font-size:26px;line-height:1;color:#a8978c;-webkit-text-stroke:0;text-shadow:2px 2px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink);transition:.3s}
+.perk small{display:block;font-family:var(--ui);font-weight:900;font-size:12px;letter-spacing:1px;margin-top:2px}
+.perk.on{color:var(--gold)}
+#heatBox{filter:url(#roughU);position:absolute;left:8px;top:496px;width:92px;padding:6px 0 8px;text-align:center;background:var(--ink);border:4px solid #6e5d58;border-radius:14px}
+#heatV{font-family:var(--toon);font-size:34px;color:var(--gold);line-height:1}
+#heatBox small{display:block;font-size:10px;font-weight:900;letter-spacing:2px;color:#b8a89a}
+
+/* ---------- character ---------- */
+#char{left:1100px;top:296px;width:480px;height:500px;pointer-events:none}
+#char svg{width:480px;height:500px;overflow:visible}
+#char [id^=c]{transform-box:view-box}
+#cBody{transform-origin:260px 488px;animation:breathe 3.4s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.012,1.022)}}
+#cHead{transform-origin:260px 262px;animation:hbob 3.4s ease-in-out infinite}
+@keyframes hbob{50%{transform:translateY(3px) rotate(-1.2deg)}}
+#cArmR{transform-origin:205px 300px}
+#cArmL{transform-origin:314px 300px;animation:armL 3.4s ease-in-out infinite}
+@keyframes armL{50%{transform:rotate(3deg)}}
+#cEyes{transform-box:fill-box;transform-origin:center;animation:blink 4.6s infinite}
+#cFlames path{transform-box:fill-box;transform-origin:50% 100%;animation:flick .5s ease-in-out infinite alternate}
+#cFlames path:nth-child(2){animation-duration:.37s}#cFlames path:nth-child(3){animation-duration:.61s}
+#cMouth,#cHot{opacity:0}
+#cMouth{transition:opacity .1s}
+#cHot{transition:opacity .3s}
+#char.win #cMouth,#char.big #cMouth,#char.boom #cMouth{opacity:1}
+#char.bonusmode #cPupils circle{fill:#ff8a1a}
+#char.bonusmode #cEyeGlow{opacity:1}
+#cEyeGlow{opacity:0}
+/* strike on every spin */
+#char.swing #cArmR{animation:swing calc(.95s*var(--spd)) cubic-bezier(.5,0,.5,1)}
+@keyframes swing{0%{transform:rotate(0)}30%{transform:rotate(112deg)}46%{transform:rotate(112deg)}62%{transform:rotate(-3deg)}70%{transform:rotate(3deg)}100%{transform:rotate(0)}}
+#char.swing #cHead{animation:nod calc(.95s*var(--spd))}
+@keyframes nod{0%,30%{transform:translateY(0)}62%{transform:translateY(9px) rotate(2deg)}100%{transform:none}}
+#char.swing #cHot{animation:hotflash calc(.95s*var(--spd))}
+@keyframes hotflash{0%,58%{opacity:0}64%{opacity:1}100%{opacity:0}}
+/* cheers */
+#char.win #cArmL{animation:pumpL 1.5s ease-in-out}
+@keyframes pumpL{0%{transform:rotate(0)}18%{transform:rotate(-122deg)}30%{transform:rotate(-112deg)}42%{transform:rotate(-124deg)}85%{transform:rotate(-120deg)}100%{transform:rotate(0)}}
+#char.win #cArmR{animation:hammerUp 1.5s ease-in-out}
+@keyframes hammerUp{0%{transform:rotate(0)}20%{transform:rotate(104deg)}85%{transform:rotate(104deg)}100%{transform:rotate(0)}}
+#char.win #cHead,#char.big #cHead{animation:cheerhead .5s ease-in-out 3}
+@keyframes cheerhead{50%{transform:translateY(-10px) rotate(-3deg)}}
+#char.win #cBrows,#char.big #cBrows{transform:translateY(-4px)}
+#char.big #cArmL{animation:pumpL 3.2s ease-in-out}
+#char.big #cArmR{animation:slam2 3.2s ease-in-out}
+@keyframes slam2{0%{transform:rotate(0)}10%,20%{transform:rotate(108deg)}27%{transform:rotate(0)}40%{transform:rotate(108deg)}47%{transform:rotate(0)}60%{transform:rotate(108deg)}67%{transform:rotate(0)}100%{transform:rotate(0)}}
+#char.big #cBody{animation:hop .4s ease-in-out 6}
+@keyframes hop{50%{transform:translateY(-14px)}}
+#char.boom #cHead{animation:flinch .9s ease-out}
+@keyframes flinch{0%{transform:translateY(0)}15%{transform:translate(8px,-16px) rotate(8deg)}60%{transform:translate(4px,-6px) rotate(4deg)}100%{transform:none}}
+#char.boom #cEyes{animation:none;transform:scale(1.25)}
+#char.boom #cBrows{transform:translateY(-5px)}
+#char.boom #cArmL{animation:pumpL .9s ease-in-out}
+#cBrows{transition:transform .15s}
