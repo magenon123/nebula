@@ -70,6 +70,9 @@ Channels (groups): `#all` everyone · `#planning` maya, leo, judge · `#building
 - Taking longer to make it better is explicitly wanted. If the judge is not satisfied there are as many extra fix rounds as needed; "Round 3" is not a deadline.
 - The ship bar is **at least 4 on EVERY rubric line** (not just on average) plus zero open blocking issues. The lead delivers only after that.
 
+## Owner approval gate (added by the owner)
+The judge is NOT the final authority: the **owner** is. After the judge approves a slot, the lead presents it to the owner. Only after the owner approves does the next slot start, and the owner's wishes for the next slot go into `OWNER-PREFS.md`. Read `OWNER-PREFS.md` before every decision.
+
 ## Workflow (rounds)
 
 - **Round 1** (parallel): planners pitch and converge on the concept for slot #2 and write the full design doc; builders extract the reusable shell and the engine interface from EmberClaw (so slot #2 is cheap to build); the judge publishes the rubric/acceptance criteria and reviews the EmberClaw baseline.
