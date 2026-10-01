@@ -16,13 +16,16 @@ Server-authoritative cluster-pays slot (6x5, tumbles, Forge Core heat meter).
 - Bonus: 10 spins, heat carries between spins (spins open pre-armed: heat>=6 opens with a reforge, >=9 also a detonation), flat bonus stacks per 3 heat, every 3rd spin opens with a guaranteed detonation, 2+ scatters retrigger +4. Bonus uses its own symbol weights.
 - Cap 9,500x. Ante = 1.25x cost with higher scatter weight. Buy 100x / 500x (heat starts at 6).
 
-## Simulated math (seeded, 400k–600k rounds)
+## Simulated math (seeded, 400k-600k rounds; `CFG.payScale = 1.055` scales every cluster win)
 | | RTP | hit freq | bonus 1-in |
 |---|---|---|---|
-| Base | ~91% (base game ~72%, bonus ~21%) | ~23.7% | ~284 |
-| Ante (per 1.25x cost) | ~91% | ~23.5% | ~140 |
-| Buy 100x | ~63% | – | – |
-| Pre-Heated 500x | ~92% | – | – |
+| Base | 93.6-96.2% across two seeds (base game ~76%, bonus ~19-21%) | ~23.7% | ~284 |
+| Ante (per 1.25x cost) | ~96.4% | ~23.5% | ~140 |
+| Buy 100x | ~66% | - | - |
+| Pre-Heated 500x | ~97% | - | - |
 
-Known gaps vs. the design doc: RTP is ~5 points under the 96.2% target and the bonus share is ~21% rather than 29%.
-The doc's constraints pull against each other (Pre-Heated is worth ~8x a standard bonus but is priced at 5x, so raising bonus strength to hit 29% makes Pre-Heated player-positive). Also, "doubled scatter weight" gives ~1-in-45, not 1-in-140; ante uses a ~1.3x scatter weight to hit 1-in-140 (the doc also says 1-in-180 in one place).
+The bonus is heavy-tailed, so even 600k-round runs wobble by about +/-2 points; the overall RTP is ~95-96%.
+Known gaps vs. the design doc: the bonus share is ~20% rather than 29%, and Buy 100x returns well under the other modes
+(Pre-Heated is worth ~8x a standard bonus but priced at 5x, so a richer bonus would make Pre-Heated player-positive).
+"Doubled scatter weight" gives ~1-in-45, not 1-in-140; ante uses ~1.3x scatter weight to hit 1-in-140
+(the doc also says 1-in-180 in one place).

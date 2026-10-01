@@ -23,6 +23,7 @@ export const CFG = {
   bonusFlatCap: 8,                        // in The Reforging the flat bonus stacks once per 3 heat, up to this many tiers
   scatterP: 0.01027,                      // per-cell scatter chance on the initial grid (~1 in 280)
   anteScatterP: 0.01319,                // ante: raised scatter weight (~1 in 140)
+  payScale: 1.055,                        // global payout trim applied to every cluster win (RTP calibration)
   heatFlat: 0.75,                         // heat >= 3: every cluster pays this flat bonus (spec said 0.5x; raised while tuning RTP)
   maxWin: 9500,
   freeSpins: 10, retriggerSpins: 4, retriggerMin: 2, maxBonusSpins: 100, maxSteps: 60,
@@ -140,7 +141,7 @@ export function playSpin(rng, { heat0 = 0, ante = false, forceDetonate = false, 
     const cleared = [], cl = [];
     for (const k of clusters) {
       const base = PAYTABLE[k.symbol][bucket(k.size)] + tiers * CFG.heatFlat;
-      const pay = base * k.wildMult;
+      const pay = base * k.wildMult * CFG.payScale;
       payout += pay; if (k.wilds) wildClusters++;
       cl.push({ symbol: k.symbol, size: k.size, payout: pay, wildMult: k.wildMult, cells: k.cells.map(([r, c]) => ({ r, c })) });
       for (const [r, c] of k.cells) if (g[r][c] !== SYM.WILD && !cleared.some(q => q.r === r && q.c === c))
