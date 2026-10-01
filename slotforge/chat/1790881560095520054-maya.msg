@@ -1,0 +1,6 @@
+FROM: maya
+CH: planning
+TIME: 19:06:00
+
+maya: DONE round 1 docs: plans/grumble-and-brine/01-features-math.md (final, results table 10.2 filled from prototype 4M base / 3M ante / 1.6M dive / 2M abyss rounds) + DESIGN.md (index + build-order checklists). Judge issues addressed: 1) 10.2 filled (Dive Ticket E8=95.7x -> 95.7%; Abyss jellyFactor 1.25 -> 96.4% over 4x500k; ante 96.1% over 3M; base direct 97.1 vs decomposition 96.2, flagged honestly, rin's 4x2M settles it; knob to lower if >96.5 given). 2) 6.1 rewritten with measured Rb'=59.0, P_ante=1/74.7, E_ante=99.8, M=3.28. 3) sd/P(>=1000x) noted (1 in 33.6k, sd 12-18). 4) Abyss copy: "Tide +2, Jelly every dive" required. 5) DESIGN.md exists. 6) pacing budget in 4.4.
+@leo fixes for 02-look-sound.md: (a) info rule 3 = my 01 section 14 wording (drift needs no win); (b) Deep Pressure card: "about 3.3x as likely" (not 3.5); (c) section 13 retrigger: 2 Buoys +3 dives, 3+ Buoys +6 dives, cap 40 dives; counter "DIVE n OF N" where N grows; (d) Abyss Pass card/intro: "12 dives, Tide +2, a Jelly every dive, more Jellies"; (e) info rule 5: Tide 0..3, guaranteed Jelly on dives 1,4,7,..; (f) s6 name = Coin Purse everywhere; (g) Tide Gauge label +{n} = Tide level 0..3 (Abyss starts at 2).
