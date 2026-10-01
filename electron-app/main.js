@@ -155,6 +155,35 @@ async function launchGame(gameKey) {
   // show 100k on Nebula while playing
   await syncNebulaBalance(DEMO_START_BALANCE);
 
+  // Intercept reloadBalance.do at network level via Fetch CDP domain
+  try {
+    gameWin.webContents.debugger.attach('1.3');
+    await gameWin.webContents.debugger.sendCommand('Fetch.enable', {
+      patterns: [{ urlPattern: '*reloadBalance*', requestStage: 'Response' }]
+    });
+    gameWin.webContents.debugger.on('message', async (event, method, params) => {
+      if (method !== 'Fetch.requestPaused') return;
+      try {
+        const bodyResult = await gameWin.webContents.debugger.sendCommand(
+          'Fetch.getResponseBody', { requestId: params.requestId }
+        );
+        const text = bodyResult.base64Encoded
+          ? Buffer.from(bodyResult.body, 'base64').toString()
+          : bodyResult.body;
+        const match = text.match(/(?:^|&)balance=([0-9.]+)/);
+        if (match) {
+          const bal = parseFloat(match[1]);
+          if (!isNaN(bal) && bal >= 0) lastDemoBalance = bal;
+        }
+      } catch (_) {}
+      try {
+        await gameWin.webContents.debugger.sendCommand(
+          'Fetch.continueRequest', { requestId: params.requestId }
+        );
+      } catch (_) {}
+    });
+  } catch (e) {}
+
   gameWin.webContents.on('did-finish-load', () => {
     setTimeout(() => startBalanceTracking(), 4000);
   });
