@@ -6,7 +6,7 @@ const CASINO_URL = 'https://nebula-4ggz.onrender.com';
 const DEMO_GAMES = {
   gates: {
     name: 'Gates of Olympus',
-    url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur=USD&gameSymbol=vs20olympgold&jurisdiction=99&stylename=demo_clienthub&websiteUrl=https%3A%2F%2Fwww.pragmaticplay.com'
+    url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur=USD&gameSymbol=vs20olympgold&jurisdiction=99&stylename=demo_clienthub&websiteUrl=https%3A%2F%2Fclienthub.pragmaticplay.com&gcpif=4963'
   },
   fisherman: {
     name: 'Gates of Olympus',
