@@ -6,7 +6,9 @@ SlotShell.boot(SLOT_CFG, S => {
 const { $, sfx, wait, T, say, shake, flash, embers, char, pop, fmt } = S;
 const TIER = ['low','low','low','mid','mid','high','high','wild','scatter'];
 const NAMES = ['Iron Shard','Copper Ingot','Silver Chain','Molten Hammer','Rune-Etched Tongs','Dragonbone Blade','Crown of Cinders'];
-const PT = [[.1,.25,.5,1.5],[.15,.3,.6,1.75],[.2,.4,.8,2],[.4,1,2.5,6],[.6,1.5,3.5,9],[1.5,4,10,25],[3,8,20,50]];  // display only
+/* paytable shown in Game Info: the engine's PAYTABLE x CFG.payScale, injected by the build (never typed by hand), so the screen shows what is actually paid */
+const ED = S.cfg.engineData, round2 = v => +v.toFixed(2);
+const PT = ED.paytable.map(r => r.map(v => round2(v * ED.payScale)));
 let lastGrid = null, lastWilds = [];
 
 /* ---------- the board ---------- */

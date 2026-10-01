@@ -39,7 +39,7 @@ def bundle_engine(path):
 def check_against_engine(cfg, path):
     """slot.json is the client's copy of a few engine numbers; fail the build if they drift."""
     js = ("import(process.argv[1]).then(m=>{const C=m.CFG;console.log(JSON.stringify({bets:C.bets,maxWin:C.maxWin,anteCost:C.anteCost||0,"
-          "buy:Object.fromEntries(Object.entries(C.buy||{}).map(([k,v])=>[k,v.cost]))}))})")
+          "buy:Object.fromEntries(Object.entries(C.buy||{}).map(([k,v])=>[k,v.cost])),paytable:m.PAYTABLE||null,payScale:C.payScale||1}))})")
     r = subprocess.run(['node', '-e', js, 'file://' + os.path.join(ROOT, path)], capture_output=True, text=True)
     if r.returncode:
         sys.exit('cannot load engine for the CFG check:\n' + r.stderr)
@@ -52,6 +52,7 @@ def check_against_engine(cfg, path):
     if mine != e['buy']: bad.append(f'buys {mine} != engine CFG.buy costs {e["buy"]}')
     if bad:
         sys.exit('slot.json / engine mismatch:\n  ' + '\n  '.join(bad))
+    return {'paytable': e['paytable'], 'payScale': e['payScale']}
 
 
 def assemble(slug, standalone):
@@ -59,7 +60,11 @@ def assemble(slug, standalone):
     if not os.path.isdir(sd): sys.exit(f'no such slot: {sd}')
     cfg = json.loads(read(sd, 'slot.json'))
     engine_path = cfg.get('engineSource') or f'slotforge/engines/{slug}.js'
-    check_against_engine(cfg, engine_path)
+    cfg['engineData'] = check_against_engine(cfg, engine_path)   # engine PAYTABLE x payScale reach the info screen: one source of truth
+    info = read(sd, 'info.html')
+    vals = {'maxWin': f"{cfg['maxWin']:,}", 'anteCost': str(cfg.get('anteCost', 0))}
+    vals.update({'buy:' + b['key']: str(b['mult']) for b in cfg.get('buys', [])})
+    info = re.sub(r'\[\[([\w:]+)\]\]', lambda m: vals[m.group(1)], info)
     scripts = "'use strict';\n/* ---- slot config (slots/%s/slot.json) ---- */\nconst SLOT_CFG = %s;\n" % (slug, json.dumps(cfg, ensure_ascii=False))
     if standalone:
         scripts += ("/* ---- STANDALONE MODE: the server engine is embedded and runs locally with play money. ---- */\nconst SLOT_ENGINE = "
@@ -72,7 +77,7 @@ def assemble(slug, standalone):
         'SHELL_CSS': read(SF, 'shell', 'slot-shell.css'), 'SLOT_CSS': read(sd, 'slot.css'),
         'SHELL_DEFS': read(SF, 'shell', 'shell-defs.svg'), 'SYMBOLS': read(sd, 'symbols.svg'),
         'SCENE': read(sd, 'scene.html'), 'LOGO': read(sd, 'logo.html'), 'FRAME': read(sd, 'frame.html'),
-        'CHARACTER': read(sd, 'character.html'), 'SIDE': read(sd, 'side.html'), 'INFO': read(sd, 'info.html'),
+        'CHARACTER': read(sd, 'character.html'), 'SIDE': read(sd, 'side.html'), 'INFO': info,
         'SCRIPTS': scripts.replace('</script', '<\\/script'),
     }
     html = re.sub(r'\{\{([A-Z_]+)\}\}', lambda m: parts[m.group(1)], read(SF, 'shell', 'template.html'))

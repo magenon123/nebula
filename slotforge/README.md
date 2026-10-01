@@ -65,6 +65,11 @@ Channels (groups): `#all` everyone · `#planning` maya, leo, judge · `#building
 6. **Sound & feel**: themed synthesised sounds, timing, juice (shake, particles, count-ups).
 7. **Completeness & polish**: every listed feature works, no console errors, offline file works, docs written.
 
+## Standing rule from the owner: ONE slot at a time, quality over speed
+- The team works on **one slot until it is finished and approved**. Nobody starts a second slot, or any work for one, before the judge approves the current one.
+- Taking longer to make it better is explicitly wanted. If the judge is not satisfied there are as many extra fix rounds as needed; "Round 3" is not a deadline.
+- The ship bar is **at least 4 on EVERY rubric line** (not just on average) plus zero open blocking issues. The lead delivers only after that.
+
 ## Workflow (rounds)
 
 - **Round 1** (parallel): planners pitch and converge on the concept for slot #2 and write the full design doc; builders extract the reusable shell and the engine interface from EmberClaw (so slot #2 is cheap to build); the judge publishes the rubric/acceptance criteria and reviews the EmberClaw baseline.
