@@ -16,6 +16,24 @@ const DEMO_GAMES = {
 
 const DEMO_START_BALANCE = 100000; // Pragmatic Play gives 100k demo credits
 
+function findBalanceInObject(obj, depth) {
+  if (!obj || typeof obj !== 'object' || depth > 6) return undefined;
+  for (const k of Object.keys(obj)) {
+    const kl = k.toLowerCase();
+    if ((kl.includes('bal') || kl.includes('credit') || kl.includes('cash') || kl.includes('coin')) &&
+        typeof obj[k] === 'number' && obj[k] >= 0 && obj[k] <= 2000000) {
+      return obj[k];
+    }
+  }
+  for (const k of Object.keys(obj)) {
+    if (typeof obj[k] === 'object') {
+      const found = findBalanceInObject(obj[k], depth + 1);
+      if (found !== undefined) return found;
+    }
+  }
+  return undefined;
+}
+
 let mainWin, gameWin;
 let nebulaBalance = 0;
 let conversionRate = 0;
@@ -136,6 +154,24 @@ async function launchGame(gameKey) {
   // show 100k on Nebula while playing
   await syncNebulaBalance(DEMO_START_BALANCE);
 
+  // Use CDP to intercept WebSocket frames and XHR responses for balance
+  try {
+    gameWin.webContents.debugger.attach('1.3');
+    gameWin.webContents.debugger.sendCommand('Network.enable');
+    gameWin.webContents.debugger.on('message', (event, method, params) => {
+      try {
+        let text = null;
+        if (method === 'Network.webSocketFrameReceived') {
+          text = params.response && params.response.payloadData;
+        }
+        if (!text) return;
+        const d = JSON.parse(text);
+        const bal = findBalanceInObject(d, 0);
+        if (bal !== undefined) lastDemoBalance = bal;
+      } catch (_) {}
+    });
+  } catch (e) {}
+
   gameWin.webContents.on('did-finish-load', () => {
     setTimeout(() => startBalanceTracking(), 4000);
   });
@@ -156,41 +192,34 @@ function startBalanceTracking() {
 
   // conversionRate already set from known 100k start balance
 
+  let prevDemoBal = DEMO_START_BALANCE;
   balancePoller = setInterval(async () => {
     if (!gameWin) { stopBalanceTracking(); return; }
     if (!conversionRate) return;
 
-    try {
-      const demoBal = await gameWin.webContents.executeJavaScript(
-        `window.__ppBalance !== undefined ? window.__ppBalance : null`
-      );
+    const demoBal = lastDemoBalance;
+    if (demoBal === prevDemoBal) return;
+    prevDemoBal = demoBal;
 
-      if (demoBal === null) return;
+    if (demoBal <= 0) {
+      stopBalanceTracking();
+      await syncNebulaBalance(0);
+      gameWin && gameWin.close();
+      mainWin.webContents.executeJavaScript(`alert('Your demo balance ran out.')`);
+      return;
+    }
 
-      if (demoBal <= 0) {
-        stopBalanceTracking();
-        await syncNebulaBalance(0);
-        gameWin && gameWin.close();
-        mainWin.webContents.executeJavaScript(`alert('Your demo balance ran out. Please deposit to keep playing.')`);
-        return;
-      }
+    const dropped = (DEMO_START_BALANCE - demoBal) * conversionRate;
+    if (dropped > nebulaBalance) {
+      stopBalanceTracking();
+      gameWin && gameWin.close();
+      mainWin.webContents.executeJavaScript(`alert('You cannot bet more than your Nebula balance. Game closed.')`);
+      return;
+    }
 
-      const dropped = (DEMO_START_BALANCE - demoBal) * conversionRate;
-      if (dropped > nebulaBalance) {
-        stopBalanceTracking();
-        gameWin && gameWin.close();
-        mainWin.webContents.executeJavaScript(`alert('You cannot bet more than your Nebula balance. Game closed.\\nYour balance was not changed.')`);
-        return;
-      }
-
-      if (demoBal !== lastDemoBalance) {
-        lastDemoBalance = demoBal;
-        const profitLoss = (demoBal - DEMO_START_BALANCE) * conversionRate;
-        const newBal = Math.max(0, Math.round((nebulaBalance + profitLoss) * 100) / 100);
-        await syncNebulaBalance(newBal);
-      }
-
-    } catch(e) {}
+    const profitLoss = (demoBal - DEMO_START_BALANCE) * conversionRate;
+    const newBal = Math.max(0, Math.round((nebulaBalance + profitLoss) * 100) / 100);
+    await syncNebulaBalance(newBal);
   }, 1000);
 }
 
