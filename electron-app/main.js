@@ -154,26 +154,6 @@ async function launchGame(gameKey) {
   // show 100k on Nebula while playing
   await syncNebulaBalance(DEMO_START_BALANCE);
 
-  // Use CDP to intercept reloadBalance.do XHR responses for live balance
-  try {
-    gameWin.webContents.debugger.attach('1.3');
-    gameWin.webContents.debugger.sendCommand('Network.enable');
-    gameWin.webContents.debugger.on('message', async (event, method, params) => {
-      try {
-        if (method !== 'Network.responseReceived') return;
-        if (!params.response.url.includes('reloadBalance')) return;
-        const body = await gameWin.webContents.debugger.sendCommand(
-          'Network.getResponseBody', { requestId: params.requestId }
-        );
-        const match = body.body.match(/(?:^|&)balance=([0-9.]+)/);
-        if (match) {
-          const bal = parseFloat(match[1]);
-          if (!isNaN(bal) && bal >= 0) lastDemoBalance = bal;
-        }
-      } catch (_) {}
-    });
-  } catch (e) {}
-
   gameWin.webContents.on('did-finish-load', () => {
     setTimeout(() => startBalanceTracking(), 4000);
   });
@@ -198,6 +178,13 @@ function startBalanceTracking() {
   balancePoller = setInterval(async () => {
     if (!gameWin) { stopBalanceTracking(); return; }
     if (!conversionRate) return;
+
+    try {
+      const raw = await gameWin.webContents.executeJavaScript(
+        `window.__ppBalance !== undefined ? window.__ppBalance : null`
+      );
+      if (raw !== null && raw !== lastDemoBalance) lastDemoBalance = raw;
+    } catch (_) {}
 
     const demoBal = lastDemoBalance;
     if (demoBal === prevDemoBal) return;
