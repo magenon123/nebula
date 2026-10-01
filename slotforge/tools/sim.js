@@ -60,7 +60,7 @@ export function summarize(rows, band = [96.0, 96.5]) {
   const se = Math.max(seCLT, k >= 3 && !isNaN(seSeeds) ? seSeeds : 0), half = 1.96 * se;
   let verdict;
   if (rtp - half > band[1] || rtp + half < band[0]) verdict = 'FAIL';
-  else if (rtp >= band[0] && rtp <= band[1] && half <= 1.0) verdict = 'PASS';
+  else if (rtp >= band[0] && rtp <= band[1] && rtp + half < 97.0) verdict = 'PASS';   // point estimate in band AND 95% CI upper < 97.0 (acceptance A3)
   else verdict = 'INCONCLUSIVE';
   const trig = rows.reduce((a, r) => a + r.trig, 0), bonusN = rows.reduce((a, r) => a + r.bonusN, 0), bonusSum = rows.reduce((a, r) => a + r.bonusSum, 0);
   const baseRet = rows.reduce((a, r) => a + r.baseRet, 0), hits = rows.reduce((a, r) => a + r.hits, 0);
@@ -92,7 +92,14 @@ async function main() {
     rows.forEach((r, i) => console.log(`${String(r.seed).padEnd(8)}${f(s.rtps[i]).padStart(7)}${f(r.max, 1).padStart(11)}${String(r.capped).padStart(9)}`));
     console.log(`RTP mean ${f(s.rtp)}% +- ${f(s.half)} (95% CI; round-level SE ${f(s.seCLT)}, seed-to-seed SE ${f(s.seSeeds)}, sd of seeds ${f(s.sdSeeds)})`);
     console.log(`hit freq ${f(s.hitPct)}% | bonus trigger ${s.trigOneIn ? '1-in-' + s.trigOneIn.toFixed(0) : '-'} | avg bonus ${f(s.avgBonusX, 1)}x | base-game RTP ${f(s.baseRtp)}% | bonus share ${f(s.bonusShare, 1)}% | max win ${f(s.max, 1)}x | capped ${s.capped}`);
-    console.log(`TARGET 96.0-96.5%: ${s.verdict}${s.verdict === 'INCONCLUSIVE' ? ' (mean ' + (s.rtp >= 96 && s.rtp <= 96.5 ? 'in band but CI too wide' : 'outside band but CI overlaps it') + '; need more rounds)' : ''}`);
+    console.log(`TARGET 96.0-96.5%: ${s.verdict}${s.verdict === 'INCONCLUSIVE' ? ' (mean ' + (s.rtp >= 96 && s.rtp <= 96.5 ? 'in band but CI upper >= 97.0' : 'outside band but CI overlaps it') + '; need more rounds)' : ''}`);
+  }
+  // decomposition: RTP = Rb + P(trigger) * E[bonus]; E[bonus] measured separately from the buy-mode rows of the same run
+  const bs = report.base;
+  if (bs && bs.trigOneIn) for (const m of modes.filter(m => m.startsWith('buy:'))) {
+    const eb = report[m].avgBonusX, dec = bs.baseRtp + 100 * eb / bs.trigOneIn;
+    report[m].decomposedBaseRtp = dec;
+    if (!asJson) console.log(`\nDECOMPOSITION base RTP = Rb ${bs.baseRtp.toFixed(2)}% + (1/${bs.trigOneIn.toFixed(0)}) x E[bonus] ${eb.toFixed(1)}x (from ${m}) = ${dec.toFixed(2)}%   (direct base-mode measurement: ${bs.rtp.toFixed(2)}%)`);
   }
   if (asJson) console.log(JSON.stringify(report, null, 1));
   else console.log(`\n(${((Date.now() - t0) / 1000).toFixed(1)}s on ${os.cpus().length} cpus)`);

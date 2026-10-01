@@ -15,6 +15,7 @@ export function checkRound(r, CFG, { ante = false, buy = null } = {}) {
   else if (!near(r.cost, expCost)) bad(`cost ${r.cost} != expected ${expCost}`);
   if (!num(r.totalPayout) || r.totalPayout < 0) bad('totalPayout must be a number >= 0');
   else if (r.totalPayout > CFG.maxWin + 1e-9) bad(`totalPayout ${r.totalPayout} exceeds maxWin ${CFG.maxWin}`);
+  if (r.v !== 1) bad('round.v must be 1');
   if (typeof r.bonusTriggered !== 'boolean') bad('bonusTriggered must be boolean');
   if (typeof r.capped !== 'boolean') bad('capped must be boolean');
   if (!r.initialGrid) bad('initialGrid missing');
@@ -41,7 +42,7 @@ export function checkRound(r, CFG, { ante = false, buy = null } = {}) {
           if (!num(s.totalPayout) || s.totalPayout < 0) bad(`bonus.spins[${i}].totalPayout invalid`); else sum += s.totalPayout;
           if (s.spinIndex !== i + 1) bad(`bonus.spins[${i}].spinIndex must be ${i + 1} (1-based, in order)`);
           if (s.retrigger !== undefined && !(Number.isInteger(s.retrigger) && s.retrigger > 0)) bad(`bonus.spins[${i}].retrigger must be a positive integer`);
-          if (s.spinsLeft !== undefined && !(Number.isInteger(s.spinsLeft) && s.spinsLeft >= 0)) bad(`bonus.spins[${i}].spinsLeft must be an integer >= 0`);
+          if (!(Number.isInteger(s.spinsLeft) && s.spinsLeft >= 0)) bad(`bonus.spins[${i}].spinsLeft is required (integer >= 0)`);
         }
         if (num(b.totalPayout) && !near(b.totalPayout, Math.min(CFG.maxWin, sum))) bad(`bonus.totalPayout ${b.totalPayout} != min(maxWin, sum spins ${sum})`);
       }

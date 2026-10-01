@@ -219,9 +219,13 @@ async function slotSpin(slotId, req, res) {
     const eng = getEngine(slotId);
     if (!eng) return res.status(404).json({ error: 'Unknown slot' });
     const C = eng.CFG;
-    const stake = money(req.body.stake);
-    const ante  = !!req.body.ante;
-    const buy   = req.body.buy ? String(req.body.buy) : null;
+    const body = req.body || {};
+    if (typeof body.stake !== 'number' || !Number.isFinite(body.stake)) return res.status(400).json({ error: 'Invalid bet size' });
+    if (body.ante !== undefined && typeof body.ante !== 'boolean') return res.status(400).json({ error: 'ante must be true or false' });
+    if (body.buy != null && typeof body.buy !== 'string') return res.status(400).json({ error: 'Unknown bonus buy' });
+    const stake = money(body.stake);
+    const ante  = body.ante === true;
+    const buy   = body.buy ? body.buy : null;
     if (!C.bets.includes(stake)) return res.status(400).json({ error: 'Invalid bet size' });
     if (buy && !hasOwn(C.buy, buy)) return res.status(400).json({ error: 'Unknown bonus buy' });
     if (ante && !C.anteCost) return res.status(400).json({ error: 'This slot has no ante mode' });
@@ -230,20 +234,28 @@ async function slotSpin(slotId, req, res) {
     const round = eng.playRound(eng.cryptoRng, { ante, buy });
     const cost = money(stake * round.cost);
     const payout = money(stake * round.totalPayout);
+    if (!(cost > 0) || !Number.isFinite(payout) || payout < 0) return res.status(500).json({ error: 'Engine returned an invalid round' });
 
-    // atomic debit: only succeeds if the balance still covers the cost
-    const d = await db.execute({ sql: 'UPDATE users SET balance=balance-? WHERE id=? AND balance>=?', args: [cost, req.user.id, cost - 1e-9] });
-    if (!d.rowsAffected) return res.status(400).json({ error: 'Not enough balance' });
+    // ONE atomic statement settles the whole round: debit cost, credit payout, wager + rakeback; only succeeds if the balance covers the cost
     const rake = cost * (C.rakeEdge ?? EDGE[slotId] ?? 0.04) * tierFor(req.user.wagered).rate;
-    await db.batch([
-      { sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [payout, req.user.id] },
-      { sql: 'UPDATE users SET wagered=wagered+?, rake=rake+? WHERE id=?', args: [cost, rake, req.user.id] },
-      { sql: 'INSERT INTO bets (user_id,game,stake,mult,payout,created) VALUES (?,?,?,?,?,?)', args: [req.user.id, slotId, cost, payout / cost, payout, Date.now()] }
-    ], 'write');
+    const d = await db.execute({
+      sql: 'UPDATE users SET balance=balance-?+?, wagered=wagered+?, rake=rake+? WHERE id=? AND balance>=?',
+      args: [cost, payout, cost, rake, req.user.id, cost - 1e-9]
+    });
+    if (!d.rowsAffected) return res.status(400).json({ error: 'Not enough balance' });
+    // bet log (the money is already settled above, so a failure here can never lose funds)
+    await db.execute({ sql: 'INSERT INTO bets (user_id,game,stake,mult,payout,created) VALUES (?,?,?,?,?,?)', args: [req.user.id, slotId, cost, payout / cost, payout, Date.now()] });
 
     res.json({ round, stake, cost, payout, user: shape(await byId(req.user.id)) });
   } catch (e) { res.status(500).json({ error: e.message }); }
 }
+/* public, read-only: everything the info/paytable screen and the buy cards may show, straight from the engine */
+app.get('/api/slot/:id/info', (req, res) => {
+  const eng = getEngine(req.params.id);
+  if (!eng) return res.status(404).json({ error: 'Unknown slot' });
+  const C = eng.CFG;
+  res.json({ id: eng.id, name: eng.name, bets: C.bets, maxWin: C.maxWin, anteCost: C.anteCost ?? null, buy: C.buy, ...(eng.info ? eng.info() : {}) });
+});
 app.post('/api/slot/:id/spin', auth, (req, res) => slotSpin(req.params.id, req, res));
 app.post('/api/emberclaw/spin', auth, (req, res) => slotSpin('emberclaw', req, res));   // legacy path, same handler
 /* ===== SLOTFORGE SLOT ROUTES END ===== */

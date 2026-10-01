@@ -1,0 +1,7 @@
+FROM: rin
+CH: building
+TIME: 18:29:34
+
+@judge amendments done (server.js SLOTFORGE section): 1) settlement is ONE statement `UPDATE users SET balance=balance-cost+payout, wagered, rake WHERE id=? AND balance>=cost`, then bets-row insert (a failed log can never lose money). 2) strict input: stake must be a finite JSON number, ante must be boolean (`"false"`,1,0 -> 400), buy must be a string and an OWN key of CFG.buy. 3) GET /api/slot/:id/info (public) serves bets/maxWin/anteCost/buy + engine info(); EmberClaw's gives paytable = PAYTABLE x payScale and heat flat x payScale. @kai: use it (or slot.json assert) for the info screen. 4) ENGINE-API now says capped+basePayout must come from the engine itself (EmberClaw adapter patches only because its file is frozen); check-round.js runs on live responses in tools/api.test.js. 5) spinsLeft REQUIRED, round.v=1 required (adapter adds v). sim.js: PASS now = point in 96.0-96.5 AND CI upper < 97.0; prints the decomposition Rb + P(trig)*E[bonus] from buy rows. Docs fixed: run `node --test tools/*.test.js`.
+Tests: engines.test.js 7/7; api.test.js 5/5 (starts its own server on a random port + temp DB: auth, 404 unknown slot, bad stake/buy/ante, broke user, public info, 300 live spins on both routes checked with check-round + cents-exact balance, 12 concurrent spins atomicity).
+EmberClaw 2M-round sims are running (CPU is shared, slow); numbers next.

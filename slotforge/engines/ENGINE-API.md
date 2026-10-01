@@ -12,6 +12,7 @@ EmberClaw's adapter (`engines/emberclaw.js`) re-exports `/emberclaw-engine.js`, 
 | `name` | string | display name |
 | `CFG` | object | tunables, see below |
 | `playRound(rng, {ante=false, buy=null})` | function | pure; returns a round (CONTRACT v1). `rng()` returns uniform [0,1). No I/O, no clock, no `Math.random` |
+| `info()` (optional) | function | extra data for `GET /api/slot/:id/info` (paytable etc.). Anything a player is shown (paytable, pays, flat bonuses) must be derived from engine data, never retyped by hand |
 | `cryptoRng()` | function | production RNG (`crypto.randomBytes`, 48 bit uniform [0,1)) |
 
 ### `CFG` (required fields)
@@ -31,11 +32,12 @@ Everything else in `CFG` (weights, scatterP, payScale ...) is engine-private; th
 1. `cost` number > 0: 1 for base, `CFG.anteCost` for ante, `CFG.buy[key].cost` for a buy.
 2. `totalPayout` number >= 0 and <= `CFG.maxWin`; includes the bonus.
 3. `bonusTriggered` boolean.
-4. `bonus` null if not triggered, else `{ startSpins:int>=1, spins:[>=1 items], totalPayout }`; every `spins[i]` has `totalPayout` (number), `spinIndex` (1-based, in order), optional `retrigger` (int, spins added) and `spinsLeft` (int); `bonus.totalPayout == min(maxWin, sum spins)`.
+4. `bonus` null if not triggered, else `{ startSpins:int>=1, spins:[>=1 items], totalPayout }`; every `spins[i]` has `totalPayout` (number), `spinIndex` (1-based, in order), optional `retrigger` (int, spins added) and REQUIRED `spinsLeft` (int, spins remaining after this one); `bonus.totalPayout == min(maxWin, sum spins)`.
 5. `bought` absent/null, or the buy key. If set: `bonusTriggered === true`, `cost === CFG.buy[key].cost`, `basePayout` 0 or absent.
 6. `initialGrid` present on every round. For a bought round it is the visible **trigger spin**: scatters land, `cascadeSteps` is `[]` (no wins), then the client shows the intro splash.
 7. `cascadeSteps` array (items slot-defined; any `payout` must be a number). `basePayout` number (base spin payout; absent only for bought rounds).
-8. `capped` boolean (true when the cap truncated the round).
+8. `v: 1` (contract version) on every round.
+9. `capped` boolean (true when the cap truncated the round). **Both `capped` and `basePayout` must come from the engine itself** on every round (only EmberClaw's adapter patches them in, because its source file is frozen).
 Invariant: `totalPayout == min(maxWin, (basePayout||0) + (bonus?.totalPayout||0))`.
 Per-spin payload (grid, clusters/lines, features) is slot-defined and documented in that slot's plan. The client reads no money from anywhere else.
 
@@ -50,4 +52,4 @@ The offline build embeds the engine source, so a slot engine must be ONE self-co
 - Bonus loops are bounded (max spins / steps) so a round always terminates.
 
 ## Adding a slot
-1. `engines/<id>.js` exporting the table above. 2. Register in `engines/index.js`. 3. `node tools/sim.js <id> all 2000000 1,2,3,4` and `node --test tools/engines.test.js`.
+1. `engines/<id>.js` exporting the table above. 2. Register in `engines/index.js`. 3. `node tools/sim.js <id> all 2000000 1,2,3,4` and `node --test tools/*.test.js`.

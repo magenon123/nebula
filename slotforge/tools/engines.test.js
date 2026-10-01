@@ -1,4 +1,4 @@
-/* node --test tools/   -- contract + determinism for every registered engine */
+/* node --test tools/engines.test.js   (TEST_ROUNDS=100000 for the full run) -- contract + determinism for every registered engine */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getEngine, listEngines, listModes, modeOpts } from '../engines/index.js';
