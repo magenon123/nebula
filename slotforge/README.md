@@ -7,7 +7,7 @@ We are building a family of casino slots for **Nebula** (repo root `/home/user/n
 | name | role | owns (only write here) |
 |---|---|---|
 | **maya** | Planner: game design, features, math model, bonus design, paytable, volatility, buy/ante modes | `plans/<slug>/` sections "Features & Math" |
-| **leo** | Planner: theme, art direction, symbols, scene, **character & its animations**, sound design, UX/copy | `plans/<slug>/` sections "Look & Sound" |
+| **leo** | Planner + artist: theme, art direction, symbols, scene, **character & its animations**, sound design, UX/copy | `plans/<slug>/` sections "Look & Sound" and the art fragments in `slots/<slug>/art/` |
 | **kai** | Builder: front end. Shared shell (`shell/`), slot client (`slots/<slug>/`), standalone build | `shell/`, `slots/<slug>/`, `build-standalone.py` |
 | **rin** | Builder: engine, server, math tooling. Engine interface (`engines/`), simulator + math tools (`tools/`), API route, RTP tuning, tests | `engines/`, `tools/`, and ONLY the clearly marked slot-route section of `/home/user/nebula/server.js` |
 | **judge** | Reviews plans and builds against the rubric. Decides disputes. Never edits code or plans | `reviews/` |

@@ -1,0 +1,17 @@
+# STATUS (the lead keeps this current; any new agent reads it FIRST)
+
+**Rule from the owner:** the owner is the judge (no judge agent). ONE slot at a time (Grumble & Brine now). All agents run on **Sonnet 5.5**. Keep usage lean: do the job, don't re-read what you don't need, no long chatter. Work may be interrupted by the owner's usage limit at any time: **save work to files often, and write your progress in the chat** so a fresh agent can continue exactly where you stopped.
+
+## Done
+- EmberClaw (slot #1): finished, math retuned to ~96.2% in all modes, files rebuilt. Do not touch except bug fixes.
+- Shared shell (`shell/`), slot module format (`slots/emberclaw/`), engine registry + generic server route (`engines/`, `server.js` marked section), math tools + tests (`tools/`), build script (`/home/user/nebula/build-standalone.py <slug>`).
+- Grumble & Brine design: `plans/grumble-and-brine/01-features-math.md` (maya, rules/math/payload) and `02-look-sound.md` (leo, look/sound/character, incl. section 14 fixes) + `DESIGN.md`. Owner preferences override leo's doc where they clash (no floating bubbles, no halftone dots).
+
+## Slot #2 pipeline (grumble-and-brine), in dependency order
+1. **rin**: engine `engines/grumble-and-brine.js` per 01 (243 ways, Drift, Deep Dive bonus, Deep Pressure 2x, Dive Ticket 100x, Abyss Pass 500x, bought-bonus trigger spin, round JSON section 11), register in `engines/index.js`, tests pass, tune every mode to 96.0-96.5% (seeded sims, `tools/sim.js`), fill the measured-results section of 01. Status: NOT STARTED
+2. **leo** (parallel with rin): art fragments in `slots/grumble-and-brine/art/`: `symbols.svg` (11 symbols), `scene.html`, `logo.html`, `frame.html`, `character.html` (Captain Barnacle, a crab; named animation groups), `side.html` (Tide gauge / dive counter), `info.html`, following the fragment format in `slots/emberclaw/`. Status: NOT STARTED
+3. **kai** (after 1 and 2): `slots/grumble-and-brine/` slot.json (must match engine CFG), slot.js hooks (ways rendering, drift animation, character controller, sfx recipes from 02), slot.css; `python3 build-standalone.py grumble-and-brine` must produce `grumble-and-brine-standalone.html`; run regress on EmberClaw AND a smoke run for the new slot; zero console errors. Status: NOT STARTED
+4. **lead**: independent sim check, tests, build, screenshots; deliver `grumble-and-brine-standalone.html` + `emberclaw-standalone.html` to the owner with a short honest report. The owner approves/revises. Status: NOT STARTED
+
+## How to resume after an interruption
+Read: README.md, OWNER-PREFS.md, this file, the last ~30 chat messages (`./chat.sh read <you> all 30`), then your files. Pick up your own step; do not redo finished work. Update the "Status:" line of your step here when you finish or stop.
