@@ -1,0 +1,39 @@
+<!-- frame: salvaged ship-hatch. SVG origin = stage (438,158), 724x520. Board window (22,64)-(702,472) = stage (460,222) 680x408. Strip trough (22,12)-(702,58) = stage (460,170). -->
+<svg id="frameArt" viewBox="0 0 724 520" filter="url(#roughC)" stroke-linejoin="round" stroke-linecap="round">
+ <defs>
+  <pattern id="gbRope" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(55)"><rect width="8" height="8" fill="#d9c79a"/><rect width="4" height="8" fill="#a88f5e"/></pattern>
+ </defs>
+ <!-- iron hatch plate -->
+ <path d="M6 6 L360 2 L718 5 L722 498 L360 504 L3 500Z" fill="#1b2d36" stroke="#0b1820" stroke-width="8"/>
+ <path d="M12 12 L360 8 L712 11 L712 17 L12 20Z" fill="#2b4551"/>
+ <path d="M10 488 L360 492 L714 486 L714 496 L360 500 L10 496Z" fill="#101c23"/>
+ <path d="M14 70 L18 300 M706 120 L710 330" stroke="#2b4551" stroke-width="5" fill="none"/>
+ <!-- strip trough (brass lip around) -->
+ <rect x="16" y="6" width="692" height="56" rx="4" fill="#b88a3e" stroke="#0b1820" stroke-width="5"/>
+ <path d="M18 9 H706" stroke="#e8c46a" stroke-width="3" fill="none"/>
+ <rect x="22" y="12" width="680" height="46" rx="2" fill="#0e4a5a" stroke="#0b1820" stroke-width="4"/>
+ <path d="M18 58 H706 V62 H18Z" fill="#6b4a1c"/>
+ <!-- board window: brass trim, dark glass back -->
+ <rect x="14" y="62" width="696" height="418" rx="3" fill="#b88a3e" stroke="#0b1820" stroke-width="6"/>
+ <path d="M16 65 H708 M16 65 V478" stroke="#e8c46a" stroke-width="3.5" fill="none"/>
+ <path d="M710 66 V478 H18" stroke="#6b4a1c" stroke-width="5" fill="none"/>
+ <rect x="22" y="64" width="680" height="408" fill="#04141f" stroke="#0b1820" stroke-width="5"/>
+ <!-- rivets -->
+ <g fill="#e8c46a" stroke="#0b1820" stroke-width="3.5">
+  <circle cx="13" cy="18" r="7"/><circle cx="711" cy="17" r="7"/><circle cx="12" cy="486" r="7"/><circle cx="712" cy="485" r="7"/>
+  <circle cx="13" cy="268" r="6"/><circle cx="711" cy="262" r="6"/>
+  <circle cx="190" cy="488" r="6"/><circle cx="362" cy="490" r="6"/><circle cx="534" cy="487" r="6"/>
+ </g>
+ <!-- rust drips -->
+ <g stroke="#c4602a" stroke-width="4" fill="none" opacity=".75"><path d="M13 26 L14 52"/><path d="M711 26 L709 62"/><path d="M190 496 L190 508"/><path d="M534 495 L535 512"/><path d="M12 494 L11 516"/></g>
+ <!-- bottom-left weed -->
+ <path d="M60 494 Q50 520 64 540 M72 494 Q80 516 72 536" fill="none" stroke="#0b1820" stroke-width="10"/><path d="M60 494 Q50 520 64 540 M72 494 Q80 516 72 536" fill="none" stroke="#2c7a62" stroke-width="5"/>
+</svg>
+<div id="frame"><div id="grid"></div><div id="fxl"></div>
+ <svg id="frameFx" viewBox="0 0 680 408" filter="url(#roughS)" stroke-linecap="round">
+  <g id="ropes"><path d="M136 0 V408" stroke="#0b1820" stroke-width="7"/><path d="M272 0 V408" stroke="#0b1820" stroke-width="7"/><path d="M408 0 V408" stroke="#0b1820" stroke-width="7"/><path d="M544 0 V408" stroke="#0b1820" stroke-width="7"/>
+   <path d="M136 0 V408 M272 0 V408 M408 0 V408 M544 0 V408" stroke="url(#gbRope)" stroke-width="3.6"/></g>
+  <path d="M0 0 H680 M0 408 H680" stroke="#0b1820" stroke-width="3" opacity=".5"/>
+ </svg></div>
+<div id="strip"><i class="lane" data-r="0"><b>&lsaquo;</b></i><i class="lane" data-r="1"><b>&lsaquo;</b></i><i class="lane" data-r="2"><b>&lsaquo;</b></i><i class="lane" data-r="3"><b>&lsaquo;</b></i><i class="lane" data-r="4"><b>&lsaquo;</b></i><div id="chain">DRIFT <span id="chainN">x0</span></div></div>
+<div id="tagArt"><svg viewBox="0 0 90 100" filter="url(#roughS)" stroke-linejoin="round" stroke-linecap="round"><path d="M45 0 Q40 10 46 22" fill="none" stroke="#0b1820" stroke-width="7"/><path d="M45 0 Q40 10 46 22" fill="none" stroke="#d9c79a" stroke-width="3.2"/><path d="M12 24 L78 22 L82 82 L10 84Z" fill="#f2e5c2" stroke="#0b1820" stroke-width="4.5"/><circle cx="45" cy="32" r="3.4" fill="#1b2d36" stroke="#0b1820" stroke-width="2"/><g font-family="Luckiest Guy,Impact,Arial Black,sans-serif" text-anchor="middle" font-size="17" fill="#c4402a" stroke="none"><text x="46" y="55">NO</text><text x="46" y="75" font-size="13">REFUNDS</text></g></svg></div>

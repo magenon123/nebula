@@ -1,0 +1,1619 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Grumble & Brine: Deep Salvage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Roboto:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+/* SlotForge shell CSS: everything shared by every slot (see shell/README.md). Per-slot art/colours go in slots/<slug>/slot.css. */
+:root{--ink:#1d0f09;--ui:Roboto,system-ui,'Segoe UI',Arial,sans-serif;--toon:'Luckiest Guy',Impact,'Arial Black',sans-serif;--spd:1;--heat:0;--gold:#ffc83a;--accent:#f26b0f;
+  /* theme tokens: a slot re-skins the shell by overriding these in slot.css (:root{...}) */
+  --rivet:#c9a15a;--bevel:#7a5238;--muted:#b79a82;--rim:#6e4a36;--panel1:#34231c;--panel2:#1c100c;--hover:#2a1a14;--txt:#e3d0b8;--btn:#3a251c;--gold2:#ffd36a;--acc1:#ff8a2a;--acc2:#e0500a}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;overflow:hidden;background:#1a0a12;font-family:var(--ui);color:#fff;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;cursor:pointer;color:inherit;border:0;background:none;padding:0}
+button:disabled{cursor:not-allowed}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:85}
+#grain{position:fixed;inset:0;z-index:30;pointer-events:none;opacity:.5;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.4 -.15'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
+#flash{position:fixed;inset:0;z-index:45;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(255,235,170,.95),rgba(255,120,20,.55) 45%,transparent 75%);opacity:0}
+#flash.go{animation:flash .7s ease-out}
+@keyframes flash{0%{opacity:.9}100%{opacity:0}}
+
+
+/* the whole game lives on a fixed 1600x900 stage that is scaled to fit, so every slot has identical placement */
+#shaker{position:fixed;inset:0;overflow:hidden}
+#shaker.shake{animation:shake .45s}#shaker.shake2{animation:shake 1s}
+@keyframes shake{10%,50%,90%{transform:translate(-6px,3px)}30%,70%{transform:translate(7px,-4px)}}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%;transform:translate(-50%,-50%) scale(var(--s,1))}
+#stage>*{position:absolute}
+#scene{left:0;top:0;overflow:visible;pointer-events:none}
+
+/* shared keyframes used by shell and slot art */
+@keyframes wob{to{transform:scale(1.07) rotate(3deg)}}
+@keyframes flick{from{transform:scale(.85,.9)}to{transform:scale(1.1,1.25)}}
+.pop{position:absolute;transform:translate(-50%,-50%);padding:4px 16px;border-radius:99px;border:4px solid var(--ink);font-family:var(--toon);font-size:30px;color:var(--ink);background:var(--gold);animation:popup 1.1s ease-out forwards;white-space:nowrap;box-shadow:0 4px 0 rgba(0,0,0,.4)}
+@keyframes popup{0%{transform:translate(-50%,-30%) scale(.4);opacity:0}18%{transform:translate(-50%,-50%) scale(1.12);opacity:1}100%{transform:translate(-50%,-160%) scale(1);opacity:0}}
+
+/* ---------- bottom bar (SHELL: identical in every slot) ---------- */
+#buyOpen{left:40px;top:150px;width:184px;height:270px;transform-origin:50% -150px;animation:sway 5.5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+#buyOpen .ch{position:absolute;top:-400px;width:10px;height:480px;background:repeating-linear-gradient(180deg,#9a9ea8 0 12px,#3a3d46 12px 15px);border-radius:5px;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+#buyOpen .ch.l{left:26px}#buyOpen .ch.r{right:26px}
+#buyOpen .plq{position:absolute;left:0;top:80px;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding-top:14px;border-radius:12px 12px 22px 22px;background:radial-gradient(circle at 14px 14px,#d9b56a 4.5px,transparent 5.5px),radial-gradient(circle at calc(100% - 14px) 14px,#d9b56a 4.5px,transparent 5.5px),linear-gradient(#3a2a22,#1a0f0b);border:5px solid var(--ink);box-shadow:inset 0 0 0 3px #b8742a,0 0 22px rgba(255,120,30,.55),0 8px 0 rgba(0,0,0,.45);filter:url(#roughU);transition:.15s}
+#buyOpen:hover:not(:disabled) .plq{box-shadow:inset 0 0 0 3px #ffb02e,0 0 34px rgba(255,140,30,.9),0 8px 0 rgba(0,0,0,.45);transform:translateY(-3px)}
+#buyOpen svg{width:84px;height:84px;overflow:visible;filter:drop-shadow(0 4px 0 rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(255,70,130,.8));animation:wob 2s ease-in-out infinite alternate}
+#buyOpen b{font-family:var(--toon);font-weight:400;font-size:34px;line-height:.95;letter-spacing:1px;text-align:center;color:var(--gold);text-shadow:2px 3px 0 var(--ink)}
+#buyOpen em{margin-top:8px;font-style:normal;font-family:var(--toon);font-size:22px;color:#fff;background:var(--ink);padding:2px 14px 0;border-radius:20px;border:3px solid var(--bevel)}
+#buyOpen:disabled{filter:saturate(.4) brightness(.7);animation:none}
+#barL{left:150px;top:782px;width:700px;height:92px;background:radial-gradient(circle at 14px 14px,var(--rivet) 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),var(--rivet) 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) 14px,var(--rivet) 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) calc(100% - 14px),var(--rivet) 4px,transparent 5px),linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-left:0;border-radius:0 18px 12px 0;display:flex;align-items:center;gap:30px;padding-left:24px;box-shadow:inset 0 0 0 3px var(--rim),0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+#menuBtn{width:54px;height:54px;display:grid;place-items:center;border-radius:12px}
+#menuBtn:hover{background:var(--hover)}
+#menuBtn svg{width:42px;height:42px;fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round}
+.fld label{display:block;font-size:14px;font-weight:900;color:var(--muted);letter-spacing:2px}
+.fld .v{font-family:var(--toon);font-size:35px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
+.fld .v.gold{color:var(--gold)}
+#barR{left:880px;top:782px;width:380px;height:92px;background:radial-gradient(circle at 14px 14px,var(--rivet) 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),var(--rivet) 4px,transparent 5px),linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-radius:12px 0 0 18px;border-right:0;padding:12px 0 0 28px;box-shadow:inset 0 0 0 3px var(--rim),0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+#betV{font-family:var(--toon);font-size:31px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
+#betBar{position:absolute;left:0;bottom:0;height:7px;background:#fff;border-radius:0 4px 0 0;transition:width .2s}
+#chev{position:absolute;right:92px;top:8px;width:56px;height:76px;display:flex;flex-direction:column;justify-content:space-between}
+#chev{pointer-events:none}
+#chev button{pointer-events:auto;height:34px;display:grid;place-items:center;border-radius:8px}
+#chev button:hover:not(:disabled){background:var(--hover)}
+#chev button:disabled{opacity:.35}
+#chev svg{width:34px;height:20px;fill:none;stroke:#cfc3b8;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+#spin{left:1198px;top:752px;width:140px;height:140px;border-radius:50%;background:#14100f;border:7px solid #fff;box-shadow:0 0 0 5px var(--ink),0 8px 0 5px rgba(0,0,0,.4);display:grid;place-items:center;transition:transform .12s}
+#spin:hover:not(:disabled){transform:scale(1.04)}
+#spin:active:not(:disabled){transform:scale(.96)}
+#spin svg{width:84px;height:84px;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+#spin.busy svg{animation:rot .9s linear infinite}
+#spin:disabled{border-color:#8a8078}
+#spin:disabled svg{stroke:#8a8078}
+@keyframes rot{to{transform:rotate(360deg)}}
+#spin .cnt{position:absolute;width:64px;height:64px;border-radius:15px;background:#fff;color:#14100f;font-family:var(--toon);font-size:40px;line-height:1;padding-top:5px;display:grid;place-items:center;box-shadow:0 0 0 4px rgba(255,255,255,.25)}
+#bAuto{left:1362px;top:800px;width:68px;height:68px;border-radius:50%;background:linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);display:grid;place-items:center;box-shadow:inset 0 0 0 3px var(--rim),0 5px 0 rgba(0,0,0,.35);filter:url(#roughU)}
+#bAuto svg{width:36px;height:36px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#bAuto:hover:not(:disabled){background:var(--hover)}
+#bAuto.on{background:var(--accent)}
+#bAuto:disabled{opacity:.5}
+#turboBadge{left:1290px;top:732px;padding:2px 12px;border-radius:99px;background:var(--accent);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px}
+#barR.hot{border-color:var(--ink);background:radial-gradient(circle at 14px 14px,var(--gold2) 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),var(--gold2) 4px,transparent 5px),linear-gradient(#5a2210,#2a0e06);box-shadow:inset 0 0 0 3px #ff8a1a,0 0 26px rgba(255,100,20,.8),0 7px 0 rgba(0,0,0,.4);animation:hotp 1.6s ease-in-out infinite}
+@keyframes hotp{50%{box-shadow:inset 0 0 0 3px #ffb02e,0 0 40px rgba(255,120,20,1),0 7px 0 rgba(0,0,0,.4)}}
+#barR.hot #betV{color:#ffb02e;text-shadow:0 0 16px #ff6a00,2px 3px 0 var(--ink)}
+#barR.hot #betLbl{color:#ffb070}
+#feverBadge{left:1075px;top:732px;padding:2px 12px;border-radius:99px;background:linear-gradient(var(--acc1),#d8400a);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px;box-shadow:0 0 18px rgba(255,100,20,.8)}
+#msg{left:540px;top:728px;width:520px;height:42px;display:flex;align-items:center;justify-content:center;font-family:var(--toon);font-size:25px;letter-spacing:1px;color:#fff;text-shadow:2px 2px 0 var(--ink),-2px 2px 0 var(--ink),2px -2px 0 var(--ink),-2px -2px 0 var(--ink)}
+#msg.hl{color:var(--gold)}
+#fsBox{filter:url(#roughU);left:36px;top:34px;padding:8px 22px 8px 56px;border-radius:14px;background:var(--ink);border:4px solid var(--accent);font-family:var(--toon);font-size:30px;color:#fff;animation:pillin .35s ease-out}
+#fsBox::before{content:"FS";position:absolute;left:8px;top:5px;width:38px;height:38px;border-radius:50%;background:var(--gold);color:var(--ink);display:grid;place-items:center;font-size:18px;border:3px solid #7a4a00}
+#fsBox small{display:block;font-family:var(--ui);font-size:11px;font-weight:900;letter-spacing:2px;color:#b8a89a;margin-bottom:-2px}
+@keyframes pillin{from{transform:translateY(-12px);opacity:0}}
+#menu{left:154px;top:560px;width:230px;padding:10px;background:linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px var(--rim),0 8px 0 rgba(0,0,0,.4);z-index:20;filter:url(#roughU)}
+#menu button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:11px 12px;border-radius:9px;font-size:17px;font-weight:700}
+#menu button:hover{background:var(--hover)}
+#menu i{font-style:normal;font-size:13px;font-weight:900;letter-spacing:1px;padding:2px 9px;border-radius:99px;background:#3a2a24;color:#b8a89a}
+#menu button.on i{background:var(--accent);color:#fff}
+
+/* ---------- overlays ---------- */
+.modal{position:fixed;inset:0;z-index:80;background:rgba(10,4,6,.8);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal.tap{cursor:pointer}
+.mbox{position:relative;width:min(94vw,460px);max-height:92vh;padding:50px 28px 26px;margin-top:34px;border-radius:16px 12px 18px 11px;background:radial-gradient(circle at 18px 18px,var(--rivet) 5px,transparent 6px),radial-gradient(circle at calc(100% - 18px) 18px,var(--rivet) 5px,transparent 6px),radial-gradient(circle at 18px calc(100% - 18px),var(--rivet) 5px,transparent 6px),radial-gradient(circle at calc(100% - 18px) calc(100% - 18px),var(--rivet) 5px,transparent 6px),linear-gradient(180deg,#3b2820,#22140f);color:#f4e4cf;border:5px solid var(--ink);box-shadow:inset 0 0 0 3px var(--bevel),inset 0 0 40px rgba(0,0,0,.5),0 12px 0 rgba(0,0,0,.4);text-align:center;animation:mpop .22s ease-out;filter:url(#roughU)}
+.mbox.wide{width:min(94vw,760px);text-align:left;overflow:auto}
+@keyframes mpop{from{transform:translateY(14px) scale(.96);opacity:0}}
+.mbox h2{position:absolute;left:50%;top:-30px;transform:translateX(-50%) rotate(-1.5deg);margin:0;padding:7px 30px 4px;background:var(--accent);border:5px solid var(--ink);border-radius:8px;font-family:var(--toon);font-weight:400;font-size:30px;color:#fff;text-shadow:2px 3px 0 var(--ink);white-space:nowrap;letter-spacing:1px;box-shadow:0 5px 0 rgba(0,0,0,.4)}
+.mbox.wide h2{position:static;display:inline-block;transform:rotate(-1deg);margin:0 0 14px}
+.mbox p{margin:8px 0;font-size:15px;line-height:1.5;color:var(--txt);font-weight:500}
+.mbox .x{position:absolute;right:10px;top:8px;width:34px;height:34px;border-radius:50%;font-size:24px;line-height:1;background:var(--ink);color:#fff;border:3px solid var(--bevel)}
+.big-n{font-family:var(--toon);font-size:60px;margin:10px 0;color:var(--gold);text-shadow:3px 4px 0 var(--ink)}
+.big-n small{display:block;font-family:var(--ui);font-size:12px;letter-spacing:3px;color:var(--muted);font-weight:900;text-shadow:none}
+.row2{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;padding:13px 16px;border-radius:10px;font-size:15px;font-weight:900;letter-spacing:1px;background:var(--btn);color:#fff;border:4px solid var(--ink);box-shadow:inset 0 0 0 2px var(--bevel),0 4px 0 rgba(0,0,0,.4)}
+.btn:hover:not(:disabled){filter:brightness(1.25)}
+.btn.pri{background:var(--accent)}
+.btn:disabled{opacity:.4}
+.tapHint{margin-top:22px;font-size:15px;font-weight:900;letter-spacing:4px;color:var(--gold);text-shadow:2px 2px 0 var(--ink);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{50%{opacity:.3}}
+#cWarn{color:#ff8a78;min-height:18px;font-size:13px;font-weight:700}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.opt{padding:12px 0;border-radius:10px;background:var(--btn);border:4px solid var(--ink);box-shadow:inset 0 0 0 2px var(--bevel);font-weight:900;font-size:17px;color:#fff}
+.opt.sel{background:var(--accent);color:#fff}
+.srow{display:flex;justify-content:space-between;align-items:center;margin:12px 0;font-size:15px;font-weight:700;text-align:left}
+.sw{width:52px;height:28px;flex:none;border-radius:99px;background:#5a4338;border:3px solid var(--ink);position:relative}
+.sw::after{content:"";position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--ink);transition:.2s}
+.sw.on{background:var(--accent)}.sw.on::after{left:26px}
+.pt{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0 14px}
+.pt th{font-size:11px;letter-spacing:1.5px;color:var(--muted);text-align:right;padding:4px 8px;font-weight:900}
+.pt th:first-child{text-align:left}
+.pt td{padding:5px 8px;text-align:right;border-top:2px solid #4a3328;font-variant-numeric:tabular-nums;font-weight:700}
+.pt td:first-child{text-align:left}.pt .nm{display:flex;align-items:center;gap:10px}
+.pt svg{width:38px;height:38px;flex:none;background:#27160f;border-radius:8px;padding:2px}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rules div{padding:12px;border-radius:10px;background:#2a1913;border:3px solid #4a3328}
+.rules b{display:block;font-family:var(--toon);font-weight:400;font-size:20px;color:var(--gold);margin-bottom:4px}
+.rules span{font-size:13.5px;line-height:1.5;color:var(--txt);font-weight:500}
+.modal.splash{flex-direction:column;overflow:hidden;background:radial-gradient(circle,rgba(90,32,8,.985),rgba(8,3,4,.99))}
+.rays{position:absolute;width:170vmax;height:170vmax;left:50%;top:50%;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(rgba(255,170,40,.2) 0 7deg,transparent 7deg 20deg);-webkit-mask:radial-gradient(circle,#000 4%,transparent 52%);mask:radial-gradient(circle,#000 4%,transparent 52%);animation:rot 50s linear infinite}
+.sp{position:relative;display:flex;flex-direction:column;align-items:center;padding:0 20px}
+.gems{display:flex;justify-content:center;position:relative;z-index:4;height:120px;margin-bottom:-34px}
+.gems .g{animation:gemin .85s cubic-bezier(.3,1.4,.5,1) backwards}
+.gems .g:nth-child(1){animation-delay:.05s}.gems .g:nth-child(2){animation-delay:.3s;margin:-20px -6px 0}.gems .g:nth-child(3){animation-delay:.55s}
+.gems svg{width:134px;height:134px;overflow:visible;filter:drop-shadow(0 7px 0 rgba(0,0,0,.5)) drop-shadow(0 0 16px rgba(255,80,140,.7))}
+.gems .g:nth-child(1) svg{transform:rotate(-15deg)}.gems .g:nth-child(3) svg{transform:rotate(15deg)}
+@keyframes gemin{from{transform:translateY(-700px) rotate(240deg);opacity:0}}
+.medalWrap{position:relative;z-index:2}
+.medalWrap .fire{position:absolute;left:-30px;right:-30px;top:-86px;height:150px;overflow:visible}
+.fire path{transform-box:fill-box;transform-origin:50% 100%;animation:flick .55s ease-in-out infinite alternate}
+.fire path:nth-child(2n){animation-duration:.4s}.fire path:nth-child(3n){animation-duration:.68s}
+.medal{position:relative;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#ffbc3a,var(--acc2) 58%,#8a1f06);border:12px solid var(--ink);box-shadow:inset 0 0 0 7px var(--gold2),inset 0 0 0 12px var(--ink),0 14px 0 rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;filter:url(#roughU);animation:bigin .7s .15s cubic-bezier(.2,1.4,.4,1) backwards}
+.medal .mtop{font-weight:900;letter-spacing:5px;font-size:15px;color:#ffe9b8;text-shadow:2px 2px 0 var(--ink)}
+.medal .mnum{font-family:var(--toon);font-size:170px;line-height:.9;color:#fff;-webkit-text-stroke:11px var(--ink);paint-order:stroke fill;text-shadow:0 9px 0 var(--ink);margin-top:14px}
+.medal .mlbl{font-family:var(--toon);font-size:42px;color:var(--gold);-webkit-text-stroke:7px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);margin-top:2px}
+.medal.wide{width:min(86vw,640px);height:250px;border-radius:84px}
+.medal.wide .mnum{font-size:clamp(70px,10vw,124px);margin-top:6px}
+.ribbon{position:relative;z-index:5;margin-top:-44px;padding:14px 64px 8px;background:linear-gradient(var(--acc1),var(--acc2));border:7px solid var(--ink);border-radius:6px;font-family:var(--toon);font-size:clamp(40px,5.6vw,66px);line-height:1;color:#fff;text-shadow:3px 5px 0 var(--ink);transform:rotate(-2deg);box-shadow:inset 0 0 0 3px rgba(255,255,255,.3),0 9px 0 rgba(0,0,0,.45);filter:url(#roughU);animation:bigin .6s .3s cubic-bezier(.2,1.4,.4,1) backwards;white-space:nowrap}
+.ribbon::before,.ribbon::after{content:"";position:absolute;top:16px;width:70px;height:100%;background:#a83a08;border:7px solid var(--ink);z-index:-1}
+.ribbon::before{left:-56px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,28% 50%)}.ribbon::after{right:-56px;clip-path:polygon(0 0,100% 0,72% 50%,100% 100%,0 100%)}
+.chips{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;justify-content:center;max-width:720px}
+.chips span{padding:9px 14px 7px;background:var(--ink);border:3px solid var(--bevel);border-radius:10px;font-weight:900;font-size:13px;letter-spacing:1.5px;color:#ffe3b0;transform:rotate(-.8deg)}
+.chips span:nth-child(2n){transform:rotate(.9deg)}
+.betgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.betgrid .opt{padding:10px 0;font-size:15px}
+#betV{cursor:pointer;display:inline-block}
+#big{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(60,20,8,.82),rgba(0,0,0,.92));opacity:0;pointer-events:none;transition:opacity .3s;cursor:pointer}
+#big.show{opacity:1;pointer-events:auto}
+#bigT{font-family:var(--toon);font-size:clamp(46px,9vw,120px);letter-spacing:4px;color:var(--gold);-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 8px 0 var(--ink);animation:bigin .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes bigin{from{transform:scale(.2) rotate(-8deg);opacity:0}}
+#bigA{font-family:var(--toon);font-size:clamp(46px,9vw,110px);color:#fff;-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 7px 0 var(--ink)}
+#bigX{font-size:18px;color:var(--gold);font-weight:900;letter-spacing:3px;margin-top:10px}
+#auth{position:fixed;inset:0;z-index:90;background:#1a0a12;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--toon)}
+
+/* bonus buy screen: hand-cut iron plaques with a medallion on top */
+.modal.bb{flex-direction:column;justify-content:flex-start;padding-top:26px;background:radial-gradient(circle at 50% 30%,rgba(60,22,10,.92),rgba(8,3,4,.97));overflow:auto}
+.bbT{position:relative;margin:0 0 20px;padding:8px 44px 4px;background:var(--accent);border:5px solid var(--ink);border-radius:8px;font-family:var(--toon);font-weight:400;font-size:44px;letter-spacing:2px;color:#fff;text-shadow:3px 4px 0 var(--ink);transform:rotate(-1.2deg);box-shadow:0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+.bbX{position:absolute;right:26px;top:22px;width:50px;height:50px;border-radius:50%;border:5px solid var(--ink);background:var(--btn);box-shadow:inset 0 0 0 2px var(--bevel);font-size:30px;line-height:1;color:#fff}
+.bbX:hover{background:var(--accent)}
+.bbBet{display:flex;align-items:center;gap:18px;padding:8px 18px;margin-bottom:46px;background:linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px var(--rim),0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+.bbBet small{display:block;font-size:12px;font-weight:900;letter-spacing:3px;color:var(--muted);text-align:center}
+.bbBet b{display:block;font-family:var(--toon);font-weight:400;font-size:40px;text-align:center;text-shadow:2px 3px 0 var(--ink);min-width:150px}
+.bbBet button{width:46px;height:46px;border-radius:50%;background:var(--accent);border:4px solid var(--ink);font-family:var(--toon);font-size:28px;line-height:1;color:#fff;text-shadow:2px 2px 0 var(--ink)}
+.bbBet button:hover:not(:disabled){filter:brightness(1.15)}
+.bbRow{display:flex;gap:30px;flex-wrap:wrap;justify-content:center;max-width:1200px;padding:0 10px 30px}
+.bbc{position:relative;width:252px;padding:62px 18px 18px;text-align:center;background:radial-gradient(circle at 16px 16px,var(--rivet) 4.5px,transparent 5.5px),radial-gradient(circle at calc(100% - 16px) 16px,var(--rivet) 4.5px,transparent 5.5px),linear-gradient(180deg,#3d2a21,#21130e);border:5px solid var(--ink);border-radius:16px 11px 17px 12px;box-shadow:inset 0 0 0 3px var(--bevel),inset 0 -30px 40px rgba(0,0,0,.35),0 10px 0 rgba(0,0,0,.45);filter:url(#roughU)}
+.bbc:nth-child(1){transform:rotate(-1.4deg)}.bbc:nth-child(2){transform:rotate(.7deg) translateY(-8px)}.bbc:nth-child(3){transform:rotate(-.6deg)}
+.bbc .med{position:absolute;left:50%;top:-52px;width:108px;height:108px;margin-left:-54px;border-radius:50%;background:radial-gradient(circle,#ff9a2a,#a83a0a 75%);border:6px solid var(--ink);box-shadow:inset 0 0 0 3px var(--gold2),0 6px 0 rgba(0,0,0,.4);display:grid;place-items:center}
+.bbc .med svg{width:78px;height:78px;overflow:visible;filter:drop-shadow(0 3px 0 rgba(0,0,0,.5))}
+.bbc h3{margin:0 0 6px;font-family:var(--toon);font-weight:400;font-size:28px;line-height:1.05;letter-spacing:1px;color:var(--gold);text-shadow:2px 3px 0 var(--ink)}
+.bbc p{margin:0 4px;font-size:14px;line-height:1.4;min-height:96px;font-weight:500;color:var(--txt)}
+.vol{display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0 12px;font-size:11px;font-weight:900;letter-spacing:2px;color:var(--muted)}
+.vol i{width:14px;height:18px;background:#4a3228;clip-path:polygon(50% 0,80% 32%,100% 62%,84% 100%,16% 100%,0 62%,22% 32%)}
+.vol i.on{background:linear-gradient(#ffd23a,#ff5a14)}
+.vol span{margin-right:6px}
+.price#pa{font-size:26px;padding-top:5px}
+.price{display:inline-block;margin-bottom:14px;padding:2px 24px 0;border-radius:30px;background:var(--ink);border:3px solid var(--bevel);font-family:var(--toon);font-size:34px;letter-spacing:1px;color:var(--gold)}
+.bbc button.go{display:block;width:100%;padding:11px 0 8px;border-radius:10px;border:5px solid var(--ink);font-family:var(--toon);font-size:30px;letter-spacing:2px;color:#fff;text-shadow:2px 3px 0 var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35),0 5px 0 rgba(0,0,0,.45)}
+.bbc button.or{background:linear-gradient(var(--acc1),var(--acc2))}
+.bbc button.gd{background:linear-gradient(#ffd23a,#e8a010);color:#2b1b12;text-shadow:none}
+.bbc button.off{background:linear-gradient(#7a655a,#4e3d34)}
+.bbc button.go:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
+
+/* optional copy blocks (only present when a slot.json provides them) */
+.quote{margin-top:18px;max-width:640px;text-align:center;font-family:var(--toon);font-size:26px;letter-spacing:1px;color:#fff;text-shadow:2px 3px 0 var(--ink)}
+#bigTag{margin-top:8px;text-align:center;font-family:var(--toon);font-size:clamp(20px,3vw,34px);color:#fff;text-shadow:2px 3px 0 var(--ink)}
+.splashArt{position:relative;z-index:3}
+.splashArt:empty{display:none}
+
+/* Grumble & Brine ART CSS (leo). Concatenate into slot.css (or load after the shell CSS). Layout, scene motion, board/cells, Current Strip,
+   Tide Gauge and Captain Barnacle states. Keyframes are prefixed gb* (shell owns blink/rot/flick/wob/bigin: not redefined). */
+:root{--ink:#0b1820;--gold:#ffb938;--accent:#ffb938;--panel1:#1b2d36;--panel2:#13222a;--rim:#b88a3e;--rivet:#e8c46a;--bevel:#6b4a1c;--btn:#2c7a62;--txt:#f2e5c2;--muted:#9fc2c0;--acc1:#5df2e0;--acc2:#ff6f7d;
+ --foam:#d9fbff;--jelly:#5df2e0;--jelly2:#c65bff;--rust:#c4602a;--paper:#f2e5c2}
+
+/* ---------- scene motion (animated parts are plain shapes: only opacity/transform) ---------- */
+#sRays{animation:gbRayShift 22s ease-in-out infinite alternate}
+@keyframes gbRayShift{from{transform:translateX(-18px)}to{transform:translateX(18px)}}
+.ray{animation:gbRayFade 9s ease-in-out infinite alternate}
+.ray.r1{animation-duration:7s}.ray.r2{animation-duration:11s;animation-delay:-3s}.ray.r3{animation-duration:9s;animation-delay:-5s}
+.ray.r4{animation-duration:13s;animation-delay:-2s}.ray.r5{animation-duration:8s;animation-delay:-6s}.ray.r6{animation-duration:12s;animation-delay:-4s}
+@keyframes gbRayFade{from{opacity:.45}to{opacity:1}}
+.kelp{animation:gbSway 5s ease-in-out infinite alternate}
+.kelp.k2{animation-duration:6.4s;animation-delay:-2s}.kelp.k3{animation-duration:4.6s;animation-delay:-1s}.kelp.k4{animation-duration:7s;animation-delay:-3s}.kelp.k5{animation-duration:5.6s}.kelp.k6{animation-duration:6s;animation-delay:-4s}
+@keyframes gbSway{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+.lamp .lglow{animation:gbFlick 3.1s ease-in-out infinite alternate}
+.lamp.l2 .lglow{animation-duration:2.3s;animation-delay:-1.1s}
+@keyframes gbFlick{0%{opacity:.62}30%{opacity:.9}55%{opacity:.7}100%{opacity:.95}}
+#sPortLight,#sBigGlow{animation:gbPort 3.7s steps(1) infinite}
+@keyframes gbPort{0%{opacity:1}12%{opacity:.78}16%{opacity:1}52%{opacity:.86}58%{opacity:1}80%{opacity:.72}84%{opacity:.95}}
+#sSign{animation:gbSignSwing 4s ease-in-out infinite alternate}
+@keyframes gbSignSwing{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}
+#sSuitBody{animation:gbSuit 6s ease-in-out infinite alternate}
+@keyframes gbSuit{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+
+/* ---------- logo / frame / board (5 x 3, 136px cells) ---------- */
+#logo{left:470px;top:6px;width:660px;height:150px;overflow:visible;filter:drop-shadow(0 6px 0 rgba(0,0,0,.4));animation:gbBob 4.5s ease-in-out infinite}
+@keyframes gbBob{50%{transform:translateY(2px)}}
+#frameArt{left:438px;top:158px;width:724px;height:520px;overflow:visible}
+#frame{left:460px;top:222px;width:680px;height:408px}
+#grid{position:relative;display:grid;grid-template-columns:repeat(5,136px);grid-template-rows:repeat(3,136px);width:680px;height:408px;overflow:hidden;background:rgba(4,20,31,.82)}
+#grid.focus .cell:not(.hit):not(.win){opacity:.38;filter:saturate(.45) brightness(.7);transition:.25s}
+#fxl{left:0;top:0;width:680px;height:408px;pointer-events:none;z-index:6;overflow:visible}
+#frameFx{position:absolute;left:0;top:0;width:680px;height:408px;pointer-events:none;z-index:4;opacity:.8;overflow:visible}
+#tagArt{left:1020px;top:626px;width:70px;height:78px;pointer-events:none;transform-origin:35px 0;animation:gbTag 5s ease-in-out infinite alternate}
+#tagArt svg{width:70px;height:78px;overflow:visible}
+@keyframes gbTag{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+.cell{position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;background:rgba(10,38,52,.35);border:0}
+.cell:nth-child(2n){background:rgba(8,30,44,.4)}
+.cell svg.g{position:absolute;left:5%;top:5%;width:90%;height:90%;overflow:visible;filter:drop-shadow(0 4px 0 rgba(0,0,0,.5))}
+.cell .m{position:absolute;right:6px;bottom:6px;min-width:38px;text-align:center;padding:1px 7px;border-radius:99px;border:3px solid var(--ink);font-family:var(--toon);font-size:21px;line-height:1.25;color:var(--ink);background:var(--paper);box-shadow:0 0 0 2px #b88a3e;z-index:3}
+.cell.wild{background:radial-gradient(circle,rgba(93,242,224,.38),rgba(8,30,44,.2) 72%)}
+.cell.wild svg.g{animation:gbBob 1.8s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(93,242,224,.7))}
+.cell.scatter svg.g{animation:wob 1.9s ease-in-out infinite alternate}
+.cell.scat svg.g{animation:gbScat .55s ease-in-out infinite alternate;filter:drop-shadow(0 0 14px #ffb938)}
+@keyframes gbScat{to{transform:scale(1.18) rotate(5deg)}}
+.cell.hit{z-index:2;background:radial-gradient(circle,rgba(255,185,56,.34),rgba(8,30,44,.2) 78%)}
+.cell.hit svg.g{animation:gbHit .5s ease-in-out infinite alternate}
+@keyframes gbHit{to{transform:translateY(-6px) scale(1.08)}}
+.cell.drop{animation:gbDrop calc(.5s*var(--spd,1)) cubic-bezier(.3,1.25,.5,1) backwards;animation-delay:var(--dl,0ms)}
+@keyframes gbDrop{from{transform:translateY(-440%);opacity:0}22%{opacity:1}}
+.cell.out{animation:gbOut calc(.4s*var(--spd,1)) cubic-bezier(.6,0,1,.6) forwards;animation-delay:var(--dl,0ms)}
+@keyframes gbOut{to{transform:translateY(440%);opacity:0}}
+.cell.drifting{animation:gbDriftL calc(.45s*var(--spd,1)) ease-in-out}
+@keyframes gbDriftL{from{transform:translateX(136px)}to{transform:none}}
+.cell.pulse::after{content:"";position:absolute;inset:6%;border-radius:50%;border:4px solid var(--foam);animation:gbRing .6s ease-out forwards}
+@keyframes gbRing{from{transform:scale(.5);opacity:1}to{transform:scale(1.5);opacity:0}}
+
+/* ---------- Current Strip (above the board) ---------- */
+#strip{left:460px;top:170px;width:680px;height:46px;display:flex;overflow:hidden;border-radius:2px;pointer-events:none;
+ background:repeating-linear-gradient(90deg,transparent 0 34px,rgba(217,251,255,.16) 34px 52px,transparent 52px 90px),repeating-linear-gradient(90deg,transparent 0 60px,rgba(217,251,255,.1) 60px 72px,transparent 72px 130px);
+ background-size:90px 8px,130px 8px;background-repeat:repeat-x;background-position:0 9px,0 26px;animation:gbCurrent 6s linear infinite}
+@keyframes gbCurrent{to{background-position:-90px 9px,-130px 26px}}
+#strip .lane{flex:1;display:flex;align-items:center;justify-content:center;border-right:2px solid rgba(11,24,32,.5);font-style:normal}
+#strip .lane:last-of-type{border:0}
+#strip .lane b{font-family:var(--toon);font-size:36px;line-height:1;color:rgba(217,251,255,.18);transition:.2s}
+#strip .lane.on b{color:var(--jelly);text-shadow:0 0 10px var(--jelly);animation:gbNudge .5s ease-in-out infinite alternate}
+@keyframes gbNudge{to{transform:translateX(-5px)}}
+#strip .lane .chip,#strip .chip{font-family:var(--toon);font-size:20px;color:var(--ink);background:var(--paper);border:3px solid var(--ink);border-radius:99px;padding:0 8px;animation:gbPopChip .4s ease-out}
+@keyframes gbPopChip{from{transform:scale(1.5)}to{transform:none}}
+#chain{position:absolute;right:6px;top:6px;padding:1px 10px;border-radius:6px;border:3px solid var(--ink);background:var(--rim);font-family:var(--toon);font-size:17px;color:var(--ink);opacity:0;transition:opacity .2s}
+#chain.on{opacity:1}
+#chain.bump{animation:gbPopChip .35s ease-out}
+#strip{pointer-events:none}
+
+/* ---------- Tide Gauge ---------- */
+#tide{left:52px;top:440px;width:90px;height:330px;opacity:0;transition:opacity .4s;pointer-events:none}
+#tide.on{opacity:1}
+#tideArt{position:absolute;left:0;top:0;width:90px;height:330px;overflow:visible}
+#tHead{position:absolute;left:5px;top:8px;width:80px;text-align:center;line-height:1}
+#tHead small{display:block;font-family:var(--toon);font-size:15px;letter-spacing:3px;color:var(--rivet);margin-top:4px}
+#tideV{display:block;font-family:var(--toon);font-size:30px;color:var(--gold);text-shadow:2px 2px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink);margin-top:3px}
+#tWin{position:absolute;left:21px;top:91px;width:48px;height:204px;display:flex;flex-direction:column;gap:5px;padding:4px;box-sizing:border-box;overflow:hidden;border-radius:7px}
+#tWin .seg{flex:1;border-radius:6px;background:rgba(14,74,90,.55);border:2px solid var(--ink);transition:background .3s}
+#tide.lv1 .s1,#tide.lv2 .s1,#tide.lv2 .s2,#tide.lv3 .s1,#tide.lv3 .s2,#tide.lv3 .s3{background:linear-gradient(#a8fff1,#2fd0c0 70%,#14907f);box-shadow:0 0 12px rgba(93,242,224,.8)}
+#tide.pulse .seg{animation:gbSeg .8s ease-out}
+@keyframes gbSeg{0%{filter:brightness(3);transform:scaleX(1.25)}100%{filter:none;transform:none}}
+#tWin .tk{position:absolute;left:3px;font-family:var(--toon);font-size:15px;line-height:1;color:var(--paper);text-shadow:1px 1px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink)}
+#tWin .t1{bottom:6px}#tWin .t2{bottom:73px}#tWin .t3{bottom:140px}
+#tide.shake{animation:gbShakeT .4s}
+@keyframes gbShakeT{20%{transform:translateX(-4px)}60%{transform:translateX(4px)}}
+
+/* ---------- character: Captain Barnacle ---------- */
+#char{left:1130px;top:300px;width:480px;height:500px;pointer-events:none}
+#char svg{width:480px;height:500px;overflow:visible}
+#char [id^=c]{transform-box:view-box}
+#cAll{transform-origin:240px 488px}
+#cBody{transform-origin:240px 488px;animation:gbBreathe 3.4s ease-in-out infinite}
+@keyframes gbBreathe{50%{transform:scale(1.012,1.022)}}
+#cHead{transform-origin:240px 280px;animation:gbHbob 3.4s ease-in-out infinite}
+@keyframes gbHbob{50%{transform:translateY(3px) rotate(-1.2deg)}}
+#cClawL{transform-origin:352px 332px;animation:gbClawL 3.4s ease-in-out infinite}
+@keyframes gbClawL{50%{transform:rotate(3deg)}}
+#cClawR{transform-origin:128px 330px}
+#cHandR #cPincerTop,#cHandR #cPincerBot,#cHandL #cPincerTop2,#cHandL #cPincerBot2{transform-origin:0px -36px}
+#cHandR #cPincerTop{animation:gbClickT 7s infinite}
+@keyframes gbClickT{0%,92%,100%{transform:none}94%{transform:rotate(11deg)}96%{transform:none}98%{transform:rotate(11deg)}}
+#cLids{transform-box:fill-box;transform-origin:50% 0;animation:gbBlink 4.6s infinite}
+@keyframes gbBlink{0%,94%,100%{transform:none}97%{transform:scaleY(3.4)}}
+#cBrows{transition:transform .15s}
+#cBrows path:first-child{animation:gbTwitch 9s infinite}
+@keyframes gbTwitch{0%,93%,100%{transform:none}95%{transform:translateY(-4px)}}
+#cMandL,#cMandR{transform-box:fill-box;transform-origin:50% 0;animation:gbGrumble 5s ease-in-out infinite}
+#cMandR{animation-delay:-.2s}
+@keyframes gbGrumble{0%,70%,100%{transform:none}76%,84%{transform:rotate(-7deg)}80%{transform:rotate(5deg)}}
+#cMouthOpen,#cTongue,#cBubbles,#cLampGlow,#cBang,#cBurst{opacity:0}
+#cMouthOpen,#cTongue{transition:opacity .1s}
+#cBubbles circle{transform-box:fill-box;transform-origin:center}
+#cLampGlow{transition:opacity .3s;transform-origin:240px 94px}
+#cBang{transform-origin:240px 64px;transform-box:view-box}
+#cNeedle{transform-origin:46px 338px}
+
+/* spin: big claw yanks the lever, head nods */
+#char.spin #cClawR{animation:gbYank calc(.95s*var(--spd,1)) cubic-bezier(.5,0,.5,1)}
+@keyframes gbYank{0%{transform:none}30%{transform:rotate(38deg)}46%{transform:rotate(38deg)}62%{transform:rotate(-6deg)}72%{transform:rotate(3deg)}100%{transform:none}}
+#char.spin #cHead{animation:gbNod calc(.95s*var(--spd,1))}
+@keyframes gbNod{0%,30%{transform:none}62%{transform:translateY(9px) rotate(2deg)}100%{transform:none}}
+#char.spin #cBody{animation:gbPulse calc(.95s*var(--spd,1))}
+@keyframes gbPulse{62%{transform:scale(1.025)}}
+#char.spin #cLids{animation:none;transform:scaleY(1.9)}
+#char.spin #cBubbles{animation:gbPuff calc(.95s*var(--spd,1)) both}
+@keyframes gbPuff{0%,55%{opacity:0;transform:none}65%{opacity:1}100%{opacity:0;transform:translateY(-40px)}}
+
+/* win: both claws up, pincers snap, head bounces, grudging grin */
+#char.win #cClawL,#char.big #cClawL{animation:gbUpL 1.5s ease-in-out}
+#char.win #cClawR,#char.big #cClawR{animation:gbUpR 1.5s ease-in-out}
+@keyframes gbUpL{0%{transform:none}20%,85%{transform:rotate(-58deg)}100%{transform:none}}
+@keyframes gbUpR{0%{transform:none}20%,85%{transform:rotate(52deg)}100%{transform:none}}
+#char.win #cPincerTop,#char.big #cPincerTop,#char.win #cPincerTop2,#char.big #cPincerTop2{animation:gbSnap .3s ease-in-out 5}
+@keyframes gbSnap{50%{transform:rotate(15deg)}}
+#char.win #cPincerBot,#char.big #cPincerBot,#char.win #cPincerBot2,#char.big #cPincerBot2{animation:gbSnapB .3s ease-in-out 5}
+@keyframes gbSnapB{50%{transform:rotate(-12deg)}}
+#char.win #cHead,#char.big #cHead{animation:gbCheer .5s ease-in-out 3}
+@keyframes gbCheer{50%{transform:translateY(-10px) rotate(-3deg)}}
+#char.win #cBrows,#char.big #cBrows,#char.special #cBrows{transform:translateY(-6px)}
+#char.win #cMouthOpen,#char.big #cMouthOpen,#char.special #cMouthOpen,#char.win #cTongue,#char.big #cTongue{opacity:1}
+#char.win #cMandL,#char.big #cMandL{animation:gbWag .3s ease-in-out infinite alternate}
+#char.win #cMandR,#char.big #cMandR{animation:gbWag .3s ease-in-out infinite alternate-reverse}
+@keyframes gbWag{to{transform:rotate(14deg)}}
+#char.win #cLids,#char.big #cLids,#char.special #cLids{animation:none;transform:scaleY(.2)}
+#char.win #cBubbles,#char.big #cBubbles{animation:gbRise 1.5s ease-out both}
+@keyframes gbRise{0%{opacity:0;transform:translateY(8px)}20%{opacity:1}100%{opacity:0;transform:translateY(-56px)}}
+
+/* big: hop, pump, lamp strobe, coin burst */
+#char.big #cAll{animation:gbHop .4s ease-in-out 8}
+@keyframes gbHop{50%{transform:translateY(-14px)}}
+#char.big #cClawL{animation:gbUpL 3.2s ease-in-out}
+#char.big #cClawR{animation:gbUpR 3.2s ease-in-out}
+#char.big #cLampGlow{animation:gbStrobe .25s steps(1) 13}
+@keyframes gbStrobe{0%{opacity:1}50%{opacity:.15}}
+#char.big #cBurst{animation:gbBurst 3.2s ease-out both}
+@keyframes gbBurst{0%{opacity:0;transform:translateY(20px) scale(.6)}15%{opacity:1}100%{opacity:0;transform:translateY(-150px) scale(1.2)}}
+#char.big #cHead{animation:gbShakeH .5s ease-in-out 6}
+@keyframes gbShakeH{25%{transform:translateY(-8px) rotate(-4deg)}75%{transform:translateY(-8px) rotate(4deg)}}
+
+/* special (a Drift step / buoys landing): panic flinch */
+#char.special #cHead{animation:gbFlinch .9s ease-out}
+@keyframes gbFlinch{0%{transform:none}15%{transform:translate(8px,-16px) rotate(8deg)}60%{transform:translate(4px,-6px) rotate(4deg)}100%{transform:none}}
+#char.special #cEyes{animation:gbEyeBig .9s ease-out;transform-origin:240px 190px}
+@keyframes gbEyeBig{0%{transform:none}15%,60%{transform:scale(1.2)}100%{transform:none}}
+#char.special #cClawL{animation:gbUpL .9s ease-in-out}
+#char.special #cScope{animation:gbDrop2 .9s ease-in}
+@keyframes gbDrop2{0%{transform:rotate(16deg)}50%{transform:translate(20px,50px) rotate(70deg);opacity:1}51%{opacity:0}100%{transform:rotate(16deg);opacity:1}}
+#char.special #cBang{animation:gbBang .9s ease-out both}
+@keyframes gbBang{0%{opacity:0;transform:scale(.2)}20%{opacity:1;transform:scale(1.25)}35%{transform:scale(1)}85%{opacity:1}100%{opacity:0}}
+
+/* wince: claws over the helmet window, body trembles */
+#char.wince #cClawR{transform:translate(148px,-118px) rotate(26deg);transition:transform .25s}
+#char.wince #cClawL{animation:none;transform:translate(-128px,-102px) rotate(-30deg);transition:transform .25s}
+#char.wince #cAll{animation:gbTremble .07s linear infinite alternate}
+@keyframes gbTremble{from{transform:translateX(-2px)}to{transform:translateX(2px)}}
+
+/* bonus mode (Deep Dive): lamp on, fierce amber eyes, shaking gauge, bubble stream */
+#char.bonusmode #cLampGlow{opacity:1;animation:gbBeam 1.6s ease-in-out infinite alternate}
+@keyframes gbBeam{from{opacity:.75}to{opacity:1}}
+#char.bonusmode #cPupils circle:not(:nth-child(n+3)){fill:#ffb938}
+#char.bonusmode #cBrows{transform:translateY(3px)}
+#char.bonusmode #cNeedle{animation:gbShakeN .5s linear infinite alternate}
+@keyframes gbShakeN{from{transform:rotate(-14deg)}to{transform:rotate(18deg)}}
+#char.bonusmode #cBubbles{animation:gbStream 2.2s linear infinite}
+@keyframes gbStream{0%{opacity:0;transform:translateY(10px)}25%{opacity:.9}100%{opacity:0;transform:translateY(-60px)}}
+#char.bonusmode.win #cLampGlow,#char.bonusmode.big #cLampGlow{animation:gbBeam .4s ease-in-out infinite alternate}
+
+/* ---------- shell reskin for modal/info content (teal iron instead of EmberClaw browns) ---------- */
+.pt td{border-top-color:#2b4551}.pt svg{background:#0b2c3a}
+.rules div{background:#13222a;border-color:#2b4551}
+.rules b{color:var(--gold)}
+
+/* ---------- kai: Drift respin (short drop-in, sink-out, sliding Jelly, trail) ---------- */
+.cell.rdrop{animation:gbDrop calc(.3s*var(--spd,1)) cubic-bezier(.3,1.2,.5,1) backwards;animation-delay:var(--dl,0ms)}
+@keyframes gbRsOut{to{transform:translateY(30%) scale(.8);opacity:0}}
+.cell.drifting{animation:gbDriftL calc(.32s*var(--spd,1)) ease-in-out}
+.trail{position:absolute;width:136px;height:136px;display:flex;align-items:center;justify-content:center;font-family:var(--toon);font-size:64px;letter-spacing:-6px;color:var(--jelly);text-shadow:0 0 12px var(--jelly),3px 3px 0 var(--ink);pointer-events:none;z-index:5;animation:gbTrail calc(.5s*var(--spd,1)) ease-out forwards}
+@keyframes gbTrail{from{opacity:1;transform:translateX(120px)}to{opacity:0;transform:translateX(-24px)}}
+#msg{left:420px;width:760px;white-space:nowrap}
+.cell.rsout,.cell.drifting.rsout{animation:gbRsOut calc(.14s*var(--spd,1)) ease-in forwards}
+
+/* ---------- kai: shell reskin, deep-sea iron (modals, buy screen, splashes, big win) ---------- */
+:root{--gold2:#e8c46a}
+.modal{background:rgba(3,14,20,.84)}
+.mbox{background:linear-gradient(180deg,#1f3640,#13222a);color:var(--txt);box-shadow:inset 0 0 0 3px var(--rim),inset 0 0 40px rgba(0,0,0,.5),0 12px 0 rgba(0,0,0,.4)}
+.mbox h2,.bbT{background:var(--accent);color:var(--ink);text-shadow:none}
+.mbox .x,.bbX{background:var(--btn);color:#fff;border-color:var(--ink)}
+.btn.pri{background:var(--accent);color:var(--ink)}
+.modal.splash{background:radial-gradient(circle,rgba(14,74,90,.985),rgba(3,12,18,.995))}
+.rays{background:repeating-conic-gradient(rgba(93,242,224,.16) 0 7deg,transparent 7deg 20deg)}
+.medal{background:radial-gradient(circle at 50% 30%,#4fe0cf,#1b8f86 58%,#0b3a46);box-shadow:inset 0 0 0 7px var(--rim),inset 0 0 0 12px var(--ink),0 14px 0 rgba(0,0,0,.45)}
+.medal .mtop{color:var(--paper)}
+.medal .mlbl{color:var(--gold)}
+.ribbon{background:var(--rim);color:var(--ink);text-shadow:none;box-shadow:inset 0 0 0 3px rgba(255,236,170,.4),0 9px 0 rgba(0,0,0,.45)}
+.ribbon::before,.ribbon::after{background:#7b3b1c}
+.gems svg{filter:drop-shadow(0 7px 0 rgba(0,0,0,.5)) drop-shadow(0 0 18px rgba(255,185,56,.75))}
+.chips span{background:var(--panel2);border-color:var(--rim);color:var(--paper)}
+.quote{color:var(--paper)}
+#big{background:radial-gradient(circle,rgba(14,74,90,.85),rgba(2,10,14,.94))}
+#bigA{color:var(--paper)}
+.modal.bb{background:radial-gradient(circle at 50% 30%,rgba(14,74,90,.93),rgba(2,10,14,.98))}
+.bbBet button{background:var(--rim);color:var(--ink);text-shadow:none}
+.bbc{background:linear-gradient(180deg,#22404a,#13222a);box-shadow:inset 0 0 0 3px var(--rim),inset 0 -30px 40px rgba(0,0,0,.35),0 10px 0 rgba(0,0,0,.45)}
+.bbc .med{background:radial-gradient(circle,#2fd0c0,#0e4a5a 75%);box-shadow:inset 0 0 0 3px var(--gold2),0 6px 0 rgba(0,0,0,.4)}
+.bbc h3{color:var(--gold)}
+.price{border-color:var(--rim)}
+.bbc button.or{background:var(--btn);color:#fff}
+.bbc button.gd{background:var(--gold);color:var(--ink)}
+.bbc button.off{background:#4b5f68}
+.vol i{width:11px;height:18px;border-radius:3px;clip-path:none;background:#2b4551}
+.vol i.on{background:var(--acc1)}
+#barR.hot{border-color:var(--acc2)}
+#barR.hot{background:linear-gradient(#4a1f2c,#220e16);box-shadow:inset 0 0 0 3px var(--acc2),0 0 26px rgba(255,111,125,.7),0 8px 0 rgba(0,0,0,.4)}
+#barR.hot #betV{color:#ff9aa4;text-shadow:0 0 16px #ff4a5e,2px 3px 0 var(--ink)}
+#barR.hot #betLbl{color:#ffb8c0}
+
+</style></head><body>
+
+<!-- ============ shared defs (wobble filters, hatch patterns) + this slot's symbols ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <!-- hand-inked wobble: displaces every edge a hair so nothing is a perfect vector line -->
+ <filter id="roughS" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <filter id="roughC" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency=".034" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <filter id="roughL" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency=".014" numOctaves="2" seed="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <filter id="roughU" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="6" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <pattern id="hatchS" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><line x1="0" y1="0" x2="0" y2="5" stroke="#1d0f09" stroke-width="1.5" opacity=".5"/></pattern>
+ <pattern id="hatchC" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(38)"><line x1="0" y1="0" x2="0" y2="8" stroke="#1d0f09" stroke-width="2.6" opacity=".38"/></pattern>
+ <pattern id="hatchL" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="12" stroke="#1d0f09" stroke-width="3" opacity=".4"/></pattern>
+ <pattern id="dots" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.7" fill="#1d0f09" opacity=".2"/></pattern>
+
+ <!-- Grumble & Brine symbols. Hand-inked: Wet Ink outline, flat fills, pen hatch on the shade side, wobble via roughS (shell-defs.svg). -->
+ <pattern id="gbH" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><line x1="0" y1="0" x2="0" y2="5" stroke="#0b1820" stroke-width="1.5" opacity=".5"/></pattern>
+ <pattern id="gbHC" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(38)"><line x1="0" y1="0" x2="0" y2="8" stroke="#0b1820" stroke-width="2.6" opacity=".38"/></pattern>
+ <pattern id="gbHL" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="12" stroke="#0b1820" stroke-width="3" opacity=".4"/></pattern>
+ <pattern id="gbHX" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-50)"><line x1="0" y1="0" x2="0" y2="7" stroke="#0b1820" stroke-width="2" opacity=".3"/></pattern>
+ <filter id="gbGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4"/></filter>
+ <symbol id="s0" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M33 8 Q28 3 35 1 M39 8 Q45 3 51 6" fill="none" stroke-width="5"/><path d="M33 8 Q28 3 35 1 M39 8 Q45 3 51 6" fill="none" stroke="#2c7a62" stroke-width="2.4"/>
+  <path d="M27 7 H49 V40 Q50 46 55 49 Q60 54 56 59 Q54 61 50 61 H11 Q4 61 5 54 Q6 47 14 45 Q26 44 27 36Z" fill="#d9a830" stroke-width="4"/>
+  <path d="M27 7 H49 V16 H27Z" fill="#b98a22" stroke-width="3"/>
+  <path d="M5 54 H56 Q57 58 54 60 H10 Q5 60 5 54Z" fill="#6b4a1a" stroke-width="3"/>
+  <path d="M41 17 V40 Q42 46 50 50 Q56 54 54 56 L40 56 Q44 46 36 42 V17Z" fill="url(#gbH)" stroke="none"/>
+  <path d="M41 17 H49 V42 Q50 46 55 49 L54 55 L45 53 Q47 44 41 38Z" fill="url(#gbH)" stroke="none"/>
+  <g transform="rotate(-8 37 28)"><rect x="29" y="23" width="17" height="8" fill="#f2e5c2" stroke-width="2.5"/></g>
+  <path d="M31 22 L33 33" stroke="#0b1820" stroke-width="1.4" fill="none"/>
+  <ellipse cx="15" cy="53" rx="5" ry="4" fill="#4a3210" stroke-width="2.5"/>
+  <path d="M15 50 Q12 42 17 39" fill="none" stroke="#2c7a62" stroke-width="3"/>
+  <path d="M31 11 V20" stroke="#fff3c4" stroke-width="3" opacity=".85"/>
+  <path d="M11 47 Q16 44 22 45" stroke="#fff3c4" stroke-width="2.4" fill="none" opacity=".8"/></g></symbol>
+ <symbol id="s1" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M15 14 H49 V50 Q32 59 15 50Z" fill="#8fa3b5" stroke-width="4"/>
+  <path d="M15 26 H49 V42 Q32 49 15 42Z" fill="#d8402e" stroke-width="3"/>
+  <circle cx="31" cy="35" r="7" fill="#f2e5c2" stroke-width="2.5"/><path d="M25 35 q5 -5 10 0 q-5 5 -10 0z M35 35 l4 -3 v6z" fill="#0b1820" stroke="none"/>
+  <ellipse cx="32" cy="14" rx="17" ry="5.5" fill="#c3d0dc" stroke-width="4"/>
+  <path d="M46 12 Q60 6 56 -1 Q52 7 42 10Z" fill="#c3d0dc" stroke-width="3"/>
+  <path d="M42 15 V50 Q46 49 49 50 V15Z" fill="url(#gbH)" stroke="none"/><path d="M42 42 Q46 41 49 42" stroke="none"/>
+  <path d="M20 19 V47" stroke="#fff" stroke-width="3" opacity=".7"/>
+  <path d="M15 20 L21 25 M49 44 L43 47" stroke-width="2.4" fill="none"/>
+  <path d="M26 53 q6 4 13 0" stroke-width="0" fill="none"/></g></symbol>
+ <symbol id="s2" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round" transform="rotate(38 32 33)">
+  <path d="M26 20 V9 H38 V20 Q50 24 50 40 Q50 59 32 59 Q14 59 14 40 Q14 24 26 20Z" fill="#3fae7e" stroke-width="4"/>
+  <rect x="26" y="1" width="12" height="9" rx="2" fill="#d6a15a" stroke-width="3"/>
+  <path d="M40 20 Q50 24 50 40 Q50 57 36 59 Q44 50 42 36Z" fill="url(#gbH)" stroke="none"/>
+  <g transform="rotate(-12 32 42)"><rect x="19" y="33" width="24" height="16" rx="6" fill="#f2e5c2" stroke-width="2.6"/><ellipse cx="21" cy="41" rx="3" ry="6.5" fill="#d9c79a" stroke-width="2"/><path d="M27 38 H38 M27 42 H36 M27 46 H34" stroke-width="1.5" fill="none"/><circle cx="39" cy="45" r="3.2" fill="#d8402e" stroke-width="2"/></g>
+  <path d="M19 28 Q17 38 19 48" stroke="#c9f5df" stroke-width="3" fill="none"/>
+  <circle cx="44" cy="52" r="2" fill="#c9f5df" stroke-width="1.4"/><circle cx="19" cy="52" r="1.6" fill="#c9f5df" stroke-width="1.2"/></g></symbol>
+ <symbol id="s3" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round" transform="rotate(40 32 32)">
+  <path d="M2 24 H14 V30 H18 V24 H24 V36 H2Z" fill="#a8481f" stroke-width="3.5" transform="translate(0 -1)"/>
+  <rect x="20" y="28" width="26" height="8" fill="#a8481f" stroke-width="3.5"/>
+  <circle cx="52" cy="32" r="11" fill="#c4602a" stroke-width="4"/>
+  <path d="M52 27 Q48 24 46 28 Q44 32 48 33 Q46 37 50 38 Q52 36 52 34 Q54 38 58 36 Q58 33 56 33 Q60 31 58 27 Q55 25 52 27Z" fill="#0b1820" stroke-width="0"/>
+  <path d="M30 28 H46 V36 H40 Q36 32 30 36Z" fill="url(#gbH)" stroke="none"/>
+  <path d="M20 29 H44" stroke="#f19a58" stroke-width="2.4" fill="none"/>
+  <path d="M47 24 Q54 20 60 28" stroke="#f19a58" stroke-width="2.4" fill="none"/>
+  <circle cx="30" cy="32" r="2" fill="#7a2f12" stroke="none"/><circle cx="44" cy="31" r="1.8" fill="#7a2f12" stroke="none"/><circle cx="56" cy="38" r="2" fill="#7a2f12" stroke="none"/>
+  <path d="M26 27 Q24 36 28 38 Q32 32 28 26" fill="none" stroke="#2c7a62" stroke-width="2.6"/></g></symbol>
+ <symbol id="s4" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M34 9 Q14 6 10 24 Q8 33 12 40" fill="none" stroke-width="8"/><path d="M34 9 Q14 6 10 24 Q8 33 12 40" fill="none" stroke="#c3d0dc" stroke-width="4" stroke-dasharray="6 2.5"/>
+  <circle cx="38" cy="8" r="5.5" fill="none" stroke-width="5.5"/><circle cx="38" cy="8" r="5.5" fill="none" stroke="#e8b23c" stroke-width="2.2"/>
+  <ellipse cx="38" cy="38" rx="23" ry="22" fill="#e8b23c" stroke-width="4"/>
+  <ellipse cx="38" cy="38" rx="18" ry="17" fill="#8a5a1a" stroke-width="2.5"/>
+  <ellipse cx="38" cy="38" rx="15.5" ry="14.5" fill="#f2e5c2" stroke-width="2.5"/>
+  <path d="M38 26 v3 M38 47 v3 M26 38 h3 M47 38 h3" stroke-width="2.4"/>
+  <text x="38" y="35" text-anchor="middle" font-family="Impact,Arial Black,sans-serif" font-size="8" fill="#d8402e" stroke="none">N</text>
+  <g transform="rotate(35 38 39)"><path d="M38 39 L34.5 39 L38 24 L41.5 39Z" fill="#d8402e" stroke-width="2.2"/><path d="M38 39 L34.5 39 L38 53 L41.5 39Z" fill="#fff" stroke-width="2.2"/></g>
+  <circle cx="38" cy="39" r="2" fill="#e8b23c" stroke-width="1.6"/>
+  <path d="M45 28 L40 35 L46 40 L42 46" fill="none" stroke="#fff" stroke-width="2"/>
+  <path d="M56 46 Q49 58 30 59 Q46 54 54 38Z" fill="url(#gbH)" stroke="none"/>
+  <path d="M24 26 Q28 20 34 18" stroke="#fff3c4" stroke-width="3" fill="none"/></g></symbol>
+ <symbol id="s5" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M9 36 Q13 58 32 58 Q51 58 55 36" fill="none" stroke-width="14"/><path d="M9 36 Q13 58 32 58 Q51 58 55 36" fill="none" stroke="#58708a" stroke-width="7.5"/>
+  <path d="M2 30 L14 31 L13 46Z M62 30 L50 31 L51 46Z" fill="#58708a" stroke-width="3.5"/>
+  <rect x="28" y="12" width="8" height="46" fill="#58708a" stroke-width="3.5"/>
+  <rect x="16" y="18" width="32" height="7" rx="2" fill="#58708a" stroke-width="3.5"/>
+  <circle cx="32" cy="8" r="6" fill="none" stroke-width="7.5"/><circle cx="32" cy="8" r="6" fill="none" stroke="#58708a" stroke-width="3.5"/>
+  <path d="M36 14 V58 H43 V16Z" fill="url(#gbH)" stroke="none"/><path d="M50 36 Q50 52 40 57 Q56 54 58 36Z" fill="url(#gbH)" stroke="none"/>
+    <circle cx="14" cy="47" r="4.5" fill="#ff6f7d" stroke-width="2.5"/><circle cx="20" cy="54" r="3.8" fill="#ff6f7d" stroke-width="2.5"/><circle cx="9" cy="41" r="3.4" fill="#ff6f7d" stroke-width="2.5"/>
+  <path d="M26 54 q-5 -8 1 -11 q-1 -5 4 -5" fill="none" stroke-width="6"/><path d="M26 54 q-5 -8 1 -11 q-1 -5 4 -5" fill="none" stroke="#ff6f7d" stroke-width="3"/>
+  <path d="M20 26 H27" stroke="#c3d4e4" stroke-width="2.2"/><path d="M30 14 V34" stroke="#a8bdd0" stroke-width="2"/></g></symbol>
+ <symbol id="s6" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <g transform="rotate(-8 28 38)">
+   <path d="M20 17 Q10 24 7 40 Q4 58 24 59 H34 Q52 58 50 41 Q47 24 38 17Z" fill="#8a2a3a" stroke-width="4"/>
+   <path d="M38 17 Q47 24 50 41 Q52 56 36 59 Q44 50 42 38 Q41 26 34 19Z" fill="url(#gbH)" stroke="none"/>
+   <path d="M19 18 L14 8 Q22 12 26 8 Q29 14 32 7 Q36 13 42 8 L38 18Z" fill="#8a2a3a" stroke-width="3.5"/>
+   <path d="M18 19 Q29 24 40 19" fill="none" stroke="#f2e5c2" stroke-width="5.5"/><path d="M18 19 Q29 24 40 19" fill="none" stroke="#0b1820" stroke-width="1.2"/>
+   <path d="M29 22 Q22 29 18 26 Q18 20 26 22Z M29 22 Q36 29 41 25 Q40 19 32 22Z" fill="#f2e5c2" stroke-width="2.4"/>
+   <path d="M29 22 Q27 32 24 36 M29 22 Q32 31 33 35" fill="none" stroke="#f2e5c2" stroke-width="2.6"/>
+   <circle cx="26" cy="43" r="6.5" fill="#f2e5c2" stroke-width="2.2"/><rect x="22" y="47" width="8" height="4.5" fill="#f2e5c2" stroke-width="2"/>
+   <circle cx="24" cy="42.5" r="1.7" fill="#0b1820" stroke="none"/><circle cx="29" cy="42.5" r="1.7" fill="#0b1820" stroke="none"/><path d="M24 49 v2 M27 49 v2 M30 49 v2" stroke-width="1.2"/>
+   <path d="M12 30 Q10 40 13 48" stroke="#c4506a" stroke-width="3" fill="none"/>
+  </g>
+  <ellipse cx="50" cy="56" rx="9" ry="4.2" fill="#ffc83a" stroke-width="3"/><ellipse cx="50" cy="53.5" rx="9" ry="4.2" fill="#ffd95e" stroke-width="3"/>
+  <ellipse cx="44" cy="50" rx="7" ry="6" fill="#ffc83a" stroke-width="3"/><path d="M42 48 q2 -2 4 0" stroke-width="1.6" fill="none"/>
+  <ellipse cx="56" cy="43" rx="5" ry="6.5" fill="#ffd95e" stroke-width="3" transform="rotate(14 56 43)"/><path d="M55 40 v6" stroke-width="1.6" fill="none"/></g></symbol>
+ <symbol id="s7" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round" transform="translate(32 32) rotate(-45) scale(.97) translate(-32 -32)">
+  <path d="M6 32 H42" stroke-width="17"/><path d="M6 32 H42" stroke="#8a5a2e" stroke-width="9.5"/><path d="M6 35.5 H42" stroke="#5e3a1a" stroke-width="2.6"/><path d="M10 29 H40" stroke="#c48a52" stroke-width="2"/>
+  <path d="M64 32 Q56 26 50 24 Q46 20 38 12 Q40 22 38 26 V38 Q40 42 38 52 Q46 44 50 40 Q56 38 64 32Z" fill="#6c7d86" stroke-width="3.8"/>
+  <path d="M64 32 Q56 26 50 24 Q46 20 38 12 Q40 22 38 26 L44 28Z" fill="#b4c3cc" stroke="none"/>
+  <path d="M38 38 Q40 42 38 52 Q46 44 50 40 Q56 38 62 33 L48 35Z" fill="url(#gbH)" stroke="none"/>
+  <path d="M42 32 H58" stroke-width="2" fill="none"/>
+  <path d="M25 22 L29 42 M31 22 L35 42" stroke="#0b1820" stroke-width="7.5"/><path d="M25 23 L29 41 M31 23 L35 41" stroke="#d8402e" stroke-width="3.6"/>
+  <circle cx="8" cy="32" r="6" fill="none" stroke-width="6.5"/><circle cx="8" cy="32" r="6" fill="none" stroke="#6c7d86" stroke-width="2.8"/>
+  <path d="M5 38 Q-1 49 8 53 Q15 51 11 45" fill="none" stroke-width="5.5"/><path d="M5 38 Q-1 49 8 53 Q15 51 11 45" fill="none" stroke="#d8402e" stroke-width="2.4"/>
+  <circle cx="38" cy="39" r="1.8" fill="#c4602a" stroke="none"/><circle cx="16" cy="30" r="1.6" fill="#c4602a" stroke="none"/></g></symbol>
+ <symbol id="s8" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M5 38 Q2 22 12 13 Q15 7 22 7 Q26 2 32 2 Q38 2 42 7 Q49 7 52 13 Q62 22 59 38 Q32 30 5 38Z" fill="#7c4aae" stroke-width="4"/>
+  <path d="M32 34 L32 5 M32 34 L16 10 M32 34 L48 10 M32 34 L8 22 M32 34 L56 22" stroke-width="2" fill="none"/>
+  <path d="M40 6 Q50 7 52 13 Q62 22 59 38 L36 33Z" fill="url(#gbH)" stroke="none"/>
+  <path d="M8 36 Q26 30 56 36 Q32 42 8 36Z" fill="#ff6f7d" stroke-width="3"/>
+  <path d="M4 38 Q32 30 60 38 Q63 50 53 57 Q47 62 41 59 Q36 63 32 62 Q28 63 23 59 Q17 62 11 57 Q1 50 4 38Z" fill="#b783e0" stroke-width="4"/>
+  <path d="M32 40 L32 61 M32 40 L21 59 M32 40 L43 59 M32 40 L11 55 M32 40 L53 55" fill="none" stroke-width="2.4"/>
+  <path d="M38 36 Q60 36 60 40 Q62 50 53 57 Q47 62 41 59 Q50 50 46 38Z" fill="url(#gbH)" stroke="none"/>
+  <path d="M8 44 Q9 40 13 38" stroke="#e6c8fa" stroke-width="3" fill="none"/>
+  <circle cx="32" cy="33" r="12.5" fill="#fffdf5" stroke-width="3.8"/>
+  <path d="M41 37 Q38 45 28 44 Q44 47 45 35Z" fill="#ffd6e0" stroke="none"/><path d="M24 26 Q28 22 34 23" stroke="#d9fbff" stroke-width="3.2" fill="none"/>
+  <path d="M55 2 l2.4 5.6 5.6 2.4 -5.6 2.4 -2.4 5.6 -2.4 -5.6 -5.6 -2.4 5.6 -2.4z" fill="#fff" stroke-width="1.8"/></g></symbol>
+ <symbol id="s9" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <ellipse cx="32" cy="28" rx="31" ry="27" fill="#5df2e0" opacity=".38" filter="url(#gbGlow)" stroke="none"/>
+  <path d="M19 38 q-7 8 0 14 q6 6 -2 10 M32 40 q-3 8 2 12 q5 5 0 10 M45 38 q7 8 0 14 q-6 6 2 10" fill="none" stroke-width="9.5"/>
+  <path d="M19 38 q-7 8 0 14 q6 6 -2 10 M32 40 q-3 8 2 12 q5 5 0 10 M45 38 q7 8 0 14 q-6 6 2 10" fill="none" stroke="#c65bff" stroke-width="4"/>
+  <path d="M7 36 Q5 5 32 4 Q59 5 57 36 Q51 41 46 36 Q40 42 34 36 Q28 42 22 36 Q16 42 7 36Z" fill="#5df2e0" stroke-width="4"/>
+  <path d="M7 36 Q6 27 8 22 Q22 30 32 28 Q44 30 56 22 Q58 28 57 36 Q51 41 46 36 Q40 42 34 36 Q28 42 22 36 Q16 42 7 36Z" fill="#c65bff" stroke-width="0"/>
+  <path d="M8 22 Q22 30 32 28 Q44 30 56 22" fill="none" stroke-width="2.2"/>
+  <path d="M7 36 Q5 5 32 4 Q59 5 57 36 Q51 41 46 36 Q40 42 34 36 Q28 42 22 36 Q16 42 7 36Z" fill="none" stroke-width="4"/>
+  <path d="M46 8 Q56 14 56 34 Q52 40 46 36 Q50 22 44 10Z" fill="url(#gbH)" stroke="none"/>
+  <ellipse cx="32" cy="14" rx="11" ry="7" fill="#e8fffb" stroke="none"/>
+  <path d="M24 23 q3 3 6 0 M34 23 q3 3 6 0" fill="none" stroke-width="2.4"/><path d="M30 27.5 q2 1.6 4 0" fill="none" stroke-width="1.8"/>
+  <path d="M14 14 Q17 9 23 8" stroke="#fff" stroke-width="3" fill="none" opacity=".9"/></g></symbol>
+ <symbol id="s10" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M18 56 Q12 32 25 22 H39 Q52 32 46 56Z" fill="#f2e5c2" stroke-width="4"/>
+  <path d="M15.5 48 Q14 41 16 38 H48 Q50 43 48 49Z M20 31 Q22 27 24 25 H40 Q42 28 44 31Z" fill="#d8402e" stroke-width="2.5"/>
+  <rect x="13" y="54" width="38" height="7" rx="2" fill="#2a3a44" stroke-width="3.5"/>
+  <path d="M26 22 V14 M38 22 V14" fill="none" stroke-width="3"/>
+  <circle cx="32" cy="9" r="8" fill="#ffb938" stroke-width="3.5"/><circle cx="29" cy="6" r="2.5" fill="#fff" stroke="none"/>
+  <path d="M17 5 Q11 9 17 14 M10 2 Q2 9 10 16 M47 5 Q53 9 47 14 M54 2 Q62 9 54 16" fill="none" stroke="#d9fbff" stroke-width="2.6"/>
+  <path d="M38 24 Q50 32 46 56 H37Z" fill="url(#gbH)" stroke="none"/></g></symbol>
+
+</defs></svg>
+
+<div id="shaker"><div id="stage">
+
+<!-- ============ per-slot art (slots/<slug>/*.html) ============ -->
+<svg id="scene" width="1600" height="900" viewBox="0 0 1600 900">
+ <defs>
+  <linearGradient id="gbWater" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="900"><stop offset="0" stop-color="#0f4a63"/><stop offset=".3" stop-color="#0b3a52"/><stop offset=".6" stop-color="#072a40"/><stop offset="1" stop-color="#03111c"/></linearGradient>
+  <radialGradient id="gbSun" cx=".5" cy="0" r=".75"><stop offset="0" stop-color="#4fd0c4" stop-opacity=".55"/><stop offset=".45" stop-color="#2aa1a8" stop-opacity=".18"/><stop offset="1" stop-color="#2aa1a8" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gbRay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a6fff2" stop-opacity=".30"/><stop offset=".6" stop-color="#8ff5ea" stop-opacity=".09"/><stop offset="1" stop-color="#8ff5ea" stop-opacity="0"/></linearGradient>
+  <radialGradient id="gbLamp" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd978" stop-opacity=".85"/><stop offset=".35" stop-color="#ffb938" stop-opacity=".35"/><stop offset="1" stop-color="#ffb938" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gbVig" cx=".5" cy=".46" r=".72"><stop offset=".55" stop-color="#010a12" stop-opacity="0"/><stop offset="1" stop-color="#010a12" stop-opacity=".78"/></radialGradient>
+  <linearGradient id="gbFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#010a12" stop-opacity="0"/><stop offset="1" stop-color="#010a12" stop-opacity=".7"/></linearGradient>
+  <linearGradient id="gbSand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6a62"/><stop offset=".4" stop-color="#1f4c4c"/><stop offset="1" stop-color="#0d2a30"/></linearGradient>
+  <linearGradient id="gbHull" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a3482c"/><stop offset=".5" stop-color="#7a3422"/><stop offset="1" stop-color="#3b1c18"/></linearGradient>
+  <linearGradient id="gbHullL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c6f6a"/><stop offset="1" stop-color="#173f44"/></linearGradient>
+  <filter id="gbRock" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".012 .04" numOctaves="5" seed="7" result="n"/><feDiffuseLighting in="n" lighting-color="#9fd8c8" surfaceScale="16" diffuseConstant="1.05"><feDistantLight azimuth="215" elevation="50"/></feDiffuseLighting><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 .75"/></filter>
+  <filter id="gbRust" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".035 .08" numOctaves="4" seed="21" result="n"/><feDiffuseLighting in="n" lighting-color="#e0a070" surfaceScale="9" diffuseConstant="1"><feDistantLight azimuth="225" elevation="55"/></feDiffuseLighting><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 .7"/></filter>
+  <filter id="gbHaze" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0035 .009" numOctaves="4" seed="5"/><feColorMatrix type="matrix" values="0 0 0 0 .16  0 0 0 0 .62  0 0 0 0 .62  1.5 0 0 0 -.62" result="s"/><feGaussianBlur in="s" stdDeviation="7"/></filter>
+  <filter id="gbHazeDark" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".004 .012" numOctaves="4" seed="17"/><feColorMatrix type="matrix" values="0 0 0 0 .01  0 0 0 0 .07  0 0 0 0 .12  1.7 0 0 0 -.7" result="s"/><feGaussianBlur in="s" stdDeviation="6"/></filter>
+  <filter id="gbSoft" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="3.2"/></filter>
+  <filter id="gbBlur14" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="14"/></filter>
+  <clipPath id="gbHullClip"><path d="M1050 600 L1600 560 V900 H1130 Q1060 800 1050 600Z"/></clipPath>
+  <clipPath id="gbSeaClip"><path d="M0 700 Q120 676 250 690 Q380 660 520 684 Q700 660 900 690 Q1100 676 1250 700 Q1420 672 1600 690 V900 H0Z"/></clipPath>
+ </defs>
+ <rect width="1600" height="900" fill="url(#gbWater)"/>
+ <rect width="1600" height="900" fill="url(#gbSun)"/>
+
+ <!-- god-rays: gradient trapezoids, only opacity animates -->
+ <g id="sRays">
+  <path class="ray r1" d="M210 0 L300 0 L520 760 L300 760Z" fill="url(#gbRay)"/>
+  <path class="ray r2" d="M440 0 L560 0 L700 800 L470 800Z" fill="url(#gbRay)"/>
+  <path class="ray r3" d="M720 0 L800 0 L960 780 L760 780Z" fill="url(#gbRay)"/>
+  <path class="ray r4" d="M930 0 L1050 0 L1210 800 L1000 800Z" fill="url(#gbRay)"/>
+  <path class="ray r5" d="M1170 0 L1240 0 L1500 760 L1290 760Z" fill="url(#gbRay)"/>
+  <path class="ray r6" d="M1340 0 L1420 0 L1600 700 L1450 700Z" fill="url(#gbRay)"/>
+ </g>
+
+ <!-- far wreck skyline: blurred silhouettes -->
+ <g id="sFar" filter="url(#gbSoft)" opacity=".72" fill="#0a2d40">
+  <path d="M40 640 L90 470 L180 430 L330 470 L560 600 L600 650 Z"/>
+  <path d="M150 440 L146 330 L160 328 L172 436Z M250 460 L262 372 L274 372 L276 470Z"/>
+  <path d="M120 470 L520 590" stroke="#0a2d40" stroke-width="10" fill="none"/>
+  <path d="M1240 650 L1262 440 L1290 430 L1330 650Z"/><path d="M1236 440 L1296 410 L1352 438 L1296 462Z"/>
+  <path d="M740 700 L760 560 L842 520 L880 380 L894 380 L860 530 L800 580 L792 700Z"/>
+  <path d="M870 380 L1010 420 L1012 430 L880 396Z"/>
+ </g>
+ <rect width="1600" height="900" filter="url(#gbHazeDark)" opacity=".5"/>
+ <rect y="330" width="1600" height="380" filter="url(#gbHaze)" opacity=".28"/>
+
+ <!-- seabed: painted sand + rock lighting, inked ridge -->
+ <g id="sSeabed">
+  <path d="M0 700 Q120 676 250 690 Q380 660 520 684 Q700 660 900 690 Q1100 676 1250 700 Q1420 672 1600 690 V900 H0Z" fill="url(#gbSand)"/>
+  <rect width="1600" height="900" filter="url(#gbRock)" clip-path="url(#gbSeaClip)" style="mix-blend-mode:multiply"/>
+  <path d="M0 770 Q200 750 420 780 Q640 800 900 770 Q1200 750 1600 790 V900 H0Z" fill="#0a2229" opacity=".5"/>
+  <path d="M0 700 Q120 676 250 690 Q380 660 520 684 Q700 660 900 690 Q1100 676 1250 700 Q1420 672 1600 690" fill="none" stroke="#0b1820" stroke-width="5" filter="url(#roughL)"/>
+  <g fill="none" stroke="#0b1820" stroke-width="2.2" opacity=".5" stroke-linecap="round"><path d="M80 740 l40 -6 M150 760 l50 -4 M320 744 l36 -8 M560 734 l54 -4 M690 760 l40 -6 M880 740 l50 -5 M1020 770 l40 -6 M1190 744 l40 -7 M1380 750 l50 -4 M1500 774 l40 -6"/></g>
+  <g fill="#0b1820" opacity=".35"><path d="M410 706 q18 -16 40 -6 q18 4 24 12 q-30 6 -64 -6z"/><path d="M1000 704 q20 -14 50 -4 q16 6 20 12 q-36 6 -70 -8z"/></g>
+  <!-- bleached bones, shells, a plate -->
+  <g stroke="#0b1820" stroke-width="3" stroke-linejoin="round" filter="url(#roughC)">
+   <ellipse cx="800" cy="738" rx="30" ry="9" fill="#e6dcc0"/><path d="M780 738 h40" fill="none" stroke-width="1.6"/>
+   <path d="M606 722 q8 -16 24 -8 q-4 12 -24 8z" fill="#e6b4a8"/>
+  </g>
+ </g>
+
+ <!-- left foreground: junk pile -->
+ <g id="sJunk" filter="url(#roughL)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <ellipse cx="260" cy="880" rx="260" ry="44" fill="#02080c" opacity=".55" stroke="none"/>
+  <g id="sTyres">
+   <ellipse cx="240" cy="856" rx="84" ry="26" fill="#1d262b" stroke-width="5"/><ellipse cx="240" cy="848" rx="84" ry="26" fill="#2a353b" stroke-width="5"/><ellipse cx="240" cy="846" rx="44" ry="12" fill="#10181c" stroke-width="4"/>
+   <ellipse cx="258" cy="818" rx="72" ry="22" fill="#232d33" stroke-width="5"/><ellipse cx="258" cy="810" rx="72" ry="22" fill="#313e45" stroke-width="5"/><ellipse cx="258" cy="808" rx="36" ry="10" fill="#10181c" stroke-width="4"/>
+   <path d="M170 856 Q176 868 240 872 Q310 868 322 854" fill="url(#hatchL)" stroke="none"/>
+  </g>
+  <g id="sBarrel"><path d="M318 780 Q312 830 322 868 Q370 880 414 868 Q422 828 414 780Z" fill="#6a4a2c" stroke-width="5"/><path d="M318 800 H414 M320 846 H416" stroke-width="5" fill="none"/><path d="M318 800 H414 M320 846 H416" stroke="#8a8f93" stroke-width="2.5" fill="none"/>
+   <path d="M318 780 Q366 764 414 780 Q366 794 318 780Z" fill="#2a1c10" stroke-width="4"/><path d="M386 784 Q420 826 400 868 Q420 828 414 782Z" fill="url(#hatchL)" stroke="none"/><path d="M340 812 l22 8" stroke-width="3.5" fill="none"/></g>
+  <g id="sChainPile" fill="none"><path d="M60 880 Q100 840 150 862 Q170 872 190 856" stroke-width="16"/><path d="M60 880 Q100 840 150 862 Q170 872 190 856" stroke="#6c7d86" stroke-width="8"/>
+   <path d="M64 880 l10 -6 M84 862 l9 -6 M112 850 l12 0 M140 858 l10 4" stroke-width="3"/></g>
+  <g id="sCoral" stroke-width="3.4"><path d="M120 862 Q108 830 120 808 Q132 830 128 846 Q142 826 154 812 Q156 836 138 866Z" fill="#ff6f7d"/><path d="M130 828 l-6 8 M142 826 l4 10" stroke-width="2" fill="none"/></g>
+ </g>
+ <!-- hanging empty diving suit on a crane rope -->
+ <g id="sSuit" filter="url(#roughC)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M338 0 V396" stroke-width="9" fill="none"/><path d="M338 0 V396" stroke="#c9b07a" stroke-width="4" fill="none"/>
+  <circle cx="338" cy="408" r="12" fill="none" stroke-width="7"/><circle cx="338" cy="408" r="12" fill="none" stroke="#6c7d86" stroke-width="3"/>
+  <g id="sSuitBody" style="transform-origin:338px 400px">
+   <path d="M310 438 Q338 426 366 438 L372 520 Q338 534 304 520Z" fill="#8a7a3a" stroke-width="5"/>
+   <path d="M304 520 L296 600 L322 604 L338 544 L354 604 L380 600 L372 520Z" fill="#7a6a30" stroke-width="5"/>
+   <path d="M310 450 Q280 480 288 530 L304 528 Q300 490 318 470Z M366 450 Q396 480 388 530 L372 528 Q376 490 358 470Z" fill="#8a7a3a" stroke-width="4"/>
+   <path d="M296 600 L284 618 L324 618 L322 604 M380 600 L392 618 L352 618 L354 604" fill="#4a3a1a" stroke-width="4"/>
+   <path d="M360 440 L372 520 L350 526Z" fill="url(#hatchC)" stroke="none"/>
+   <circle cx="338" cy="420" r="30" fill="#b08a3a" stroke-width="5.5"/><circle cx="338" cy="420" r="19" fill="#0d3a44" stroke-width="4.5"/><path d="M326 410 Q332 404 340 405" stroke="#9fe8ee" stroke-width="3" fill="none"/>
+   <rect x="326" y="446" width="24" height="9" fill="#8a6420" stroke-width="3.5"/>
+   <g fill="#e8c46a" stroke-width="2"><circle cx="312" cy="414" r="3"/><circle cx="364" cy="414" r="3"/><circle cx="338" cy="392" r="3"/></g>
+  </g>
+ </g>
+
+ <!-- tugboat wreck (right): the Captain's workshop -->
+ <g id="sTug" filter="url(#roughL)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <g transform="rotate(-5 1380 600)">
+   <path d="M1050 600 L1600 560 V900 H1130 Q1060 800 1050 600Z" fill="url(#gbHull)" stroke-width="7"/>
+   <path d="M1050 600 L1600 560 V584 L1058 626Z" fill="#c8c0a4" stroke-width="5"/>
+   <path d="M1058 626 L1600 584 V610 L1066 656Z" fill="#6a2a1e" stroke-width="3"/>
+   <path d="M1086 700 Q1100 780 1134 880 M1190 668 Q1204 780 1230 890 M1290 660 Q1296 780 1320 896 M1400 654 V900 M1500 640 V900" fill="none" stroke-width="3.5" opacity=".6"/>
+   <g fill="#e0b070" stroke-width="2.5"><circle cx="1076" cy="690" r="4"/><circle cx="1180" cy="680" r="4"/><circle cx="1280" cy="672" r="4"/><circle cx="1390" cy="664" r="4"/><circle cx="1490" cy="658" r="4"/><circle cx="1090" cy="740" r="4"/><circle cx="1196" cy="730" r="4"/><circle cx="1296" cy="722" r="4"/><circle cx="1406" cy="714" r="4"/></g>
+   <!-- cabin -->
+   <path d="M1300 566 L1318 330 L1586 318 L1590 560Z" fill="#4a8f86" stroke-width="7"/>
+   <path d="M1300 566 L1318 330 L1332 330 L1316 566Z" fill="#8fd0c0" stroke="none" opacity=".6"/>
+   <path d="M1310 440 L1588 428 M1306 500 L1590 490" stroke-width="3.5" fill="none" opacity=".6"/>
+   <path d="M1296 336 L1330 296 L1590 288 V320Z" fill="#7a3422" stroke-width="6"/>
+   <!-- funnel -->
+   <path d="M1180 566 L1196 398 L1274 394 L1288 562Z" fill="#a3482c" stroke-width="7"/>
+   <path d="M1178 420 L1198 396 L1276 392 L1292 418 Q1236 430 1178 420Z" fill="#2a1a16" stroke-width="5"/>
+   <path d="M1186 470 L1286 466 L1284 484 L1184 488Z" fill="#c8c0a4" stroke-width="4"/>
+   <path d="M1230 480 L1238 520 L1224 540" stroke-width="1" fill="none"/>
+   <path d="M1264 400 l16 -12 l8 10 z" fill="#ece0c4" stroke-width="2.4"/>
+   <!-- deep damage: torn plate -->
+   <path d="M1090 586 L1130 560 L1150 602 L1120 630 L1090 616Z" fill="#050e14" stroke-width="5"/><path d="M1096 592 L1126 570 L1140 600" stroke="#e0a070" stroke-width="2.4" fill="none"/>
+  </g>
+  <!-- porthole + flicker light -->
+  <g id="sPorthole"><circle cx="1480" cy="392" r="54" fill="#6c4a2c" stroke-width="7"/><circle id="sPortLight" cx="1480" cy="392" r="42" fill="#ffb938" stroke-width="5"/><circle cx="1480" cy="392" r="42" fill="url(#gbLamp)" stroke="none"/>
+   <path d="M1444 392 H1516 M1480 356 V428" stroke="#6a3a16" stroke-width="6" fill="none" opacity=".7"/>
+   <g fill="#e8c46a" stroke-width="2.4"><circle cx="1480" cy="334" r="4.5"/><circle cx="1480" cy="450" r="4.5"/><circle cx="1422" cy="392" r="4.5"/><circle cx="1538" cy="392" r="4.5"/></g></g>
+  <path id="sBigGlow" d="M1480 392 m-120 0 a120 100 0 1 0 240 0 a120 100 0 1 0 -240 0" fill="url(#gbLamp)" stroke="none" opacity=".35"/>
+  <!-- sign -->
+  <g id="sSign" style="transform-origin:1346px 572px"><path d="M1346 572 V610" stroke-width="7" fill="none"/><path d="M1346 572 V610" stroke="#c9b07a" stroke-width="3" fill="none"/>
+   <g transform="rotate(-3 1346 650)"><rect x="1270" y="610" width="152" height="52" rx="4" fill="#d9c79a" stroke-width="5"/><path d="M1274 612 H1418" stroke="#fff3cf" stroke-width="3" fill="none"/>
+   <text x="1346" y="633" text-anchor="middle" font-family="Luckiest Guy,Impact,Arial Black,sans-serif" font-size="16" fill="#c4402a" stroke="none">OPEN:</text><text x="1346" y="654" text-anchor="middle" font-family="Luckiest Guy,Impact,Arial Black,sans-serif" font-size="18" fill="#c4402a" stroke="none">MOSTLY</text></g></g>
+  <!-- barnacle ring on funnel and hull -->
+  <g transform="rotate(-5 1380 600)"><rect x="1000" y="540" width="620" height="380" filter="url(#gbRust)" clip-path="url(#gbHullClip)" style="mix-blend-mode:multiply" opacity=".9"/></g>
+  <path d="M1050 600 L1600 560 V900 H1130 Q1060 800 1050 600Z" fill="#000" opacity=".16" stroke="none" transform="rotate(-5 1380 600)"/>
+ </g>
+
+ <!-- kelp: blades sway on the CSS side (transform-origin at the base) -->
+ <g id="sKelp" stroke="#0b1820" stroke-width="4.5" stroke-linejoin="round" filter="url(#roughC)">
+  <g class="kelp k1" style="transform-origin:402px 700px"><path d="M402 700 Q376 600 396 500 Q410 430 392 350 Q420 440 412 520 Q404 610 420 700Z" fill="#2c7a62"/><path d="M396 500 Q410 430 392 350 Q404 430 402 500" fill="none" stroke="#6fd1a0" stroke-width="2.6"/></g>
+  <g class="kelp k2" style="transform-origin:430px 700px"><path d="M430 700 Q456 620 440 540 Q426 480 448 410 Q462 480 458 550 Q456 630 450 700Z" fill="#256b56"/></g>
+  <g class="kelp k3" style="transform-origin:1176px 700px"><path d="M1176 700 Q1150 610 1170 520 Q1182 450 1164 380 Q1196 450 1192 530 Q1186 620 1196 700Z" fill="#2c7a62"/><path d="M1170 520 Q1182 450 1164 380 Q1178 450 1176 520" fill="none" stroke="#6fd1a0" stroke-width="2.6"/></g>
+  <g class="kelp k4" style="transform-origin:1202px 700px"><path d="M1202 700 Q1224 630 1210 560 Q1198 500 1218 440 Q1232 500 1230 570 Q1226 640 1222 700Z" fill="#256b56"/></g>
+  <g class="kelp k5" style="transform-origin:560px 686px"><path d="M560 686 Q540 640 556 596 Q566 560 552 520 Q580 560 574 604 Q568 650 580 686Z" fill="#2c7a62"/></g>
+  <g class="kelp k6" style="transform-origin:960px 690px"><path d="M960 690 Q982 646 968 600 Q956 560 972 520 Q990 566 984 610 Q980 654 984 690Z" fill="#256b56"/></g>
+ </g>
+
+ <!-- hanging lanterns at both sides of the board -->
+ <g id="sLamps" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <g class="lamp l1">
+   <circle class="lglow" cx="372" cy="190" r="150" fill="url(#gbLamp)" stroke="none"/>
+   <path d="M372 0 V138" stroke-width="8" fill="none"/><path d="M372 0 V138" stroke="#6c7d86" stroke-width="3.5" stroke-dasharray="7 5" fill="none"/>
+   <path d="M356 138 H388 L394 154 H350Z" fill="#6c7d86" stroke-width="4"/><rect x="352" y="154" width="40" height="52" rx="8" fill="#ffd978" stroke-width="5"/>
+   <path d="M352 168 H392 M352 190 H392" stroke-width="3" fill="none"/><path d="M358 160 V202" stroke="#fff6d2" stroke-width="4" fill="none"/>
+   <path d="M350 206 H394 L388 216 H356Z" fill="#6c7d86" stroke-width="4"/>
+  </g>
+  <g class="lamp l2">
+   <circle class="lglow" cx="1236" cy="150" r="150" fill="url(#gbLamp)" stroke="none"/>
+   <path d="M1236 0 V98" stroke-width="8" fill="none"/><path d="M1236 0 V98" stroke="#6c7d86" stroke-width="3.5" stroke-dasharray="7 5" fill="none"/>
+   <path d="M1220 98 H1252 L1258 114 H1214Z" fill="#6c7d86" stroke-width="4"/><rect x="1216" y="114" width="40" height="52" rx="8" fill="#ffd978" stroke-width="5"/>
+   <path d="M1216 128 H1256 M1216 150 H1256" stroke-width="3" fill="none"/><path d="M1222 120 V162" stroke="#fff6d2" stroke-width="4" fill="none"/>
+   <path d="M1214 166 H1258 L1252 176 H1220Z" fill="#6c7d86" stroke-width="4"/>
+  </g>
+ </g>
+
+ <!-- lower dark fade + vignette -->
+ <rect y="560" width="1600" height="340" fill="url(#gbFloor)"/>
+ <rect width="1600" height="900" fill="url(#gbVig)"/>
+</svg>
+
+<svg id="logo" viewBox="0 0 660 150" filter="url(#roughC)" overflow="visible">
+ <defs><clipPath id="gbLogoLow"><rect x="0" y="62" width="660" height="40"/></clipPath>
+  <path id="gbRopeP" d="M70 118 Q330 132 590 118"/></defs>
+ <g font-family="Luckiest Guy,Impact,Arial Black,sans-serif" stroke-linejoin="round" stroke-linecap="round">
+  <!-- rust drop shadow layer -->
+  <g fill="#c4602a" stroke="#0b1820" stroke-width="20" transform="translate(4 6)">
+   <text x="20" y="84" font-size="76" textLength="262" lengthAdjust="spacingAndGlyphs" rotate="-3 2 -2 4 -3 1 -2" dy="0 -3 3 -2 2 -3 1">GRUMBLE</text>
+   <text x="318" y="96" font-size="104" text-anchor="middle" rotate="6">&amp;</text>
+   <text x="360" y="84" font-size="76" textLength="262" lengthAdjust="spacingAndGlyphs" rotate="2 -3 3 -2 3" dy="-2 3 -3 2 -1">BRINE</text>
+  </g>
+  <!-- ink body -->
+  <g fill="#0b1820" stroke="#0b1820" stroke-width="20">
+   <text x="20" y="84" font-size="76" textLength="262" lengthAdjust="spacingAndGlyphs" rotate="-3 2 -2 4 -3 1 -2" dy="0 -3 3 -2 2 -3 1">GRUMBLE</text>
+   <text x="318" y="96" font-size="104" text-anchor="middle" rotate="6">&amp;</text>
+   <text x="360" y="84" font-size="76" textLength="262" lengthAdjust="spacingAndGlyphs" rotate="2 -3 3 -2 3" dy="-2 3 -3 2 -1">BRINE</text>
+  </g>
+  <!-- cream face -->
+  <g stroke="#f2e5c2" stroke-width="3.2">
+   <text x="36" y="84" font-size="76" fill="#f2e5c2" textLength="270" lengthAdjust="spacingAndGlyphs" rotate="-3 2 -2 4 -3 1 -2" dy="0 -3 3 -2 2 -3 1">GRUMBLE</text>
+   <text x="318" y="96" font-size="104" text-anchor="middle" fill="#ff6f7d" stroke="#ff6f7d" stroke-width="3" rotate="6">&amp;</text>
+   <text x="352" y="84" font-size="76" fill="#f2e5c2" textLength="270" lengthAdjust="spacingAndGlyphs" rotate="2 -3 3 -2 3" dy="-2 3 -3 2 -1">BRINE</text>
+  </g>
+  <!-- hatch on the lower half of each letter -->
+  <g clip-path="url(#gbLogoLow)" fill="url(#hatchL)" stroke="none">
+   <text x="20" y="84" font-size="76" textLength="262" lengthAdjust="spacingAndGlyphs" rotate="-3 2 -2 4 -3 1 -2" dy="0 -3 3 -2 2 -3 1">GRUMBLE</text>
+   <text x="360" y="84" font-size="76" textLength="262" lengthAdjust="spacingAndGlyphs" rotate="2 -3 3 -2 3" dy="-2 3 -3 2 -1">BRINE</text>
+  </g>
+  <!-- drip off the ampersand -->
+  <path d="M322 108 Q320 118 322 124" stroke="#0b1820" stroke-width="9" fill="none"/><path d="M322 108 Q320 118 322 124" stroke="#ff6f7d" stroke-width="4" fill="none"/>
+  <circle cx="322" cy="128" r="5" fill="#ff6f7d" stroke="#0b1820" stroke-width="3"/>
+ </g>
+ <!-- barnacles on the U (top-left) -->
+ <path d="M96 30 h8 M111 24 h5" stroke="#0b1820" stroke-width="1.8"/>
+ <!-- rope banner with the subtitle -->
+ <g>
+  <path d="M120 114 L540 112 L548 138 L112 141Z" fill="#1b2d36" stroke="#0b1820" stroke-width="5"/>
+  <path d="M124 117 L536 115" stroke="#b88a3e" stroke-width="3.5" fill="none"/><path d="M118 137 L544 135" stroke="#b88a3e" stroke-width="3.5" fill="none"/>
+  <g fill="#e8c46a" stroke="#0b1820" stroke-width="2.4"><circle cx="124" cy="127" r="4.5"/><circle cx="536" cy="125" r="4.5"/></g>
+  <g stroke-linecap="round"><path d="M112 141 Q86 148 80 134" stroke="#0b1820" stroke-width="9" fill="none"/><path d="M112 141 Q86 148 80 134" stroke="url(#gbRope)" stroke-width="5" fill="none"/>
+  <path d="M548 138 Q574 146 580 130" stroke="#0b1820" stroke-width="9" fill="none"/><path d="M548 138 Q574 146 580 130" stroke="url(#gbRope)" stroke-width="5" fill="none"/></g>
+  <text x="330" y="136" text-anchor="middle" font-family="Luckiest Guy,Impact,Arial Black,sans-serif" font-size="25" font-weight="900" textLength="300" lengthAdjust="spacing" fill="#ffb938" stroke="#ffb938" stroke-width="1.3">DEEP SALVAGE</text>
+ </g>
+</svg>
+
+<!-- frame: salvaged ship-hatch. SVG origin = stage (438,158), 724x520. Board window (22,64)-(702,472) = stage (460,222) 680x408. Strip trough (22,12)-(702,58) = stage (460,170). -->
+<svg id="frameArt" viewBox="0 0 724 520" filter="url(#roughC)" stroke-linejoin="round" stroke-linecap="round">
+ <defs>
+  <pattern id="gbRope" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(55)"><rect width="8" height="8" fill="#d9c79a"/><rect width="4" height="8" fill="#a88f5e"/></pattern>
+ </defs>
+ <!-- iron hatch plate -->
+ <path d="M6 6 L360 2 L718 5 L722 498 L360 504 L3 500Z" fill="#1b2d36" stroke="#0b1820" stroke-width="8"/>
+ <path d="M12 12 L360 8 L712 11 L712 17 L12 20Z" fill="#2b4551"/>
+ <path d="M10 488 L360 492 L714 486 L714 496 L360 500 L10 496Z" fill="#101c23"/>
+ <path d="M14 70 L18 300 M706 120 L710 330" stroke="#2b4551" stroke-width="5" fill="none"/>
+ <!-- strip trough (brass lip around) -->
+ <rect x="16" y="6" width="692" height="56" rx="4" fill="#b88a3e" stroke="#0b1820" stroke-width="5"/>
+ <path d="M18 9 H706" stroke="#e8c46a" stroke-width="3" fill="none"/>
+ <rect x="22" y="12" width="680" height="46" rx="2" fill="#0e4a5a" stroke="#0b1820" stroke-width="4"/>
+ <path d="M18 58 H706 V62 H18Z" fill="#6b4a1c"/>
+ <!-- board window: brass trim, dark glass back -->
+ <rect x="14" y="62" width="696" height="418" rx="3" fill="#b88a3e" stroke="#0b1820" stroke-width="6"/>
+ <path d="M16 65 H708 M16 65 V478" stroke="#e8c46a" stroke-width="3.5" fill="none"/>
+ <path d="M710 66 V478 H18" stroke="#6b4a1c" stroke-width="5" fill="none"/>
+ <rect x="22" y="64" width="680" height="408" fill="#04141f" stroke="#0b1820" stroke-width="5"/>
+ <!-- rivets -->
+ <g fill="#e8c46a" stroke="#0b1820" stroke-width="3.5">
+  <circle cx="13" cy="18" r="7"/><circle cx="711" cy="17" r="7"/><circle cx="12" cy="486" r="7"/><circle cx="712" cy="485" r="7"/>
+  <circle cx="13" cy="268" r="6"/><circle cx="711" cy="262" r="6"/>
+  <circle cx="190" cy="488" r="6"/><circle cx="362" cy="490" r="6"/><circle cx="534" cy="487" r="6"/>
+ </g>
+ <!-- rust drips -->
+ <g stroke="#c4602a" stroke-width="4" fill="none" opacity=".75"><path d="M13 26 L14 52"/><path d="M711 26 L709 62"/><path d="M190 496 L190 508"/><path d="M534 495 L535 512"/><path d="M12 494 L11 516"/></g>
+ <!-- bottom-left weed -->
+ <path d="M60 494 Q50 520 64 540 M72 494 Q80 516 72 536" fill="none" stroke="#0b1820" stroke-width="10"/><path d="M60 494 Q50 520 64 540 M72 494 Q80 516 72 536" fill="none" stroke="#2c7a62" stroke-width="5"/>
+</svg>
+<div id="frame"><div id="grid"></div><div id="fxl"></div>
+ <svg id="frameFx" viewBox="0 0 680 408" filter="url(#roughS)" stroke-linecap="round">
+  <g id="ropes"><path d="M136 0 V408" stroke="#0b1820" stroke-width="7"/><path d="M272 0 V408" stroke="#0b1820" stroke-width="7"/><path d="M408 0 V408" stroke="#0b1820" stroke-width="7"/><path d="M544 0 V408" stroke="#0b1820" stroke-width="7"/>
+   <path d="M136 0 V408 M272 0 V408 M408 0 V408 M544 0 V408" stroke="url(#gbRope)" stroke-width="3.6"/></g>
+  <path d="M0 0 H680 M0 408 H680" stroke="#0b1820" stroke-width="3" opacity=".5"/>
+ </svg></div>
+<div id="strip"><i class="lane" data-r="0"><b>&lsaquo;</b></i><i class="lane" data-r="1"><b>&lsaquo;</b></i><i class="lane" data-r="2"><b>&lsaquo;</b></i><i class="lane" data-r="3"><b>&lsaquo;</b></i><i class="lane" data-r="4"><b>&lsaquo;</b></i><div id="chain">DRIFT <span id="chainN">x0</span></div></div>
+<div id="tagArt"><svg viewBox="0 0 90 100" filter="url(#roughS)" stroke-linejoin="round" stroke-linecap="round"><path d="M45 0 Q40 10 46 22" fill="none" stroke="#0b1820" stroke-width="7"/><path d="M45 0 Q40 10 46 22" fill="none" stroke="#d9c79a" stroke-width="3.2"/><path d="M12 24 L78 22 L82 82 L10 84Z" fill="#f2e5c2" stroke="#0b1820" stroke-width="4.5"/><circle cx="45" cy="32" r="3.4" fill="#1b2d36" stroke="#0b1820" stroke-width="2"/><g font-family="Luckiest Guy,Impact,Arial Black,sans-serif" text-anchor="middle" font-size="17" fill="#c4402a" stroke="none"><text x="46" y="55">NO</text><text x="46" y="75" font-size="13">REFUNDS</text></g></svg></div>
+
+<div id="char"><svg viewBox="0 0 480 500">
+ <defs><clipPath id="gbWin"><ellipse cx="240" cy="200" rx="58" ry="52"/></clipPath>
+  <radialGradient id="gbBeam" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd978" stop-opacity=".95"/><stop offset=".5" stop-color="#ffb938" stop-opacity=".35"/><stop offset="1" stop-color="#ffb938" stop-opacity="0"/></radialGradient></defs>
+ <ellipse cx="250" cy="490" rx="200" ry="13" fill="#000" opacity=".4"/>
+ <!-- crate (static) -->
+ <g id="cCrate" filter="url(#roughC)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M92 442 H398 V488 H92Z" fill="#8a5a2e" stroke-width="6"/>
+  <path d="M92 442 L110 430 H380 L398 442Z" fill="#b07a40" stroke-width="5"/>
+  <path d="M104 456 H386 M100 472 H390" stroke="#5a3a1c" stroke-width="3" fill="none"/>
+  <path d="M340 444 H398 V488 H360Z" fill="url(#gbHC)" stroke="none"/>
+  <g fill="#c8b890" stroke-width="2.5"><circle cx="106" cy="452" r="3.4"/><circle cx="384" cy="452" r="3.4"/><circle cx="106" cy="478" r="3.4"/><circle cx="384" cy="478" r="3.4"/></g>
+  <path d="M118 436 H362" stroke="#d0a066" stroke-width="3" fill="none"/>
+  <g transform="rotate(-1.5 240 466)"><rect x="168" y="454" width="144" height="24" rx="3" fill="#f2e5c2" stroke-width="3"/>
+   <text x="240" y="473" text-anchor="middle" font-family="Luckiest Guy,Impact,Arial Black,sans-serif" font-size="19" letter-spacing="3" fill="#c4602a" stroke="none">SALVAGE</text></g>
+ </g>
+  <g id="cAll">
+ <!-- body: legs, shell, belt -->
+ <g id="cBody" filter="url(#roughC)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <g id="cLegs" fill="none">
+   <g stroke-width="15"><path d="M130 372 L70 368 L44 414 L46 438 M128 388 L82 396 L62 430 L66 440 M128 404 L96 420 L84 440 M130 418 L108 432 L104 442"/><path d="M350 372 L410 368 L436 414 L434 438 M352 388 L398 396 L418 430 L414 440 M352 404 L384 420 L396 440 M350 418 L372 432 L376 442"/></g>
+   <g stroke="#d9532f" stroke-width="8"><path d="M130 372 L70 368 L44 414 L46 438 M128 388 L82 396 L62 430 L66 440 M128 404 L96 420 L84 440 M130 418 L108 432 L104 442"/><path d="M350 372 L410 368 L436 414 L434 438 M352 388 L398 396 L418 430 L414 440 M352 404 L384 420 L396 440 M350 418 L372 432 L376 442"/></g>
+   <g fill="#b8431f" stroke-width="2.5"><circle cx="70" cy="368" r="5"/><circle cx="44" cy="414" r="4.5"/><circle cx="82" cy="396" r="4.5"/><circle cx="410" cy="368" r="5"/><circle cx="436" cy="414" r="4.5"/><circle cx="398" cy="396" r="4.5"/></g>
+  </g>
+  <path d="M104 372 Q96 322 124 292 L116 270 L142 284 L150 256 L176 276 L190 248 L214 270 L240 244 L266 270 L290 248 L304 276 L330 256 L338 284 L364 270 L356 292 Q384 322 376 372 Q372 420 340 442 H140 Q108 420 104 372Z" fill="#d9532f" stroke-width="6"/>
+  <path d="M338 284 L364 270 L356 292 Q384 322 376 372 Q372 420 340 442 H300 Q336 400 332 340 Q330 310 322 290Z" fill="url(#gbHC)" stroke="none"/>
+  <path d="M146 300 Q150 270 160 262 M334 300 Q330 270 320 262" stroke="#f08a5a" stroke-width="4" fill="none"/>
+  <path d="M138 330 Q240 372 342 330 M130 362 Q240 404 350 362" fill="none" stroke="#a63a1a" stroke-width="3.5"/>
+  <path d="M104 392 H376 V416 H104Z" fill="#3a2a22" stroke-width="5"/>
+  <path d="M110 404 H214 M266 404 H370" stroke="#c8b890" stroke-width="2.4" stroke-dasharray="5 5" fill="none"/>
+  <rect x="222" y="388" width="36" height="30" rx="4" fill="#e8c46a" stroke-width="4.5"/><rect x="230" y="395" width="20" height="16" rx="2" fill="#7a5a22" stroke-width="3"/>
+  <g fill="#ece0c4" stroke-width="3"><circle cx="128" cy="338" r="8"/><circle cx="141" cy="348" r="5.5"/><circle cx="121" cy="351" r="4.5"/><circle cx="352" cy="430" r="7"/><circle cx="338" cy="436" r="4.5"/><circle cx="170" cy="428" r="5.5"/></g>
+  <g fill="#a63a1a" stroke="none"><circle cx="300" cy="360" r="4"/><circle cx="316" cy="372" r="3"/><circle cx="168" cy="368" r="3.4"/></g>
+ </g>
+ <!-- head: hose, collar, helmet, window, crab face -->
+ <g id="cHead" filter="url(#roughC)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M322 218 Q394 200 404 262 Q410 312 388 342" fill="none" stroke-width="17"/><path d="M322 218 Q394 200 404 262 Q410 312 388 342" fill="none" stroke="#7c8a94" stroke-width="9"/>
+  <path d="M348 208 l4 14 M393 218 l12 -6 M408 262 l14 2 M402 300 l13 6" stroke="#0b1820" stroke-width="5" fill="none"/>
+  <path d="M152 270 Q240 312 328 270 L338 296 Q240 342 142 296Z" fill="#a97a2c" stroke-width="6"/>
+  <path d="M150 284 Q240 330 330 284" stroke="#7a5a22" stroke-width="3" fill="none"/>
+  <g fill="#e8c46a" stroke-width="2.6"><circle cx="170" cy="288" r="4.5"/><circle cx="206" cy="304" r="4.5"/><circle cx="240" cy="310" r="4.5"/><circle cx="274" cy="304" r="4.5"/><circle cx="310" cy="288" r="4.5"/></g>
+  <ellipse cx="240" cy="200" rx="92" ry="88" fill="#c99a45" stroke-width="6.5"/>
+  <path d="M300 130 Q338 170 330 226 Q320 270 276 284 Q310 238 306 186Z" fill="url(#gbHC)" stroke="none"/>
+  <path d="M164 160 Q170 132 196 118" stroke="#f6dd9c" stroke-width="6" fill="none"/>
+  <path d="M168 176 Q166 164 170 156" stroke="#f6dd9c" stroke-width="4" fill="none"/>
+  <path d="M172 152 Q184 132 206 128 Q198 142 202 158 Q190 160 180 170Z" fill="#a97a2c" stroke-width="3.2"/>
+  <path d="M182 150 Q192 142 198 146" stroke="#e8c46a" stroke-width="2.4" fill="none"/>
+  <g fill="#e8c46a" stroke-width="2.6"><circle cx="240" cy="126" r="4"/><circle cx="296" cy="146" r="4"/><circle cx="318" cy="200" r="4"/><circle cx="298" cy="254" r="4"/><circle cx="182" cy="256" r="4"/><circle cx="162" cy="200" r="4"/></g>
+  <g id="cLamp"><rect x="224" y="98" width="32" height="16" rx="3" fill="#8a6420" stroke-width="4"/><circle cx="240" cy="94" r="14" fill="#ffb938" stroke-width="4"/><circle cx="235" cy="89" r="4" fill="#fff4c4" stroke="none"/></g>
+  <g id="cLampGlow" stroke="none"><ellipse cx="240" cy="90" rx="86" ry="66" fill="url(#gbBeam)"/></g>
+  <g id="cValve"><rect x="138" y="208" width="26" height="14" rx="3" fill="#8a6420" stroke-width="4"/><circle cx="136" cy="215" r="6.5" fill="#d8402e" stroke-width="3"/></g>
+  <ellipse cx="240" cy="200" rx="66" ry="60" fill="#e8c46a" stroke-width="6"/>
+  <ellipse cx="240" cy="200" rx="58" ry="52" fill="#1d4f5a" stroke-width="4.5"/>
+  <g clip-path="url(#gbWin)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+   <path d="M182 150 Q240 130 298 150 L298 120 H182Z" fill="#2d7683" stroke="none" opacity=".6"/>
+   <g id="cEyes">
+    <g stroke-width="4"><path d="M212 262 Q209 224 214 186" fill="none" stroke-width="16"/><path d="M268 262 Q271 224 266 186" fill="none" stroke-width="16"/></g>
+    <path d="M212 262 Q209 224 214 186" fill="none" stroke="#d9532f" stroke-width="8.5"/><path d="M268 262 Q271 224 266 186" fill="none" stroke="#d9532f" stroke-width="8.5"/>
+    <circle cx="214" cy="176" r="14" fill="#fffdf5" stroke-width="4"/><circle cx="266" cy="172" r="14" fill="#fffdf5" stroke-width="4"/>
+    <g id="cPupils"><circle cx="218" cy="181" r="6.2" fill="#0b1820" stroke="none"/><circle cx="262" cy="177" r="6.2" fill="#0b1820" stroke="none"/><circle cx="220" cy="178.5" r="1.8" fill="#fff" stroke="none"/><circle cx="264" cy="174.5" r="1.8" fill="#fff" stroke="none"/></g>
+    <g id="cLids" fill="#c4402a" stroke-width="3.2"><path d="M200 170 L228 180 A14.6 14.6 0 0 0 200 170Z"/><path d="M280 166 L252 176 A14.6 14.6 0 0 1 280 166Z"/></g>
+   </g>
+   <g id="cBrows" fill="#f2e5c2" stroke-width="3.6"><path d="M180 150 Q196 138 238 162 L240 172 Q206 160 182 162Z"/><path d="M300 140 Q284 130 244 154 L242 164 Q276 152 300 152Z"/>
+    <path d="M190 148 l-6 -6 M204 144 l-2 -8 M218 150 l2 -8 M290 138 l6 -6 M276 136 l2 -8 M262 142 l-2 -8" fill="none" stroke-width="3"/></g>
+   <g id="cMouth">
+    <path id="cMouthOpen" d="M214 238 Q240 270 266 238 Q240 244 214 238Z" fill="#6a1a1e" stroke-width="3.5"/>
+    <path id="cTongue" d="M228 250 Q240 262 252 250 Q240 254 228 250Z" fill="#ff7a8a" stroke="none"/>
+    <path id="cMandL" d="M238 236 Q222 238 210 252 Q226 256 238 245Z" fill="#d9532f" stroke-width="3.4"/>
+    <path id="cMandR" d="M242 236 Q258 238 270 252 Q254 256 242 245Z" fill="#d9532f" stroke-width="3.4"/>
+   </g>
+   <path d="M240 228 Q226 214 200 222 Q184 228 190 241 Q210 240 226 236 Q236 238 240 234 Q244 238 254 236 Q272 240 292 241 Q298 228 280 222 Q254 214 240 228Z" fill="#f2e5c2" stroke-width="3.8"/>
+   <path d="M196 232 Q206 230 216 232 M264 232 Q274 230 284 232" stroke-width="1.8" fill="none" opacity=".6"/>
+   <path d="M192 156 Q202 146 214 143 M190 166 Q192 160 196 156" stroke="#fff" stroke-width="3.5" fill="none" opacity=".55"/>
+  </g>
+  <ellipse cx="240" cy="200" rx="58" ry="52" fill="none" stroke-width="4.5"/>
+  <path d="M190 152 Q214 140 240 140" stroke="#e6fbff" stroke-width="3" fill="none" opacity=".7"/>
+ </g>
+ <!-- big claw (viewer left): gauge on the wrist, true pincers -->
+ <g id="cClawR" filter="url(#roughC)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M128 330 Q82 336 62 354 Q44 334 52 304" fill="none" stroke-width="32"/><path d="M128 330 Q82 336 62 354 Q44 334 52 304" fill="none" stroke="#d9532f" stroke-width="21"/>
+  <path d="M120 344 Q88 346 68 364 M48 340 Q42 322 46 312" stroke="#a63a1a" stroke-width="4" fill="none" opacity=".8"/>
+  <path d="M60 346 l-12 10 l16 -2z" fill="#b8431f" stroke-width="2.4"/>
+  <g id="cHandR"><g transform="translate(52 304) rotate(-6)">
+   <path d="M-27 6 Q-36 -22 -22 -40 L22 -40 Q38 -22 27 6 Q0 16 -27 6Z" fill="#d9532f" stroke-width="6"/>
+   <path d="M10 -36 Q34 -20 24 6 Q16 10 10 11Z" fill="url(#gbHC)" stroke="none"/>
+   <path id="cPincerBot" d="M-24 -34 Q-44 -68 -18 -98 Q-14 -74 -4 -54 L-1 -36Z" fill="#d9532f" stroke-width="5.5"/>
+   <path d="M-6 -56 l-8 2 l6 5 z M-9 -70 l-8 3 l7 5 z M-12 -82 l-7 3 l6 5z" fill="#f2e5c2" stroke-width="2"/>
+   <g id="cPincerTop"><path d="M24 -34 Q46 -64 28 -92 Q18 -70 4 -52 L1 -36Z" fill="#d9532f" stroke-width="5.5"/>
+   <path d="M6 -56 l8 2 l-6 5 z M10 -68 l8 3 l-7 5 z" fill="#f2e5c2" stroke-width="2"/></g>
+  </g></g>
+  <g id="cGauge"><circle cx="46" cy="338" r="16" fill="#c99a45" stroke-width="5"/><circle cx="46" cy="338" r="10.5" fill="#f2e5c2" stroke-width="2.4"/>
+   <path d="M46 329 v3 M37 338 h3 M55 338 h3" stroke-width="1.8"/><path d="M52 330 L56 327" stroke="#d8402e" stroke-width="3"/>
+   <g id="cNeedle"><path d="M46 338 L40 328" stroke="#d8402e" stroke-width="2.8"/></g><circle cx="46" cy="338" r="2.2" fill="#0b1820" stroke="none"/></g>
+ </g>
+ <!-- small claw (viewer right): telescope -->
+ <g id="cClawL" filter="url(#roughC)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M352 332 Q398 338 416 360 Q432 340 426 314" fill="none" stroke-width="26"/><path d="M352 332 Q398 338 416 360 Q432 340 426 314" fill="none" stroke="#d9532f" stroke-width="16"/>
+  <path d="M408 372 l10 10 l-14 -2z" fill="#b8431f" stroke-width="2.4"/>
+  <g id="cHandL"><g transform="translate(426 316) rotate(8) scale(.72)">
+   <path d="M-27 6 Q-36 -22 -22 -40 L22 -40 Q38 -22 27 6 Q0 16 -27 6Z" fill="#d9532f" stroke-width="7.5"/>
+   <g id="cScope" transform="rotate(16)"><rect x="-9" y="-124" width="18" height="96" rx="4" fill="#c99a45" stroke-width="6"/><rect x="-13" y="-148" width="26" height="30" rx="5" fill="#e8c46a" stroke-width="6"/><path d="M-9 -92 H9 M-9 -60 H9" stroke-width="4"/><ellipse cx="0" cy="-148" rx="9" ry="3.5" fill="#9fe6ee" stroke-width="3"/><path d="M-4 -118 V-40" stroke="#f6dd9c" stroke-width="3.5"/></g>
+   <path id="cPincerBot2" d="M-24 -34 Q-44 -68 -18 -98 Q-14 -74 -4 -54 L-1 -36Z" fill="#d9532f" stroke-width="7"/>
+   <g id="cPincerTop2"><path d="M24 -34 Q46 -64 28 -92 Q18 -70 4 -52 L1 -36Z" fill="#d9532f" stroke-width="7"/></g>
+  </g></g>
+ </g>
+ <g id="cBurst" stroke="#0b1820" stroke-width="3.5"><circle cx="190" cy="432" r="8" fill="#ffc83a"/><circle cx="230" cy="430" r="7" fill="#ffd95e"/><circle cx="270" cy="432" r="8" fill="#ffc83a"/><circle cx="310" cy="430" r="7" fill="#ff6f7d"/><circle cx="210" cy="430" r="6" fill="#fffdf5"/><circle cx="290" cy="430" r="6" fill="#fffdf5"/></g>
+ <g id="cBang" stroke="#0b1820" stroke-width="5" stroke-linejoin="round"><path d="M232 20 Q240 14 248 20 L246 56 Q240 60 234 56Z" fill="#f2e5c2"/><circle cx="240" cy="72" r="7" fill="#f2e5c2"/></g>
+ </g>
+</svg></div>
+
+<!-- Tide Gauge: left of the board, x52-142, y440-770 (Deep Dive only; kai toggles .on and sets lv0..lv3). -->
+<div id="tide" class="lv0">
+ <svg id="tideArt" viewBox="0 0 90 330" filter="url(#roughU)" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M45 -170 V8" stroke="#0b1820" stroke-width="9" fill="none"/><path d="M45 -170 V8" stroke="#6c7d86" stroke-width="4" stroke-dasharray="7 5" fill="none"/>
+  <!-- label plate -->
+  <path d="M6 8 L84 6 L86 74 L5 76Z" fill="#1b2d36" stroke="#0b1820" stroke-width="5"/>
+  <path d="M10 12 L80 10" stroke="#e8c46a" stroke-width="3" fill="none"/><path d="M9 71 L82 70" stroke="#6b4a1c" stroke-width="3" fill="none"/>
+  <g fill="#e8c46a" stroke="#0b1820" stroke-width="2"><circle cx="11" cy="17" r="3.4"/><circle cx="79" cy="16" r="3.4"/><circle cx="11" cy="66" r="3.4"/><circle cx="79" cy="65" r="3.4"/></g>
+  <!-- brass tube -->
+  <rect x="10" y="80" width="70" height="226" rx="14" fill="#b88a3e" stroke="#0b1820" stroke-width="5.5"/>
+  <path d="M14 94 V292" stroke="#e8c46a" stroke-width="3.5" fill="none"/>
+  <rect x="17" y="87" width="56" height="212" rx="9" fill="#0b2c3a" stroke="#0b1820" stroke-width="4.5"/>
+  <rect x="2" y="304" width="86" height="20" rx="5" fill="#6b4a1c" stroke="#0b1820" stroke-width="5"/>
+  <path d="M9 308 H80" stroke="#b88a3e" stroke-width="3" fill="none"/>
+ </svg>
+ <div id="tHead"><small>TIDE</small><b id="tideV">+0</b></div>
+ <div id="tWin"><i class="seg s3"></i><i class="seg s2"></i><i class="seg s1"></i><span class="tk t3">3</span><span class="tk t2">2</span><span class="tk t1">1</span></div>
+</div>
+
+
+<!-- ============ shell: message line, free-spin counter, badges, bonus-buy sign, bottom bar, menu ============ -->
+<div id="msg"></div>
+<div id="fsBox" hidden><small>FREE SPINS</small><span id="fs">0</span></div>
+<div id="turboBadge" hidden>TURBO</div><div id="feverBadge" hidden></div>
+<button id="buyOpen" title="Bonus buy"><i class="ch l"></i><i class="ch r"></i><span class="plq"><svg viewBox="0 0 64 64"></svg><b>BONUS<br>BUY</b><em id="buyPrice">$100.00</em></span></button>
+<div id="barL">
+  <button id="menuBtn" title="Menu"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  <div class="fld"><label>BALANCE</label><div class="v" id="bal">–</div></div>
+  <div class="fld"><label>WIN</label><div class="v gold" id="win">$0.00</div></div>
+</div>
+<div id="barR"><label id="betLbl" style="font-size:14px;font-weight:900;color:var(--muted);display:block;letter-spacing:2px">BET</label><div id="betV"><span id="bet">$1.00</span></div><div id="betBar"></div>
+  <div id="chev"><button id="p" title="Raise bet"><svg viewBox="0 0 34 20"><path d="M4 16 L17 4 L30 16"/></svg></button><button id="m" title="Lower bet"><svg viewBox="0 0 34 20"><path d="M4 4 L17 16 L30 4"/></svg></button></div></div>
+<button id="spin" title="Spin (Space)"><svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-3-6.5"/><path d="M20.5 3.5v5.5h-5.5"/></svg><span class="cnt" id="spinCnt" hidden></span></button>
+<button id="bAuto" title="Autoplay"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
+<div id="menu" hidden>
+  <button id="bSnd"><span>Sound</span><i>ON</i></button>
+  <button id="bTurbo"><span>Turbo spin</span><i>OFF</i></button>
+  <button id="bInfo"><span>Game info</span><i>›</i></button>
+  <button id="bFs"><span>Fullscreen</span><i>⤢</i></button>
+</div>
+
+</div></div>
+<div id="grain"></div><canvas id="fx"></canvas><div id="flash"></div>
+<div id="auth" hidden><div><h1 id="authName"></h1><p style="font-family:var(--ui)">Sign in to Nebula first, then reopen this game.</p></div></div>
+<div id="big"><div id="bigT"></div><div id="bigA"></div><div id="bigX"></div></div>
+
+<!-- bonus buy screen (cards are generated from slot.json: fever + buys) -->
+<div class="modal bb" id="buyM" hidden>
+  <h2 class="bbT">BONUS BUY</h2><button class="bbX" data-close>×</button>
+  <div class="bbBet"><button id="bbM">−</button><div><small>YOUR BET</small><b id="bbBet">$1.00</b></div><button id="bbP">+</button></div>
+  <div class="bbRow" id="bbRow"></div>
+</div>
+<!-- buy confirm -->
+<div class="modal" id="confirm" hidden><div class="mbox">
+  <h2 id="cTitle"></h2><p id="cDesc"></p>
+  <div class="big-n"><small>COST</small><span id="cCost"></span></div>
+  <div id="cWarn"></div>
+  <div class="row2"><button class="btn" id="cNo">CANCEL</button><button class="btn pri" id="cYes">CONFIRM</button></div>
+</div></div>
+<!-- bet picker -->
+<div class="modal" id="betM" hidden><div class="mbox wide"><button class="x" data-close>×</button><h2>CHOOSE YOUR BET</h2><div class="betgrid" id="betGrid"></div></div></div>
+<!-- autoplay -->
+<div class="modal" id="autoM" hidden><div class="mbox">
+  <button class="x" data-close>×</button><h2>AUTOPLAY</h2><p>Number of automatic spins</p>
+  <div class="opts" id="autoOpts"></div>
+  <div class="srow"><span>Stop when a bonus triggers</span><button class="sw on" id="swFeat"></button></div>
+  <div class="srow"><span id="swBigTxt">Stop on a big win</span><button class="sw" id="swBig"></button></div>
+  <div class="row2"><button class="btn" data-close>CANCEL</button><button class="btn pri" id="autoGo">START</button></div>
+</div></div>
+<!-- bonus intro / outro: tap anywhere -->
+<div class="modal tap splash" id="introM" hidden><div class="rays"></div><div class="sp">
+  <div class="gems" id="introGems"></div>
+  <div class="medalWrap">    <div class="medal"><div class="mnum"><span id="introN">10</span></div><div class="mlbl" id="introLbl">FREE SPINS</div></div></div>
+  <div class="ribbon" id="introRibbon"></div>
+  <div class="chips" id="introChips"></div>
+  <div class="tapHint">TAP ANYWHERE TO START</div></div></div>
+<div class="modal tap splash" id="outroM" hidden><div class="rays"></div><div class="sp">
+  <div class="ribbon" style="margin:0 0 -40px" id="outroRibbon">BONUS COMPLETE</div>
+  <div class="medalWrap"><div class="medal wide"><div class="mtop">TOTAL WIN</div><div class="mnum"><span id="outroV">$0.00</span></div></div></div>
+  <div class="tapHint" style="margin-top:34px">TAP ANYWHERE TO CONTINUE</div></div></div>
+<!-- info: title from slot.json, body = slots/<slug>/info.html -->
+<div class="modal" id="infoM" hidden><div class="mbox wide">
+  <button class="x" data-close>×</button><h2>GRUMBLE & BRINE · DEEP SALVAGE</h2>
+  <p>5 reels x 3 rows, <b>243 WAYS</b>. Match 3 or more of a symbol on neighbouring reels from the left; any position on a reel counts. Old Boot and Tin Can need 4 or more. Max win 7,500x your bet.</p>
+  <table class="pt" id="ptab"></table>
+  <div class="rules">
+    <div><b>LANTERN JELLY (WILD)</b><span>Jellies carry a number. A Jelly of value v counts as v copies of the symbol on its reel, and counts add up inside a reel. It substitutes for every symbol except Sonar Buoys.</span></div>
+    <div><b>THE DRIFT</b><span>While a Jelly is on the board it drifts one reel to the left and grows by 1. Every other symbol respins and every board is paid. No win is needed to keep drifting. The Jelly leaves after it is paid on reel 1. Up to 4 drifts per spin.</span></div>
+    <div><b>SONAR BUOYS (SCATTER)</b><span>3, 4 or 5 Buoys anywhere pay 2x, 10x or 50x your bet and start the DEEP DIVE with 8, 10 or 12 free dives.</span></div>
+    <div><b>DEEP DIVE</b><span>Every 3rd dive brings a guaranteed Jelly. Each Jelly that leaves raises the TIDE (max 3), and new Jellies start bigger. 2 Buoys add 3 dives, 3 or more add 6. At most 40 dives.</span></div>
+    <div><b>DEEP PRESSURE</b><span>Every spin costs 2x your bet, and the Deep Dive becomes about 3.3 times as likely to trigger.</span></div>
+    <div><b>BONUS BUY</b><span>DIVE TICKET: buy the Deep Dive for 100x. ABYSS PASS: 500x for 12 dives with Tide +2 and a Jelly on every dive. This is not the same as a natural 5-Buoy start.</span></div>
+  </div>
+
+</div></div>
+<script>
+'use strict';
+/* ---- slot config (slots/grumble-and-brine/slot.json) ---- */
+const SLOT_CFG = {"id": "grumble-and-brine", "title": "Grumble & Brine: Deep Salvage", "logoText": "GRUMBLE & BRINE", "infoTitle": "GRUMBLE & BRINE · DEEP SALVAGE", "api": "/api/slot/grumble-and-brine/spin", "engineSource": "slotforge/engines/grumble-and-brine.js", "storage": "gb", "walletKey": "grumbleBrineWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 7500, "anteCost": 2, "scatterSym": 10, "char": {"el": "char", "states": ["spin", "win", "big", "special", "wince"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "KRAKEN", "lv": 4, "tag": "RELEASE THE KRAKEN MONEY!"}, {"min": 25, "name": "SALVAGE", "lv": 3, "tag": "Now THAT is a haul!"}, {"min": 10, "name": "BARNACLE", "lv": 2, "tag": "Stuck to the hull and paying."}, {"min": 5, "name": "BUBBLE", "lv": 1, "tag": "Meh. Pocket change."}], "autoBigLv": 3, "text": {"idle": "PLACE YOUR BET, KID", "spin": "SIFTING THE JUNK...", "win": "SALVAGED {amt}", "lose": "JUST JUNK", "freeSpin": "DEEP DIVE: DIVE {n} OF {total}", "freeSpinRetrigger": "  ·  +{r} DIVES!"}, "fsLabel": "DIVE", "fsCounter": "running", "fever": {"name": "Deep Pressure", "sym": 4, "vol": 3, "text": "Bet more, dive deeper. Each spin costs 2x your bet, and the Deep Dive becomes about 3.3 times as likely.", "badge": "DEEP PRESSURE ×2", "onMsg": "DEEP PRESSURE ON. TOTAL BET x2", "offMsg": "PRESSURE RELEASED"}, "buys": [{"key": "dive", "mult": 100, "sym": 10, "vol": 4, "name": "Dive Ticket", "text": "Skip the sifting. Go straight to the Deep Dive with 8 free dives. Jellies drift left and grow.", "confirmTitle": "SIGN THE TICKET?", "confirmText": "DIVE TICKET: 3 Sonar Buoys ping and the Deep Dive starts right away with 8 free dives."}, {"key": "abyss", "mult": 500, "sym": 9, "vol": 5, "name": "Abyss Pass", "text": "The premium ticket. 12 dives, the Tide already at +2, a Jelly on every dive and more Jellies in the herd.", "confirmTitle": "SIGN THE TICKET?", "confirmText": "ABYSS PASS: 12 dives, Tide starts at +2, a guaranteed Jelly every dive. Only for the brave (and the broke)."}], "intro": {"unit": "FREE DIVES", "ribbon": "DEEP DIVE", "quote": "\"Fine. Hold your breath. Don't touch the Jellies.\"", "tap": "TAP ANYWHERE TO DIVE", "chips": ["JELLIES DRIFT LEFT", "TIDE RISES, JELLIES GROW", "2+ BUOYS: MORE DIVES"]}, "outro": {"ribbon": "SURFACING", "label": "YOU SALVAGED", "quote": "\"Hmph. Not bad. Don't get used to it.\"", "tap": "TAP ANYWHERE TO SURFACE"}, "audio": {"reverb": {"sec": 2.4, "pow": 2.2, "wet": 0.34, "lp": 0.37}}, "engineData": {"paytable": [{"id": 0, "name": "Old Boot", "pays": {"3": null, "4": 0.12, "5": 0.35}}, {"id": 1, "name": "Tin Can", "pays": {"3": null, "4": 0.14, "5": 0.45}}, {"id": 2, "name": "Message Bottle", "pays": {"3": 0.04, "4": 0.14, "5": 0.41}}, {"id": 3, "name": "Rusty Key", "pays": {"3": 0.05, "4": 0.17, "5": 0.55}}, {"id": 4, "name": "Brass Compass", "pays": {"3": 0.07, "4": 0.21, "5": 0.7}}, {"id": 5, "name": "Barnacle Anchor", "pays": {"3": 0.1, "4": 0.35, "5": 1.1}}, {"id": 6, "name": "Coin Purse", "pays": {"3": 0.17, "4": 0.55, "5": 1.7}}, {"id": 7, "name": "Rusty Harpoon", "pays": {"3": 0.27, "4": 1, "5": 3.4}}, {"id": 8, "name": "Pearl Clam", "pays": {"3": 0.55, "4": 2.05, "5": 8.2}}], "payScale": 1, "scatterPay": {"3": 2, "4": 10, "5": 50}}};
+/* ---- shell ---- */
+/* SlotForge shell: shared logic for every Nebula slot. See shell/README.md for the hook API.
+ *
+ *   SlotShell.boot(SLOT_CFG, S => ({ ...hooks }))
+ *
+ * `SLOT_CFG` is slots/<slug>/slot.json (injected by build-standalone.py). The factory receives the shell API `S` and returns the
+ * slot's hooks. Pure renderer: the server returns the whole round; nothing here computes an outcome.
+ * In the standalone build a global `SLOT_ENGINE` ({playRound, CFG}) exists and the shell plays against it locally (play money).
+ */
+const SlotShell = (() => {
+const $ = id => document.getElementById(id);
+const store = { get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+const fmt = n => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const betLbl = n => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
+
+function boot(cfg, factory) {
+const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : null;   // standalone build: engine embedded, play money
+const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, BUYS = cfg.buys || [], P = cfg.storage || cfg.id;
+let hooks = {};
+let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, busy = false, balance = 0, STAGE_S = 1;
+let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false);
+let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
+const T = () => turbo ? .45 : 1;
+const wait = ms => sleep(ms * T());
+
+/* the 1600x900 stage is scaled to fit the window */
+function fit() { STAGE_S = Math.min(innerWidth / 1600, innerHeight / 900); $('stage').style.setProperty('--s', STAGE_S); }
+addEventListener('resize', fit); fit();
+
+/* ---------- audio: everything is synthesised, nothing is sampled. The shell owns the primitives; the slot owns the recipes ---------- */
+function makeKit(ctx, out) {
+  const sr = ctx.sampleRate, rvc = (cfg.audio && cfg.audio.reverb) || { sec: 1.7, pow: 2.8, wet: .28 };
+  const nb = ctx.createBuffer(1, sr * 2, sr), nd = nb.getChannelData(0);
+  for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  // room reverb: decaying noise impulse
+  const rv = ctx.createConvolver(), ib = ctx.createBuffer(2, Math.floor(sr * rvc.sec), sr);
+  for (let c = 0; c < 2; c++) { const d = ib.getChannelData(c); let lp = 0; for (let i = 0; i < d.length; i++) { d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, rvc.pow); if (rvc.lp) { lp += (d[i] - lp) * rvc.lp; d[i] = lp; } } }   // rvc.lp (0..1) = one-pole lowpass on the impulse: darker room
+  rv.buffer = ib; const wet = ctx.createGain(); wet.gain.value = rvc.wet; rv.connect(wet).connect(out);
+  const bus = ctx.createGain(); bus.connect(out); bus.connect(rv);
+  const env = (t, a, peak, d) => { const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(.0002, peak), t + a); g.gain.exponentialRampToValueAtTime(.0001, t + a + d); return g; };
+  const osc = (type, f, t, d, peak, a = .004, to, dest = bus) => { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); if (to) o.frequency.exponentialRampToValueAtTime(to, t + d); o.connect(env(t, a, peak, d)).connect(dest); o.start(t); o.stop(t + a + d + .05); };
+  const noise = (t, d, peak, type, f1, f2, q = 1, a = .002) => { const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; const f = ctx.createBiquadFilter(); f.type = type; f.frequency.setValueAtTime(f1, t); if (f2) f.frequency.exponentialRampToValueAtTime(f2, t + d); f.Q.value = q; s.connect(f).connect(env(t, a, peak, d)).connect(bus); s.start(t, Math.random()); s.stop(t + a + d + .05); };
+  const metal = (f, t, d, peak, R = [1, 2.756, 5.404, 8.933]) => R.forEach((r, i) => osc('sine', f * r, t, d / (1 + i * .7), peak / (1 + i * 1.1), .002));
+  const st = n => Math.pow(2, n / 12);
+  const T0 = () => ctx.currentTime + .005;
+  /* ambience bed: looping filtered noise + random crackles. o = {lowpass, gain, level, loopSec, crack:{gain:[min,range], f:[min,range], q, every:[min,range], len:[min,range]}} */
+  const bed = (o = {}) => {
+    const c = ctx, k = Object.assign({ lowpass: 170, gain: .5, level: .02, loopSec: 3 }, o), ck = Object.assign({ gain: [.025, .05], f: [2500, 4500], q: 3, every: [120, 900], len: [.03, .05] }, o.crack);
+    let nodes = null, timer = 0;
+    return {
+      start() { if (timer) return; const s = c.createBufferSource(), b = c.createBuffer(1, c.sampleRate * k.loopSec, c.sampleRate), d = b.getChannelData(0); let l = 0;
+        for (let i = 0; i < d.length; i++) { l = (l + (Math.random() * 2 - 1) * k.level) / 1.02; d[i] = l * 3; }
+        s.buffer = b; s.loop = true; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = k.lowpass; const g = c.createGain(); g.gain.value = k.gain; s.connect(f).connect(g).connect(out); s.start(); nodes = { s, g };
+        const crack = () => { if (!nodes) return; const t = c.currentTime, n = c.createBufferSource(); n.buffer = b; const q = c.createBiquadFilter(); q.type = 'bandpass'; q.frequency.value = ck.f[0] + Math.random() * ck.f[1]; q.Q.value = ck.q;
+          const e = c.createGain(); e.gain.setValueAtTime(.0001, t); e.gain.exponentialRampToValueAtTime(ck.gain[0] + Math.random() * ck.gain[1], t + .004); e.gain.exponentialRampToValueAtTime(.0001, t + ck.len[0] + Math.random() * ck.len[1]); n.connect(q).connect(e).connect(out); n.start(t, Math.random() * 2); n.stop(t + .12); timer = setTimeout(crack, ck.every[0] + Math.random() * ck.every[1]); };
+        crack(); },
+      stop() { clearTimeout(timer); timer = 0; if (nodes) { try { nodes.s.stop(); } catch {} nodes = null; } }
+    };
+  };
+  /* feedback delay send (sonar ping, echoes): kit.ping({time, fb, lp, wet}) -> a GainNode to connect sources to (created once) */
+  let pingN = null;
+  const ping = (o = {}) => { if (pingN) return pingN; const k = Object.assign({ time: .32, fb: .45, lp: 2500, wet: .5 }, o);
+    const inp = ctx.createGain(), dl = ctx.createDelay(2), fb = ctx.createGain(), f = ctx.createBiquadFilter(), w = ctx.createGain();
+    dl.delayTime.value = k.time; fb.gain.value = k.fb; f.type = 'lowpass'; f.frequency.value = k.lp; w.gain.value = k.wet;
+    inp.connect(out); inp.connect(dl); dl.connect(f); f.connect(fb); fb.connect(dl); f.connect(w); w.connect(out); pingN = inp; return inp; };
+  return { ctx, out, bus, env, osc, noise, metal, st, T0, bed, ping };
+}
+let ac, master, recipes, ambCtl = null;
+function audio() {
+  if (!recipes) { ac = new (window.AudioContext || window.webkitAudioContext)();
+    const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; master = ac.createGain(); master.gain.value = .9; master.connect(comp).connect(ac.destination);
+    const kit = makeKit(ac, master); recipes = hooks.sfx(kit); if (hooks.ambience) ambCtl = hooks.ambience(kit); }
+  if (ac.state === 'suspended') ac.resume(); return recipes;
+}
+const sfx = new Proxy({}, { get: (_, k) => (...a) => { if (!soundOn) return; try { audio()[k](...a); } catch {} } });
+const amb = {
+  start() { if (!soundOn) return; try { audio(); if (ambCtl) ambCtl.start(); } catch {} },
+  stop() { if (ambCtl) ambCtl.stop(); }
+};
+addEventListener('pointerdown', () => amb.start(), { once: true });
+
+/* ---------- particles (restrained: small ambient sparks + event bursts) ---------- */
+const cv = $('fx'), cx = cv.getContext('2d'); let parts = [];
+function size() { cv.width = innerWidth; cv.height = innerHeight; } size(); addEventListener('resize', size);
+function embers(n, x = innerWidth / 2, y = innerHeight / 2, gold) {
+  for (let i = 0; i < n; i++) parts.push({ x, y, vx: (Math.random() - .5) * 9, vy: -Math.random() * 8 - 1, l: 60 + Math.random() * 60, s: 2 + Math.random() * 3.5, g: .14, c: gold ? 1 : 0 });
+}
+function coins(n) { for (let i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, l: 200, s: 6 + Math.random() * 6, g: .05, c: 1 }); }
+function ambient() {
+  if (parts.length > 120) return;
+  if (Math.random() < .12 + (hooks.ambientBoost ? hooks.ambientBoost() : 0)) parts.push({ x: Math.random() * innerWidth, y: innerHeight + 6, vx: (Math.random() - .5) * .6, vy: -(.5 + Math.random() * 1.1), l: 260 + Math.random() * 160, s: 1.2 + Math.random() * 2, g: -.001, w: Math.random() * 6, c: 0 });
+}
+const defColor = (p, a) => `rgba(255,255,255,${a})`;
+(function loop() {
+  cx.clearRect(0, 0, cv.width, cv.height); ambient();
+  parts = parts.filter(p => p.l-- > 0 && p.y > -30 && p.y < innerHeight + 30);
+  const col = hooks.particleColor || defColor;
+  for (const p of parts) {
+    p.x += p.vx + (p.w ? Math.sin((p.l + p.w * 40) / 25) * .4 : 0); p.y += p.vy; p.vy += p.g;
+    const a = Math.min(1, p.l / 70); cx.fillStyle = col(p, a);
+    cx.fillRect(p.x, p.y, p.s, p.s);
+  }
+  requestAnimationFrame(loop);
+})();
+const shake = big => { const a = $('shaker'); a.classList.remove('shake', 'shake2'); void a.offsetWidth; a.classList.add(big ? 'shake2' : 'shake'); };
+const flash = () => { const f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); };
+const say = (t, hl) => { $('msg').textContent = t; $('msg').classList.toggle('hl', !!hl); };
+
+/* ---------- character controller: one CSS class per state on #char (states are animated in slot.css) ---------- */
+let charT;
+const cc = cfg.char || { el: 'char', states: ['swing', 'win', 'big', 'boom'], bonusClass: 'bonusmode' };
+function char(name, ms) {
+  const c = $(cc.el); c.classList.remove(...cc.states); void c.getBoundingClientRect(); c.classList.add(name);
+  clearTimeout(charT); charT = setTimeout(() => c.classList.remove(name), ms);
+}
+
+/* count a number up (click to skip) */
+function countUp(el, to, ms, from = 0, onTick) {
+  return new Promise(res => { const t0 = performance.now(); skipBig = false; let lt = 0;
+    (function f(t) { if (onTick && t - lt > 75) { lt = t; onTick(Math.min(1, (t - t0) / ms)); }
+      const k = skipBig ? 1 : Math.min(1, (t - t0) / ms); el.textContent = fmt(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+      k < 1 ? requestAnimationFrame(f) : res(); })(t0); });
+}
+/* floating "+$x.xx" pop at a screen point, inside #fxl (the board's fx layer) */
+function pop(sx, sy, text, layer = $('fxl')) {
+  const g = layer.getBoundingClientRect(), e = document.createElement('div'); e.className = 'pop'; e.textContent = text;
+  e.style.left = ((sx - g.left) / STAGE_S) + 'px'; e.style.top = ((sy - g.top) / STAGE_S) + 'px'; layer.append(e); setTimeout(() => e.remove(), 1200);
+}
+
+/* ---------- API client: server round, or the embedded engine with play money (standalone) ---------- */
+const API = location.origin.startsWith('http') ? '' : 'http://localhost:3000';
+const TOKEN = LOCAL ? null : localStorage.getItem('stakeToken');
+const _r2 = n => Math.round(n * 100) / 100;
+let wallet = 0;
+if (LOCAL) { try { wallet = Number(localStorage.getItem(cfg.walletKey) || cfg.startBalance || 1000); } catch { wallet = cfg.startBalance || 1000; } if (!(wallet >= 0.1)) wallet = cfg.startBalance || 1000; }
+const webRng = () => { const a = new Uint32Array(2); crypto.getRandomValues(a); return (a[0] * 2 ** 21 + (a[1] >>> 11)) / 2 ** 53; };
+async function api(body) {
+  if (LOCAL) {
+    const stake = _r2(body.stake), buy = body.buy || null;
+    const round = LOCAL.playRound(webRng, { ante: !!body.ante, buy });
+    const cost = _r2(stake * round.cost), payout = _r2(stake * round.totalPayout);
+    if (cost > wallet + 1e-9) throw new Error('Not enough balance (clear site data to reset play money)');
+    wallet = _r2(wallet - cost + payout); try { localStorage.setItem(cfg.walletKey, wallet); } catch {}
+    return { round, stake, cost, payout, user: { balance: wallet } };
+  }
+  const r = await fetch(API + cfg.api, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
+  const j = await r.json(); if (!r.ok) throw new Error(j.error || 'Spin failed'); return j;
+}
+function syncParent(u) { try { const a = parent !== window && parent._slotAPI; if (a) { a.bal = u.balance; a.paintBal(0); } } catch {} }
+
+/* ---------- modals ---------- */
+const openM = id => { $(id).hidden = false; }, closeM = id => { $(id).hidden = true; };
+document.querySelectorAll('.modal [data-close]').forEach(b => b.onclick = () => closeM(b.closest('.modal').id));
+document.querySelectorAll('.modal').forEach(m => m.addEventListener('mousedown', e => { if (e.target === m && m.id !== 'introM' && m.id !== 'outroM') { m.id === 'confirm' ? closeBuy(false) : closeM(m.id); } }));
+/* tap anywhere (or Space/Enter) to continue; ignores taps for the first 450ms so a stray click can't skip it */
+function tapWait(id, autoMs, minMs = 450) { return new Promise(res => { const m = $(id); openM(id); const t0 = performance.now(); let done = false;
+  const fin = () => { if (done) return; done = true; closeM(id); m.removeEventListener('click', onc); removeEventListener('keydown', onk); res(); };
+  const onc = () => { if (performance.now() - t0 > minMs) { sfx.hit(); fin(); } };
+  const onk = e => { if ((e.code === 'Space' || e.code === 'Enter') && performance.now() - t0 > minMs) { e.preventDefault(); sfx.hit(); fin(); } };
+  m.addEventListener('click', onc); addEventListener('keydown', onk); if (autoMs) setTimeout(fin, autoMs); }); }
+
+/* ---------- big win overlay ---------- */
+const tierOf = x => cfg.tiers.find(t => x >= t.min) || null;
+async function bigWin(x, amt) {
+  const t = tierOf(x); if (!t) return null;
+  const lv = t.lv;
+  $('bigT').textContent = t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = t.tag || '';
+  $('big').classList.add('show'); char('big', 3300); shake(lv > 2); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
+  sfx.big(lv);
+  await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => sfx.tick(k)), sleep(20000)]);
+  await sleep(auto.left > 0 ? 700 : 1500 + lv * 300);
+  $('big').classList.remove('show'); return t.name;
+}
+$('big').onclick = () => { skipBig = true; };
+
+/* ---------- the round ---------- */
+function setBusy(b) {
+  busy = b; ['m', 'p', 'buyOpen', 'menuBtn'].forEach(id => $(id).disabled = b); $('spin').disabled = b && auto.left <= 0;
+  $('bAuto').disabled = b && auto.left <= 0; $('spin').classList.toggle('busy', b && auto.left <= 0);
+}
+async function go(buy) {
+  if (busy) return; setBusy(true); sfx.spin(); closeMenu(); if (cfg.text.spin) say(cfg.text.spin);
+  $('win').textContent = fmt(0); $('fsBox').hidden = true;
+  const stake = BETS[bi]; let out = { payout: 0, bonus: false, tier: null };
+  try {
+    hooks.roundStart();
+    let j;
+    try { [j] = await Promise.all([api({ stake, ante: buy ? false : ante, buy }), hooks.clearBoard()]); }
+    catch (e) { hooks.restoreBoard(); throw e; }
+    const R = j.round; let run = 0;
+    balance = j.user.balance - j.payout;  // show the stake leaving now, the win as it lands
+    $('bal').textContent = fmt(balance);
+    const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b); } };
+    run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
+    if (R.bonusTriggered) {
+      out.bonus = true;
+      await hooks.showTrigger(R); sfx.bonus(); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
+      $('introN').textContent = R.bonus.startSpins; await tapWait('introM', auto.left > 0 ? 1800 : 0);
+      $('fsBox').hidden = false; $(cc.el).classList.add(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(true); if (ambCtl && ambCtl.bonus) ambCtl.bonus(true);
+      let total = R.bonus.spins.length;
+      for (const sp of R.bonus.spins) {
+        if (cfg.fsCounter === 'running' && sp.spinsLeft != null) total = sp.spinIndex + sp.spinsLeft;   // optional: N grows with retriggers (default: final total, as EmberClaw)
+        $('fs').textContent = `${sp.spinIndex} / ${total}` + (sp.retrigger ? '  +' + sp.retrigger : ''); say(tpl(cfg.text.freeSpin, { n: sp.spinIndex, total }) + (sp.retrigger ? tpl(cfg.text.freeSpinRetrigger, { r: sp.retrigger }) : ''), !!sp.retrigger);
+        await hooks.clearBoard();
+        run = await hooks.playSpin(sp, run, ctx); await wait(300);
+      }
+      $('fsBox').hidden = true; $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); if (ambCtl && ambCtl.bonus) ambCtl.bonus(false); $('outroV').textContent = fmt(0);
+      openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
+      await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);
+      await tapWait('outroM', auto.left > 0 ? 1500 : 0);
+    }
+    $('win').textContent = fmt(j.payout); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user);
+    out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
+    out.tier = await bigWin(R.totalPayout, j.payout);
+  } catch (e) { say(e.message); out.err = true; }
+  setBusy(false); refreshUi(); return out;
+}
+
+/* ---------- autoplay ---------- */
+async function runAuto() {
+  while (auto.left > 0) {
+    refreshUi(); const o = await go(null);
+    if (o.err) break;
+    auto.left--;
+    if ((o.bonus && auto.stopFeat) || (o.tier && auto.stopBig && cfg.tiers.find(t => t.name === o.tier).lv >= cfg.autoBigLv)) break;
+    if (BETS[bi] * (ante ? ANTE_COST : 1) > balance + 1e-9) { say('Not enough balance — autoplay stopped.'); break; }
+    await wait(450);
+  }
+  auto.left = 0; refreshUi();
+}
+const AUTO_N = [10, 25, 50, 100];
+$('autoOpts').innerHTML = AUTO_N.map(n => `<button class="opt${n === 25 ? ' sel' : ''}" data-n="${n}">${n}</button>`).join('');
+$('autoOpts').onclick = e => { const b = e.target.closest('.opt'); if (!b) return; auto.pickN = +b.dataset.n; [...$('autoOpts').children].forEach(x => x.classList.toggle('sel', x === b)); };
+$('swFeat').onclick = () => { auto.stopFeat = !auto.stopFeat; $('swFeat').classList.toggle('on', auto.stopFeat); };
+$('swBig').onclick = () => { auto.stopBig = !auto.stopBig; $('swBig').classList.toggle('on', auto.stopBig); };
+$('bAuto').onclick = () => { if (auto.left > 0) { auto.left = 0; refreshUi(); return; } if (!busy) openM('autoM'); };
+$('autoGo').onclick = () => { closeM('autoM'); auto.left = auto.pickN; runAuto(); };
+
+/* ---------- bonus buy screen + confirmation ---------- */
+let pendingBuy = null;
+function askBuy(kind) {
+  if (busy) return; const b = BUYS.find(x => x.key === kind), cost = BETS[bi] * b.mult; pendingBuy = kind;
+  $('cTitle').textContent = b.confirmTitle; $('cDesc').textContent = b.confirmText; $('cCost').textContent = fmt(cost); $('cCost').style.fontSize = fmt(cost).length > 10 ? '38px' : '';
+  const short = cost > balance + 1e-9; $('cWarn').textContent = short ? 'Not enough balance.' : ''; $('cYes').disabled = short;
+  openM('confirm');
+}
+function closeBuy(ok) { if (ok) { sfx.hit(); ante = false; refreshUi(); } const k = pendingBuy; pendingBuy = null; closeM('confirm'); if (ok && k) go(k); }
+$('cYes').onclick = () => closeBuy(true);
+$('cNo').onclick = () => closeBuy(false);
+$('buyOpen').onclick = () => { if (busy) return; sfx.ui(); refreshUi(); openM('buyM'); };
+$('bbM').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
+$('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
+
+function refreshUi() {
+  const s = BETS[bi], risk = s * (ante ? ANTE_COST : 1); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
+  $('barR').classList.toggle('hot', ante); $('betLbl').textContent = ante ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !ante; $('buyPrice').textContent = fmt(s * BUYS[0].mult);
+  const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
+  $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
+  BUYS.forEach((b, i) => fitTxt($('p' + (i + 1)), fmt(s * b.mult), 34, '23px'));
+  $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante);
+  $('bAuto').classList.toggle('on', auto.left > 0);
+  $('spinCnt').hidden = !(auto.left > 0); $('spinCnt').textContent = auto.left; $('spin').querySelector('svg').style.visibility = auto.left > 0 ? 'hidden' : '';
+  $('bTurbo').classList.toggle('on', turbo); $('bTurbo').querySelector('i').textContent = turbo ? 'ON' : 'OFF'; $('turboBadge').hidden = !turbo;
+  $('bSnd').classList.toggle('on', soundOn); $('bSnd').querySelector('i').textContent = soundOn ? 'ON' : 'OFF';
+  document.body.style.setProperty('--spd', T());
+}
+function openBets() {
+  if (busy) return; sfx.ui();
+  $('betGrid').innerHTML = BETS.map((v, i) => `<button class="opt${i === bi ? ' sel' : ''}" data-i="${i}">${betLbl(v)}</button>`).join('');
+  openM('betM');
+}
+$('betGrid').onclick = e => { const o = e.target.closest('.opt'); if (!o) return; sfx.ui(); bi = +o.dataset.i; refreshUi(); closeM('betM'); };
+$('betV').onclick = openBets;
+$('m').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
+$('p').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
+$('spin').onclick = () => { if (auto.left > 0) { auto.left = 0; sfx.ui(); refreshUi(); say('Autoplay stopping after this spin'); return; } go(null); };
+/* hamburger menu */
+const closeMenu = () => { $('menu').hidden = true; };
+$('menuBtn').onclick = e => { e.stopPropagation(); sfx.ui(); $('menu').hidden = !$('menu').hidden; };
+document.addEventListener('click', e => { if (!e.target.closest('#menu') && !e.target.closest('#menuBtn')) closeMenu(); });
+$('bTurbo').onclick = () => { sfx.ui(); turbo = !turbo; store.set(P + '_turbo', turbo); refreshUi(); };
+$('bSnd').onclick = () => { soundOn = !soundOn; store.set(P + '_snd', soundOn); soundOn ? (amb.start(), sfx.ui()) : amb.stop(); refreshUi(); };
+$('bInfo').onclick = () => { closeMenu(); openM('infoM'); };
+$('bFs').onclick = () => { closeMenu(); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch {} };
+addEventListener('keydown', e => {
+  if (e.code === 'Escape') { for (const m of ['confirm', 'buyM', 'autoM', 'infoM']) if (!$(m).hidden) { m === 'confirm' ? closeBuy(false) : closeM(m); return; } closeMenu(); }
+  if (document.querySelector('.modal:not([hidden])')) return;
+  if (e.code === 'Space') { e.preventDefault(); if (!busy) go(null); }
+});
+
+/* ---------- the API handed to the slot ---------- */
+const S = {
+  cfg, $, store, fmt, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
+  scale: () => STAGE_S, bet: () => BETS[bi], isTurbo: () => turbo, isBusy: () => busy, local: !!LOCAL,
+  skipCount: () => { skipBig = true; }
+};
+hooks = factory(S) || {};
+for (const k of ['sfx', 'init', 'paintIdle', 'roundStart', 'clearBoard', 'restoreBoard', 'playSpin', 'showTrigger'])
+  if (typeof hooks[k] !== 'function') throw new Error('slot is missing hook: ' + k);
+/* ---------- static UI generated from slot.json ---------- */
+const sym = id => `<svg viewBox="0 0 64 64"><use href="#s${id}"/></svg>`;
+document.title = cfg.title + (LOCAL ? ' (offline demo)' : '');
+$('authName').textContent = cfg.logoText;
+$('buyOpen').querySelector('svg').innerHTML = `<use href="#s${cfg.scatterSym}"/>`;
+$('feverBadge').textContent = cfg.fever.badge;
+const bigTier = cfg.tiers.find(t => t.lv === cfg.autoBigLv); $('swBigTxt').textContent = `Stop on a big win (${bigTier.min}x+)`;
+$('bbRow').innerHTML =
+  `<div class="bbc"><div class="med">${sym(cfg.fever.sym)}</div><h3>${cfg.fever.name}</h3><p>${cfg.fever.text}</p><div class="vol" data-n="${cfg.fever.vol}"><span>VOLATILITY</span></div><div class="price" id="pa">${ANTE_COST}x BET</div><button class="go or" id="ante">ACTIVATE</button></div>` +
+  BUYS.map((b, i) => `<div class="bbc"><div class="med">${sym(b.sym)}</div><h3>${b.name}</h3><p>${b.text}</p><div class="vol" data-n="${b.vol}"><span>VOLATILITY</span></div><div class="price" id="p${i + 1}">$${b.mult}.00</div><button class="go gd" id="buy${i + 1}">BUY</button></div>`).join('');
+document.querySelectorAll('.vol').forEach(v => { for (let i = 1; i <= 5; i++) v.insertAdjacentHTML('beforeend', `<i class="${i <= +v.dataset.n ? 'on' : ''}"></i>`); });
+BUYS.forEach((b, i) => { $('buy' + (i + 1)).onclick = () => { closeM('buyM'); askBuy(b.key); }; });
+$('ante').onclick = () => { sfx.ui(); ante = !ante; refreshUi(); closeM('buyM'); if (ante) { say(cfg.fever.onMsg, true); sfx.feverOn(); } else say(cfg.fever.offMsg); };
+$('introGems').innerHTML = [1, 2, 3].map(() => `<div class="g">${sym(cfg.scatterSym)}</div>`).join('');
+$('introLbl').textContent = cfg.intro.unit; $('introRibbon').textContent = cfg.intro.ribbon;
+$('introChips').innerHTML = cfg.intro.chips.map(c => `<span>${c}</span>`).join('');
+$('outroRibbon').textContent = cfg.outro.ribbon;
+/* optional extra copy (absent in EmberClaw): fs counter label, splash quote lines, tap hints, outro label, big-win taglines, splash art */
+if (cfg.fsLabel || cfg.intro.unit) document.querySelector('#fsBox small').textContent = cfg.fsLabel || cfg.intro.unit;
+const addQuote = (id, q) => { if (q) $(id).querySelector('.ribbon').insertAdjacentHTML('afterend', `<div class="quote">${q}</div>`); };
+addQuote('introM', cfg.intro.quote); addQuote('outroM', cfg.outro.quote);
+if (cfg.intro.tap) document.querySelector('#introM .tapHint').textContent = cfg.intro.tap;
+if (cfg.outro.tap) document.querySelector('#outroM .tapHint').textContent = cfg.outro.tap;
+if (cfg.outro.label) document.querySelector('#outroM .mtop').textContent = cfg.outro.label;
+if (cfg.tiers.some(t => t.tag)) $('bigX').insertAdjacentHTML('afterend', '<div id="bigTag"></div>');
+if (hooks.splashArt) for (const k of ['intro', 'outro']) $(k + 'M').querySelector('.sp').insertAdjacentHTML('afterbegin', `<div class="splashArt" id="${k}Art">${hooks.splashArt(k)}</div>`);
+
+hooks.init(S);
+hooks.paintIdle();
+refreshUi();
+say(cfg.text.idle + (LOCAL ? ' (Play-money demo)' : ''));
+if (LOCAL) { balance = wallet; $('bal').textContent = fmt(balance); }
+else if (!TOKEN) $('auth').hidden = false;
+else fetch(API + '/api/me', { headers: { authorization: 'Bearer ' + TOKEN } }).then(r => r.json())
+  .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); } else $('auth').hidden = false; });
+}
+return { boot, $, store, fmt, betLbl, sleep };
+})();
+
+/* ---- slot: grumble-and-brine ---- */
+/* Grumble & Brine: Deep Salvage. The only slot-specific client logic. The shell (shell/slot-shell.js) calls these hooks.
+ * Pure renderer: the engine/server returns the whole round (steps, drifts, wins, jelly values); nothing here computes an outcome.
+ * Round payload: see plans/grumble-and-brine/01-features-math.md section 11 (initialGrid, cascadeSteps[]/steps[] of {kind, grid, jellies, moves, wins, exits}). */
+SlotShell.boot(SLOT_CFG, S => {
+const { $, sfx, wait, T, say, shake, flash, embers, char, pop, fmt, sleep } = S;
+const ROWS = 3, COLS = 5, JELLY = 9, BUOY = 10;
+const NAMES = ['Old Boot', 'Tin Can', 'Message Bottle', 'Rusty Key', 'Brass Compass', 'Barnacle Anchor', 'Coin Purse', 'Rusty Harpoon', 'Pearl Clam'];
+const ED = S.cfg.engineData;
+let lastGrid = null, lastJ = [], tideNow = 0;
+
+/* ---------- the board: 5 reels x 3 rows ---------- */
+const cells = [];
+const at = (r, c) => cells[r * COLS + c];
+const ctr = list => { let x = 0, y = 0; list.forEach(([r, c]) => { const b = at(r, c).getBoundingClientRect(); x += b.left + b.width / 2; y += b.top + b.height / 2; }); return [x / list.length, y / list.length]; };
+function paint(grid, jellies = []) {
+  lastGrid = grid; lastJ = jellies;
+  const jm = {}; jellies.forEach(j => jm[j.r * COLS + j.c] = j.v);
+  grid.forEach((row, r) => row.forEach((s, c) => {
+    const d = at(r, c); d.className = 'cell' + (s === JELLY ? ' wild' : s === BUOY ? ' scatter' : ''); d.style.removeProperty('--dl');
+    d.innerHTML = `<svg class="g"><use href="#s${s}"/></svg>` + (s === JELLY && jm[r * COLS + c] != null ? `<span class="m">x${jm[r * COLS + c]}</span>` : '');
+  }));
+  $('grid').classList.remove('focus');
+}
+/* bottom row lands first, every row above follows (a hair of left-to-right stagger); fast = the short respin drop of a Drift */
+const dropCell = (d, r, c, fast) => { d.style.setProperty('--dl', (fast ? (2 - r) * 34 : (2 - r) * 95 + c * 22) * T() + 'ms'); d.classList.add(fast ? 'rdrop' : 'drop'); };
+function dropAll() { for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) dropCell(at(r, c), r, c); }
+async function dropOut() {
+  setStrip([], 0);
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { const d = at(r, c); d.classList.remove('drop', 'rdrop', 'hit'); d.style.setProperty('--dl', (2 - r) * 55 * T() + 'ms'); d.classList.add('out'); }
+  await wait(2 * 55 + 430);
+}
+const landSounds = (cellsList, fast) => { sfx.drop(); [0, 1, 2].forEach(r => setTimeout(() => sfx.land(r), (((2 - r) * 95) + 330) * T())); };
+
+/* ---------- Current Strip + Drift chain ---------- */
+const lanes = [...document.querySelectorAll('#strip .lane')];
+let lastChain = 0;
+function setStrip(jellies, chain) {
+  lanes.forEach((ln, c) => {
+    const js = jellies.filter(j => j.c === c), had = ln.querySelector('.chip'), sum = js.reduce((a, j) => a + j.v, 0);
+    ln.classList.toggle('on', js.length > 0);
+    if (!js.length) { if (had) had.remove(); return; }
+    const txt = 'x' + sum;
+    if (!had) ln.insertAdjacentHTML('beforeend', `<span class="chip">${txt}</span>`);
+    else if (had.textContent !== txt) { had.textContent = txt; had.style.animation = 'none'; void had.offsetWidth; had.style.animation = ''; }
+  });
+  const ch = $('chain'); if (chain === 0) lastChain = 0; ch.classList.toggle('on', chain > 0);
+  if (chain > 0 && chain !== lastChain) { lastChain = chain; $('chainN').textContent = 'x' + chain; ch.classList.remove('bump'); void ch.offsetWidth; ch.classList.add('bump'); }
+}
+
+/* ---------- Tide Gauge (Deep Dive only) ---------- */
+function setTide(n, anim) {
+  const t = $('tide'), up = n > tideNow; tideNow = n;
+  t.classList.remove('lv0', 'lv1', 'lv2', 'lv3'); t.classList.add('lv' + n); $('tideV').textContent = '+' + n;
+  if (anim && up) { t.classList.remove('pulse', 'shake'); void t.offsetWidth; t.classList.add('pulse', 'shake'); sfx.tide(n); setTimeout(() => t.classList.remove('pulse', 'shake'), 950); if (n >= 3) flash(); }
+}
+
+/* ---------- effects ---------- */
+function trail(m) {
+  const t = document.createElement('div'); t.className = 'trail'; t.textContent = '‹‹‹';
+  t.style.left = m.to * 136 + 'px'; t.style.top = m.r * 136 + 'px'; $('fxl').append(t); setTimeout(() => t.remove(), 700);
+}
+function popWin(w, stake) { const [x, y] = ctr(w.cells); pop(x, y, '+' + fmt(w.payout * stake)); }
+const buoyCells = grid => { const o = []; grid.forEach((row, r) => row.forEach((s, c) => { if (s === BUOY) o.push([r, c]); })); return o; };
+const maxV = js => js.reduce((a, j) => Math.max(a, j.v), 1);
+
+/* one board evaluation: highlight every winning way, pop the pays, update WIN */
+async function evalStep(st, n, ctx, run) {
+  let first = false;
+  if (st.wins.length) {
+    $('grid').classList.add('focus');
+    st.wins.forEach((w, i) => { w.cells.forEach(([r, c]) => at(r, c).classList.add('hit')); setTimeout(() => { popWin(w, ctx.stake); sfx.hit(); }, i * 90 * T()); });
+    sfx.win(Math.min(7, n + st.wins.length - 1));
+    if (n === 0 || st.kind === 'open') { char('win', 1500 * T()); first = true; }
+    const before = run; run += st.payout * ctx.stake; ctx.onWin(before, run);
+    say(st.kind === 'drift' ? `DRIFT! x${maxV(st.jellies)}  +${fmt(st.payout * ctx.stake)}` : `SALVAGED +${fmt(st.payout * ctx.stake)}`, true);
+    await wait(st.kind === 'open' ? 760 : 300);
+  } else if (st.kind === 'open') await wait(120);
+  return run;
+}
+
+/* Drift: the old herd stays, everything else sinks, then the new board drops in while each Jelly slides one reel left (+1) */
+async function driftStep(st, prev) {
+  setStrip(st.jellies, st.chain);
+  say(`DRIFT! x${maxV(st.jellies)}`, true); char('special', 900 * T()); sfx.special(maxV(st.jellies));
+  const keep = new Set(prev.jellies.filter(j => j.c > 0).map(j => j.r * COLS + j.c));
+  prev.exits.forEach(e => { const d = at(e.r, 0); d.classList.remove('hit'); });
+  cells.forEach((d, i) => { if (!keep.has(i)) d.classList.add('rsout'); });
+  if (prev.exits.length) say('THE JELLY LEAVES THE BOARD', true);
+  st.moves.forEach(trail);
+  await wait(140);
+  paint(st.grid, st.jellies);
+  const jm = new Set(st.jellies.map(j => j.r * COLS + j.c));
+  cells.forEach((d, i) => { if (!jm.has(i)) dropCell(d, Math.floor(i / COLS), i % COLS, true); });
+  st.moves.forEach(m => { const d = at(m.r, m.to); d.classList.add('drifting', 'pulse'); });
+  sfx.drop(); setTimeout(() => sfx.land(2), 300 * T());
+  await wait(300);
+}
+
+/* buoys on the board: staggered sonar pings as they land; returns after the landing */
+function pingBuoys(list, base) { list.forEach((_, i) => setTimeout(() => sfx.scatter(i), (base + i * 170) * T())); }
+
+async function playSpin(sp, run, ctx) {
+  const stake = ctx.stake, steps = sp.steps || [], open = steps[0], jel = open ? open.jellies : [];
+  char('spin', 950 * T());
+  if (sp.tideBefore != null) setTide(sp.tideBefore, true);
+  paint(sp.initialGrid, jel); setStrip(jel, 0); dropAll(); landSounds();
+  const buoys = buoyCells(sp.initialGrid);
+  if (buoys.length) pingBuoys(buoys, 450);
+  if (jel.length) setTimeout(() => sfx.jelly(), 520 * T());
+  await wait(820);
+  if (buoys.length && sp.tideBefore != null && buoys.length >= 2) { char('special', 900 * T()); }
+  if (sp.retrigger) { say(`+${sp.retrigger} DIVES!`, true); buoys.forEach(([r, c]) => at(r, c).classList.add('hit', 'scat')); sfx.retrigger(); await wait(700); }
+  else if (sp.scatter && sp.scatter.count === 2 && !sp.bought) { say('ONE MORE BUOY...', true); char('wince', 1100 * T()); await wait(500); }
+  let n = 0;
+  for (let i = 0; i < steps.length; i++) {
+    const st = steps[i];
+    if (i > 0) await driftStep(st, steps[i - 1]);
+    run = await evalStep(st, n, ctx, run);
+    if (st.wins.length) n++;
+    if (st.exits && st.exits.length) { st.exits.forEach(e => { const d = at(e.r, 0); d.classList.remove('drifting', 'pulse', 'hit'); d.classList.add('rsout'); }); setStrip(st.jellies.filter(j => j.c > 0), st.chain); sfx.leave(); await wait(i === steps.length - 1 ? 260 : 0); }
+    $('grid').classList.remove('focus'); cells.forEach(d => d.classList.remove('hit'));
+  }
+  if (sp.tideAfter != null) { setTide(sp.tideAfter, true); if (sp.tideAfter > (sp.tideBefore || 0)) await wait(350); }
+  if (sp.scatter && sp.scatter.payout > 0) {
+    const bc = sp.scatter.cells; bc.forEach(([r, c]) => at(r, c).classList.add('hit')); $('grid').classList.add('focus');
+    const [x, y] = ctr(bc); pop(x, y, '+' + fmt(sp.scatter.payout * stake));
+    const before = run; run += sp.scatter.payout * stake; ctx.onWin(before, run); sfx.win(4); await wait(450);
+    $('grid').classList.remove('focus');
+  }
+  if (!steps.length && !buoys.length) await wait(100);
+  return run;
+}
+
+/* the Sonar Buoys that triggered the Deep Dive ping on the board before the splash */
+async function showTrigger(R) {
+  const list = (R.scatter && R.scatter.cells) || buoyCells(lastGrid), g = list.map(([r, c]) => at(r, c));
+  cells.forEach(d => d.classList.remove('hit'));
+  $('grid').classList.add('focus'); g.forEach(d => d.classList.add('hit', 'scat'));
+  say(g.length >= 3 ? 'PING! PING! PING!' : 'SONAR PING! DEEP DIVE', true); char('special', 1100 * T());
+  g.forEach((d, i) => setTimeout(() => sfx.scatter(i), i * 260 * T()));
+  await wait(260 * g.length + 800);
+  say('SONAR PING! DEEP DIVE', true); await wait(500);
+}
+
+/* ---------- Game Info paytable (engine data x payScale, never retyped) ---------- */
+{
+  const sc = ED.scatterPay || {};
+  const f = v => v == null || v === 0 ? '<td class="no">-</td>' : `<td>${+v.toFixed(2)}x</td>`;
+  $('ptab').innerHTML = '<tr><th>SYMBOL</th><th>3</th><th>4</th><th>5</th></tr>' +
+    ED.paytable.slice().reverse().map(p => `<tr><td><div class="nm"><svg viewBox="0 0 64 64"><use href="#s${p.id}"/></svg>${p.name}</div></td>${f(p.pays[3])}${f(p.pays[4])}${f(p.pays[5])}</tr>`).join('') +
+    `<tr><td><div class="nm"><svg viewBox="0 0 64 64"><use href="#s${BUOY}"/></svg>Sonar Buoy (Scatter)</div></td>${f(sc[3])}${f(sc[4])}${f(sc[5])}</tr>` +
+    `<tr><td><div class="nm"><svg viewBox="0 0 64 64"><use href="#s${JELLY}"/></svg>Lantern Jelly (Wild)</div></td><td colspan="3">Counts as its x-value in symbols</td></tr>`;
+}
+
+/* ---------- sound: sonar pings, brass bells, bubbles and rubbery thunks (all synthesised) ---------- */
+let ambBonus = null;
+return {
+  sfx(kit) {
+    const { ctx, bus, env, osc, noise, metal, st, T0 } = kit;
+    const pg = kit.ping({ time: .32, fb: .45, lp: 2500, wet: .5 });
+    const blup = (t, f = 300, to = 900, peak = .09, d = .07) => osc('sine', f, t, d, peak, .004, to);
+    const horn = (t, d, peak, base = 55) => [1, 1.5, 2, 3].forEach((m, i) => [-7, 7].forEach(c => {
+      const o = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = env(t, d * .45, peak / (1 + i * .5), d * .55);
+      o.type = 'sawtooth'; o.frequency.value = base * m; o.detune.value = c; f.type = 'lowpass'; f.frequency.setValueAtTime(200, t); f.frequency.exponentialRampToValueAtTime(1000, t + d * .5); f.Q.value = 1.2;
+      o.connect(f).connect(g).connect(bus); o.start(t); o.stop(t + d + .1); }));
+    const flurry = (t, n, span) => { for (let i = 0; i < n; i++) blup(t + Math.random() * span, 250 + Math.random() * 300, 700 + Math.random() * 600, .05 + Math.random() * .03, .06); };
+    const bell = (f, t, p = 1, d = 1.2) => { metal(f, t, d, .13 * p, [1, 2.756, 5.404, 8.933]); noise(t, .04, .1 * p, 'bandpass', 2600, 1200, 1.4); };
+    const SC = [0, 2, 5, 7, 9, 12, 14, 17];
+    const R = {
+      ui: () => { const t = T0(); osc('triangle', 330, t, .07, .16, .002, 220); blup(t + .01, 600, 900, .06, .04); },
+      tap: () => { const t = T0(); osc('triangle', 330, t, .07, .16, .002, 220); blup(t + .01, 800, 1300, .08, .05); },
+      hit: () => { const t = T0(); noise(t, .08, .17, 'highpass', 3000, 6000, .7); osc('sine', 700, t, .07, .1, .004, 1500); },
+      spin: () => { const t = T0(); noise(t, .2, .16, 'bandpass', 220, 1400, .8, .04); osc('sine', 140, t, .2, .14, .02, 80); blup(t + .1, 300, 900, .09); },
+      drop: () => { const t = T0(); noise(t, .45, .11, 'bandpass', 1800, 300, .7, .03); },
+      land: r => { const t = T0(); osc('sine', 130, t, .13, .24, .002, 62); noise(t, .06, .15, 'lowpass', 500, 0); if (r === 2) metal(300, t, .3, .04); },
+      win: n => { const t = T0(), f = 392 * st(SC[Math.min(n, 7)]); metal(f, t, 1.0, .13, [1, 2.756, 5.404]); osc('triangle', f / 2, t, .5, .08); noise(t, .08, .03, 'highpass', 5000, 0); },
+      jelly: () => { const t = T0(); osc('sine', 520, t, .45, .1, .02, 1040); osc('sine', 780, t + .06, .45, .06, .02, 1560); },
+      special: m => { const t = T0(), k = st(Math.min(12, 2 * Math.max(0, (m || 1) - 1)));
+        osc('sine', 400 * k, t, .35, .12, .01, 1200 * k); osc('sine', 400 * k, t, .35, .1, .01, 1200 * k, pg);
+        const o = ctx.createOscillator(), l = ctx.createOscillator(), lg = ctx.createGain(), g = env(t, .05, .1, .4);
+        o.frequency.value = 220 * k; l.frequency.value = 5; lg.gain.value = 30; l.connect(lg).connect(o.frequency); o.connect(g).connect(bus); o.start(t); l.start(t); o.stop(t + .5); l.stop(t + .5);
+        metal(520 * st((m || 1) * 2), t + .28, .5, .12, [1, 2.756, 5.404]); },
+      leave: () => { const t = T0(); osc('sine', 600, t, .35, .08, .01, 200); blup(t + .1, 400, 1000, .05); },
+      scatter: n => { const t = T0(); osc('sine', 1318, t, 1.4, .14, .01, undefined, pg); if (n === 1) osc('sine', 1976, t + .02, 1.2, .1, .01, undefined, pg); if (n >= 2) osc('sine', 1568, t + .02, 1.2, .1, .01, undefined, pg); },
+      retrigger: () => { const t = T0(); [0, 7, 12].forEach((s, i) => osc('sine', 1046 * st(s), t + i * .12, 1.2, .1, .01, undefined, pg)); },
+      tide: n => { const t = T0(); osc('sine', 110, t, .8, .3, .01, 62); noise(t, .6, .14, 'lowpass', 900, 150); metal(180 * st(n * 2), t + .05, 1.2, .1); },
+      bonus: () => { const t = T0(); [1046, 1318, 1568].forEach((f, i) => osc('sine', f, t + i * .36, 1.4, .14, .01, undefined, pg)); horn(t + .6, 2.4, .07);
+        bell(220, t + 1, 1.2, 2.0); osc('sine', 50, t + 1, 1.6, .35, .01, 36);
+        const o = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = env(t + 1.2, .3, .09, 1.5); o.type = 'sawtooth'; o.frequency.setValueAtTime(90, t + 1.2); o.frequency.exponentialRampToValueAtTime(40, t + 2.8);
+        f.type = 'lowpass'; f.frequency.value = 400; o.connect(f).connect(g).connect(bus); o.start(t + 1.2); o.stop(t + 3); flurry(t + 1.3, 10, 1.2);
+        [0, 4, 7, 12].forEach((n, i) => metal(330 * st(n), t + 1.8 + i * .12, 1.6, .06)); },
+      outro: () => { const t = T0(); [0, 4, 7, 12, 16].forEach((n, i) => metal(392 * st(n), t + i * .13, 1.3, .1)); horn(t, 1.6, .045, 82.5); [1500, 2100, 1800].forEach((f, i) => osc('sine', f, t + 1 + i * .15, .12, .05, .001)); },
+      big: lv => { const t = T0(); for (let i = 0; i < lv; i++) bell(300 * (1 + i * .06), t + i * .28, .9);
+        if (lv >= 3) { const o = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = env(t + .2, .2, .14, 1.4); o.type = 'sawtooth'; o.frequency.setValueAtTime(45, t + .2); o.frequency.exponentialRampToValueAtTime(32, t + 1.7); f.type = 'lowpass'; f.frequency.value = 300; o.connect(f).connect(g).connect(bus); o.start(t + .2); o.stop(t + 1.9); noise(t + .2, 1.5, .28, 'lowpass', 900, 120); }
+        [0, 4, 7, 12, 16, 19, 24].slice(0, 3 + lv).forEach((n, i) => metal(440 * st(n), t + .3 + i * .1, 1.2, .08)); flurry(t, 20, 1.5); osc('sine', 110, t, 1.4, .5, .01, 24); },
+      tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .12, .001); noise(t, .02, .08, 'highpass', 6000, 0); },
+      feverOn: () => { const t = T0(); noise(t, .5, .12, 'highpass', 3000, 800, .8); osc('sine', 90, t, .5, .14, .02, 140); metal(260, t + .1, .8, .1); }
+    };
+    return R;
+  },
+  /* deep water hum, bubble bursts, a far whale, rare ship-bell clank; in the dive a sonar heartbeat */
+  ambience(kit) {
+    const { ctx, out, osc, metal } = kit; let src = null, g = null, tm = [], hb = 0, run = false, inBonus = false;
+    const later = (fn, lo, hi) => { const id = setTimeout(() => { tm = tm.filter(x => x !== id); if (run) { if (!S.isTurbo()) fn(); later(fn, lo, hi); } }, lo + Math.random() * (hi - lo)); tm.push(id); };
+    return {
+      start() { if (run) return; run = true;
+        const b = ctx.createBuffer(1, ctx.sampleRate * 4, ctx.sampleRate), d = b.getChannelData(0); let l = 0; for (let i = 0; i < d.length; i++) { l = (l + (Math.random() * 2 - 1) * .02) / 1.02; d[i] = l * 3; }
+        src = ctx.createBufferSource(); src.buffer = b; src.loop = true; const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 260;
+        const lf = ctx.createOscillator(), lg = ctx.createGain(); lf.frequency.value = .07; lg.gain.value = 120; lf.connect(lg).connect(f.frequency); lf.start();
+        g = ctx.createGain(); g.gain.value = .05 * 6; src.connect(f).connect(g).connect(out); src.start(); this.lf = lf;
+        later(() => { const n = 3 + Math.floor(Math.random() * 4), t = ctx.currentTime + .02; for (let i = 0; i < n; i++) osc('sine', 250 + Math.random() * 100, t + i * .08, .06, .03, .004, 800); }, 4000, 9000);
+        later(() => { const t = ctx.currentTime + .02, o = ctx.createOscillator(), f2 = ctx.createBiquadFilter(), e = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(90, t); o.frequency.linearRampToValueAtTime(140, t + 1.5); o.frequency.linearRampToValueAtTime(100, t + 3);
+          f2.type = 'lowpass'; f2.frequency.value = 400; e.gain.setValueAtTime(.0001, t); e.gain.linearRampToValueAtTime(.025, t + 1); e.gain.linearRampToValueAtTime(.0001, t + 3); o.connect(f2).connect(e).connect(kit.bus); o.start(t); o.stop(t + 3.1); }, 14000, 25000);
+        later(() => metal(180, ctx.currentTime + .02, 2, .02), 30000, 50000);
+        if (inBonus) this.bonus(true); },
+      stop() { run = false; tm.forEach(clearTimeout); tm = []; clearInterval(hb); hb = 0; try { src && src.stop(); this.lf && this.lf.stop(); } catch {} src = null; },
+      bonus(on) { inBonus = on; if (g) g.gain.value = on ? .08 * 6 : .05 * 6; clearInterval(hb); hb = 0;
+        if (on && run) hb = setInterval(() => { if (!S.isTurbo()) osc('sine', 220, ctx.currentTime + .01, .5, .03, .01); }, 1600); }
+    };
+  },
+  /* only event bursts are drawn; the shell's ambient rising specks (p.w) stay invisible: no floating dots/bubbles (owner preference) */
+  particleColor: (p, a) => p.w ? 'rgba(0,0,0,0)' : p.c ? `rgba(255,${190 + (p.l % 50)},70,${a})` : `rgba(${170 + (p.l % 60)},250,255,${a})`,
+  init() { for (let i = 0; i < ROWS * COLS; i++) { const d = document.createElement('div'); d.className = 'cell'; $('grid').append(d); cells.push(d); } },
+  paintIdle() { paint([[0, 2, 4, 6, 8], [3, 5, 1, 7, 2], [4, 0, 6, 3, 5]]); dropAll(); },
+  roundStart() { setStrip([], 0); },
+  clearBoard: dropOut,
+  restoreBoard() { if (lastGrid) paint(lastGrid, lastJ); },
+  baseSpin: R => ({ initialGrid: R.initialGrid, steps: R.cascadeSteps, scatter: R.scatter, bought: R.bought }),
+  playSpin,
+  showTrigger,
+  bonusMode(on) { $('tide').classList.toggle('on', on); setTide(0, false); }
+};
+});
+
+</script></body></html>

@@ -1,0 +1,163 @@
+{
+ "id": "grumble-and-brine",
+ "title": "Grumble & Brine: Deep Salvage",
+ "logoText": "GRUMBLE & BRINE",
+ "infoTitle": "GRUMBLE & BRINE · DEEP SALVAGE",
+ "api": "/api/slot/grumble-and-brine/spin",
+ "engineSource": "slotforge/engines/grumble-and-brine.js",
+ "storage": "gb",
+ "walletKey": "grumbleBrineWallet",
+ "startBalance": 1000,
+ "bets": [
+  0.1,
+  0.2,
+  0.3,
+  0.4,
+  0.5,
+  0.6,
+  0.8,
+  1,
+  1.5,
+  2,
+  2.5,
+  3,
+  4,
+  5,
+  6,
+  8,
+  10,
+  12,
+  15,
+  20,
+  25,
+  30,
+  40,
+  50,
+  60,
+  80,
+  100,
+  150,
+  200,
+  250,
+  300,
+  400,
+  500,
+  750,
+  1000,
+  1500,
+  2000,
+  3000,
+  4000,
+  5000,
+  7500,
+  10000
+ ],
+ "defaultBet": 1,
+ "maxWin": 7500,
+ "anteCost": 2,
+ "scatterSym": 10,
+ "char": {
+  "el": "char",
+  "states": [
+   "spin",
+   "win",
+   "big",
+   "special",
+   "wince"
+  ],
+  "bonusClass": "bonusmode"
+ },
+ "tiers": [
+  {
+   "min": 100,
+   "name": "KRAKEN",
+   "lv": 4,
+   "tag": "RELEASE THE KRAKEN MONEY!"
+  },
+  {
+   "min": 25,
+   "name": "SALVAGE",
+   "lv": 3,
+   "tag": "Now THAT is a haul!"
+  },
+  {
+   "min": 10,
+   "name": "BARNACLE",
+   "lv": 2,
+   "tag": "Stuck to the hull and paying."
+  },
+  {
+   "min": 5,
+   "name": "BUBBLE",
+   "lv": 1,
+   "tag": "Meh. Pocket change."
+  }
+ ],
+ "autoBigLv": 3,
+ "text": {
+  "idle": "PLACE YOUR BET, KID",
+  "spin": "SIFTING THE JUNK...",
+  "win": "SALVAGED {amt}",
+  "lose": "JUST JUNK",
+  "freeSpin": "DEEP DIVE: DIVE {n} OF {total}",
+  "freeSpinRetrigger": "  ·  +{r} DIVES!"
+ },
+ "fsLabel": "DIVE",
+ "fsCounter": "running",
+ "fever": {
+  "name": "Deep Pressure",
+  "sym": 4,
+  "vol": 3,
+  "text": "Bet more, dive deeper. Each spin costs 2x your bet, and the Deep Dive becomes about 3.3 times as likely.",
+  "badge": "DEEP PRESSURE ×2",
+  "onMsg": "DEEP PRESSURE ON. TOTAL BET x2",
+  "offMsg": "PRESSURE RELEASED"
+ },
+ "buys": [
+  {
+   "key": "dive",
+   "mult": 100,
+   "sym": 10,
+   "vol": 4,
+   "name": "Dive Ticket",
+   "text": "Skip the sifting. Go straight to the Deep Dive with 8 free dives. Jellies drift left and grow.",
+   "confirmTitle": "SIGN THE TICKET?",
+   "confirmText": "DIVE TICKET: 3 Sonar Buoys ping and the Deep Dive starts right away with 8 free dives."
+  },
+  {
+   "key": "abyss",
+   "mult": 500,
+   "sym": 9,
+   "vol": 5,
+   "name": "Abyss Pass",
+   "text": "The premium ticket. 12 dives, the Tide already at +2, a Jelly on every dive and more Jellies in the herd.",
+   "confirmTitle": "SIGN THE TICKET?",
+   "confirmText": "ABYSS PASS: 12 dives, Tide starts at +2, a guaranteed Jelly every dive. Only for the brave (and the broke)."
+  }
+ ],
+ "intro": {
+  "unit": "FREE DIVES",
+  "ribbon": "DEEP DIVE",
+  "quote": "\"Fine. Hold your breath. Don't touch the Jellies.\"",
+  "tap": "TAP ANYWHERE TO DIVE",
+  "chips": [
+   "JELLIES DRIFT LEFT",
+   "TIDE RISES, JELLIES GROW",
+   "2+ BUOYS: MORE DIVES"
+  ]
+ },
+ "outro": {
+  "ribbon": "SURFACING",
+  "label": "YOU SALVAGED",
+  "quote": "\"Hmph. Not bad. Don't get used to it.\"",
+  "tap": "TAP ANYWHERE TO SURFACE"
+ },
+ "audio": {
+  "reverb": {
+   "sec": 2.4,
+   "pow": 2.2,
+   "wet": 0.34,
+   "lp": 0.37
+  }
+ }
+}

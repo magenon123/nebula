@@ -144,7 +144,7 @@ A base spin has a Jelly about 1 time in 9 and up to 4 drifts. One drift step (ch
 
 ### 5.1 Trigger and dives
 - **3, 4 or 5+ Sonar Buoys** anywhere on a normal base-spin opening grid trigger it: **8 / 10 / 12 dives**. (Scatter pay 2x / 10x / 50x is paid as well.)
-- Buoy frequency per cell (base) is `scatterP` = 0.0222: P(3+) = 1 in 245 (E[8-dive trigger]); 4+ = 6.7% of triggers, 5+ = 0.33%.
+- Buoy frequency per cell (base) is `scatterP` = 0.02202: P(3+) = 1 in 251 (E[8-dive trigger]); 4+ = 6.7% of triggers, 5+ = 0.33%.
 - Every dive is a normal spin (opening grid + the Drift loop) with the bonus parameters below. Dives do **not** cost a bet. Total dives paid are not limited by the buoy count: retriggers add dives.
 
 ### 5.2 Bonus board parameters (same table for natural trigger, Deep Pressure and Dive Ticket)
@@ -179,7 +179,7 @@ All three use **the same Deep Dive** (same bonus table); only the start state or
 - Dive Ticket and Abyss Pass cannot be combined with Deep Pressure.
 
 ### 6.1 Deep Pressure ("Fever" mode, bet-up)
-- **Cost: 2x bet** (the stake shown as total bet), **Deep Dive about 3.3x as likely** (1 in ~75 instead of 1 in 245): the opening-grid Buoy probability is `anteScatterP` = 0.0342 (instead of 0.0222). Nothing else changes: same Jelly rates, same pay table, same bonus (judge rule: ONE bonus).
+- **Cost: 2x bet** (the stake shown as total bet), **Deep Dive about 3.3x as likely** (1 in ~75 instead of 1 in 251): the opening-grid Buoy probability is `anteScatterP` = 0.0342 (instead of 0.02202). Nothing else changes: same Jelly rates, same pay table, same bonus (judge rule: ONE bonus).
 - RTP algebra (judge's form), with the measured numbers (prototype, 3M ante rounds; rin re-measures with the engine):
   - Normal game: `Rb` = 56.6% per bet, `F` = 244.7 (exact binomial 245.4), `E_nat` = 97.1x (decomposition) so `S = E_nat / F` = 39.6% and RTP = `Rb + S` = 96.2%.
   - Deep Pressure per round (staked N = 2 bets): `Rb'` = 59.0% of one bet (it is higher than `Rb`: more Buoys also mean more scatter pay), `P_ante` = 1 in 74.7 (exact binomial 74.8) so **M = 245.4 / 74.8 = 3.28**, `E_ante` = 99.8x (higher than 97.1 because 4+ Buoys are 10.6% of ante triggers instead of 6.7%).
@@ -239,6 +239,19 @@ The four numbers the judge asked for: **F = 245** (natural trigger 1-in-245), **
 Honest reading: the normal-game direct estimate (97.1 +-0.7 over 4M rounds) is about 0.9 above the decomposition (96.2); the decomposition is the better estimate because Rb is precise and E[bonus] comes from 1.6M bonus plays. rin's 4 x 2M run settles it; if the true normal RTP is above 96.5, lower `bonus.jellyP` by ~1% (or raise F by lowering `scatterP` to 0.0220); the Dive Ticket and Abyss Pass move with `bonus.jellyP` too, so re-tune `buy.abyss.jellyFactor` afterwards. The prototype simulator is meant to be within ~1 point; the engine's own simulator is the authority.
 
 Tails (normal game, 4M rounds): P(>= 1,000x) = 29.8 per million (1 in 33,600); 7,500x cap hit 3 times in 4M rounds (1 in 1.3M); Deep Pressure cap hits 4 in 3M. Standard deviation per round: 12-18 x bet (seed dependent).
+
+### 10.2b MEASURED RESULTS, engine simulator (rin, final; this section is the authority, 10.2 above is maya's prototype)
+
+Tuning change versus the first draft: `scatterP` 0.0222 -> **0.02202** (trigger 1 in 245 -> 1 in 251). Nothing else moved (`anteScatterP` 0.0342, `bonus.jellyP`, `jellyFactor` 1.25, paytable unchanged). Command: `node tools/sim.js grumble-and-brine <mode> <rounds> <seeds>`; seeds 31-34 (final), plus 11-14 / 21-24 tuning runs.
+
+| mode | rounds (4 seeds each) | RTP per unit staked | seed spread | 95% CI | decomposition / notes |
+|---|---|---|---|---|---|
+| Normal (1x) | 4 x 10M = 40M (plus 20M tuning run, 96.24) | **96.33%** | 96.27-96.45 | +-0.48 | base game (ways+drift+scatter pay) 56.67% + bonus share 41.2% (E[natural bonus] 99.4x, 1 in 251); hit 26.25% |
+| Deep Pressure (2x) | 4 x 10M = 40M (seeds 21-24) | **96.27%** | 95.99-96.52 | +-0.41 | per total bet: base 29.65% + bonus 69.2% share (1 in 75, E 99.6x, M = 3.35); hit 26.49% |
+| Dive Ticket (100x) | 4 x 2M = 8M | **96.05%** | 95.98-96.15 | +-0.14 | E[bonus] 96.0x; cap hit 1 in 11.1k |
+| Abyss Pass (500x) | 4 x 2M = 8M | **96.42%** | 96.39-96.45 | +-0.08 | E[bonus] 482.1x; cap hit 1 in 3.8k |
+
+Tails (normal, 20M rounds, seeds 41-44): P(>= 1,000x) = 486 / 20M = **1 in 41,150**; P(>= 100x) = 1 in 734; hit frequency 26.25%; 7,500x cap hit 30 times in 40M (1 in 1.3M, 7.5 per 10M); no round above 7,500x ever. No buy returns more than its price on average (all <= 96.5%). The bonus tail is heavy: the CI above uses the larger of the round-level and seed-to-seed error. Normal-game direct and decomposed estimates agree (56.67 + 99.4/251 = 96.27). Dive Ticket sits at the low edge of the band (96.05, CI +-0.14), Abyss Pass near the upper edge (96.42, +-0.08), both inside 96.0-96.5.
 
 ### 10.3 Notes
 - A single 1M run swings by about +-1.5 RTP points (bonus tail); do not trust one seed.
@@ -320,7 +333,7 @@ The bought trigger spin: `initialGrid` with 3 or 5 Buoys, `cascadeSteps: []`, `s
 | `weights` | [11,11,11,11,11,10,10,9,8] | pay symbol weights ids 0..8, base and bonus and drift refills |
 | `pay` | table 2.2 | `pay[id] = [p3,p4,p5]` (0 where absent) |
 | `payScale` | 1 | must stay 1 (paytable honesty); keep only as a tuning escape hatch, printed by the paytable if it ever differs |
-| `scatterP` | 0.0222 | per-cell Buoy probability on the base opening grid |
+| `scatterP` | 0.02202 | per-cell Buoy probability on the base opening grid |
 | `anteScatterP` | 0.0342 | same, Deep Pressure |
 | `anteCost` | 2 | Deep Pressure cost |
 | `scatterPay` | {3:2,4:10,5:50} | base Buoy pay, bet multiples |
