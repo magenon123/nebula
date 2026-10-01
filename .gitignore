@@ -5,3 +5,4 @@ node_modules/
 package-lock.json
 nebula-casino-99rtp.html
 electron-app/node_modules/
+slotforge/chat/.cursor-*
