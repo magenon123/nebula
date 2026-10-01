@@ -33,7 +33,8 @@ Known gaps vs. the design doc: the bonus share is ~20% rather than 29%, and Buy 
 ## Shared slot layout (use for every new slot)
 The game lives on a fixed 1600x900 stage that is scaled to fit the window, so positions are identical in every slot.
 `emberclaw.html` marks the reusable "SHELL" pieces; keep them exactly here:
-- **Bottom bar:** round yellow BUY BONUS button (far left); hamburger menu + balance + win; bet panel with up/down chevrons and a progress bar; big ring-shaped spin button; small autoplay button.
+- **Bonus Buy:** a forged sign hanging on chains at the left edge of the stage (below the top-left corner), showing the standard buy price. Opens the Bonus Buy screen.
+- **Bottom bar:** hamburger menu + balance + win; bet panel with up/down chevrons and a progress bar; big ring-shaped spin button; small autoplay button.
 - **Bonus Buy screen:** full-screen row of white cards (title, text, icon, volatility, price, ACTIVATE/BUY) with the bet adjuster on top. Ante / double-chance is a card here. BUY opens a confirm popup.
 - **Menu:** sound, turbo, game info (paytable), fullscreen. Bonus intro/outro screens are "tap anywhere to continue".
 - **Per-slot art (swap for each new slot):** the scene, logo, frame, symbols (`<symbol id="s0..s8">`), the character on the right, and the side mechanic (here the Forge Core tube on the left).
@@ -47,3 +48,7 @@ The game lives on a fixed 1600x900 stage that is scaled to fit the window, so po
 ## Bought bonus & bet sizes
 - A bought bonus first plays a **trigger spin**: the server returns a board with 3 (4 for Pre-Heated) Forgefire Gems and no wins (`round.initialGrid`, `cascadeSteps: []`); the gems pulse, then the free-spins splash appears. The trigger spin pays nothing, so the math is unchanged.
 - Bet sizes: 42 options from $0.10 to $10,000 (`CFG.bets` on the server, validated in `/api/emberclaw/spin`; click the bet amount in the bar for a quick-pick grid).
+
+## Forge Fever (ante)
+- Costs **3x** the bet, makes the bonus **5x** as likely (about 1 in 56 spins), and uses a richer bonus table (`CFG.anteBonusWeights`) so it still returns about 96% per dollar staked (simulated 88-99% across 600k-round seeds, mean ~94-96%). Activating it closes the Bonus Buy screen, the bet bar shows the total risk ("TOTAL BET") in orange. It can't be combined with buying a bonus.
+- Autoplay: the spin button turns into a white square showing the spins left; click it to stop.

@@ -130,18 +130,24 @@ button:disabled{cursor:not-allowed}
 #cBrows{transition:transform .15s}
 
 /* ---------- bottom bar (SHELL: identical in every slot) ---------- */
-#buyOpen{filter:url(#roughU);left:98px;top:762px;width:112px;height:112px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#ffdd4a,#f4b90a 70%);border:6px solid var(--ink);box-shadow:0 6px 0 rgba(0,0,0,.45);transition:transform .15s}
-#buyOpen:hover:not(:disabled){transform:scale(1.07) rotate(-3deg)}
-#buyOpen span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--toon);font-size:25px;line-height:.95;color:var(--ink);transform:rotate(-17deg);text-align:center}
-#buyOpen:disabled{filter:saturate(.4) brightness(.7)}
-#barL{left:262px;top:782px;width:620px;height:92px;background:radial-gradient(circle at 14px 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),#c9a15a 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) calc(100% - 14px),#c9a15a 4px,transparent 5px),linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-left:0;border-radius:0 18px 12px 0;display:flex;align-items:center;gap:30px;padding-left:24px;box-shadow:inset 0 0 0 3px #6e4a36,0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+#buyOpen{left:40px;top:150px;width:184px;height:270px;transform-origin:50% -150px;animation:sway 5.5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+#buyOpen .ch{position:absolute;top:-400px;width:10px;height:480px;background:repeating-linear-gradient(180deg,#9a9ea8 0 12px,#3a3d46 12px 15px);border-radius:5px;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+#buyOpen .ch.l{left:26px}#buyOpen .ch.r{right:26px}
+#buyOpen .plq{position:absolute;left:0;top:80px;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding-top:14px;border-radius:12px 12px 22px 22px;background:radial-gradient(circle at 14px 14px,#d9b56a 4.5px,transparent 5.5px),radial-gradient(circle at calc(100% - 14px) 14px,#d9b56a 4.5px,transparent 5.5px),linear-gradient(#3a2a22,#1a0f0b);border:5px solid var(--ink);box-shadow:inset 0 0 0 3px #b8742a,0 0 22px rgba(255,120,30,.55),0 8px 0 rgba(0,0,0,.45);filter:url(#roughU);transition:.15s}
+#buyOpen:hover:not(:disabled) .plq{box-shadow:inset 0 0 0 3px #ffb02e,0 0 34px rgba(255,140,30,.9),0 8px 0 rgba(0,0,0,.45);transform:translateY(-3px)}
+#buyOpen svg{width:84px;height:84px;overflow:visible;filter:drop-shadow(0 4px 0 rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(255,70,130,.8));animation:wob 2s ease-in-out infinite alternate}
+#buyOpen b{font-family:var(--toon);font-weight:400;font-size:34px;line-height:.95;letter-spacing:1px;text-align:center;color:var(--gold);text-shadow:2px 3px 0 var(--ink)}
+#buyOpen em{margin-top:8px;font-style:normal;font-family:var(--toon);font-size:22px;color:#fff;background:var(--ink);padding:2px 14px 0;border-radius:20px;border:3px solid #7a5238}
+#buyOpen:disabled{filter:saturate(.4) brightness(.7);animation:none}
+#barL{left:150px;top:782px;width:700px;height:92px;background:radial-gradient(circle at 14px 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),#c9a15a 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) calc(100% - 14px),#c9a15a 4px,transparent 5px),linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-left:0;border-radius:0 18px 12px 0;display:flex;align-items:center;gap:30px;padding-left:24px;box-shadow:inset 0 0 0 3px #6e4a36,0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
 #menuBtn{width:54px;height:54px;display:grid;place-items:center;border-radius:12px}
 #menuBtn:hover{background:#2a1a14}
 #menuBtn svg{width:42px;height:42px;fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round}
 .fld label{display:block;font-size:14px;font-weight:900;color:#b79a82;letter-spacing:2px}
 .fld .v{font-family:var(--toon);font-size:35px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
 .fld .v.gold{color:var(--gold)}
-#barR{left:950px;top:782px;width:310px;height:92px;background:radial-gradient(circle at 14px 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),#c9a15a 4px,transparent 5px),linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-radius:12px 0 0 18px;border-right:0;padding:12px 0 0 28px;box-shadow:inset 0 0 0 3px #6e4a36,0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+#barR{left:880px;top:782px;width:380px;height:92px;background:radial-gradient(circle at 14px 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),#c9a15a 4px,transparent 5px),linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-radius:12px 0 0 18px;border-right:0;padding:12px 0 0 28px;box-shadow:inset 0 0 0 3px #6e4a36,0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
 #betV{font-family:var(--toon);font-size:31px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
 #betBar{position:absolute;left:0;bottom:0;height:7px;background:#fff;border-radius:0 4px 0 0;transition:width .2s}
 #chev{position:absolute;right:92px;top:8px;width:56px;height:76px;display:flex;flex-direction:column;justify-content:space-between}
@@ -158,20 +164,25 @@ button:disabled{cursor:not-allowed}
 #spin:disabled{border-color:#8a8078}
 #spin:disabled svg{stroke:#8a8078}
 @keyframes rot{to{transform:rotate(360deg)}}
-#spin .cnt{position:absolute;font-family:var(--toon);font-size:40px;color:#fff}
+#spin .cnt{position:absolute;width:64px;height:64px;border-radius:15px;background:#fff;color:#14100f;font-family:var(--toon);font-size:40px;line-height:1;padding-top:5px;display:grid;place-items:center;box-shadow:0 0 0 4px rgba(255,255,255,.25)}
 #bAuto{left:1362px;top:800px;width:68px;height:68px;border-radius:50%;background:linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);display:grid;place-items:center;box-shadow:inset 0 0 0 3px #6e4a36,0 5px 0 rgba(0,0,0,.35);filter:url(#roughU)}
 #bAuto svg{width:36px;height:36px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 #bAuto:hover:not(:disabled){background:#2a1a14}
 #bAuto.on{background:var(--accent)}
 #bAuto:disabled{opacity:.5}
-#turboBadge{left:950px;top:732px;padding:2px 12px;border-radius:99px;background:var(--accent);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px}
+#turboBadge{left:1290px;top:732px;padding:2px 12px;border-radius:99px;background:var(--accent);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px}
+#barR.hot{border-color:var(--ink);background:radial-gradient(circle at 14px 14px,#ffd36a 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),#ffd36a 4px,transparent 5px),linear-gradient(#5a2210,#2a0e06);box-shadow:inset 0 0 0 3px #ff8a1a,0 0 26px rgba(255,100,20,.8),0 7px 0 rgba(0,0,0,.4);animation:hotp 1.6s ease-in-out infinite}
+@keyframes hotp{50%{box-shadow:inset 0 0 0 3px #ffb02e,0 0 40px rgba(255,120,20,1),0 7px 0 rgba(0,0,0,.4)}}
+#barR.hot #betV{color:#ffb02e;text-shadow:0 0 16px #ff6a00,2px 3px 0 var(--ink)}
+#barR.hot #betLbl{color:#ffb070}
+#feverBadge{left:1075px;top:732px;padding:2px 12px;border-radius:99px;background:linear-gradient(#ff8a2a,#d8400a);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px;box-shadow:0 0 18px rgba(255,100,20,.8)}
 #msg{left:540px;top:728px;width:520px;height:42px;display:flex;align-items:center;justify-content:center;font-family:var(--toon);font-size:25px;letter-spacing:1px;color:#fff;text-shadow:2px 2px 0 var(--ink),-2px 2px 0 var(--ink),2px -2px 0 var(--ink),-2px -2px 0 var(--ink)}
 #msg.hl{color:var(--gold)}
 #fsBox{filter:url(#roughU);left:36px;top:34px;padding:8px 22px 8px 56px;border-radius:14px;background:var(--ink);border:4px solid var(--accent);font-family:var(--toon);font-size:30px;color:#fff;animation:pillin .35s ease-out}
 #fsBox::before{content:"FS";position:absolute;left:8px;top:5px;width:38px;height:38px;border-radius:50%;background:var(--gold);color:var(--ink);display:grid;place-items:center;font-size:18px;border:3px solid #7a4a00}
 #fsBox small{display:block;font-family:var(--ui);font-size:11px;font-weight:900;letter-spacing:2px;color:#b8a89a;margin-bottom:-2px}
 @keyframes pillin{from{transform:translateY(-12px);opacity:0}}
-#menu{left:266px;top:560px;width:230px;padding:10px;background:linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px #6e4a36,0 8px 0 rgba(0,0,0,.4);z-index:20;filter:url(#roughU)}
+#menu{left:154px;top:560px;width:230px;padding:10px;background:linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px #6e4a36,0 8px 0 rgba(0,0,0,.4);z-index:20;filter:url(#roughU)}
 #menu button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:11px 12px;border-radius:9px;font-size:17px;font-weight:700}
 #menu button:hover{background:#2a1a14}
 #menu i{font-style:normal;font-size:13px;font-weight:900;letter-spacing:1px;padding:2px 9px;border-radius:99px;background:#3a2a24;color:#b8a89a}
@@ -369,48 +380,78 @@ button:disabled{cursor:not-allowed}
 <!-- ============ scene: cartoon volcano forge ============ -->
 <svg id="scene" width="1600" height="900" viewBox="0 0 1600 900">
  <defs>
-  <linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="900"><stop offset="0" stop-color="#2a0f33"/><stop offset=".42" stop-color="#7a2440"/><stop offset=".75" stop-color="#e2652a"/><stop offset="1" stop-color="#ffb347"/></linearGradient>
-  <g id="cloudA"><circle cx="0" cy="0" r="46"/><circle cx="55" cy="-20" r="56"/><circle cx="115" cy="0" r="46"/><circle cx="55" cy="22" r="42"/></g>
+  <linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="900"><stop offset="0" stop-color="#07040a"/><stop offset=".3" stop-color="#1c0b18"/><stop offset=".55" stop-color="#5a1f1c"/><stop offset=".78" stop-color="#b8461a"/><stop offset="1" stop-color="#ff9a3a"/></linearGradient>
+  <radialGradient id="horizon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb04a" stop-opacity=".85"/><stop offset=".4" stop-color="#ff6a1a" stop-opacity=".4"/><stop offset="1" stop-color="#ff4a0a" stop-opacity="0"/></radialGradient>
+  <linearGradient id="farM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a3040"/><stop offset="1" stop-color="#2c1522"/></linearGradient>
+  <linearGradient id="volcG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2028"/><stop offset=".55" stop-color="#1e0f15"/><stop offset="1" stop-color="#0d0709"/></linearGradient>
+  <linearGradient id="nearM" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241218"/><stop offset="1" stop-color="#0a0507"/></linearGradient>
+  <linearGradient id="lavaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9a2a"/><stop offset=".5" stop-color="#e0480c"/><stop offset="1" stop-color="#7a1604"/></linearGradient>
+  <linearGradient id="flowG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd25a"/><stop offset="1" stop-color="#ff5a14"/></linearGradient>
+  <linearGradient id="crystalG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset=".5" stop-color="#ff9a2a"/><stop offset="1" stop-color="#c8400a"/></linearGradient>
+  <!-- volumetric smoke: layered fractal noise, alpha-keyed -->
+  <filter id="smoke" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0045 .011" numOctaves="5" seed="12"/><feColorMatrix type="matrix" values="0 0 0 0 .12  0 0 0 0 .05  0 0 0 0 .09  1.7 0 0 0 -.62" result="s"/><feGaussianBlur in="s" stdDeviation="6"/></filter>
+  <filter id="smokeLit" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".005 .013" numOctaves="4" seed="31"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 .4  0 0 0 0 .1  1.8 0 0 0 -.95" result="s"/><feGaussianBlur in="s" stdDeviation="9"/></filter>
+  <!-- rock surface: lit noise, multiplied over the shape colour -->
+  <filter id="rock" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".03 .045" numOctaves="5" seed="3" result="n"/><feDiffuseLighting in="n" lighting-color="#8a6252" surfaceScale="4.5" diffuseConstant=".75"><feDistantLight azimuth="215" elevation="52"/></feDiffuseLighting><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 .55"/></filter>
+  <filter id="veins" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0065 .032" numOctaves="4" seed="8"/><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 .62  0 0 0 0 .12  8 0 0 0 -4.3"/></filter>
+  <filter id="glowB" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14"/></filter>
+  <filter id="glowS" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+  <filter id="haze" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.2"/></filter>
+  <clipPath id="lakeClip"><path d="M-400 812 Q-100 786 220 806 Q560 830 860 808 Q1180 786 1500 812 Q1740 826 2000 806 V920 H-400Z"/></clipPath>
+  <clipPath id="volcClip"><path d="M180 760 L400 380 Q440 312 486 306 L640 306 Q690 312 724 380 L1000 760Z"/></clipPath>
  </defs>
  <rect x="-1500" y="-1200" width="4600" height="3200" fill="url(#sky)"/>
- <rect x="-500" y="-60" width="2700" height="640" fill="url(#dots)"/>
- <circle cx="560" cy="430" r="300" fill="#ffd36a" opacity=".22"/>
- <g filter="url(#roughL)">
- <!-- smoke -->
- <g fill="#5a2f4a" stroke="#1d0f09" stroke-width="12" stroke-linejoin="round"><use href="#cloudA" transform="translate(200 120) scale(1.5)"/><use href="#cloudA" transform="translate(1180 80) scale(1.2)"/><use href="#cloudA" transform="translate(760 40)"/></g>
- <g fill="#5a2f4a"><use href="#cloudA" transform="translate(200 120) scale(1.5)"/><use href="#cloudA" transform="translate(1180 80) scale(1.2)"/><use href="#cloudA" transform="translate(760 40)"/></g>
- <g fill="#7d4668"><circle cx="250" cy="96" r="24"/><circle cx="1220" cy="62" r="20"/><circle cx="800" cy="26" r="16"/></g>
- <!-- far ridge -->
- <path d="M-500 560 L-200 520 L120 430 L330 520 L460 430 L520 380 L600 300 L640 300 L720 380 L800 440 L1000 560 L1180 470 L1330 540 L1500 450 L1700 520 L2100 560 V900 H-500Z" fill="#3b1a38" stroke="#1d0f09" stroke-width="7" stroke-linejoin="round"/>
+ <ellipse cx="800" cy="560" rx="1000" ry="330" fill="url(#horizon)"/>
+ <ellipse cx="560" cy="330" rx="240" ry="150" fill="url(#horizon)" opacity=".8"/>
+ <!-- ash clouds, dark body lit from below -->
+ <rect x="-300" y="-120" width="2200" height="760" filter="url(#smoke)"/>
+ <rect x="-300" y="120" width="2200" height="560" filter="url(#smokeLit)" opacity=".28" style="mix-blend-mode:screen"/>
+ <!-- far ridge, hazy -->
+ <g filter="url(#haze)">
+  <path d="M-400 560 L-120 500 L120 430 L330 508 L470 440 L560 392 L640 340 L720 400 L800 450 L1000 546 L1180 470 L1330 530 L1500 460 L1700 520 L2000 540 V900 H-400Z" fill="url(#farM)"/>
+ </g>
  <!-- volcano -->
- <path d="M200 700 L410 360 Q440 300 480 298 L650 298 Q690 300 720 360 L980 700Z" fill="#432338" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
- <path d="M650 298 Q690 300 720 360 L980 700 L820 700 L690 420Z" fill="#331a2c"/>
- <path d="M440 300 L470 330 L520 312 L580 335 L630 312 L670 300 Q600 270 520 276 Q470 280 440 300Z" fill="#ffae2e" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
- <path d="M500 322 Q490 400 520 450 Q540 500 510 560 Q500 600 520 700 L580 700 Q560 620 575 560 Q600 480 560 420 Q548 370 560 326Z" fill="#ff7a1a" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
- <path d="M510 330 Q505 400 530 450 Q548 500 520 560" fill="none" stroke="#ffd23a" stroke-width="7" stroke-linecap="round"/>
- <path d="M630 330 Q640 380 622 420 Q612 470 634 520" fill="none" stroke="#ff7a1a" stroke-width="12" stroke-linecap="round"/>
- <path d="M630 330 Q640 380 622 420 Q612 470 634 520" fill="none" stroke="#1d0f09" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+ <path d="M180 760 L400 380 Q440 312 486 306 L640 306 Q690 312 724 380 L1000 760Z" fill="url(#volcG)"/>
+ <g clip-path="url(#volcClip)"><rect x="150" y="290" width="900" height="500" filter="url(#rock)"/></g>
+ <path d="M724 380 L1000 760 L840 760 L700 480Z" fill="#000" opacity=".35"/>
+ <!-- crater glow + lava flows -->
+ <ellipse cx="563" cy="312" rx="120" ry="34" fill="#ff7a1a" filter="url(#glowB)" opacity=".9"/>
+ <path d="M452 316 Q500 296 563 300 Q630 296 676 316 Q640 330 563 332 Q490 330 452 316Z" fill="#ffc24a"/>
+ <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M520 330 Q500 400 530 460 Q552 520 520 590 Q508 650 530 740" stroke="#ff6a14" stroke-width="22" filter="url(#glowS)" opacity=".85"/>
+  <path d="M520 330 Q500 400 530 460 Q552 520 520 590 Q508 650 530 740" stroke="url(#flowG)" stroke-width="9"/>
+  <path d="M626 330 Q646 390 624 440 Q612 500 640 560" stroke="#ff6a14" stroke-width="16" filter="url(#glowS)" opacity=".8"/>
+  <path d="M626 330 Q646 390 624 440 Q612 500 640 560" stroke="url(#flowG)" stroke-width="6"/>
+ </g>
+ <!-- eruption plume -->
+ <g filter="url(#glowB)" opacity=".85"><ellipse cx="548" cy="250" rx="70" ry="60" fill="#3a1a1c"/><ellipse cx="600" cy="170" rx="90" ry="70" fill="#2a1216"/><ellipse cx="660" cy="80" rx="120" ry="80" fill="#1c0b10"/></g>
+ <ellipse cx="560" cy="262" rx="60" ry="40" fill="#ff7a1a" filter="url(#glowB)" opacity=".5" style="mix-blend-mode:screen"/>
  <!-- right peak -->
- <path d="M1000 700 L1230 470 Q1260 440 1300 470 L1560 700Z" fill="#40213a" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
- <path d="M1300 470 L1560 700 L1400 700 L1290 520Z" fill="#311a2d"/>
+ <path d="M1000 780 L1230 500 Q1262 468 1302 496 L1600 780Z" fill="url(#nearM)"/>
+ <g><clipPath id="rpClip"><path d="M1000 780 L1230 500 Q1262 468 1302 496 L1600 780Z"/></clipPath><g clip-path="url(#rpClip)"><rect x="980" y="460" width="640" height="340" filter="url(#rock)"/></g></g>
  <!-- left cliff -->
- <path d="M-500 900 V560 L-300 560 L40 440 Q120 410 170 470 L250 600 L320 640 L340 760 L300 900Z" fill="#2c1820" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
- <path d="M40 440 Q120 410 170 470 L250 600 L190 600 L120 500Z" fill="#442736"/>
- <path d="M60 520 L90 590 M130 640 L170 700 M30 700 L70 760" stroke="#1d0f09" stroke-width="5" stroke-linecap="round"/>
- <path d="M60 520 L90 590 M130 640 L170 700 M30 700 L70 760" stroke="#ff7a1a" stroke-width="2.6" stroke-linecap="round" opacity=".9"/>
- <g stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"><path d="M250 640 L272 580 L296 640Z" fill="#ffae2e"/><path d="M286 650 L312 560 L336 650Z" fill="#ff8a1a"/><path d="M226 650 L238 612 L254 650Z" fill="#ffd23a"/></g>
- <!-- right ledge for the smith -->
- <path d="M1090 900 L1110 780 Q1150 770 1200 790 L1600 770 L2100 770 V900Z" fill="#2c1820" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
- <path d="M1110 780 Q1150 770 1200 790 L1600 770 L2100 770 L2100 800 L1600 800 L1200 818 Q1150 800 1105 810Z" fill="#442736"/>
- <path d="M1300 840 L1330 880 M1500 830 L1470 880" stroke="#1d0f09" stroke-width="5" stroke-linecap="round"/>
- <!-- lava river -->
- <path d="M-500 820 Q-300 790 120 830 Q380 860 640 836 Q900 812 1100 860 L1100 900 H-500Z" fill="#ff7a1a" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
- <path d="M-500 850 Q-200 830 130 858 Q380 878 640 862 Q880 850 1090 884 V900 H-500Z" fill="#e0460a"/>
- <g fill="#ffd23a" stroke="#1d0f09" stroke-width="4"><circle cx="150" cy="848" r="12"/><circle cx="420" cy="868" r="9"/><circle cx="700" cy="852" r="14"/><circle cx="930" cy="866" r="8"/></g>
- <!-- hanging chains behind the frame -->
- <g stroke="#1d0f09" stroke-width="14" stroke-linecap="round"><path d="M520 -400 V130" stroke-dasharray="14 8"/><path d="M1080 -400 V130" stroke-dasharray="14 8"/></g>
- <g stroke="#8d93a2" stroke-width="7" stroke-linecap="round"><path d="M520 -400 V130" stroke-dasharray="14 15"/><path d="M1080 -400 V130" stroke-dasharray="14 15"/></g>
- <path d="M410 360 Q440 300 480 298 L520 298 L400 700 L200 700Z" fill="url(#hatchL)"/><path d="M-500 560 L-300 560 L40 440 L170 470 L250 600 L190 760 L-500 760Z" fill="url(#hatchL)"/></g>
+ <path d="M-400 920 V560 L-120 560 L60 452 Q130 420 182 476 L262 610 L330 650 L346 780 L310 920Z" fill="url(#nearM)"/>
+ <clipPath id="lcClip"><path d="M-400 920 V560 L-120 560 L60 452 Q130 420 182 476 L262 610 L330 650 L346 780 L310 920Z"/></clipPath>
+ <g clip-path="url(#lcClip)"><rect x="-420" y="420" width="800" height="520" filter="url(#rock)"/></g>
+ <path d="M60 452 Q130 420 182 476 L262 610" fill="none" stroke="#ff8a3a" stroke-width="3" opacity=".55" filter="url(#glowS)"/>
+ <!-- glowing crystals -->
+ <g filter="url(#glowS)" opacity=".8"><path d="M252 660 L276 590 L300 660Z M290 668 L318 566 L344 668Z M226 668 L240 622 L258 668Z" fill="#ff9a2a"/></g>
+ <g><path d="M252 660 L276 590 L300 660Z" fill="url(#crystalG)"/><path d="M290 668 L318 566 L344 668Z" fill="url(#crystalG)"/><path d="M226 668 L240 622 L258 668Z" fill="url(#crystalG)"/>
+  <path d="M276 590 L284 660 M318 566 L328 668" stroke="#fff3c0" stroke-width="2" opacity=".6"/></g>
+ <!-- ledge for the smith -->
+ <path d="M1080 920 L1100 790 Q1150 774 1210 796 L1600 774 L2000 774 V920Z" fill="url(#nearM)"/>
+ <clipPath id="ldClip"><path d="M1080 920 L1100 790 Q1150 774 1210 796 L1600 774 L2000 774 V920Z"/></clipPath>
+ <g clip-path="url(#ldClip)"><rect x="1060" y="760" width="960" height="180" filter="url(#rock)"/></g>
+ <path d="M1100 790 Q1150 774 1210 796 L1600 774 L2000 774" fill="none" stroke="#ff8a3a" stroke-width="3" opacity=".5" filter="url(#glowS)"/>
+ <!-- lava lake -->
+ <path d="M-400 812 Q-100 786 220 806 Q560 830 860 808 Q1180 786 1500 812 Q1740 826 2000 806 V920 H-400Z" fill="#240804"/>
+ <g clip-path="url(#lakeClip)"><rect x="-420" y="770" width="2460" height="150" filter="url(#veins)"/>
+  <rect x="-420" y="860" width="2460" height="60" fill="#ff5a14" opacity=".35" filter="url(#glowB)"/></g>
+ <path d="M-400 812 Q-100 786 220 806 Q560 830 860 808 Q1180 786 1500 812 Q1740 826 2000 806" fill="none" stroke="#ff9a3a" stroke-width="6" opacity=".7" filter="url(#glowS)"/>
+ <!-- chains behind the frame -->
+ <g stroke-linecap="round"><path d="M520 -400 V130" stroke="#000" stroke-width="12" opacity=".5" transform="translate(4 3)"/><path d="M1080 -400 V130" stroke="#000" stroke-width="12" opacity=".5" transform="translate(4 3)"/>
+  <path d="M520 -400 V130" stroke="#8a8d96" stroke-width="9" stroke-dasharray="15 6"/><path d="M1080 -400 V130" stroke="#8a8d96" stroke-width="9" stroke-dasharray="15 6"/>
+  <path d="M520 -400 V130" stroke="#c9ccd4" stroke-width="3" stroke-dasharray="15 18"/><path d="M1080 -400 V130" stroke="#c9ccd4" stroke-width="3" stroke-dasharray="15 18"/></g>
 </svg>
 <div class="heatwash"></div>
 
@@ -517,16 +558,16 @@ button:disabled{cursor:not-allowed}
 
 <div id="msg">Strike the anvil. (Play-money demo)</div>
 <div id="fsBox" hidden><small>FREE SPINS</small><span id="fs">0</span></div>
-<div id="turboBadge" hidden>TURBO</div>
+<div id="turboBadge" hidden>TURBO</div><div id="feverBadge" hidden>FORGE FEVER ×3</div>
 
 <!-- ============ shell: bottom bar (same in every slot) ============ -->
-<button id="buyOpen" title="Bonus buy"><span>BUY<br>BONUS</span></button>
+<button id="buyOpen" title="Bonus buy"><i class="ch l"></i><i class="ch r"></i><span class="plq"><svg viewBox="0 0 64 64"><use href="#s8"/></svg><b>BONUS<br>BUY</b><em id="buyPrice">$100.00</em></span></button>
 <div id="barL">
   <button id="menuBtn" title="Menu"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
   <div class="fld"><label>BALANCE</label><div class="v" id="bal">–</div></div>
   <div class="fld"><label>WIN</label><div class="v gold" id="win">$0.00</div></div>
 </div>
-<div id="barR"><label style="font-size:14px;font-weight:900;color:#b79a82;display:block;letter-spacing:2px">BET</label><div id="betV"><span id="bet">$1.00</span></div><div id="betBar"></div>
+<div id="barR"><label id="betLbl" style="font-size:14px;font-weight:900;color:#b79a82;display:block;letter-spacing:2px">BET</label><div id="betV"><span id="bet">$1.00</span></div><div id="betBar"></div>
   <div id="chev"><button id="p" title="Raise bet"><svg viewBox="0 0 34 20"><path d="M4 16 L17 4 L30 16"/></svg></button><button id="m" title="Lower bet"><svg viewBox="0 0 34 20"><path d="M4 4 L17 16 L30 4"/></svg></button></div></div>
 <button id="spin" title="Spin (Space)"><svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-3-6.5"/><path d="M20.5 3.5v5.5h-5.5"/></svg><span class="cnt" id="spinCnt" hidden></span></button>
 <button id="bAuto" title="Autoplay"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
@@ -547,7 +588,7 @@ button:disabled{cursor:not-allowed}
   <h2 class="bbT">BONUS BUY</h2><button class="bbX" data-close>×</button>
   <div class="bbBet"><button id="bbM">−</button><div><small>YOUR BET</small><b id="bbBet">$1.00</b></div><button id="bbP">+</button></div>
   <div class="bbRow">
-    <div class="bbc"><div class="med"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div><h3>Double Chance</h3><p>Each spin costs 25% more, but the bonus game is about twice as likely to trigger.</p><div class="vol" data-n="3"><span>VOLATILITY</span></div><div class="price" id="pa">+25% BET</div><button class="go or" id="ante">ACTIVATE</button></div>
+    <div class="bbc"><div class="med"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div><h3>Forge Fever</h3><p>Each spin costs 3x your bet, but the bonus game is 5 times more likely to trigger!</p><div class="vol" data-n="3"><span>VOLATILITY</span></div><div class="price" id="pa">3x BET</div><button class="go or" id="ante">ACTIVATE</button></div>
     <div class="bbc"><div class="med"><svg viewBox="0 0 64 64"><use href="#s6"/></svg></div><h3>The Reforging</h3><p>10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.</p><div class="vol" data-n="4"><span>VOLATILITY</span></div><div class="price" id="p1">$100.00</div><button class="go gd" id="buy1">BUY</button></div>
     <div class="bbc"><div class="med"><svg viewBox="0 0 64 64"><use href="#s7"/></svg></div><h3>Pre-Heated</h3><p>The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.</p><div class="vol" data-n="5"><span>VOLATILITY</span></div><div class="price" id="p2">$500.00</div><button class="go gd" id="buy2">BUY</button></div>
   </div>
@@ -589,7 +630,7 @@ button:disabled{cursor:not-allowed}
     <div><b>FORGE CORE</b><span>Every winning tumble feeds the Core. Wilds feed it extra for each cluster they touch. At 3 heat every cluster pays a flat bonus. At 6 a random low symbol is reforged into a Wild. At 9 the Core detonates: all Wilds x2 and another symbol reforges.</span></div>
     <div><b>WILDS</b><span>Ember Core Sigils substitute for every symbol and stay on the board until the tumbles end. Multiple Wilds in a cluster add their multipliers.</span></div>
     <div><b>THE REFORGING</b><span>3+ Forgefire Gems start 10 free spins. The Core never resets between spins. Every 3rd spin starts with a guaranteed detonation. 2+ Gems add 4 spins.</span></div>
-    <div><b>BONUS BUY &amp; DOUBLE CHANCE</b><span>Buy the bonus for 100x, or Pre-Heated (Core at 6) for 500x. Double Chance adds 25% to your bet and boosts the odds of triggering the bonus.</span></div>
+    <div><b>BONUS BUY &amp; FORGE FEVER</b><span>Buy the bonus for 100x, or Pre-Heated (Core at 6) for 500x. Forge Fever makes every spin cost 3x your bet, and the bonus becomes 5 times more likely to trigger.</span></div>
   </div>
 </div></div>
 <script>
@@ -617,14 +658,15 @@ const CFG = {
   bonusWeights: [10, 10, 10, 14, 18, 22, 22], // leaner table during The Reforging (heat persists, so wilds snowball)
   bonusFlatCap: 8,                        // in The Reforging the flat bonus stacks once per 3 heat, up to this many tiers
   scatterP: 0.01027,                      // per-cell scatter chance on the initial grid (~1 in 280)
-  anteScatterP: 0.01319,                // ante: raised scatter weight (~1 in 140)
+  anteScatterP: 0.018557,                // Forge Fever: scatter weight raised so the bonus is ~5x as likely (~1 in 56)
   payScale: 1.055,                        // global payout trim applied to every cluster win (RTP calibration)
   heatFlat: 0.75,                         // heat >= 3: every cluster pays this flat bonus (spec said 0.5x; raised while tuning RTP)
   maxWin: 9500,
   freeSpins: 10, retriggerSpins: 4, retriggerMin: 2, maxBonusSpins: 100, maxSteps: 60,
   bets: [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000],
   buy: { standard: { cost: 100, heat: 0 }, preheated: { cost: 500, heat: 6 } },
-  anteCost: 1.25
+  anteCost: 3,                            // Forge Fever costs 3x the bet
+  anteBonusWeights: [7.75, 7.75, 7.75, 14, 18.25, 22.25, 22.25], // Forge Fever bonuses use a richer table so the 3x price still returns ~96%
 };
 
 function cryptoRng() { const a = new Uint32Array(2); crypto.getRandomValues(a); return (a[0] * 2 ** 21 + (a[1] >>> 11)) / 2 ** 53; }
@@ -775,11 +817,11 @@ function triggerGrid(rng, n) {
 }
 
 function playRound(rng, { ante = false, buy = null } = {}) {
-  const bonusFrom = (startHeat) => {
+  const bonusFrom = (startHeat, bw = CFG.bonusWeights) => {
     const spins = []; let heat = startHeat, left = CFG.freeSpins, n = 0, total = 0, awarded = CFG.freeSpins;
     while (left > 0 && n < CFG.maxBonusSpins && total < CFG.maxWin) {
       n++; left--;
-      const s = engineSpin(rng, { heat0: heat, forceDetonate: n % 3 === 0, weights: CFG.bonusWeights, inBonus: true });
+      const s = engineSpin(rng, { heat0: heat, forceDetonate: n % 3 === 0, weights: bw, inBonus: true });
       s.spinIndex = n; heat = s.endHeat; total += s.totalPayout;
       if (s.scatters >= CFG.retriggerMin) { left += CFG.retriggerSpins; awarded += CFG.retriggerSpins; s.retrigger = CFG.retriggerSpins; }
       s.spinsLeft = left;
@@ -797,7 +839,7 @@ function playRound(rng, { ante = false, buy = null } = {}) {
   const base = engineSpin(rng, { ante });
   const trig = base.scatters >= 3;
   let bonus = null, total = base.totalPayout;
-  if (trig) { bonus = bonusFrom(0); total = Math.min(CFG.maxWin, total + bonus.totalPayout); }
+  if (trig) { bonus = bonusFrom(0, ante ? CFG.anteBonusWeights : CFG.bonusWeights); total = Math.min(CFG.maxWin, total + bonus.totalPayout); }
   return {
     cost: ante ? CFG.anteCost : 1,
     initialGrid: base.initialGrid, openingEvents: base.openingEvents, openingGrid: base.openingGrid,
@@ -828,6 +870,7 @@ const PT = [[.1,.25,.5,1.5],[.15,.3,.6,1.75],[.2,.4,.8,2],[.4,1,2.5,6],[.6,1.5,3
 const BETS = [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000];  // keep in sync with CFG.bets on the server
 const betLbl = n => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2));
 const store = { get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+const ANTE_COST = 3;  // Forge Fever multiplier, keep in sync with CFG.anteCost on the server
 let bi = BETS.indexOf(1), ante = false, busy = false, balance = 0, lastGrid = null, lastWilds = [], STAGE_S = 1;
 let soundOn = store.get('ec_snd', true), turbo = store.get('ec_turbo', false);
 let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
@@ -1038,7 +1081,7 @@ function tapWait(id, autoMs, minMs = 450) { return new Promise(res => { const m 
   m.addEventListener('click', onc); addEventListener('keydown', onk); if (autoMs) setTimeout(fin, autoMs); }); }
 
 function setBusy(b) {
-  busy = b; ['spin', 'm', 'p', 'buyOpen', 'menuBtn'].forEach(id => $(id).disabled = b);
+  busy = b; ['m', 'p', 'buyOpen', 'menuBtn'].forEach(id => $(id).disabled = b); $('spin').disabled = b && auto.left <= 0;
   $('bAuto').disabled = b && auto.left <= 0; $('spin').classList.toggle('busy', b && auto.left <= 0);
 }
 
@@ -1094,7 +1137,7 @@ async function runAuto() {
     if (o.err) break;
     auto.left--;
     if ((o.bonus && auto.stopFeat) || (o.tier === 'FORGED' || o.tier === 'LEGENDARY') && auto.stopBig) break;
-    if (BETS[bi] * (ante ? 1.25 : 1) > balance + 1e-9) { say('Not enough balance — autoplay stopped.'); break; }
+    if (BETS[bi] * (ante ? ANTE_COST : 1) > balance + 1e-9) { say('Not enough balance — autoplay stopped.'); break; }
     await wait(450);
   }
   auto.left = 0; refreshUi();
@@ -1119,20 +1162,21 @@ function askBuy(kind) {
   const short = cost > balance + 1e-9; $('cWarn').textContent = short ? 'Not enough balance.' : ''; $('cYes').disabled = short;
   openM('confirm');
 }
-function closeBuy(ok) { if (ok) sfx.hit(); const k = pendingBuy; pendingBuy = null; closeM('confirm'); if (ok && k) go(k); }
+function closeBuy(ok) { if (ok) { sfx.hit(); ante = false; refreshUi(); } const k = pendingBuy; pendingBuy = null; closeM('confirm'); if (ok && k) go(k); }
 $('cYes').onclick = () => closeBuy(true);
 $('cNo').onclick = () => closeBuy(false);
 $('buyOpen').onclick = () => { if (busy) return; sfx.ui(); refreshUi(); openM('buyM'); };
 $('buy1').onclick = () => { closeM('buyM'); askBuy('standard'); };
 $('buy2').onclick = () => { closeM('buyM'); askBuy('preheated'); };
-$('ante').onclick = () => { sfx.ui(); ante = !ante; refreshUi(); };
+$('ante').onclick = () => { sfx.ui(); ante = !ante; refreshUi(); closeM('buyM'); if (ante) { say('FORGE FEVER ON · 5x BONUS CHANCE', true); sfx.heat(6); } else say('Forge Fever off'); };
 $('bbM').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
 $('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
 
 function syncParent(u) { try { const a = parent !== window && parent._slotAPI; if (a) { a.bal = u.balance; a.paintBal(0); } } catch {} }
 function refreshUi() {
-  const s = BETS[bi]; $('betV').style.fontSize = s >= 1000 ? '24px' : s >= 100 ? '28px' : '';
-  const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(s); $('bbBet').textContent = fmt(s);
+  const s = BETS[bi], risk = s * (ante ? ANTE_COST : 1); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
+  $('barR').classList.toggle('hot', ante); $('betLbl').textContent = ante ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !ante; $('buyPrice').textContent = fmt(s * 100);
+  const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
   $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
   fitTxt($('p1'), fmt(s * 100), 34, '23px'); fitTxt($('p2'), fmt(s * 500), 34, '23px');
   $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante);
@@ -1151,7 +1195,7 @@ $('betGrid').onclick = e => { const o = e.target.closest('.opt'); if (!o) return
 $('betV').onclick = openBets;
 $('m').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
 $('p').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
-$('spin').onclick = () => go(null);
+$('spin').onclick = () => { if (auto.left > 0) { auto.left = 0; sfx.ui(); refreshUi(); say('Autoplay stopping after this spin'); return; } go(null); };
 /* hamburger menu */
 const closeMenu = () => { $('menu').hidden = true; };
 $('menuBtn').onclick = e => { e.stopPropagation(); sfx.ui(); $('menu').hidden = !$('menu').hidden; };

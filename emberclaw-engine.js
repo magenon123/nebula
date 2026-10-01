@@ -22,14 +22,15 @@ export const CFG = {
   bonusWeights: [10, 10, 10, 14, 18, 22, 22], // leaner table during The Reforging (heat persists, so wilds snowball)
   bonusFlatCap: 8,                        // in The Reforging the flat bonus stacks once per 3 heat, up to this many tiers
   scatterP: 0.01027,                      // per-cell scatter chance on the initial grid (~1 in 280)
-  anteScatterP: 0.01319,                // ante: raised scatter weight (~1 in 140)
+  anteScatterP: 0.018557,                // Forge Fever: scatter weight raised so the bonus is ~5x as likely (~1 in 56)
   payScale: 1.055,                        // global payout trim applied to every cluster win (RTP calibration)
   heatFlat: 0.75,                         // heat >= 3: every cluster pays this flat bonus (spec said 0.5x; raised while tuning RTP)
   maxWin: 9500,
   freeSpins: 10, retriggerSpins: 4, retriggerMin: 2, maxBonusSpins: 100, maxSteps: 60,
   bets: [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000],
   buy: { standard: { cost: 100, heat: 0 }, preheated: { cost: 500, heat: 6 } },
-  anteCost: 1.25
+  anteCost: 3,                            // Forge Fever costs 3x the bet
+  anteBonusWeights: [7.75, 7.75, 7.75, 14, 18.25, 22.25, 22.25], // Forge Fever bonuses use a richer table so the 3x price still returns ~96%
 };
 
 export function cryptoRng() {
@@ -182,11 +183,11 @@ function triggerGrid(rng, n) {
 }
 
 export function playRound(rng, { ante = false, buy = null } = {}) {
-  const bonusFrom = (startHeat) => {
+  const bonusFrom = (startHeat, bw = CFG.bonusWeights) => {
     const spins = []; let heat = startHeat, left = CFG.freeSpins, n = 0, total = 0, awarded = CFG.freeSpins;
     while (left > 0 && n < CFG.maxBonusSpins && total < CFG.maxWin) {
       n++; left--;
-      const s = playSpin(rng, { heat0: heat, forceDetonate: n % 3 === 0, weights: CFG.bonusWeights, inBonus: true });
+      const s = playSpin(rng, { heat0: heat, forceDetonate: n % 3 === 0, weights: bw, inBonus: true });
       s.spinIndex = n; heat = s.endHeat; total += s.totalPayout;
       if (s.scatters >= CFG.retriggerMin) { left += CFG.retriggerSpins; awarded += CFG.retriggerSpins; s.retrigger = CFG.retriggerSpins; }
       s.spinsLeft = left;
@@ -204,7 +205,7 @@ export function playRound(rng, { ante = false, buy = null } = {}) {
   const base = playSpin(rng, { ante });
   const trig = base.scatters >= 3;
   let bonus = null, total = base.totalPayout;
-  if (trig) { bonus = bonusFrom(0); total = Math.min(CFG.maxWin, total + bonus.totalPayout); }
+  if (trig) { bonus = bonusFrom(0, ante ? CFG.anteBonusWeights : CFG.bonusWeights); total = Math.min(CFG.maxWin, total + bonus.totalPayout); }
   return {
     cost: ante ? CFG.anteCost : 1,
     initialGrid: base.initialGrid, openingEvents: base.openingEvents, openingGrid: base.openingGrid,
