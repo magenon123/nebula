@@ -93,17 +93,17 @@
   <path d="M5 38 Q-1 49 8 53 Q15 51 11 45" fill="none" stroke-width="5.5"/><path d="M5 38 Q-1 49 8 53 Q15 51 11 45" fill="none" stroke="#d8402e" stroke-width="2.4"/>
   <circle cx="38" cy="39" r="1.8" fill="#c4602a" stroke="none"/><circle cx="16" cy="30" r="1.6" fill="#c4602a" stroke="none"/></g></symbol>
  <symbol id="s8" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
-  <path d="M4 36 Q2 10 32 5 Q62 10 60 36Z" fill="#7c4aae" stroke-width="4"/>
-  <path d="M32 6 V34 M18 9 L14 34 M46 9 L50 34" stroke-width="2" fill="none"/>
-  <path d="M38 8 Q58 12 59 34 L46 34Z" fill="url(#gbH)" stroke="none"/>
-  <path d="M6 42 Q3 24 32 18 Q61 24 58 42 Q58 53 51 57 Q45 62 39 58 Q32 63 25 58 Q19 62 13 57 Q6 53 6 42Z" fill="#b783e0" stroke-width="4"/>
-  <path d="M32 18 V60 M19 21 L14 55 M45 21 L50 55 M10 31 L8 48 M54 31 L56 48" fill="none" stroke-width="2.4"/>
-  <path d="M37 19 Q60 25 58 43 Q58 53 51 57 Q45 62 40 58 Q50 50 50 36Z" fill="url(#gbH)" stroke="none"/>
-  <path d="M9 42 Q8 33 12 27" stroke="#e6c8fa" stroke-width="3" fill="none"/>
-  <ellipse cx="32" cy="40" rx="18" ry="7" fill="#ff6f7d" stroke-width="3"/>
-  <circle cx="32" cy="31" r="12.5" fill="#fffdf5" stroke-width="3.8"/>
-  <path d="M39 34 Q37 42 28 41 Q43 44 44 32Z" fill="#ffd6e0" stroke="none"/><path d="M26 25 Q29 22 34 23" stroke="#d9fbff" stroke-width="3" fill="none"/>
-  <path d="M55 3 l2.4 5.6 5.6 2.4 -5.6 2.4 -2.4 5.6 -2.4 -5.6 -5.6 -2.4 5.6 -2.4z" fill="#fff" stroke-width="1.8"/></g></symbol>
+  <path d="M5 38 Q2 22 12 13 Q15 7 22 7 Q26 2 32 2 Q38 2 42 7 Q49 7 52 13 Q62 22 59 38 Q32 30 5 38Z" fill="#7c4aae" stroke-width="4"/>
+  <path d="M32 34 L32 5 M32 34 L16 10 M32 34 L48 10 M32 34 L8 22 M32 34 L56 22" stroke-width="2" fill="none"/>
+  <path d="M40 6 Q50 7 52 13 Q62 22 59 38 L36 33Z" fill="url(#gbH)" stroke="none"/>
+  <path d="M8 36 Q26 30 56 36 Q32 42 8 36Z" fill="#ff6f7d" stroke-width="3"/>
+  <path d="M4 38 Q32 30 60 38 Q63 50 53 57 Q47 62 41 59 Q36 63 32 62 Q28 63 23 59 Q17 62 11 57 Q1 50 4 38Z" fill="#b783e0" stroke-width="4"/>
+  <path d="M32 40 L32 61 M32 40 L21 59 M32 40 L43 59 M32 40 L11 55 M32 40 L53 55" fill="none" stroke-width="2.4"/>
+  <path d="M38 36 Q60 36 60 40 Q62 50 53 57 Q47 62 41 59 Q50 50 46 38Z" fill="url(#gbH)" stroke="none"/>
+  <path d="M8 44 Q9 40 13 38" stroke="#e6c8fa" stroke-width="3" fill="none"/>
+  <circle cx="32" cy="33" r="12.5" fill="#fffdf5" stroke-width="3.8"/>
+  <path d="M41 37 Q38 45 28 44 Q44 47 45 35Z" fill="#ffd6e0" stroke="none"/><path d="M24 26 Q28 22 34 23" stroke="#d9fbff" stroke-width="3.2" fill="none"/>
+  <path d="M55 2 l2.4 5.6 5.6 2.4 -5.6 2.4 -2.4 5.6 -2.4 -5.6 -5.6 -2.4 5.6 -2.4z" fill="#fff" stroke-width="1.8"/></g></symbol>
  <symbol id="s9" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
   <ellipse cx="32" cy="28" rx="31" ry="27" fill="#5df2e0" opacity=".38" filter="url(#gbGlow)" stroke="none"/>
   <path d="M19 38 q-7 8 0 14 q6 6 -2 10 M32 40 q-3 8 2 12 q5 5 0 10 M45 38 q7 8 0 14 q-6 6 2 10" fill="none" stroke-width="9.5"/>
@@ -113,8 +113,8 @@
   <path d="M8 22 Q22 30 32 28 Q44 30 56 22" fill="none" stroke-width="2.2"/>
   <path d="M7 36 Q5 5 32 4 Q59 5 57 36 Q51 41 46 36 Q40 42 34 36 Q28 42 22 36 Q16 42 7 36Z" fill="none" stroke-width="4"/>
   <path d="M46 8 Q56 14 56 34 Q52 40 46 36 Q50 22 44 10Z" fill="url(#gbH)" stroke="none"/>
-  <ellipse cx="32" cy="16" rx="12" ry="8" fill="#e8fffb" stroke-width="2.5"/>
-  <circle cx="27.5" cy="16" r="2" fill="#0b1820" stroke="none"/><circle cx="36.5" cy="16" r="2" fill="#0b1820" stroke="none"/><path d="M29 20.5 q3 1.8 6 0" fill="none" stroke-width="1.8"/>
+  <ellipse cx="32" cy="14" rx="11" ry="7" fill="#e8fffb" stroke="none"/>
+  <path d="M24 23 q3 3 6 0 M34 23 q3 3 6 0" fill="none" stroke-width="2.4"/><path d="M30 27.5 q2 1.6 4 0" fill="none" stroke-width="1.8"/>
   <path d="M14 14 Q17 9 23 8" stroke="#fff" stroke-width="3" fill="none" opacity=".9"/></g></symbol>
  <symbol id="s10" viewBox="0 0 64 64"><g filter="url(#roughS)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
   <path d="M18 56 Q12 32 25 22 H39 Q52 32 46 56Z" fill="#f2e5c2" stroke-width="4"/>

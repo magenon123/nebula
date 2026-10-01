@@ -82,3 +82,30 @@ test('cap: payout never above maxWin and capped flagged', () => {
     assert.ok(capped > 0);
   } finally { G.CFG.maxWin = old; }
 });
+
+/* ---- extra hand-computed paytable examples (rin) ---- */
+test('full 243 ways: three Pearl Clams on every reel = 243 x 8.2', () => {
+  const e = G.evaluateBoard([[8, 8, 8, 8, 8], [8, 8, 8, 8, 8], [8, 8, 8, 8, 8]], []);
+  assert.equal(e.wins.length, 1); assert.equal(e.wins[0].ways, 243); assert.ok(near(e.payout, 243 * 8.2));
+});
+test('spec 3.2 worked example: opening 1.40 and drift-3 board 1.54', () => {
+  const open = G.evaluateBoard([[5, 2, 4, 0, 3], [4, 2, 2, J, 1], [2, 4, 4, 5, 6]], [{ r: 1, c: 3, v: 2 }]);
+  assert.ok(near(open.payout, 4 * 0.14 + 4 * 0.21), 'open ' + open.payout);
+  const d3 = G.evaluateBoard([[4, 2, 5, 5, 0], [J, 4, 2, 2, 3], [5, 4, 4, 8, 1]], [{ r: 1, c: 0, v: 5 }]);
+  assert.ok(near(d3.payout, 5 * 0.14 + 12 * 0.07), 'd3 ' + d3.payout);
+});
+test('5-run pays the 5 value only (not 3+4+5), jelly on reel 5 extends a 4-run to 5', () => {
+  const e = G.evaluateBoard([[7, 7, 0, 0, J], [1, 2, 7, 7, 1], [2, 3, 3, 3, 3]], [{ r: 0, c: 4, v: 2 }]);
+  const h = e.wins.find(w => w.sym === 7); assert.equal(h.len, 5); assert.deepEqual(h.counts, [1, 1, 1, 1, 2]); assert.equal(h.ways, 2); assert.ok(near(h.payout, 2 * 3.4));
+});
+test('Jelly drift: a reel-5 Jelly causes 4 drifts with values v..v+4 and is bounded; bought rounds pay 0 on the trigger spin', () => {
+  const rng = mulberry(7); let seen = 0;
+  for (let i = 0; i < 200000 && seen < 3; i++) {
+    const r = G.playRound(rng, {});
+    const first = r.cascadeSteps[0]; if (!first.jellies.some(j => j.c === 4) || r.cascadeSteps.length !== 5) continue;
+    const j4 = first.jellies.find(j => j.c === 4); seen++;
+    assert.equal(r.cascadeSteps[4].jellies.find(j => j.c === 0 && j.r === j4.r).v, Math.min(25, j4.v + 4));
+  }
+  assert.ok(seen > 0);
+  for (const b of ['dive', 'abyss']) { const r = G.playRound(mulberry(3), { buy: b }); assert.equal(r.basePayout, 0); assert.equal(r.scatter.payout, 0); assert.equal(r.cascadeSteps.length, 0); assert.equal(r.initialGrid.flat().filter(x => x === B).length, b === 'dive' ? 3 : 5); }
+});

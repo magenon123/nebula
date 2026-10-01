@@ -1,0 +1,159 @@
+<svg id="scene" width="1600" height="900" viewBox="0 0 1600 900">
+ <defs>
+  <linearGradient id="gbWater" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="900"><stop offset="0" stop-color="#0f4a63"/><stop offset=".3" stop-color="#0b3a52"/><stop offset=".6" stop-color="#072a40"/><stop offset="1" stop-color="#03111c"/></linearGradient>
+  <radialGradient id="gbSun" cx=".5" cy="0" r=".75"><stop offset="0" stop-color="#4fd0c4" stop-opacity=".55"/><stop offset=".45" stop-color="#2aa1a8" stop-opacity=".18"/><stop offset="1" stop-color="#2aa1a8" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gbRay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a6fff2" stop-opacity=".30"/><stop offset=".6" stop-color="#8ff5ea" stop-opacity=".09"/><stop offset="1" stop-color="#8ff5ea" stop-opacity="0"/></linearGradient>
+  <radialGradient id="gbLamp" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd978" stop-opacity=".85"/><stop offset=".35" stop-color="#ffb938" stop-opacity=".35"/><stop offset="1" stop-color="#ffb938" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gbVig" cx=".5" cy=".46" r=".72"><stop offset=".55" stop-color="#010a12" stop-opacity="0"/><stop offset="1" stop-color="#010a12" stop-opacity=".78"/></radialGradient>
+  <linearGradient id="gbFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#010a12" stop-opacity="0"/><stop offset="1" stop-color="#010a12" stop-opacity=".7"/></linearGradient>
+  <linearGradient id="gbSand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6a62"/><stop offset=".4" stop-color="#1f4c4c"/><stop offset="1" stop-color="#0d2a30"/></linearGradient>
+  <linearGradient id="gbHull" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a3482c"/><stop offset=".5" stop-color="#7a3422"/><stop offset="1" stop-color="#3b1c18"/></linearGradient>
+  <linearGradient id="gbHullL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c6f6a"/><stop offset="1" stop-color="#173f44"/></linearGradient>
+  <filter id="gbRock" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".012 .04" numOctaves="5" seed="7" result="n"/><feDiffuseLighting in="n" lighting-color="#9fd8c8" surfaceScale="16" diffuseConstant="1.05"><feDistantLight azimuth="215" elevation="50"/></feDiffuseLighting><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 .75"/></filter>
+  <filter id="gbRust" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".035 .08" numOctaves="4" seed="21" result="n"/><feDiffuseLighting in="n" lighting-color="#e0a070" surfaceScale="9" diffuseConstant="1"><feDistantLight azimuth="225" elevation="55"/></feDiffuseLighting><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 .7"/></filter>
+  <filter id="gbHaze" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".0035 .009" numOctaves="4" seed="5"/><feColorMatrix type="matrix" values="0 0 0 0 .16  0 0 0 0 .62  0 0 0 0 .62  1.5 0 0 0 -.62" result="s"/><feGaussianBlur in="s" stdDeviation="7"/></filter>
+  <filter id="gbHazeDark" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".004 .012" numOctaves="4" seed="17"/><feColorMatrix type="matrix" values="0 0 0 0 .01  0 0 0 0 .07  0 0 0 0 .12  1.7 0 0 0 -.7" result="s"/><feGaussianBlur in="s" stdDeviation="6"/></filter>
+  <filter id="gbSoft" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="3.2"/></filter>
+  <filter id="gbBlur14" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="14"/></filter>
+  <clipPath id="gbHullClip"><path d="M1050 600 L1600 560 V900 H1130 Q1060 800 1050 600Z"/></clipPath>
+  <clipPath id="gbSeaClip"><path d="M0 700 Q120 676 250 690 Q380 660 520 684 Q700 660 900 690 Q1100 676 1250 700 Q1420 672 1600 690 V900 H0Z"/></clipPath>
+ </defs>
+ <rect width="1600" height="900" fill="url(#gbWater)"/>
+ <rect width="1600" height="900" fill="url(#gbSun)"/>
+
+ <!-- god-rays: gradient trapezoids, only opacity animates -->
+ <g id="sRays">
+  <path class="ray r1" d="M210 0 L300 0 L520 760 L300 760Z" fill="url(#gbRay)"/>
+  <path class="ray r2" d="M440 0 L560 0 L700 800 L470 800Z" fill="url(#gbRay)"/>
+  <path class="ray r3" d="M720 0 L800 0 L960 780 L760 780Z" fill="url(#gbRay)"/>
+  <path class="ray r4" d="M930 0 L1050 0 L1210 800 L1000 800Z" fill="url(#gbRay)"/>
+  <path class="ray r5" d="M1170 0 L1240 0 L1500 760 L1290 760Z" fill="url(#gbRay)"/>
+  <path class="ray r6" d="M1340 0 L1420 0 L1600 700 L1450 700Z" fill="url(#gbRay)"/>
+ </g>
+
+ <!-- far wreck skyline: blurred silhouettes -->
+ <g id="sFar" filter="url(#gbSoft)" opacity=".72" fill="#0a2d40">
+  <path d="M40 640 L90 470 L180 430 L330 470 L560 600 L600 650 Z"/>
+  <path d="M150 440 L146 330 L160 328 L172 436Z M250 460 L262 372 L274 372 L276 470Z"/>
+  <path d="M120 470 L520 590" stroke="#0a2d40" stroke-width="10" fill="none"/>
+  <path d="M1240 650 L1262 440 L1290 430 L1330 650Z"/><path d="M1236 440 L1296 410 L1352 438 L1296 462Z"/>
+  <path d="M740 700 L760 560 L842 520 L880 380 L894 380 L860 530 L800 580 L792 700Z"/>
+  <path d="M870 380 L1010 420 L1012 430 L880 396Z"/>
+ </g>
+ <rect width="1600" height="900" filter="url(#gbHazeDark)" opacity=".5"/>
+ <rect y="330" width="1600" height="380" filter="url(#gbHaze)" opacity=".28"/>
+
+ <!-- seabed: painted sand + rock lighting, inked ridge -->
+ <g id="sSeabed">
+  <path d="M0 700 Q120 676 250 690 Q380 660 520 684 Q700 660 900 690 Q1100 676 1250 700 Q1420 672 1600 690 V900 H0Z" fill="url(#gbSand)"/>
+  <rect width="1600" height="900" filter="url(#gbRock)" clip-path="url(#gbSeaClip)" style="mix-blend-mode:multiply"/>
+  <path d="M0 770 Q200 750 420 780 Q640 800 900 770 Q1200 750 1600 790 V900 H0Z" fill="#0a2229" opacity=".5"/>
+  <path d="M0 700 Q120 676 250 690 Q380 660 520 684 Q700 660 900 690 Q1100 676 1250 700 Q1420 672 1600 690" fill="none" stroke="#0b1820" stroke-width="5" filter="url(#roughL)"/>
+  <g fill="none" stroke="#0b1820" stroke-width="2.2" opacity=".5" stroke-linecap="round"><path d="M80 740 l40 -6 M150 760 l50 -4 M320 744 l36 -8 M560 734 l54 -4 M690 760 l40 -6 M880 740 l50 -5 M1020 770 l40 -6 M1190 744 l40 -7 M1380 750 l50 -4 M1500 774 l40 -6"/></g>
+  <g fill="#0b1820" opacity=".35"><path d="M410 706 q18 -16 40 -6 q18 4 24 12 q-30 6 -64 -6z"/><path d="M1000 704 q20 -14 50 -4 q16 6 20 12 q-36 6 -70 -8z"/></g>
+  <!-- bleached bones, shells, a plate -->
+  <g stroke="#0b1820" stroke-width="3" stroke-linejoin="round" filter="url(#roughC)">
+   <ellipse cx="800" cy="738" rx="30" ry="9" fill="#e6dcc0"/><path d="M780 738 h40" fill="none" stroke-width="1.6"/>
+   <path d="M606 722 q8 -16 24 -8 q-4 12 -24 8z" fill="#e6b4a8"/>
+  </g>
+ </g>
+
+ <!-- left foreground: junk pile -->
+ <g id="sJunk" filter="url(#roughL)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <ellipse cx="260" cy="880" rx="260" ry="44" fill="#02080c" opacity=".55" stroke="none"/>
+  <g id="sTyres">
+   <ellipse cx="240" cy="856" rx="84" ry="26" fill="#1d262b" stroke-width="5"/><ellipse cx="240" cy="848" rx="84" ry="26" fill="#2a353b" stroke-width="5"/><ellipse cx="240" cy="846" rx="44" ry="12" fill="#10181c" stroke-width="4"/>
+   <ellipse cx="258" cy="818" rx="72" ry="22" fill="#232d33" stroke-width="5"/><ellipse cx="258" cy="810" rx="72" ry="22" fill="#313e45" stroke-width="5"/><ellipse cx="258" cy="808" rx="36" ry="10" fill="#10181c" stroke-width="4"/>
+   <path d="M170 856 Q176 868 240 872 Q310 868 322 854" fill="url(#hatchL)" stroke="none"/>
+  </g>
+  <g id="sBarrel"><path d="M318 780 Q312 830 322 868 Q370 880 414 868 Q422 828 414 780Z" fill="#6a4a2c" stroke-width="5"/><path d="M318 800 H414 M320 846 H416" stroke-width="5" fill="none"/><path d="M318 800 H414 M320 846 H416" stroke="#8a8f93" stroke-width="2.5" fill="none"/>
+   <path d="M318 780 Q366 764 414 780 Q366 794 318 780Z" fill="#2a1c10" stroke-width="4"/><path d="M386 784 Q420 826 400 868 Q420 828 414 782Z" fill="url(#hatchL)" stroke="none"/><path d="M340 812 l22 8" stroke-width="3.5" fill="none"/></g>
+  <g id="sChainPile" fill="none"><path d="M60 880 Q100 840 150 862 Q170 872 190 856" stroke-width="16"/><path d="M60 880 Q100 840 150 862 Q170 872 190 856" stroke="#6c7d86" stroke-width="8"/>
+   <path d="M64 880 l10 -6 M84 862 l9 -6 M112 850 l12 0 M140 858 l10 4" stroke-width="3"/></g>
+  <g id="sCoral" stroke-width="3.4"><path d="M120 862 Q108 830 120 808 Q132 830 128 846 Q142 826 154 812 Q156 836 138 866Z" fill="#ff6f7d"/><path d="M130 828 l-6 8 M142 826 l4 10" stroke-width="2" fill="none"/></g>
+ </g>
+ <!-- hanging empty diving suit on a crane rope -->
+ <g id="sSuit" filter="url(#roughC)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M338 0 V396" stroke-width="9" fill="none"/><path d="M338 0 V396" stroke="#c9b07a" stroke-width="4" fill="none"/>
+  <circle cx="338" cy="408" r="12" fill="none" stroke-width="7"/><circle cx="338" cy="408" r="12" fill="none" stroke="#6c7d86" stroke-width="3"/>
+  <g id="sSuitBody" style="transform-origin:338px 400px">
+   <path d="M310 438 Q338 426 366 438 L372 520 Q338 534 304 520Z" fill="#8a7a3a" stroke-width="5"/>
+   <path d="M304 520 L296 600 L322 604 L338 544 L354 604 L380 600 L372 520Z" fill="#7a6a30" stroke-width="5"/>
+   <path d="M310 450 Q280 480 288 530 L304 528 Q300 490 318 470Z M366 450 Q396 480 388 530 L372 528 Q376 490 358 470Z" fill="#8a7a3a" stroke-width="4"/>
+   <path d="M296 600 L284 618 L324 618 L322 604 M380 600 L392 618 L352 618 L354 604" fill="#4a3a1a" stroke-width="4"/>
+   <path d="M360 440 L372 520 L350 526Z" fill="url(#hatchC)" stroke="none"/>
+   <circle cx="338" cy="420" r="30" fill="#b08a3a" stroke-width="5.5"/><circle cx="338" cy="420" r="19" fill="#0d3a44" stroke-width="4.5"/><path d="M326 410 Q332 404 340 405" stroke="#9fe8ee" stroke-width="3" fill="none"/>
+   <rect x="326" y="446" width="24" height="9" fill="#8a6420" stroke-width="3.5"/>
+   <g fill="#e8c46a" stroke-width="2"><circle cx="312" cy="414" r="3"/><circle cx="364" cy="414" r="3"/><circle cx="338" cy="392" r="3"/></g>
+  </g>
+ </g>
+
+ <!-- tugboat wreck (right): the Captain's workshop -->
+ <g id="sTug" filter="url(#roughL)" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <g transform="rotate(-5 1380 600)">
+   <path d="M1050 600 L1600 560 V900 H1130 Q1060 800 1050 600Z" fill="url(#gbHull)" stroke-width="7"/>
+   <path d="M1050 600 L1600 560 V584 L1058 626Z" fill="#c8c0a4" stroke-width="5"/>
+   <path d="M1058 626 L1600 584 V610 L1066 656Z" fill="#6a2a1e" stroke-width="3"/>
+   <path d="M1086 700 Q1100 780 1134 880 M1190 668 Q1204 780 1230 890 M1290 660 Q1296 780 1320 896 M1400 654 V900 M1500 640 V900" fill="none" stroke-width="3.5" opacity=".6"/>
+   <g fill="#e0b070" stroke-width="2.5"><circle cx="1076" cy="690" r="4"/><circle cx="1180" cy="680" r="4"/><circle cx="1280" cy="672" r="4"/><circle cx="1390" cy="664" r="4"/><circle cx="1490" cy="658" r="4"/><circle cx="1090" cy="740" r="4"/><circle cx="1196" cy="730" r="4"/><circle cx="1296" cy="722" r="4"/><circle cx="1406" cy="714" r="4"/></g>
+   <!-- cabin -->
+   <path d="M1300 566 L1318 330 L1586 318 L1590 560Z" fill="#4a8f86" stroke-width="7"/>
+   <path d="M1300 566 L1318 330 L1332 330 L1316 566Z" fill="#8fd0c0" stroke="none" opacity=".6"/>
+   <path d="M1310 440 L1588 428 M1306 500 L1590 490" stroke-width="3.5" fill="none" opacity=".6"/>
+   <path d="M1296 336 L1330 296 L1590 288 V320Z" fill="#7a3422" stroke-width="6"/>
+   <!-- funnel -->
+   <path d="M1180 566 L1196 398 L1274 394 L1288 562Z" fill="#a3482c" stroke-width="7"/>
+   <path d="M1178 420 L1198 396 L1276 392 L1292 418 Q1236 430 1178 420Z" fill="#2a1a16" stroke-width="5"/>
+   <path d="M1186 470 L1286 466 L1284 484 L1184 488Z" fill="#c8c0a4" stroke-width="4"/>
+   <path d="M1230 480 L1238 520 L1224 540" stroke-width="1" fill="none"/>
+   <path d="M1264 400 l16 -12 l8 10 z" fill="#ece0c4" stroke-width="2.4"/>
+   <!-- deep damage: torn plate -->
+   <path d="M1090 586 L1130 560 L1150 602 L1120 630 L1090 616Z" fill="#050e14" stroke-width="5"/><path d="M1096 592 L1126 570 L1140 600" stroke="#e0a070" stroke-width="2.4" fill="none"/>
+  </g>
+  <!-- porthole + flicker light -->
+  <g id="sPorthole"><circle cx="1480" cy="392" r="54" fill="#6c4a2c" stroke-width="7"/><circle id="sPortLight" cx="1480" cy="392" r="42" fill="#ffb938" stroke-width="5"/><circle cx="1480" cy="392" r="42" fill="url(#gbLamp)" stroke="none"/>
+   <path d="M1444 392 H1516 M1480 356 V428" stroke="#6a3a16" stroke-width="6" fill="none" opacity=".7"/>
+   <g fill="#e8c46a" stroke-width="2.4"><circle cx="1480" cy="334" r="4.5"/><circle cx="1480" cy="450" r="4.5"/><circle cx="1422" cy="392" r="4.5"/><circle cx="1538" cy="392" r="4.5"/></g></g>
+  <path id="sBigGlow" d="M1480 392 m-120 0 a120 100 0 1 0 240 0 a120 100 0 1 0 -240 0" fill="url(#gbLamp)" stroke="none" opacity=".35"/>
+  <!-- sign -->
+  <g id="sSign" style="transform-origin:1346px 572px"><path d="M1346 572 V610" stroke-width="7" fill="none"/><path d="M1346 572 V610" stroke="#c9b07a" stroke-width="3" fill="none"/>
+   <g transform="rotate(-3 1346 650)"><rect x="1270" y="610" width="152" height="52" rx="4" fill="#d9c79a" stroke-width="5"/><path d="M1274 612 H1418" stroke="#fff3cf" stroke-width="3" fill="none"/>
+   <text x="1346" y="633" text-anchor="middle" font-family="Luckiest Guy,Impact,Arial Black,sans-serif" font-size="16" fill="#c4402a" stroke="none">OPEN:</text><text x="1346" y="654" text-anchor="middle" font-family="Luckiest Guy,Impact,Arial Black,sans-serif" font-size="18" fill="#c4402a" stroke="none">MOSTLY</text></g></g>
+  <!-- barnacle ring on funnel and hull -->
+  <g fill="#ece0c4" stroke-width="2.6"><circle cx="1204" cy="470" r="6"/><circle cx="1216" cy="476" r="4.4"/><circle cx="1262" cy="482" r="5.5"/><circle cx="1110" cy="730" r="7"/><circle cx="1124" cy="738" r="5"/></g>
+  <g transform="rotate(-5 1380 600)"><rect x="1000" y="540" width="620" height="380" filter="url(#gbRust)" clip-path="url(#gbHullClip)" style="mix-blend-mode:multiply" opacity=".9"/></g>
+  <path d="M1050 600 L1600 560 V900 H1130 Q1060 800 1050 600Z" fill="#000" opacity=".16" stroke="none" transform="rotate(-5 1380 600)"/>
+ </g>
+
+ <!-- kelp: blades sway on the CSS side (transform-origin at the base) -->
+ <g id="sKelp" stroke="#0b1820" stroke-width="4.5" stroke-linejoin="round" filter="url(#roughC)">
+  <g class="kelp k1" style="transform-origin:402px 700px"><path d="M402 700 Q376 600 396 500 Q410 430 392 350 Q420 440 412 520 Q404 610 420 700Z" fill="#2c7a62"/><path d="M396 500 Q410 430 392 350 Q404 430 402 500" fill="none" stroke="#6fd1a0" stroke-width="2.6"/></g>
+  <g class="kelp k2" style="transform-origin:430px 700px"><path d="M430 700 Q456 620 440 540 Q426 480 448 410 Q462 480 458 550 Q456 630 450 700Z" fill="#256b56"/></g>
+  <g class="kelp k3" style="transform-origin:1176px 700px"><path d="M1176 700 Q1150 610 1170 520 Q1182 450 1164 380 Q1196 450 1192 530 Q1186 620 1196 700Z" fill="#2c7a62"/><path d="M1170 520 Q1182 450 1164 380 Q1178 450 1176 520" fill="none" stroke="#6fd1a0" stroke-width="2.6"/></g>
+  <g class="kelp k4" style="transform-origin:1202px 700px"><path d="M1202 700 Q1224 630 1210 560 Q1198 500 1218 440 Q1232 500 1230 570 Q1226 640 1222 700Z" fill="#256b56"/></g>
+  <g class="kelp k5" style="transform-origin:560px 686px"><path d="M560 686 Q540 640 556 596 Q566 560 552 520 Q580 560 574 604 Q568 650 580 686Z" fill="#2c7a62"/></g>
+  <g class="kelp k6" style="transform-origin:960px 690px"><path d="M960 690 Q982 646 968 600 Q956 560 972 520 Q990 566 984 610 Q980 654 984 690Z" fill="#256b56"/></g>
+ </g>
+
+ <!-- hanging lanterns at both sides of the board -->
+ <g id="sLamps" stroke="#0b1820" stroke-linejoin="round" stroke-linecap="round">
+  <g class="lamp l1">
+   <circle class="lglow" cx="372" cy="190" r="150" fill="url(#gbLamp)" stroke="none"/>
+   <path d="M372 0 V138" stroke-width="8" fill="none"/><path d="M372 0 V138" stroke="#6c7d86" stroke-width="3.5" stroke-dasharray="7 5" fill="none"/>
+   <path d="M356 138 H388 L394 154 H350Z" fill="#6c7d86" stroke-width="4"/><rect x="352" y="154" width="40" height="52" rx="8" fill="#ffd978" stroke-width="5"/>
+   <path d="M352 168 H392 M352 190 H392" stroke-width="3" fill="none"/><path d="M358 160 V202" stroke="#fff6d2" stroke-width="4" fill="none"/>
+   <path d="M350 206 H394 L388 216 H356Z" fill="#6c7d86" stroke-width="4"/>
+  </g>
+  <g class="lamp l2">
+   <circle class="lglow" cx="1236" cy="150" r="150" fill="url(#gbLamp)" stroke="none"/>
+   <path d="M1236 0 V98" stroke-width="8" fill="none"/><path d="M1236 0 V98" stroke="#6c7d86" stroke-width="3.5" stroke-dasharray="7 5" fill="none"/>
+   <path d="M1220 98 H1252 L1258 114 H1214Z" fill="#6c7d86" stroke-width="4"/><rect x="1216" y="114" width="40" height="52" rx="8" fill="#ffd978" stroke-width="5"/>
+   <path d="M1216 128 H1256 M1216 150 H1256" stroke-width="3" fill="none"/><path d="M1222 120 V162" stroke="#fff6d2" stroke-width="4" fill="none"/>
+   <path d="M1214 166 H1258 L1252 176 H1220Z" fill="#6c7d86" stroke-width="4"/>
+  </g>
+ </g>
+
+ <!-- lower dark fade + vignette -->
+ <rect y="560" width="1600" height="340" fill="url(#gbFloor)"/>
+ <rect width="1600" height="900" fill="url(#gbVig)"/>
+</svg>

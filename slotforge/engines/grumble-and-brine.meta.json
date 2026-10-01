@@ -1,0 +1,254 @@
+{
+ "slug": "grumble-and-brine",
+ "name": "Grumble & Brine: Deep Salvage",
+ "grid": {
+  "rows": 3,
+  "reels": 5,
+  "ways": 243
+ },
+ "bets": [
+  0.1,
+  0.2,
+  0.3,
+  0.4,
+  0.5,
+  0.6,
+  0.8,
+  1,
+  1.5,
+  2,
+  2.5,
+  3,
+  4,
+  5,
+  6,
+  8,
+  10,
+  12,
+  15,
+  20,
+  25,
+  30,
+  40,
+  50,
+  60,
+  80,
+  100,
+  150,
+  200,
+  250,
+  300,
+  400,
+  500,
+  750,
+  1000,
+  1500,
+  2000,
+  3000,
+  4000,
+  5000,
+  7500,
+  10000
+ ],
+ "maxWin": 7500,
+ "modes": {
+  "base": {
+   "label": "Normal",
+   "request": {},
+   "cost": 1
+  },
+  "ante": {
+   "label": "Deep Pressure",
+   "request": {
+    "ante": true
+   },
+   "cost": 2,
+   "note": "Costs 2x bet, Deep Dive about 3.3x as likely"
+  },
+  "buy:dive": {
+   "label": "Dive Ticket",
+   "request": {
+    "buy": "dive"
+   },
+   "cost": 100,
+   "startDives": 8,
+   "tide": 0
+  },
+  "buy:abyss": {
+   "label": "Abyss Pass",
+   "request": {
+    "buy": "abyss"
+   },
+   "cost": 500,
+   "startDives": 12,
+   "tide": 2,
+   "guaranteedJellyEveryDive": true,
+   "jellyFactor": 1.25
+  }
+ },
+ "anteCost": 2,
+ "buy": {
+  "dive": {
+   "cost": 100,
+   "buoys": 3,
+   "tide": 0
+  },
+  "abyss": {
+   "cost": 500,
+   "buoys": 5,
+   "tide": 2,
+   "tideMax": 3,
+   "jellyFactor": 1.25,
+   "guaranteeEvery": 1
+  }
+ },
+ "paytable": [
+  {
+   "id": 0,
+   "name": "Old Boot",
+   "pays": {
+    "3": null,
+    "4": 0.12,
+    "5": 0.35
+   }
+  },
+  {
+   "id": 1,
+   "name": "Tin Can",
+   "pays": {
+    "3": null,
+    "4": 0.14,
+    "5": 0.45
+   }
+  },
+  {
+   "id": 2,
+   "name": "Message Bottle",
+   "pays": {
+    "3": 0.04,
+    "4": 0.14,
+    "5": 0.41
+   }
+  },
+  {
+   "id": 3,
+   "name": "Rusty Key",
+   "pays": {
+    "3": 0.05,
+    "4": 0.17,
+    "5": 0.55
+   }
+  },
+  {
+   "id": 4,
+   "name": "Brass Compass",
+   "pays": {
+    "3": 0.07,
+    "4": 0.21,
+    "5": 0.7
+   }
+  },
+  {
+   "id": 5,
+   "name": "Barnacle Anchor",
+   "pays": {
+    "3": 0.1,
+    "4": 0.35,
+    "5": 1.1
+   }
+  },
+  {
+   "id": 6,
+   "name": "Coin Purse",
+   "pays": {
+    "3": 0.17,
+    "4": 0.55,
+    "5": 1.7
+   }
+  },
+  {
+   "id": 7,
+   "name": "Rusty Harpoon",
+   "pays": {
+    "3": 0.27,
+    "4": 1,
+    "5": 3.4
+   }
+  },
+  {
+   "id": 8,
+   "name": "Pearl Clam",
+   "pays": {
+    "3": 0.55,
+    "4": 2.05,
+    "5": 8.2
+   }
+  }
+ ],
+ "scatterPay": {
+  "3": 2,
+  "4": 10,
+  "5": 50
+ },
+ "symbols": [
+  {
+   "id": 0,
+   "name": "Old Boot"
+  },
+  {
+   "id": 1,
+   "name": "Tin Can"
+  },
+  {
+   "id": 2,
+   "name": "Message Bottle"
+  },
+  {
+   "id": 3,
+   "name": "Rusty Key"
+  },
+  {
+   "id": 4,
+   "name": "Brass Compass"
+  },
+  {
+   "id": 5,
+   "name": "Barnacle Anchor"
+  },
+  {
+   "id": 6,
+   "name": "Coin Purse"
+  },
+  {
+   "id": 7,
+   "name": "Rusty Harpoon"
+  },
+  {
+   "id": 8,
+   "name": "Pearl Clam"
+  },
+  {
+   "id": 9,
+   "name": "Lantern Jelly"
+  },
+  {
+   "id": 10,
+   "name": "Sonar Buoy"
+  }
+ ],
+ "wild": 9,
+ "scatter": 10,
+ "jellyMax": 25,
+ "dives": {
+  "3": 8,
+  "4": 10,
+  "5": 12
+ },
+ "retrigger": {
+  "2": 3,
+  "3": 6
+ },
+ "maxDives": 40,
+ "tideMax": 3,
+ "guaranteeEvery": 3
+}
