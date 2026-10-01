@@ -16,19 +16,15 @@ Server-authoritative cluster-pays slot (6x5, tumbles, Forge Core heat meter).
 - Bonus: 10 spins, heat carries between spins (spins open pre-armed: heat>=6 opens with a reforge, >=9 also a detonation), flat bonus stacks per 3 heat, every 3rd spin opens with a guaranteed detonation, 2+ scatters retrigger +4. Bonus uses its own symbol weights.
 - Cap 9,500x. Ante = 1.25x cost with higher scatter weight. Buy 100x / 500x (heat starts at 6).
 
-## Simulated math (seeded, 400k-600k rounds; `CFG.payScale = 1.055` scales every cluster win)
-| | RTP | hit freq | bonus 1-in |
-|---|---|---|---|
-| Base | 93.6-96.2% across two seeds (base game ~76%, bonus ~19-21%) | ~23.7% | ~284 |
-| Ante (per 1.25x cost) | ~96.4% | ~23.5% | ~140 |
-| Buy 100x | ~66% | - | - |
-| Pre-Heated 500x | ~97% | - | - |
-
-The bonus is heavy-tailed, so even 600k-round runs wobble by about +/-2 points; the overall RTP is ~95-96%.
-Known gaps vs. the design doc: the bonus share is ~20% rather than 29%, and Buy 100x returns well under the other modes
-(Pre-Heated is worth ~8x a standard bonus but priced at 5x, so a richer bonus would make Pre-Heated player-positive).
-"Doubled scatter weight" gives ~1-in-45, not 1-in-140; ante uses ~1.3x scatter weight to hit 1-in-140
-(the doc also says 1-in-180 in one place).
+## Simulated math (retuned; all modes target 96.0-96.5%)
+Verified with seeded simulation (`slotforge/tools/sim.js`, `emberclaw-sim.js`). Earlier versions of this file claimed ~96% but the real base RTP was ~100.8%; this was found and fixed.
+| Mode | RTP (mean of seeds) | Notes |
+|---|---|---|
+| Base (natural play) | ~95.8% (4 seeds x 2M, lead) / 95.8% +-1.6 (12M, rin); individual seeds 93.5-97.8 | base game 72.3%, hit freq 23.4%, bonus ~1 in 400 averaging ~96x |
+| Forge Fever (3x cost, 5x bonus chance) | 96.4% +-1.7 (12M, rin) | richer bonus table in this mode |
+| Buy 100x | 96.2% +-0.6 (2M, rin) | |
+| Pre-Heated 500x | 96.1% +-0.3 (1.6M, rin) | |
+The bonus is heavy-tailed, so single runs swing +-2 points; the tight evidence is the decomposition (72.3% base game + bonus share = 96.2%).
 
 ## Shared slot layout (use for every new slot)
 The game lives on a fixed 1600x900 stage that is scaled to fit the window, so positions are identical in every slot.
