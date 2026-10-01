@@ -165,9 +165,11 @@ async function launchGame(gameKey) {
         const body = await gameWin.webContents.debugger.sendCommand(
           'Network.getResponseBody', { requestId: params.requestId }
         );
-        const d = JSON.parse(body.body);
-        const bal = findBalanceInObject(d, 0);
-        if (bal !== undefined && bal >= 0) lastDemoBalance = bal;
+        const match = body.body.match(/(?:^|&)balance=([0-9.]+)/);
+        if (match) {
+          const bal = parseFloat(match[1]);
+          if (!isNaN(bal) && bal >= 0) lastDemoBalance = bal;
+        }
       } catch (_) {}
     });
   } catch (e) {}
