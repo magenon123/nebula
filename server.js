@@ -8,6 +8,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import { fileURLToPath } from 'url';
+import { playRound, cryptoRng, CFG as EC } from './emberclaw-engine.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -88,7 +89,7 @@ const EDGE = {
   dice:.01, limbo:.01, crash:.01, mines:.01, plinko:.01, keno:.01, wheel:.01,
   flip:.01, hilo:.01, tower:.01, chicken:.01, blackjack:.005, pump:.02, rps:.02,
   cases:.01, snakes:.02, moles:.02, carrier:.03,
-  slot:.04, retro:.04, cascade:.035, thunder:.035, starfall:.04
+  emberclaw:.04, slot:.04, retro:.04, cascade:.035, thunder:.035, starfall:.04
 };
 const TIERS = [
   { n:'Bronze', min:0, rate:.05 }, { n:'Silver', min:5000, rate:.08 },
@@ -204,6 +205,35 @@ app.post('/api/bet', auth, async (req, res) => {
 
     res.json({ user: shape(await byId(req.user.id)) });
   } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+
+/* ---------------- EmberClaw: server-authoritative slot ---------------- */
+app.post('/api/emberclaw/spin', auth, async (req, res) => {
+  try {
+    const stake = money(req.body.stake);
+    const ante  = !!req.body.ante;
+    const buy   = req.body.buy ? String(req.body.buy) : null;
+    if (!(stake >= 0.1 && stake <= 500)) return res.status(400).json({ error: 'Bet must be between 0.10 and 500' });
+    if (buy && !EC.buy[buy]) return res.status(400).json({ error: 'Unknown bonus buy' });
+    if (buy && ante) return res.status(400).json({ error: 'Ante cannot be combined with Buy Bonus' });
+
+    const round = playRound(cryptoRng, { ante, buy });
+    const cost = money(stake * round.cost);
+    const payout = money(stake * round.totalPayout);
+
+    // atomic debit: only succeeds if the balance still covers the cost
+    const d = await db.execute({ sql: 'UPDATE users SET balance=balance-? WHERE id=? AND balance>=?', args: [cost, req.user.id, cost - 1e-9] });
+    if (!d.rowsAffected) return res.status(400).json({ error: 'Not enough balance' });
+    const rake = cost * (EDGE.emberclaw ?? 0.04) * tierFor(req.user.wagered).rate;
+    await db.batch([
+      { sql: 'UPDATE users SET balance=balance+? WHERE id=?', args: [payout, req.user.id] },
+      { sql: 'UPDATE users SET wagered=wagered+?, rake=rake+? WHERE id=?', args: [cost, rake, req.user.id] },
+      { sql: 'INSERT INTO bets (user_id,game,stake,mult,payout,created) VALUES (?,?,?,?,?,?)', args: [req.user.id, 'emberclaw', cost, payout / cost, payout, Date.now()] }
+    ], 'write');
+
+    res.json({ round, stake, cost, payout, user: shape(await byId(req.user.id)) });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 app.post('/api/rakeback/claim', auth, async (req, res) => {
