@@ -115,8 +115,15 @@ async function launchGame(gameKey) {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: false,
-      webSecurity: false
+      webSecurity: false,
+      allowRunningInsecureContent: true,
+      partition: 'persist:game'
     }
+  });
+
+  // allow all permissions for game window
+  gameWin.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
+    callback(true);
   });
 
   gameWin.setMenuBarVisibility(false);
