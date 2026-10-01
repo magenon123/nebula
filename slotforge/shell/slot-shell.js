@@ -36,7 +36,7 @@ function makeKit(ctx, out) {
   for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
   // room reverb: decaying noise impulse
   const rv = ctx.createConvolver(), ib = ctx.createBuffer(2, Math.floor(sr * rvc.sec), sr);
-  for (let c = 0; c < 2; c++) { const d = ib.getChannelData(c); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, rvc.pow); }
+  for (let c = 0; c < 2; c++) { const d = ib.getChannelData(c); let lp = 0; for (let i = 0; i < d.length; i++) { d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, rvc.pow); if (rvc.lp) { lp += (d[i] - lp) * rvc.lp; d[i] = lp; } } }   // rvc.lp (0..1) = one-pole lowpass on the impulse: darker room
   rv.buffer = ib; const wet = ctx.createGain(); wet.gain.value = rvc.wet; rv.connect(wet).connect(out);
   const bus = ctx.createGain(); bus.connect(out); bus.connect(rv);
   const env = (t, a, peak, d) => { const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(.0002, peak), t + a); g.gain.exponentialRampToValueAtTime(.0001, t + a + d); return g; };
@@ -59,7 +59,13 @@ function makeKit(ctx, out) {
       stop() { clearTimeout(timer); timer = 0; if (nodes) { try { nodes.s.stop(); } catch {} nodes = null; } }
     };
   };
-  return { ctx, out, bus, env, osc, noise, metal, st, T0, bed };
+  /* feedback delay send (sonar ping, echoes): kit.ping({time, fb, lp, wet}) -> a GainNode to connect sources to (created once) */
+  let pingN = null;
+  const ping = (o = {}) => { if (pingN) return pingN; const k = Object.assign({ time: .32, fb: .45, lp: 2500, wet: .5 }, o);
+    const inp = ctx.createGain(), dl = ctx.createDelay(2), fb = ctx.createGain(), f = ctx.createBiquadFilter(), w = ctx.createGain();
+    dl.delayTime.value = k.time; fb.gain.value = k.fb; f.type = 'lowpass'; f.frequency.value = k.lp; w.gain.value = k.wet;
+    inp.connect(out); inp.connect(dl); dl.connect(f); f.connect(fb); fb.connect(dl); f.connect(w); w.connect(out); pingN = inp; return inp; };
+  return { ctx, out, bus, env, osc, noise, metal, st, T0, bed, ping };
 }
 let ac, master, recipes, ambCtl = null;
 function audio() {
@@ -160,7 +166,7 @@ const tierOf = x => cfg.tiers.find(t => x >= t.min) || null;
 async function bigWin(x, amt) {
   const t = tierOf(x); if (!t) return null;
   const lv = t.lv;
-  $('bigT').textContent = t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET';
+  $('bigT').textContent = t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = t.tag || '';
   $('big').classList.add('show'); char('big', 3300); shake(lv > 2); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
   sfx.big(lv);
   await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => sfx.tick(k)), sleep(20000)]);
@@ -175,7 +181,7 @@ function setBusy(b) {
   $('bAuto').disabled = b && auto.left <= 0; $('spin').classList.toggle('busy', b && auto.left <= 0);
 }
 async function go(buy) {
-  if (busy) return; setBusy(true); sfx.spin(); closeMenu();
+  if (busy) return; setBusy(true); sfx.spin(); closeMenu(); if (cfg.text.spin) say(cfg.text.spin);
   $('win').textContent = fmt(0); $('fsBox').hidden = true;
   const stake = BETS[bi]; let out = { payout: 0, bonus: false, tier: null };
   try {
@@ -192,14 +198,14 @@ async function go(buy) {
       out.bonus = true;
       await hooks.showTrigger(R); sfx.bonus(); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
       $('introN').textContent = R.bonus.startSpins; await tapWait('introM', auto.left > 0 ? 1800 : 0);
-      $('fsBox').hidden = false; $(cc.el).classList.add(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(true);
+      $('fsBox').hidden = false; $(cc.el).classList.add(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(true); if (ambCtl && ambCtl.bonus) ambCtl.bonus(true);
       let total = R.bonus.spins.length;
       for (const sp of R.bonus.spins) {
-        $('fs').textContent = `${sp.spinIndex} / ${total}` + (sp.retrigger ? '  +' + sp.retrigger : ''); say(tpl(cfg.text.freeSpin, { n: sp.spinIndex }) + (sp.retrigger ? tpl(cfg.text.freeSpinRetrigger, { r: sp.retrigger }) : ''), !!sp.retrigger);
+        $('fs').textContent = `${sp.spinIndex} / ${total}` + (sp.retrigger ? '  +' + sp.retrigger : ''); say(tpl(cfg.text.freeSpin, { n: sp.spinIndex, total }) + (sp.retrigger ? tpl(cfg.text.freeSpinRetrigger, { r: sp.retrigger }) : ''), !!sp.retrigger);
         await hooks.clearBoard();
         run = await hooks.playSpin(sp, run, ctx); await wait(300);
       }
-      $('fsBox').hidden = true; $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); $('outroV').textContent = fmt(0);
+      $('fsBox').hidden = true; $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); if (ambCtl && ambCtl.bonus) ambCtl.bonus(false); $('outroV').textContent = fmt(0);
       openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
       await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);
       await tapWait('outroM', auto.left > 0 ? 1500 : 0);
@@ -283,6 +289,15 @@ addEventListener('keydown', e => {
   if (e.code === 'Space') { e.preventDefault(); if (!busy) go(null); }
 });
 
+/* ---------- the API handed to the slot ---------- */
+const S = {
+  cfg, $, store, fmt, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
+  scale: () => STAGE_S, bet: () => BETS[bi], isTurbo: () => turbo, isBusy: () => busy, local: !!LOCAL,
+  skipCount: () => { skipBig = true; }
+};
+hooks = factory(S) || {};
+for (const k of ['sfx', 'init', 'paintIdle', 'roundStart', 'clearBoard', 'restoreBoard', 'playSpin', 'showTrigger'])
+  if (typeof hooks[k] !== 'function') throw new Error('slot is missing hook: ' + k);
 /* ---------- static UI generated from slot.json ---------- */
 const sym = id => `<svg viewBox="0 0 64 64"><use href="#s${id}"/></svg>`;
 document.title = cfg.title + (LOCAL ? ' (offline demo)' : '');
@@ -300,16 +315,16 @@ $('introGems').innerHTML = [1, 2, 3].map(() => `<div class="g">${sym(cfg.scatter
 $('introLbl').textContent = cfg.intro.unit; $('introRibbon').textContent = cfg.intro.ribbon;
 $('introChips').innerHTML = cfg.intro.chips.map(c => `<span>${c}</span>`).join('');
 $('outroRibbon').textContent = cfg.outro.ribbon;
+/* optional extra copy (absent in EmberClaw): fs counter label, splash quote lines, tap hints, outro label, big-win taglines, splash art */
+if (cfg.fsLabel || cfg.intro.unit) document.querySelector('#fsBox small').textContent = cfg.fsLabel || cfg.intro.unit;
+const addQuote = (id, q) => { if (q) $(id).querySelector('.ribbon').insertAdjacentHTML('afterend', `<div class="quote">${q}</div>`); };
+addQuote('introM', cfg.intro.quote); addQuote('outroM', cfg.outro.quote);
+if (cfg.intro.tap) document.querySelector('#introM .tapHint').textContent = cfg.intro.tap;
+if (cfg.outro.tap) document.querySelector('#outroM .tapHint').textContent = cfg.outro.tap;
+if (cfg.outro.label) document.querySelector('#outroM .mtop').textContent = cfg.outro.label;
+if (cfg.tiers.some(t => t.tag)) $('bigX').insertAdjacentHTML('afterend', '<div id="bigTag"></div>');
+if (hooks.splashArt) for (const k of ['intro', 'outro']) $(k + 'M').querySelector('.sp').insertAdjacentHTML('afterbegin', `<div class="splashArt" id="${k}Art">${hooks.splashArt(k)}</div>`);
 
-/* ---------- the API handed to the slot ---------- */
-const S = {
-  cfg, $, store, fmt, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
-  scale: () => STAGE_S, bet: () => BETS[bi], isTurbo: () => turbo, isBusy: () => busy, local: !!LOCAL,
-  skipCount: () => { skipBig = true; }
-};
-hooks = factory(S) || {};
-for (const k of ['sfx', 'init', 'paintIdle', 'roundStart', 'clearBoard', 'restoreBoard', 'playSpin', 'showTrigger'])
-  if (typeof hooks[k] !== 'function') throw new Error('slot is missing hook: ' + k);
 hooks.init(S);
 hooks.paintIdle();
 refreshUi();
