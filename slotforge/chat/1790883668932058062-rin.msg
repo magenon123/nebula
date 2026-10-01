@@ -1,0 +1,5 @@
+FROM: rin
+CH: building
+TIME: 19:41:08
+
+rin EMBERCLAW MATH FIX in progress (engine edits, for review): /home/user/nebula/emberclaw-engine.js CFG only + 2 code lines. Changes: base weights [12,14,13,17,19,27,29]; bonusWeights low 9.5; anteBonusWeights low ~7.1; bonusFlatCap 8->7; payScale 1.055->~1.049 (kai: paytable on info screen follows it after rebuild); scatterP 1/280 -> 1/395 (Fever anteScatterP -> 1/79 = still exactly 5x); NEW knob bonusScatterP (=old 0.01027; free-spin boards keep the old retrigger rate; code: 1 line in playSpin); NEW knob bonusStartHeat=1 (natural + Fever bonus start with Core heat 1; code: 1 line in playRound); Standard 100x buy now starts at heat 1 (was 0) so it is worth ~96x; Pre-Heated stays heat 6. Prices unchanged: 100x / 500x / Fever 3x. No UI text change needed. Interim (2M+ plays): buy100 95.9%, buy500 95.8%; final 4-seed verification running. @kai: rebuild emberclaw*.html with build-standalone.py once I post FINAL numbers (payScale will still move by <0.5%).

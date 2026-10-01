@@ -19,11 +19,12 @@ const bucket = n => (n >= 13 ? 3 : n >= 10 ? 2 : n >= 8 ? 1 : 0);
 /* tunable math (see emberclaw-sim.js) */
 export const CFG = {
   weights: [12, 14, 13, 17, 19, 27, 29],   // refill + initial symbol weights
-  bonusWeights: [9.4, 9.4, 9.4, 14, 18, 22, 22], // leaner table during The Reforging (heat persists, so wilds snowball)
+  bonusWeights: [9.5, 9.5, 9.5, 14, 18, 22, 22], // leaner table during The Reforging (heat persists, so wilds snowball)
   bonusFlatCap: 7,                        // in The Reforging the flat bonus stacks once per 3 heat, up to this many tiers
-  scatterP: 0.009251,                     // per-cell scatter chance on the initial grid (~1 in 375)
-  anteScatterP: 0.016619,                // Forge Fever: ~5x as likely as the natural bonus (~1 in 75)
-  payScale: 1.034,                        // global payout trim applied to every cluster win (RTP calibration)
+  scatterP: 0.009018,                     // per-cell scatter chance on the initial grid (~1 in 403)
+  bonusScatterP: 0.01027,                 // per-cell scatter chance on free-spin boards (drives +4 retriggers; independent of the base trigger rate)
+  anteScatterP: 0.016177,                // Forge Fever: exactly 5x as likely as the natural bonus (~1 in 80.6)
+  payScale: 1.049,                        // global payout trim applied to every cluster win (RTP calibration)
   heatFlat: 0.75,                         // heat >= 3: every cluster pays this flat bonus (spec said 0.5x; raised while tuning RTP)
   maxWin: 9500,
   freeSpins: 10, retriggerSpins: 4, retriggerMin: 2, maxBonusSpins: 100, maxSteps: 60,
@@ -31,7 +32,7 @@ export const CFG = {
   buy: { standard: { cost: 100, heat: 1 }, preheated: { cost: 500, heat: 6 } },
   bonusStartHeat: 1,                      // heat the Core starts at in a natural / Fever bonus (math tuning knob)
   anteCost: 3,                            // Forge Fever costs 3x the bet
-  anteBonusWeights: [6.8, 6.8, 6.8, 14, 18, 22, 22], // Forge Fever bonuses use a richer table so the 3x price still returns ~96%
+  anteBonusWeights: [7.03, 7.03, 7.03, 14, 18, 22, 22], // Forge Fever bonuses use a richer table so the 3x price still returns ~96%
 };
 
 export function cryptoRng() {
@@ -122,7 +123,7 @@ const wildList = (g, wm) => {
 
 /* One spin = initial grid + full cascade chain. heat0 is the Core heat carried in. */
 export function playSpin(rng, { heat0 = 0, ante = false, forceDetonate = false, noScatter = false, inBonus = false, weights = CFG.weights } = {}) {
-  let g = initialGrid(rng, noScatter ? 0 : ante ? CFG.anteScatterP : CFG.scatterP, weights);
+  let g = initialGrid(rng, noScatter ? 0 : inBonus ? CFG.bonusScatterP : ante ? CFG.anteScatterP : CFG.scatterP, weights);
   const wm = newGrid(1);
   const out = { initialGrid: clone(g), startHeat: heat0, openingEvents: [], cascadeSteps: [], totalPayout: 0, scatters: 0 };
   for (const row of g) for (const v of row) if (v === SYM.SCATTER) out.scatters++;
