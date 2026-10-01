@@ -155,36 +155,41 @@ async function launchGame(gameKey) {
   // show 100k on Nebula while playing
   await syncNebulaBalance(DEMO_START_BALANCE);
 
-  // Intercept reloadBalance.do at network level via Fetch CDP domain
-  try {
-    gameWin.webContents.debugger.attach('1.3');
-    await gameWin.webContents.debugger.sendCommand('Fetch.enable', {
-      patterns: [{ urlPattern: '*reloadBalance*', requestStage: 'Response' }]
+  const XHR_INJECT = `
+    if (!window.__xhrPatched) {
+      window.__xhrPatched = true;
+      const _o = XMLHttpRequest.prototype.open;
+      const _s = XMLHttpRequest.prototype.send;
+      XMLHttpRequest.prototype.open = function(m, url) { this.__u = url; return _o.apply(this, arguments); };
+      XMLHttpRequest.prototype.send = function() {
+        this.addEventListener('load', function() {
+          try {
+            if (this.__u && this.__u.includes('reloadBalance')) {
+              const m = this.responseText.match(/(?:^|&)balance=([0-9.]+)/);
+              if (m) window.__ppBal = parseFloat(m[1]);
+            }
+          } catch(_) {}
+        });
+        return _s.apply(this, arguments);
+      };
+    }
+  `;
+
+  // Inject into every frame (including iframes) as they load
+  gameWin.webContents.on('frame-created', (e, frame) => {
+    frame.once('dom-ready', () => {
+      frame.executeJavaScript(XHR_INJECT).catch(() => {});
     });
-    gameWin.webContents.debugger.on('message', async (event, method, params) => {
-      if (method !== 'Fetch.requestPaused') return;
-      try {
-        const bodyResult = await gameWin.webContents.debugger.sendCommand(
-          'Fetch.getResponseBody', { requestId: params.requestId }
-        );
-        const text = bodyResult.base64Encoded
-          ? Buffer.from(bodyResult.body, 'base64').toString()
-          : bodyResult.body;
-        const match = text.match(/(?:^|&)balance=([0-9.]+)/);
-        if (match) {
-          const bal = parseFloat(match[1]);
-          if (!isNaN(bal) && bal >= 0) lastDemoBalance = bal;
-        }
-      } catch (_) {}
-      try {
-        await gameWin.webContents.debugger.sendCommand(
-          'Fetch.continueRequest', { requestId: params.requestId }
-        );
-      } catch (_) {}
-    });
-  } catch (e) {}
+  });
 
   gameWin.webContents.on('did-finish-load', () => {
+    // Also inject into main frame and all existing frames
+    gameWin.webContents.executeJavaScript(XHR_INJECT).catch(() => {});
+    try {
+      for (const frame of gameWin.webContents.mainFrame.frames) {
+        frame.executeJavaScript(XHR_INJECT).catch(() => {});
+      }
+    } catch(_) {}
     setTimeout(() => startBalanceTracking(), 4000);
   });
 
@@ -208,6 +213,17 @@ function startBalanceTracking() {
   balancePoller = setInterval(async () => {
     if (!gameWin) { stopBalanceTracking(); return; }
     if (!conversionRate) return;
+
+    // Check all frames for the balance value
+    try {
+      const frames = [gameWin.webContents.mainFrame, ...gameWin.webContents.mainFrame.frames];
+      for (const frame of frames) {
+        try {
+          const v = await frame.executeJavaScript('window.__ppBal !== undefined ? window.__ppBal : null');
+          if (v !== null && v !== lastDemoBalance) { lastDemoBalance = v; break; }
+        } catch(_) {}
+      }
+    } catch(_) {}
 
     const demoBal = lastDemoBalance;
     if (demoBal === prevDemoBal) return;
