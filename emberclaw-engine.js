@@ -27,6 +27,7 @@ export const CFG = {
   heatFlat: 0.75,                         // heat >= 3: every cluster pays this flat bonus (spec said 0.5x; raised while tuning RTP)
   maxWin: 9500,
   freeSpins: 10, retriggerSpins: 4, retriggerMin: 2, maxBonusSpins: 100, maxSteps: 60,
+  bets: [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000],
   buy: { standard: { cost: 100, heat: 0 }, preheated: { cost: 500, heat: 6 } },
   anteCost: 1.25
 };
@@ -167,6 +168,19 @@ export function playSpin(rng, { heat0 = 0, ante = false, forceDetonate = false, 
 }
 
 /* Full round: base spin (+ whole bonus if triggered). Payouts are in multiples of the base bet. */
+/* A bought bonus first plays a visible trigger spin: a board that lands n Forgefire Gems and pays nothing. */
+function triggerGrid(rng, n) {
+  let g;
+  for (let tries = 0; tries < 300; tries++) {
+    g = initialGrid(rng, 0, CFG.weights);
+    const used = [];
+    while (used.length < n) { const r = Math.floor(rng() * ROWS), c = Math.floor(rng() * COLS); if (!used.some(q => q[0] === r && q[1] === c)) used.push([r, c]); }
+    used.forEach(([r, c]) => { g[r][c] = SYM.SCATTER; });
+    if (!findClusters(g, newGrid(1)).length) break;
+  }
+  return g;
+}
+
 export function playRound(rng, { ante = false, buy = null } = {}) {
   const bonusFrom = (startHeat) => {
     const spins = []; let heat = startHeat, left = CFG.freeSpins, n = 0, total = 0, awarded = CFG.freeSpins;
@@ -178,13 +192,13 @@ export function playRound(rng, { ante = false, buy = null } = {}) {
       s.spinsLeft = left;
       spins.push(s);
     }
-    return { spins, totalPayout: Math.min(total, CFG.maxWin), freeSpinsAwarded: awarded, endHeat: heat };
+    return { spins, totalPayout: Math.min(total, CFG.maxWin), freeSpinsAwarded: awarded, startSpins: CFG.freeSpins, endHeat: heat };
   };
 
   if (buy) {
     const b = CFG.buy[buy];
     const bonus = bonusFrom(b.heat);
-    return { cost: b.cost, initialGrid: null, cascadeSteps: [], baseSpin: null, bonus, bonusTriggered: true,
+    return { cost: b.cost, initialGrid: triggerGrid(rng, buy === 'preheated' ? 4 : 3), cascadeSteps: [], baseSpin: null, bonus, bonusTriggered: true,
       freeSpinsAwarded: bonus.freeSpinsAwarded, totalPayout: bonus.totalPayout, bought: buy };
   }
   const base = playSpin(rng, { ante });

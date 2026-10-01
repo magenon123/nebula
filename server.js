@@ -214,7 +214,7 @@ app.post('/api/emberclaw/spin', auth, async (req, res) => {
     const stake = money(req.body.stake);
     const ante  = !!req.body.ante;
     const buy   = req.body.buy ? String(req.body.buy) : null;
-    if (!(stake >= 0.1 && stake <= 500)) return res.status(400).json({ error: 'Bet must be between 0.10 and 500' });
+    if (!EC.bets.includes(stake)) return res.status(400).json({ error: 'Invalid bet size' });
     if (buy && !EC.buy[buy]) return res.status(400).json({ error: 'Unknown bonus buy' });
     if (buy && ante) return res.status(400).json({ error: 'Ante cannot be combined with Buy Bonus' });
 

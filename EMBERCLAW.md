@@ -43,3 +43,7 @@ The game lives on a fixed 1600x900 stage that is scaled to fit the window, so po
 ## Look & feel notes
 - Money is shown in USD (`fmt()` -> `$1,234.56`).
 - Hand-inked look: SVG displacement filters (`roughS/C/L/U`) wobble every outline, pen-hatch patterns shade the art, a paper-grain overlay and halftone dots sit over the scene. Modals are forged plaques; bonus intro/outro are full-screen splashes (tap anywhere).
+
+## Bought bonus & bet sizes
+- A bought bonus first plays a **trigger spin**: the server returns a board with 3 (4 for Pre-Heated) Forgefire Gems and no wins (`round.initialGrid`, `cascadeSteps: []`); the gems pulse, then the free-spins splash appears. The trigger spin pays nothing, so the math is unchanged.
+- Bet sizes: 42 options from $0.10 to $10,000 (`CFG.bets` on the server, validated in `/api/emberclaw/spin`; click the bet amount in the bar for a quick-pick grid).

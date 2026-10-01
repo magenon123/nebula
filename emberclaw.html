@@ -42,6 +42,8 @@ button:disabled{cursor:not-allowed}
 .cell.scatter svg.g{animation:wob 1.9s ease-in-out infinite alternate}
 @keyframes wob{to{transform:scale(1.07) rotate(3deg)}}
 .cell .m{position:absolute;right:4px;bottom:4px;min-width:34px;text-align:center;padding:1px 6px;border-radius:99px;border:3px solid var(--ink);font-family:var(--toon);font-size:19px;color:var(--ink);background:var(--gold);z-index:3}
+.cell.scat svg.g{animation:scatp .55s ease-in-out infinite alternate;filter:drop-shadow(0 0 14px #ff4a8a)}
+@keyframes scatp{to{transform:scale(1.22) rotate(6deg)}}
 .cell.hit{z-index:2;background:radial-gradient(circle,#8a5410,#2b140c 80%)}
 .cell.hit svg.g{animation:hitg .5s ease-in-out infinite alternate}
 @keyframes hitg{to{transform:scale(1.13)}}
@@ -143,7 +145,8 @@ button:disabled{cursor:not-allowed}
 #betV{font-family:var(--toon);font-size:31px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
 #betBar{position:absolute;left:0;bottom:0;height:7px;background:#fff;border-radius:0 4px 0 0;transition:width .2s}
 #chev{position:absolute;right:92px;top:8px;width:56px;height:76px;display:flex;flex-direction:column;justify-content:space-between}
-#chev button{height:34px;display:grid;place-items:center;border-radius:8px}
+#chev{pointer-events:none}
+#chev button{pointer-events:auto;height:34px;display:grid;place-items:center;border-radius:8px}
 #chev button:hover:not(:disabled){background:#2a1a14}
 #chev button:disabled{opacity:.35}
 #chev svg{width:34px;height:20px;fill:none;stroke:#cfc3b8;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
@@ -211,13 +214,34 @@ button:disabled{cursor:not-allowed}
 .rules div{padding:12px;border-radius:10px;background:#2a1913;border:3px solid #4a3328}
 .rules b{display:block;font-family:var(--toon);font-weight:400;font-size:20px;color:var(--gold);margin-bottom:4px}
 .rules span{font-size:13.5px;line-height:1.5;color:#e3d0b8;font-weight:500}
-.modal.splash{flex-direction:column;overflow:hidden;background:radial-gradient(circle,rgba(80,28,8,.9),rgba(8,3,4,.97))}
+.modal.splash{flex-direction:column;overflow:hidden;background:radial-gradient(circle,rgba(90,32,8,.985),rgba(8,3,4,.99))}
 .rays{position:absolute;width:170vmax;height:170vmax;left:50%;top:50%;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(rgba(255,170,40,.2) 0 7deg,transparent 7deg 20deg);-webkit-mask:radial-gradient(circle,#000 4%,transparent 52%);mask:radial-gradient(circle,#000 4%,transparent 52%);animation:rot 50s linear infinite}
-.sp{position:relative;text-align:center;max-width:760px;padding:0 20px}
-.spT{font-family:var(--toon);font-size:clamp(46px,7.5vw,104px);line-height:1;color:var(--gold);-webkit-text-stroke:8px var(--ink);paint-order:stroke fill;text-shadow:0 9px 0 var(--ink);transform:rotate(-2.5deg);animation:bigin .6s cubic-bezier(.2,1.4,.4,1)}
-.spN{font-family:var(--toon);font-size:clamp(70px,12vw,170px);line-height:1.05;margin:14px 0 6px;color:#fff;-webkit-text-stroke:9px var(--ink);paint-order:stroke fill;text-shadow:0 10px 0 var(--ink);animation:bigin .7s .1s cubic-bezier(.2,1.4,.4,1) backwards}
-.spN small{display:block;font-family:var(--ui);font-size:clamp(14px,1.6vw,20px);letter-spacing:6px;color:var(--gold);-webkit-text-stroke:0;text-shadow:2px 2px 0 var(--ink);font-weight:900;margin-bottom:-8px}
-.sp p{font-size:clamp(14px,1.5vw,19px);color:#f0dcc4;text-shadow:2px 2px 0 var(--ink);font-weight:700;max-width:560px;margin:10px auto}
+.sp{position:relative;display:flex;flex-direction:column;align-items:center;padding:0 20px}
+.gems{display:flex;justify-content:center;position:relative;z-index:4;height:120px;margin-bottom:-34px}
+.gems .g{animation:gemin .85s cubic-bezier(.3,1.4,.5,1) backwards}
+.gems .g:nth-child(1){animation-delay:.05s}.gems .g:nth-child(2){animation-delay:.3s;margin:-20px -6px 0}.gems .g:nth-child(3){animation-delay:.55s}
+.gems svg{width:134px;height:134px;overflow:visible;filter:drop-shadow(0 7px 0 rgba(0,0,0,.5)) drop-shadow(0 0 16px rgba(255,80,140,.7))}
+.gems .g:nth-child(1) svg{transform:rotate(-15deg)}.gems .g:nth-child(3) svg{transform:rotate(15deg)}
+@keyframes gemin{from{transform:translateY(-700px) rotate(240deg);opacity:0}}
+.medalWrap{position:relative;z-index:2}
+.medalWrap .fire{position:absolute;left:-30px;right:-30px;top:-86px;height:150px;overflow:visible}
+.fire path{transform-box:fill-box;transform-origin:50% 100%;animation:flick .55s ease-in-out infinite alternate}
+.fire path:nth-child(2n){animation-duration:.4s}.fire path:nth-child(3n){animation-duration:.68s}
+.medal{position:relative;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#ffbc3a,#e0500a 58%,#8a1f06);border:12px solid var(--ink);box-shadow:inset 0 0 0 7px #ffd36a,inset 0 0 0 12px var(--ink),0 14px 0 rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;filter:url(#roughU);animation:bigin .7s .15s cubic-bezier(.2,1.4,.4,1) backwards}
+.medal .mtop{font-weight:900;letter-spacing:5px;font-size:15px;color:#ffe9b8;text-shadow:2px 2px 0 var(--ink)}
+.medal .mnum{font-family:var(--toon);font-size:170px;line-height:.9;color:#fff;-webkit-text-stroke:11px var(--ink);paint-order:stroke fill;text-shadow:0 9px 0 var(--ink);margin-top:14px}
+.medal .mlbl{font-family:var(--toon);font-size:42px;color:var(--gold);-webkit-text-stroke:7px var(--ink);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink);margin-top:2px}
+.medal.wide{width:min(86vw,640px);height:250px;border-radius:84px}
+.medal.wide .mnum{font-size:clamp(70px,10vw,124px);margin-top:6px}
+.ribbon{position:relative;z-index:5;margin-top:-44px;padding:14px 64px 8px;background:linear-gradient(#ff8a2a,#e0500a);border:7px solid var(--ink);border-radius:6px;font-family:var(--toon);font-size:clamp(40px,5.6vw,66px);line-height:1;color:#fff;text-shadow:3px 5px 0 var(--ink);transform:rotate(-2deg);box-shadow:inset 0 0 0 3px rgba(255,255,255,.3),0 9px 0 rgba(0,0,0,.45);filter:url(#roughU);animation:bigin .6s .3s cubic-bezier(.2,1.4,.4,1) backwards;white-space:nowrap}
+.ribbon::before,.ribbon::after{content:"";position:absolute;top:16px;width:70px;height:100%;background:#a83a08;border:7px solid var(--ink);z-index:-1}
+.ribbon::before{left:-56px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,28% 50%)}.ribbon::after{right:-56px;clip-path:polygon(0 0,100% 0,72% 50%,100% 100%,0 100%)}
+.chips{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;justify-content:center;max-width:720px}
+.chips span{padding:9px 14px 7px;background:var(--ink);border:3px solid #7a5238;border-radius:10px;font-weight:900;font-size:13px;letter-spacing:1.5px;color:#ffe3b0;transform:rotate(-.8deg)}
+.chips span:nth-child(2n){transform:rotate(.9deg)}
+.betgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.betgrid .opt{padding:10px 0;font-size:15px}
+#betV{cursor:pointer;display:inline-block}
 #big{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(60,20,8,.82),rgba(0,0,0,.92));opacity:0;pointer-events:none;transition:opacity .3s;cursor:pointer}
 #big.show{opacity:1;pointer-events:auto}
 #bigT{font-family:var(--toon);font-size:clamp(46px,9vw,120px);letter-spacing:4px;color:var(--gold);-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 8px 0 var(--ink);animation:bigin .6s cubic-bezier(.2,1.4,.4,1)}
@@ -535,6 +559,8 @@ button:disabled{cursor:not-allowed}
   <div id="cWarn"></div>
   <div class="row2"><button class="btn" id="cNo">CANCEL</button><button class="btn pri" id="cYes">CONFIRM</button></div>
 </div></div>
+<!-- bet picker -->
+<div class="modal" id="betM" hidden><div class="mbox wide"><button class="x" data-close>×</button><h2>CHOOSE YOUR BET</h2><div class="betgrid" id="betGrid"></div></div></div>
 <!-- autoplay -->
 <div class="modal" id="autoM" hidden><div class="mbox">
   <button class="x" data-close>×</button><h2>AUTOPLAY</h2><p>Number of automatic spins</p>
@@ -544,9 +570,16 @@ button:disabled{cursor:not-allowed}
   <div class="row2"><button class="btn" data-close>CANCEL</button><button class="btn pri" id="autoGo">START</button></div>
 </div></div>
 <!-- bonus intro / outro: tap anywhere -->
-<div class="modal tap splash" id="introM" hidden><div class="rays"></div><div class="sp"><div class="spT">THE REFORGING</div><div class="spN"><small>YOU WON</small><span id="introN">10</span> <span style="font-size:.4em">FREE SPINS</span></div>
-  <p>The Forge Core keeps its heat between spins. Every 3rd spin opens with a guaranteed detonation.</p><div class="tapHint">TAP ANYWHERE TO START</div></div></div>
-<div class="modal tap splash" id="outroM" hidden><div class="rays"></div><div class="sp"><div class="spT">BONUS COMPLETE</div><div class="spN"><small>TOTAL WIN</small><span id="outroV">$0.00</span></div><div class="tapHint">TAP ANYWHERE TO CONTINUE</div></div></div>
+<div class="modal tap splash" id="introM" hidden><div class="rays"></div><div class="sp">
+  <div class="gems"><div class="g"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div><div class="g"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div><div class="g"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div></div>
+  <div class="medalWrap">    <div class="medal"><div class="mnum"><span id="introN">10</span></div><div class="mlbl">FREE SPINS</div></div></div>
+  <div class="ribbon">THE REFORGING</div>
+  <div class="chips"><span>THE CORE KEEPS ITS HEAT</span><span>EVERY 3RD SPIN: GUARANTEED DETONATION</span><span>2+ GEMS: +4 SPINS</span></div>
+  <div class="tapHint">TAP ANYWHERE TO START</div></div></div>
+<div class="modal tap splash" id="outroM" hidden><div class="rays"></div><div class="sp">
+  <div class="ribbon" style="margin:0 0 -40px">BONUS COMPLETE</div>
+  <div class="medalWrap"><div class="medal wide"><div class="mtop">TOTAL WIN</div><div class="mnum"><span id="outroV">$0.00</span></div></div></div>
+  <div class="tapHint" style="margin-top:34px">TAP ANYWHERE TO CONTINUE</div></div></div>
 <!-- info -->
 <div class="modal" id="infoM" hidden><div class="mbox wide">
   <button class="x" data-close>×</button><h2>EMBERCLAW · MOLTEN REFORGE</h2>
@@ -568,9 +601,10 @@ const TOKEN = localStorage.getItem('stakeToken');
 const TIER = ['low','low','low','mid','mid','high','high','wild','scatter'];
 const NAMES = ['Iron Shard','Copper Ingot','Silver Chain','Molten Hammer','Rune-Etched Tongs','Dragonbone Blade','Crown of Cinders'];
 const PT = [[.1,.25,.5,1.5],[.15,.3,.6,1.75],[.2,.4,.8,2],[.4,1,2.5,6],[.6,1.5,3.5,9],[1.5,4,10,25],[3,8,20,50]];  // display only
-const BETS = [0.1,0.2,0.5,1,2,5,10,20,50,100,200,500];
+const BETS = [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000];  // keep in sync with CFG.bets on the server
+const betLbl = n => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2));
 const store = { get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
-let bi = 3, ante = false, busy = false, balance = 0, lastGrid = null, lastWilds = [], STAGE_S = 1;
+let bi = BETS.indexOf(1), ante = false, busy = false, balance = 0, lastGrid = null, lastWilds = [], STAGE_S = 1;
 let soundOn = store.get('ec_snd', true), turbo = store.get('ec_turbo', false);
 let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
 const T = () => turbo ? .45 : 1;
@@ -649,6 +683,7 @@ function makeSfx(ctx, out) {
     bonus: () => { const t = T0(); horn(t, 2.2, .075); [0, .36, .72].forEach((d, i) => anvil(.9, [.9, 1, 1.19][i], t + d)); [0, 4, 7, 12].forEach((n, i) => metal(330 * st(n), t + 1 + i * .08, 1.6, .07)); osc('sine', 60, t, 1.8, .3, .01, 40); },
     outro: () => { const t = T0(); [0, 4, 7, 12, 16].forEach((n, i) => metal(392 * st(n), t + i * .13, 1.3, .1)); horn(t, 1.6, .045, 82.5); },
     big: lv => { const t = T0(); for (let i = 0; i < lv; i++) anvil(.9, 1 + i * .06, t + i * .28); horn(t, 1.6 + lv * .5, .06 + lv * .012, 55 * st(lv)); [0, 4, 7, 12, 16, 19, 24].slice(0, 3 + lv).forEach((n, i) => metal(440 * st(n), t + .3 + i * .1, 1.2, .08)); osc('sine', 60, t, 1.2, .35, .01, 36); },
+    scatter: n => { const t = T0(), f = 660 * st([0, 4, 7, 12][Math.min(n, 3)]); metal(f, t, 1.3, .13); osc('triangle', f / 2, t, .5, .07); noise(t, .35, .06, 'highpass', 7000, 0); },
     tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .12, .001); noise(t, .02, .08, 'highpass', 6000, 0); }
   };
 }
@@ -800,17 +835,16 @@ async function go(buy) {
     balance = j.user.balance - j.payout;  // show the stake leaving now, the win as it lands
     $('bal').textContent = fmt(balance);
     const live = (a, b) => { $('win').textContent = fmt(b); };
-    if (!R.bought) { run = await playSpin({ initialGrid: R.initialGrid, openingGrid: R.openingGrid, openingEvents: R.openingEvents, openingWilds: [], cascadeSteps: R.cascadeSteps, startHeat: 0 }, 0, stake, live); }
+    run = await playSpin({ initialGrid: R.initialGrid, openingGrid: R.openingGrid, openingEvents: R.openingEvents, openingWilds: [], cascadeSteps: R.cascadeSteps, startHeat: 0 }, 0, stake, live);
     if (R.bonusTriggered) {
       out.bonus = true;
-      say(`THE REFORGING · ${R.freeSpinsAwarded} FREE SPINS`, true); sfx.bonus(); char('big', 2500); shake(true); flash(); embers(160); await sleep(700);
-      $('introN').textContent = R.bought ? 10 : R.freeSpinsAwarded; await tapWait('introM', auto.left > 0 ? 1800 : 0);
+      await showScatters(); sfx.bonus(); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
+      $('introN').textContent = R.bonus.startSpins; await tapWait('introM', auto.left > 0 ? 1800 : 0);
       $('fsBox').hidden = false; $('char').classList.add('bonusmode');
-      let first = true, total = R.bonus.spins.length;
+      let total = R.bonus.spins.length;
       for (const sp of R.bonus.spins) {
         $('fs').textContent = `${sp.spinIndex} / ${total}` + (sp.retrigger ? '  +' + sp.retrigger : ''); say(`Free spin ${sp.spinIndex}` + (sp.retrigger ? `  ·  +${sp.retrigger} SPINS!` : ''), !!sp.retrigger);
-        if (!first || !R.bought) await dropOut();
-        first = false;
+        await dropOut();
         run = await playSpin(sp, run, stake, live); await wait(300);
       }
       $('fsBox').hidden = true; $('char').classList.remove('bonusmode'); $('outroV').textContent = fmt(0);
@@ -823,6 +857,14 @@ async function go(buy) {
     out.tier = await bigWin(R.totalPayout, j.payout);
   } catch (e) { say(e.message); out.err = true; }
   setBusy(false); refreshUi(); return out;
+}
+
+/* the Forgefire Gems that triggered the bonus pulse on the board before the splash */
+async function showScatters() {
+  const g = [...cells].filter(d => d.classList.contains('scatter'));
+  $('grid').classList.add('focus'); g.forEach(d => d.classList.add('hit', 'scat'));
+  say(`${g.length} GEMS LANDED · THE REFORGING!`, true);
+  g.forEach((d, i) => setTimeout(() => sfx.scatter(i), i * 260 * T())); await wait(260 * g.length + 1000);
 }
 
 /* ---------- autoplay ---------- */
@@ -853,7 +895,7 @@ const BUYS = {
 let pendingBuy = null;
 function askBuy(kind) {
   if (busy) return; const b = BUYS[kind], cost = BETS[bi] * b.mult; pendingBuy = kind;
-  $('cTitle').textContent = b.title; $('cDesc').textContent = b.desc; $('cCost').textContent = fmt(cost);
+  $('cTitle').textContent = b.title; $('cDesc').textContent = b.desc; $('cCost').textContent = fmt(cost); $('cCost').style.fontSize = fmt(cost).length > 10 ? '38px' : '';
   const short = cost > balance + 1e-9; $('cWarn').textContent = short ? 'Not enough balance.' : ''; $('cYes').disabled = short;
   openM('confirm');
 }
@@ -869,9 +911,10 @@ $('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); ref
 
 function syncParent(u) { try { const a = parent !== window && parent._slotAPI; if (a) { a.bal = u.balance; a.paintBal(0); } } catch {} }
 function refreshUi() {
-  const s = BETS[bi]; $('bet').textContent = fmt(s); $('bbBet').textContent = fmt(s);
+  const s = BETS[bi]; $('betV').style.fontSize = s >= 1000 ? '24px' : s >= 100 ? '28px' : '';
+  const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(s); $('bbBet').textContent = fmt(s);
   $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
-  $('p1').textContent = fmt(s * 100); $('p2').textContent = fmt(s * 500);
+  fitTxt($('p1'), fmt(s * 100), 34, '23px'); fitTxt($('p2'), fmt(s * 500), 34, '23px');
   $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante);
   $('bAuto').classList.toggle('on', auto.left > 0);
   $('spinCnt').hidden = !(auto.left > 0); $('spinCnt').textContent = auto.left; $('spin').querySelector('svg').style.visibility = auto.left > 0 ? 'hidden' : '';
@@ -879,6 +922,13 @@ function refreshUi() {
   $('bSnd').classList.toggle('on', soundOn); $('bSnd').querySelector('i').textContent = soundOn ? 'ON' : 'OFF';
   document.body.style.setProperty('--spd', T());
 }
+function openBets() {
+  if (busy) return; sfx.ui();
+  $('betGrid').innerHTML = BETS.map((v, i) => `<button class="opt${i === bi ? ' sel' : ''}" data-i="${i}">${betLbl(v)}</button>`).join('');
+  openM('betM');
+}
+$('betGrid').onclick = e => { const o = e.target.closest('.opt'); if (!o) return; sfx.ui(); bi = +o.dataset.i; refreshUi(); closeM('betM'); };
+$('betV').onclick = openBets;
 $('m').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
 $('p').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
 $('spin').onclick = () => go(null);
