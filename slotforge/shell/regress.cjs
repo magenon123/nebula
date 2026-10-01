@@ -159,8 +159,11 @@ async function run(file, outDir, label) {
   // ---- 7. autoplay + stop square ----
   await clk('#bAuto'); await sleep(250); check('autoplay dialog opens', await vis('#autoM')); await mark('22-autoplay-dialog');
   check('autoplay has 4 spin counts + 2 switches', (await page.$$eval('#autoOpts .opt', o => o.length)) === 4 && (await page.$$eval('.sw', o => o.length)) === 2);
-  await clk('#autoOpts .opt >> nth=0'); await clk('#autoGo'); await sleep(1200);
-  s = await mark('23-autoplay-running', true, true); check('autoplay: spin button becomes counter square with spins left', s.spinCnt !== null && +s.spinCnt >= 1 && +s.spinCnt <= 10, 'spinCnt=' + s.spinCnt);
+  await clk('#autoOpts .opt >> nth=0'); await clk('#autoGo');
+  // deterministic stop point: wait until round 1 is over and round 2 runs (counter reads 9), so exactly 2 rounds are played however loaded the machine is
+  for (let i = 0; i < 600 && (await page.$eval('#spinCnt', e => e.textContent.trim())) !== '9'; i++) await sleep(100);
+  await sleep(300);
+  s = await mark('23-autoplay-running', true, true); check('autoplay: spin button becomes counter square with spins left', s.spinCnt === '9', 'spinCnt=' + s.spinCnt);
   check('autoplay: square is white', await page.$eval('#spinCnt', e => getComputedStyle(e).backgroundColor === 'rgb(255, 255, 255)'));
   check('autoplay: spin button is clickable (stop)', await page.$eval('#spin', e => !e.disabled));
   await clk('#spin'); await sleep(200); s = await state(); check('stop click: counter cleared', s.spinCnt === null, s.msg + ' / ' + s.spinCnt);
