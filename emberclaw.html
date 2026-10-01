@@ -11,7 +11,8 @@
 html,body{margin:0;height:100%;overflow:hidden;background:#1a0a12;font-family:var(--ui);color:#fff;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
 button{font-family:inherit;cursor:pointer;color:inherit;border:0;background:none;padding:0}
 button:disabled{cursor:not-allowed}
-#fx{position:fixed;inset:0;pointer-events:none;z-index:40}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:85}
+#grain{position:fixed;inset:0;z-index:30;pointer-events:none;opacity:.5;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.4 -.15'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
 #flash{position:fixed;inset:0;z-index:45;pointer-events:none;background:radial-gradient(circle at 50% 50%,rgba(255,235,170,.95),rgba(255,120,20,.55) 45%,transparent 75%);opacity:0}
 #flash.go{animation:flash .7s ease-out}
 @keyframes flash{0%{opacity:.9}100%{opacity:0}}
@@ -61,7 +62,7 @@ button:disabled{cursor:not-allowed}
 #core{left:318px;top:150px;width:112px;height:560px}
 #core .chain{position:absolute;top:-160px;width:10px;height:200px;background:repeating-linear-gradient(180deg,#8a8f9c 0 12px,var(--ink) 12px 15px);border:3px solid var(--ink);border-radius:5px}
 #core .chain.a{left:22px}#core .chain.b{left:70px}
-#tube{position:absolute;left:18px;top:34px;width:72px;height:450px;border-radius:36px;background:#2a1814;border:6px solid var(--ink);padding:7px;display:flex;flex-direction:column-reverse;gap:4px;box-shadow:inset 0 0 0 3px #6e5d58,0 6px 0 rgba(0,0,0,.4)}
+#tube{filter:url(#roughU);position:absolute;left:18px;top:34px;width:72px;height:450px;border-radius:36px;background:#2a1814;border:6px solid var(--ink);padding:7px;display:flex;flex-direction:column-reverse;gap:4px;box-shadow:inset 0 0 0 3px #6e5d58,0 6px 0 rgba(0,0,0,.4)}
 #tube i{flex:1;border-radius:9px;background:#3f2a22;border:2px solid #1d0f09;transition:background .3s}
 #tube i.on{background:linear-gradient(#ffe066,#ff7a1a 60%,#d8350a);box-shadow:0 0 12px #ff7a1a}
 #tube i.pulse{animation:segp .8s ease-out}
@@ -72,7 +73,7 @@ button:disabled{cursor:not-allowed}
 .perk{font-family:var(--toon);font-size:26px;line-height:1;color:#a8978c;-webkit-text-stroke:0;text-shadow:2px 2px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink);transition:.3s}
 .perk small{display:block;font-family:var(--ui);font-weight:900;font-size:12px;letter-spacing:1px;margin-top:2px}
 .perk.on{color:var(--gold)}
-#heatBox{position:absolute;left:8px;top:496px;width:92px;padding:6px 0 8px;text-align:center;background:var(--ink);border:4px solid #6e5d58;border-radius:14px}
+#heatBox{filter:url(#roughU);position:absolute;left:8px;top:496px;width:92px;padding:6px 0 8px;text-align:center;background:var(--ink);border:4px solid #6e5d58;border-radius:14px}
 #heatV{font-family:var(--toon);font-size:34px;color:var(--gold);line-height:1}
 #heatBox small{display:block;font-size:10px;font-weight:900;letter-spacing:2px;color:#b8a89a}
 
@@ -127,21 +128,21 @@ button:disabled{cursor:not-allowed}
 #cBrows{transition:transform .15s}
 
 /* ---------- bottom bar (SHELL: identical in every slot) ---------- */
-#buyOpen{left:98px;top:762px;width:112px;height:112px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#ffdd4a,#f4b90a 70%);border:6px solid var(--ink);box-shadow:0 6px 0 rgba(0,0,0,.45);transition:transform .15s}
+#buyOpen{filter:url(#roughU);left:98px;top:762px;width:112px;height:112px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#ffdd4a,#f4b90a 70%);border:6px solid var(--ink);box-shadow:0 6px 0 rgba(0,0,0,.45);transition:transform .15s}
 #buyOpen:hover:not(:disabled){transform:scale(1.07) rotate(-3deg)}
 #buyOpen span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--toon);font-size:25px;line-height:.95;color:var(--ink);transform:rotate(-17deg);text-align:center}
 #buyOpen:disabled{filter:saturate(.4) brightness(.7)}
-#barL{left:262px;top:782px;width:620px;height:92px;background:rgba(14,9,8,.93);border:4px solid var(--ink);border-left:0;border-radius:0 14px 14px 0;display:flex;align-items:center;gap:26px;padding-left:20px;box-shadow:0 6px 0 rgba(0,0,0,.35)}
+#barL{left:262px;top:782px;width:620px;height:92px;background:radial-gradient(circle at 14px 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),#c9a15a 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) calc(100% - 14px),#c9a15a 4px,transparent 5px),linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-left:0;border-radius:0 18px 12px 0;display:flex;align-items:center;gap:30px;padding-left:24px;box-shadow:inset 0 0 0 3px #6e4a36,0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
 #menuBtn{width:54px;height:54px;display:grid;place-items:center;border-radius:12px}
 #menuBtn:hover{background:#2a1a14}
 #menuBtn svg{width:42px;height:42px;fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round}
-.fld label{display:block;font-size:17px;font-weight:700;color:#9b8c80;letter-spacing:.5px}
-.fld .v{font-size:31px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.05}
+.fld label{display:block;font-size:14px;font-weight:900;color:#b79a82;letter-spacing:2px}
+.fld .v{font-family:var(--toon);font-size:35px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
 .fld .v.gold{color:var(--gold)}
-#barR{left:1010px;top:782px;width:250px;height:92px;background:rgba(14,9,8,.93);border:4px solid var(--ink);border-radius:14px 0 0 14px;border-right:0;padding:12px 0 0 18px}
-#betV{font-size:31px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.05}
+#barR{left:950px;top:782px;width:310px;height:92px;background:radial-gradient(circle at 14px 14px,#c9a15a 4px,transparent 5px),radial-gradient(circle at 14px calc(100% - 14px),#c9a15a 4px,transparent 5px),linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-radius:12px 0 0 18px;border-right:0;padding:12px 0 0 28px;box-shadow:inset 0 0 0 3px #6e4a36,0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+#betV{font-family:var(--toon);font-size:31px;letter-spacing:1px;line-height:1.05;text-shadow:2px 3px 0 var(--ink)}
 #betBar{position:absolute;left:0;bottom:0;height:7px;background:#fff;border-radius:0 4px 0 0;transition:width .2s}
-#chev{position:absolute;right:104px;top:8px;width:56px;height:76px;display:flex;flex-direction:column;justify-content:space-between}
+#chev{position:absolute;right:92px;top:8px;width:56px;height:76px;display:flex;flex-direction:column;justify-content:space-between}
 #chev button{height:34px;display:grid;place-items:center;border-radius:8px}
 #chev button:hover:not(:disabled){background:#2a1a14}
 #chev button:disabled{opacity:.35}
@@ -155,19 +156,19 @@ button:disabled{cursor:not-allowed}
 #spin:disabled svg{stroke:#8a8078}
 @keyframes rot{to{transform:rotate(360deg)}}
 #spin .cnt{position:absolute;font-family:var(--toon);font-size:40px;color:#fff}
-#bAuto{left:1362px;top:800px;width:68px;height:68px;border-radius:50%;background:rgba(14,9,8,.93);border:4px solid var(--ink);display:grid;place-items:center;box-shadow:0 5px 0 rgba(0,0,0,.35)}
+#bAuto{left:1362px;top:800px;width:68px;height:68px;border-radius:50%;background:linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);display:grid;place-items:center;box-shadow:inset 0 0 0 3px #6e4a36,0 5px 0 rgba(0,0,0,.35);filter:url(#roughU)}
 #bAuto svg{width:36px;height:36px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 #bAuto:hover:not(:disabled){background:#2a1a14}
 #bAuto.on{background:var(--accent)}
 #bAuto:disabled{opacity:.5}
-#turboBadge{left:1010px;top:732px;padding:2px 12px;border-radius:99px;background:var(--accent);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px}
+#turboBadge{left:950px;top:732px;padding:2px 12px;border-radius:99px;background:var(--accent);border:3px solid var(--ink);font-family:var(--toon);font-size:17px;letter-spacing:1px}
 #msg{left:540px;top:728px;width:520px;height:42px;display:flex;align-items:center;justify-content:center;font-family:var(--toon);font-size:25px;letter-spacing:1px;color:#fff;text-shadow:2px 2px 0 var(--ink),-2px 2px 0 var(--ink),2px -2px 0 var(--ink),-2px -2px 0 var(--ink)}
 #msg.hl{color:var(--gold)}
-#fsBox{left:36px;top:34px;padding:8px 22px 8px 56px;border-radius:14px;background:var(--ink);border:4px solid var(--accent);font-family:var(--toon);font-size:30px;color:#fff;animation:pillin .35s ease-out}
+#fsBox{filter:url(#roughU);left:36px;top:34px;padding:8px 22px 8px 56px;border-radius:14px;background:var(--ink);border:4px solid var(--accent);font-family:var(--toon);font-size:30px;color:#fff;animation:pillin .35s ease-out}
 #fsBox::before{content:"FS";position:absolute;left:8px;top:5px;width:38px;height:38px;border-radius:50%;background:var(--gold);color:var(--ink);display:grid;place-items:center;font-size:18px;border:3px solid #7a4a00}
 #fsBox small{display:block;font-family:var(--ui);font-size:11px;font-weight:900;letter-spacing:2px;color:#b8a89a;margin-bottom:-2px}
 @keyframes pillin{from{transform:translateY(-12px);opacity:0}}
-#menu{left:266px;top:560px;width:230px;padding:10px;background:rgba(14,9,8,.97);border:4px solid var(--ink);border-radius:14px;box-shadow:0 8px 0 rgba(0,0,0,.4);z-index:20}
+#menu{left:266px;top:560px;width:230px;padding:10px;background:linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px #6e4a36,0 8px 0 rgba(0,0,0,.4);z-index:20;filter:url(#roughU)}
 #menu button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:11px 12px;border-radius:9px;font-size:17px;font-weight:700}
 #menu button:hover{background:#2a1a14}
 #menu i{font-style:normal;font-size:13px;font-weight:900;letter-spacing:1px;padding:2px 9px;border-radius:99px;background:#3a2a24;color:#b8a89a}
@@ -176,39 +177,47 @@ button:disabled{cursor:not-allowed}
 /* ---------- overlays ---------- */
 .modal{position:fixed;inset:0;z-index:80;background:rgba(10,4,6,.8);display:flex;align-items:center;justify-content:center;padding:16px}
 .modal.tap{cursor:pointer}
-.mbox{position:relative;width:min(94vw,440px);max-height:92vh;overflow:auto;padding:26px;border-radius:18px;background:#fffaf0;color:#2b1b12;border:5px solid var(--ink);box-shadow:0 10px 0 rgba(0,0,0,.35);text-align:center;animation:mpop .22s ease-out}
-.mbox.wide{width:min(94vw,740px);text-align:left}
+.mbox{position:relative;width:min(94vw,460px);max-height:92vh;padding:50px 28px 26px;margin-top:34px;border-radius:16px 12px 18px 11px;background:radial-gradient(circle at 18px 18px,#c9a15a 5px,transparent 6px),radial-gradient(circle at calc(100% - 18px) 18px,#c9a15a 5px,transparent 6px),radial-gradient(circle at 18px calc(100% - 18px),#c9a15a 5px,transparent 6px),radial-gradient(circle at calc(100% - 18px) calc(100% - 18px),#c9a15a 5px,transparent 6px),linear-gradient(180deg,#3b2820,#22140f);color:#f4e4cf;border:5px solid var(--ink);box-shadow:inset 0 0 0 3px #7a5238,inset 0 0 40px rgba(0,0,0,.5),0 12px 0 rgba(0,0,0,.4);text-align:center;animation:mpop .22s ease-out;filter:url(#roughU)}
+.mbox.wide{width:min(94vw,760px);text-align:left;overflow:auto}
 @keyframes mpop{from{transform:translateY(14px) scale(.96);opacity:0}}
-.mbox h2{margin:0 0 6px;font-family:var(--toon);font-weight:400;font-size:34px;letter-spacing:1px;color:#d2500a}
-.mbox p{margin:6px 0;font-size:15px;line-height:1.5;color:#4a3a2e;font-weight:500}
-.mbox .x{position:absolute;right:12px;top:10px;width:34px;height:34px;border-radius:50%;font-size:24px;line-height:1;background:#2b1b12;color:#fff}
-.big-n{font-family:var(--toon);font-size:58px;margin:10px 0;color:#2b1b12}
-.big-n small{display:block;font-family:var(--ui);font-size:12px;letter-spacing:2px;color:#8a7a6c;font-weight:900}
+.mbox h2{position:absolute;left:50%;top:-30px;transform:translateX(-50%) rotate(-1.5deg);margin:0;padding:7px 30px 4px;background:var(--accent);border:5px solid var(--ink);border-radius:8px;font-family:var(--toon);font-weight:400;font-size:30px;color:#fff;text-shadow:2px 3px 0 var(--ink);white-space:nowrap;letter-spacing:1px;box-shadow:0 5px 0 rgba(0,0,0,.4)}
+.mbox.wide h2{position:static;display:inline-block;transform:rotate(-1deg);margin:0 0 14px}
+.mbox p{margin:8px 0;font-size:15px;line-height:1.5;color:#e3d0b8;font-weight:500}
+.mbox .x{position:absolute;right:10px;top:8px;width:34px;height:34px;border-radius:50%;font-size:24px;line-height:1;background:var(--ink);color:#fff;border:3px solid #7a5238}
+.big-n{font-family:var(--toon);font-size:60px;margin:10px 0;color:var(--gold);text-shadow:3px 4px 0 var(--ink)}
+.big-n small{display:block;font-family:var(--ui);font-size:12px;letter-spacing:3px;color:#b79a82;font-weight:900;text-shadow:none}
 .row2{display:flex;gap:10px;margin-top:16px}
-.btn{flex:1;padding:13px 16px;border-radius:10px;font-size:15px;font-weight:900;letter-spacing:1px;background:#2b1b12;color:#fff;border:3px solid var(--ink)}
+.btn{flex:1;padding:13px 16px;border-radius:10px;font-size:15px;font-weight:900;letter-spacing:1px;background:#3a251c;color:#fff;border:4px solid var(--ink);box-shadow:inset 0 0 0 2px #7a5238,0 4px 0 rgba(0,0,0,.4)}
 .btn:hover:not(:disabled){filter:brightness(1.25)}
 .btn.pri{background:var(--accent)}
 .btn:disabled{opacity:.4}
-.tapHint{margin-top:20px;font-size:13px;font-weight:900;letter-spacing:3px;color:#d2500a;animation:blink 1.4s ease-in-out infinite}
+.tapHint{margin-top:22px;font-size:15px;font-weight:900;letter-spacing:4px;color:var(--gold);text-shadow:2px 2px 0 var(--ink);animation:blink 1.4s ease-in-out infinite}
 @keyframes blink{50%{opacity:.3}}
-#cWarn{color:#c0291a;min-height:18px;font-size:13px;font-weight:700}
+#cWarn{color:#ff8a78;min-height:18px;font-size:13px;font-weight:700}
 .opts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
-.opt{padding:12px 0;border-radius:10px;background:#efe3d0;border:3px solid var(--ink);font-weight:900;font-size:17px;color:#2b1b12}
+.opt{padding:12px 0;border-radius:10px;background:#3a251c;border:4px solid var(--ink);box-shadow:inset 0 0 0 2px #7a5238;font-weight:900;font-size:17px;color:#fff}
 .opt.sel{background:var(--accent);color:#fff}
 .srow{display:flex;justify-content:space-between;align-items:center;margin:12px 0;font-size:15px;font-weight:700;text-align:left}
-.sw{width:52px;height:28px;flex:none;border-radius:99px;background:#cdbba5;border:3px solid var(--ink);position:relative}
+.sw{width:52px;height:28px;flex:none;border-radius:99px;background:#5a4338;border:3px solid var(--ink);position:relative}
 .sw::after{content:"";position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--ink);transition:.2s}
 .sw.on{background:var(--accent)}.sw.on::after{left:26px}
 .pt{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0 14px}
-.pt th{font-size:11px;letter-spacing:1.5px;color:#8a7a6c;text-align:right;padding:4px 8px;font-weight:900}
+.pt th{font-size:11px;letter-spacing:1.5px;color:#b79a82;text-align:right;padding:4px 8px;font-weight:900}
 .pt th:first-child{text-align:left}
-.pt td{padding:5px 8px;text-align:right;border-top:2px solid #e6d8c2;font-variant-numeric:tabular-nums;font-weight:700}
+.pt td{padding:5px 8px;text-align:right;border-top:2px solid #4a3328;font-variant-numeric:tabular-nums;font-weight:700}
 .pt td:first-child{text-align:left}.pt .nm{display:flex;align-items:center;gap:10px}
 .pt svg{width:38px;height:38px;flex:none;background:#27160f;border-radius:8px;padding:2px}
 .rules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.rules div{padding:12px;border-radius:10px;background:#f3e6d2;border:3px solid #e0cfb4}
-.rules b{display:block;font-family:var(--toon);font-weight:400;font-size:18px;color:#d2500a;margin-bottom:4px}
-.rules span{font-size:13.5px;line-height:1.5;color:#4a3a2e;font-weight:500}
+.rules div{padding:12px;border-radius:10px;background:#2a1913;border:3px solid #4a3328}
+.rules b{display:block;font-family:var(--toon);font-weight:400;font-size:20px;color:var(--gold);margin-bottom:4px}
+.rules span{font-size:13.5px;line-height:1.5;color:#e3d0b8;font-weight:500}
+.modal.splash{flex-direction:column;overflow:hidden;background:radial-gradient(circle,rgba(80,28,8,.9),rgba(8,3,4,.97))}
+.rays{position:absolute;width:170vmax;height:170vmax;left:50%;top:50%;margin:-85vmax 0 0 -85vmax;background:repeating-conic-gradient(rgba(255,170,40,.2) 0 7deg,transparent 7deg 20deg);-webkit-mask:radial-gradient(circle,#000 4%,transparent 52%);mask:radial-gradient(circle,#000 4%,transparent 52%);animation:rot 50s linear infinite}
+.sp{position:relative;text-align:center;max-width:760px;padding:0 20px}
+.spT{font-family:var(--toon);font-size:clamp(46px,7.5vw,104px);line-height:1;color:var(--gold);-webkit-text-stroke:8px var(--ink);paint-order:stroke fill;text-shadow:0 9px 0 var(--ink);transform:rotate(-2.5deg);animation:bigin .6s cubic-bezier(.2,1.4,.4,1)}
+.spN{font-family:var(--toon);font-size:clamp(70px,12vw,170px);line-height:1.05;margin:14px 0 6px;color:#fff;-webkit-text-stroke:9px var(--ink);paint-order:stroke fill;text-shadow:0 10px 0 var(--ink);animation:bigin .7s .1s cubic-bezier(.2,1.4,.4,1) backwards}
+.spN small{display:block;font-family:var(--ui);font-size:clamp(14px,1.6vw,20px);letter-spacing:6px;color:var(--gold);-webkit-text-stroke:0;text-shadow:2px 2px 0 var(--ink);font-weight:900;margin-bottom:-8px}
+.sp p{font-size:clamp(14px,1.5vw,19px);color:#f0dcc4;text-shadow:2px 2px 0 var(--ink);font-weight:700;max-width:560px;margin:10px auto}
 #big{position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(60,20,8,.82),rgba(0,0,0,.92));opacity:0;pointer-events:none;transition:opacity .3s;cursor:pointer}
 #big.show{opacity:1;pointer-events:auto}
 #bigT{font-family:var(--toon);font-size:clamp(46px,9vw,120px);letter-spacing:4px;color:var(--gold);-webkit-text-stroke:6px var(--ink);paint-order:stroke fill;text-shadow:0 8px 0 var(--ink);animation:bigin .6s cubic-bezier(.2,1.4,.4,1)}
@@ -217,95 +226,110 @@ button:disabled{cursor:not-allowed}
 #bigX{font-size:18px;color:var(--gold);font-weight:900;letter-spacing:3px;margin-top:10px}
 #auth{position:fixed;inset:0;z-index:90;background:#1a0a12;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--toon)}
 
-/* bonus buy screen */
-.modal.bb{flex-direction:column;justify-content:flex-start;padding-top:20px;background:rgba(10,4,6,.86);overflow:auto}
-.bbT{font-family:var(--toon);font-weight:400;font-size:36px;letter-spacing:2px;margin:0 0 14px;color:#fff;text-shadow:3px 3px 0 var(--ink)}
-.bbX{position:absolute;right:26px;top:20px;width:48px;height:48px;border-radius:50%;border:3px solid #fff;font-size:30px;line-height:1;color:#fff}
-.bbX:hover{background:#fff;color:var(--ink)}
-.bbBet{background:#fff;color:#2b1b12;border-radius:12px;padding:12px 28px;text-align:center;margin-bottom:34px}
-.bbBet small{display:block;font-size:15px;font-weight:500}
-.bbBet b{display:block;font-size:30px;font-weight:700;margin:2px 0 8px}
-.bbBet button{width:52px;height:38px;border-radius:7px;background:#2b2b2b;color:#fff;font-size:26px;font-weight:900;margin:0 3px}
-.bbBet button:hover:not(:disabled){background:#555}
-.bbRow{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;max-width:1100px}
-.bbc{width:230px;background:#fff;color:#2b1b12;border-radius:6px;display:flex;flex-direction:column;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.35);overflow:hidden}
-.bbc h3{margin:18px 10px 8px;font-size:16px;font-weight:900;letter-spacing:.5px;line-height:1.15;text-transform:uppercase}
-.bbc p{margin:0 14px;font-size:13.5px;line-height:1.35;min-height:104px;font-weight:500}
-.bbc .ic{height:92px;display:grid;place-items:center;margin:6px 0}
-.bbc .ic svg{width:88px;height:88px;background:#27160f;border-radius:14px;padding:4px;border:3px solid var(--ink)}
-.bbc em{font-size:12px;color:#444;font-weight:500}
-.bbc .pr{font-size:27px;font-weight:700;margin:6px 0 14px}
-.bbc button.go{height:58px;font-size:25px;font-weight:900;letter-spacing:1px;color:#fff}
-.bbc button.or{background:#ef6c0c}.bbc button.gr{background:#58b947}
-.bbc button.go:hover:not(:disabled){filter:brightness(1.1)}
-.bbc button.go:disabled{background:#999}
+/* bonus buy screen: hand-cut iron plaques with a medallion on top */
+.modal.bb{flex-direction:column;justify-content:flex-start;padding-top:26px;background:radial-gradient(circle at 50% 30%,rgba(60,22,10,.92),rgba(8,3,4,.97));overflow:auto}
+.bbT{position:relative;margin:0 0 20px;padding:8px 44px 4px;background:var(--accent);border:5px solid var(--ink);border-radius:8px;font-family:var(--toon);font-weight:400;font-size:44px;letter-spacing:2px;color:#fff;text-shadow:3px 4px 0 var(--ink);transform:rotate(-1.2deg);box-shadow:0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+.bbX{position:absolute;right:26px;top:22px;width:50px;height:50px;border-radius:50%;border:5px solid var(--ink);background:#3a251c;box-shadow:inset 0 0 0 2px #7a5238;font-size:30px;line-height:1;color:#fff}
+.bbX:hover{background:var(--accent)}
+.bbBet{display:flex;align-items:center;gap:18px;padding:8px 18px;margin-bottom:46px;background:linear-gradient(#34231c,#1c100c);border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px #6e4a36,0 7px 0 rgba(0,0,0,.4);filter:url(#roughU)}
+.bbBet small{display:block;font-size:12px;font-weight:900;letter-spacing:3px;color:#b79a82;text-align:center}
+.bbBet b{display:block;font-family:var(--toon);font-weight:400;font-size:40px;text-align:center;text-shadow:2px 3px 0 var(--ink);min-width:150px}
+.bbBet button{width:46px;height:46px;border-radius:50%;background:var(--accent);border:4px solid var(--ink);font-family:var(--toon);font-size:28px;line-height:1;color:#fff;text-shadow:2px 2px 0 var(--ink)}
+.bbBet button:hover:not(:disabled){filter:brightness(1.15)}
+.bbRow{display:flex;gap:30px;flex-wrap:wrap;justify-content:center;max-width:1200px;padding:0 10px 30px}
+.bbc{position:relative;width:252px;padding:62px 18px 18px;text-align:center;background:radial-gradient(circle at 16px 16px,#c9a15a 4.5px,transparent 5.5px),radial-gradient(circle at calc(100% - 16px) 16px,#c9a15a 4.5px,transparent 5.5px),linear-gradient(180deg,#3d2a21,#21130e);border:5px solid var(--ink);border-radius:16px 11px 17px 12px;box-shadow:inset 0 0 0 3px #7a5238,inset 0 -30px 40px rgba(0,0,0,.35),0 10px 0 rgba(0,0,0,.45);filter:url(#roughU)}
+.bbc:nth-child(1){transform:rotate(-1.4deg)}.bbc:nth-child(2){transform:rotate(.7deg) translateY(-8px)}.bbc:nth-child(3){transform:rotate(-.6deg)}
+.bbc .med{position:absolute;left:50%;top:-52px;width:108px;height:108px;margin-left:-54px;border-radius:50%;background:radial-gradient(circle,#ff9a2a,#a83a0a 75%);border:6px solid var(--ink);box-shadow:inset 0 0 0 3px #ffd36a,0 6px 0 rgba(0,0,0,.4);display:grid;place-items:center}
+.bbc .med svg{width:78px;height:78px;overflow:visible;filter:drop-shadow(0 3px 0 rgba(0,0,0,.5))}
+.bbc h3{margin:0 0 6px;font-family:var(--toon);font-weight:400;font-size:28px;line-height:1.05;letter-spacing:1px;color:var(--gold);text-shadow:2px 3px 0 var(--ink)}
+.bbc p{margin:0 4px;font-size:14px;line-height:1.4;min-height:96px;font-weight:500;color:#e3d0b8}
+.vol{display:flex;align-items:center;justify-content:center;gap:4px;margin:8px 0 12px;font-size:11px;font-weight:900;letter-spacing:2px;color:#b79a82}
+.vol i{width:14px;height:18px;background:#4a3228;clip-path:polygon(50% 0,80% 32%,100% 62%,84% 100%,16% 100%,0 62%,22% 32%)}
+.vol i.on{background:linear-gradient(#ffd23a,#ff5a14)}
+.vol span{margin-right:6px}
+.price#pa{font-size:26px;padding-top:5px}
+.price{display:inline-block;margin-bottom:14px;padding:2px 24px 0;border-radius:30px;background:var(--ink);border:3px solid #7a5238;font-family:var(--toon);font-size:34px;letter-spacing:1px;color:var(--gold)}
+.bbc button.go{display:block;width:100%;padding:11px 0 8px;border-radius:10px;border:5px solid var(--ink);font-family:var(--toon);font-size:30px;letter-spacing:2px;color:#fff;text-shadow:2px 3px 0 var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35),0 5px 0 rgba(0,0,0,.45)}
+.bbc button.or{background:linear-gradient(#ff8a2a,#e0500a)}
+.bbc button.gd{background:linear-gradient(#ffd23a,#e8a010);color:#2b1b12;text-shadow:none}
+.bbc button.off{background:linear-gradient(#7a655a,#4e3d34)}
+.bbc button.go:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
 </style></head><body>
 
 <!-- ============ symbol artwork: hand-inked cartoon style (thick outline, flat colours, solid shading) ============ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
- <symbol id="s0" viewBox="0 0 64 64"><!-- iron shard -->
+ <!-- hand-inked wobble: displaces every edge a hair so nothing is a perfect vector line -->
+ <filter id="roughS" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <filter id="roughC" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency=".034" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <filter id="roughL" x="-2%" y="-2%" width="104%" height="104%"><feTurbulence type="fractalNoise" baseFrequency=".014" numOctaves="2" seed="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <filter id="roughU" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="6" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <pattern id="hatchS" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><line x1="0" y1="0" x2="0" y2="5" stroke="#1d0f09" stroke-width="1.5" opacity=".5"/></pattern>
+ <pattern id="hatchC" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(38)"><line x1="0" y1="0" x2="0" y2="8" stroke="#1d0f09" stroke-width="2.6" opacity=".38"/></pattern>
+ <pattern id="hatchL" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="12" stroke="#1d0f09" stroke-width="3" opacity=".4"/></pattern>
+ <pattern id="dots" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.7" fill="#1d0f09" opacity=".2"/></pattern>
+ <symbol id="s0" viewBox="0 0 64 64"><g filter="url(#roughS)"><!-- iron shard -->
   <path d="M7 45 L15 27 L27 39 L22 57 L8 55Z" fill="#7c889e" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
   <path d="M15 27 L22 38 L11 47Z" fill="#a5b1c6"/>
   <path d="M23 54 L19 30 L32 7 L47 26 L53 54Z" fill="#9aa7bd" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M32 7 L47 26 L53 54 L41 54 L36 31Z" fill="#6a7790"/>
+  <path d="M32 7 L47 26 L53 54 L41 54 L36 31Z" fill="#6a7790"/><path d="M32 7 L47 26 L53 54 L41 54 L36 31Z" fill="url(#hatchS)"/>
   <path d="M32 7 L19 30 L28 34 L35 14Z" fill="#dbe3f0"/>
   <path d="M29 33 L35 43 L30 54" stroke="#1d0f09" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M47 13 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2z" fill="#fff" stroke="#1d0f09" stroke-width="1.5" stroke-linejoin="round"/></symbol>
- <symbol id="s1" viewBox="0 0 64 64"><!-- copper ingot -->
+  <path d="M47 13 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2z" fill="#fff" stroke="#1d0f09" stroke-width="1.5" stroke-linejoin="round"/></g></symbol>
+ <symbol id="s1" viewBox="0 0 64 64"><g filter="url(#roughS)"><!-- copper ingot -->
   <path d="M12 24 L52 25 L59 40 L5 41Z" fill="#f2a95e" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
   <path d="M5 41 L59 40 L58 54 Q58 57 55 57 L9 57 Q6 57 6 54Z" fill="#c4682b" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M7 50 L58 49 L58 54 Q58 57 55 57 L9 57 Q6 57 6 54Z" fill="#9c4a1c"/>
+  <path d="M7 50 L58 49 L58 54 Q58 57 55 57 L9 57 Q6 57 6 54Z" fill="#9c4a1c"/><path d="M7 50 L58 49 L58 54 Q58 57 55 57 L9 57 Q6 57 6 54Z" fill="url(#hatchS)"/>
   <path d="M13 30 L47 31" stroke="#ffe0b4" stroke-width="3" stroke-linecap="round"/>
   <path d="M32 29 Q38 34 32 40 Q27 34 32 29Z" fill="#8a3c12" stroke="#1d0f09" stroke-width="2"/>
-  <path d="M10 46 L18 46" stroke="#e58a46" stroke-width="3" stroke-linecap="round"/></symbol>
- <symbol id="s2" viewBox="0 0 64 64"><!-- silver chain -->
+  <path d="M10 46 L18 46" stroke="#e58a46" stroke-width="3" stroke-linecap="round"/></g></symbol>
+ <symbol id="s2" viewBox="0 0 64 64"><g filter="url(#roughS)"><!-- silver chain -->
   <g fill="none" stroke-linecap="round" stroke-linejoin="round">
    <rect x="5" y="19" width="31" height="22" rx="11" stroke="#1d0f09" stroke-width="13" transform="rotate(-26 20 30)"/>
    <rect x="28" y="24" width="31" height="22" rx="11" stroke="#1d0f09" stroke-width="13" transform="rotate(-26 43 35)"/>
    <rect x="5" y="19" width="31" height="22" rx="11" stroke="#c7d0dd" stroke-width="6.5" transform="rotate(-26 20 30)"/>
    <rect x="28" y="24" width="31" height="22" rx="11" stroke="#aab5c6" stroke-width="6.5" transform="rotate(-26 43 35)"/>
    <path d="M12 20 Q16 14 24 15" stroke="#fff" stroke-width="2.6" transform="rotate(-26 20 30)"/>
-   <path d="M30 31 L40 24" stroke="#1d0f09" stroke-width="13"/><path d="M30 31 L40 24" stroke="#c7d0dd" stroke-width="6.5"/></g></symbol>
- <symbol id="s3" viewBox="0 0 64 64"><!-- molten hammer -->
+   <path d="M30 31 L40 24" stroke="#1d0f09" stroke-width="13"/><path d="M30 31 L40 24" stroke="#c7d0dd" stroke-width="6.5"/></g></g></symbol>
+ <symbol id="s3" viewBox="0 0 64 64"><g filter="url(#roughS)"><!-- molten hammer -->
   <g transform="rotate(36 32 32)">
    <rect x="28" y="17" width="8" height="43" rx="3" fill="#b9733a" stroke="#1d0f09" stroke-width="3.5"/>
    <path d="M33 22 V58" stroke="#8a4f22" stroke-width="2.5"/>
    <rect x="9" y="5" width="46" height="21" rx="4" fill="#737d8f" stroke="#1d0f09" stroke-width="4"/>
    <path d="M11 8 H53 V13 H11Z" fill="#a7b1c3"/>
    <path d="M11 20 H53 V24 Q53 25 52 25 H12 Q11 25 11 24Z" fill="#ff8a1a"/>
-   <path d="M18 25 V31 Q18 34 21 31 V25 M40 25 V30 Q40 33 43 30 V25" fill="#ff8a1a" stroke="#1d0f09" stroke-width="2"/></g></symbol>
- <symbol id="s4" viewBox="0 0 64 64"><!-- rune tongs -->
+   <path d="M18 25 V31 Q18 34 21 31 V25 M40 25 V30 Q40 33 43 30 V25" fill="#ff8a1a" stroke="#1d0f09" stroke-width="2"/></g></g></symbol>
+ <symbol id="s4" viewBox="0 0 64 64"><g filter="url(#roughS)"><!-- rune tongs -->
   <g fill="none" stroke-linecap="round" stroke-linejoin="round">
    <path d="M20 60 L33 33 L21 8" stroke="#1d0f09" stroke-width="12"/><path d="M44 60 L31 33 L43 8" stroke="#1d0f09" stroke-width="12"/>
    <path d="M20 60 L33 33 L21 8" stroke="#aeb8c8" stroke-width="6"/><path d="M44 60 L31 33 L43 8" stroke="#8d98ab" stroke-width="6"/>
    <path d="M22 54 L28 41 M42 54 L36 41" stroke="#e6ecf5" stroke-width="2"/></g>
   <circle cx="32" cy="33" r="6" fill="#ffc83a" stroke="#1d0f09" stroke-width="3.5"/>
   <circle cx="21" cy="9" r="5" fill="#ff7a1a" stroke="#1d0f09" stroke-width="3"/><circle cx="43" cy="9" r="5" fill="#ff5a14" stroke="#1d0f09" stroke-width="3"/>
-  <path d="M25 47 l3 -3 M39 47 l-3 -3 M24 53 h4 M40 53 h-4" stroke="#ff8a1a" stroke-width="2.4" stroke-linecap="round"/></symbol>
- <symbol id="s5" viewBox="0 0 64 64"><!-- dragonbone blade -->
+  <path d="M25 47 l3 -3 M39 47 l-3 -3 M24 53 h4 M40 53 h-4" stroke="#ff8a1a" stroke-width="2.4" stroke-linecap="round"/></g></symbol>
+ <symbol id="s5" viewBox="0 0 64 64"><g filter="url(#roughS)"><!-- dragonbone blade -->
   <path d="M32 3 L40 13 L37 19 L41 29 L37 35 L38 45 L32 51 L26 45 L27 35 L23 29 L27 19 L24 13Z" fill="#f6edd6" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
-  <path d="M32 3 L40 13 L37 19 L41 29 L37 35 L38 45 L32 51Z" fill="#d6c6a2"/>
+  <path d="M32 3 L40 13 L37 19 L41 29 L37 35 L38 45 L32 51Z" fill="#d6c6a2"/><path d="M32 3 L40 13 L37 19 L41 29 L37 35 L38 45 L32 51Z" fill="url(#hatchS)"/>
   <path d="M32 9 V43" stroke="#1d0f09" stroke-width="2.4" stroke-linecap="round"/>
   <path d="M8 49 L22 44 L32 48 L42 44 L56 49 L48 55 L32 51 L16 55Z" fill="#ffc83a" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
   <rect x="29" y="51" width="6" height="9" rx="2" fill="#7a3d1c" stroke="#1d0f09" stroke-width="3"/>
   <circle cx="32" cy="61" r="3" fill="#e0281c" stroke="#1d0f09" stroke-width="2.5"/>
-  <circle cx="32" cy="48.5" r="3" fill="#e0281c" stroke="#1d0f09" stroke-width="2.2"/></symbol>
- <symbol id="s6" viewBox="0 0 64 64"><!-- crown of cinders -->
+  <circle cx="32" cy="48.5" r="3" fill="#e0281c" stroke="#1d0f09" stroke-width="2.2"/></g></symbol>
+ <symbol id="s6" viewBox="0 0 64 64"><g filter="url(#roughS)"><!-- crown of cinders -->
   <path d="M7 50 L5 19 L20 32 L32 11 L44 32 L59 19 L57 50Z" fill="#ffcf3d" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M32 11 L44 32 L59 19 L57 50 L40 50 L38 30Z" fill="#e8a516"/>
+  <path d="M32 11 L44 32 L59 19 L57 50 L40 50 L38 30Z" fill="#e8a516"/><path d="M32 11 L44 32 L59 19 L57 50 L40 50 L38 30Z" fill="url(#hatchS)"/>
   <path d="M8 50 H56 V58 Q56 60 54 60 H10 Q8 60 8 58Z" fill="#f0b02a" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
   <path d="M12 26 L18 38 M30 22 L28 36" stroke="#fff3b0" stroke-width="3" stroke-linecap="round"/>
   <circle cx="5" cy="17" r="4.5" fill="#ff6a14" stroke="#1d0f09" stroke-width="3"/><circle cx="32" cy="9" r="4.5" fill="#ff6a14" stroke="#1d0f09" stroke-width="3"/><circle cx="59" cy="17" r="4.5" fill="#ff6a14" stroke="#1d0f09" stroke-width="3"/>
-  <circle cx="32" cy="54" r="4" fill="#e0281c" stroke="#1d0f09" stroke-width="2.6"/><circle cx="19" cy="54" r="3" fill="#ff8a1a" stroke="#1d0f09" stroke-width="2.2"/><circle cx="45" cy="54" r="3" fill="#ff8a1a" stroke="#1d0f09" stroke-width="2.2"/></symbol>
- <symbol id="s7" viewBox="0 0 64 64"><!-- ember core sigil (wild) -->
+  <circle cx="32" cy="54" r="4" fill="#e0281c" stroke="#1d0f09" stroke-width="2.6"/><circle cx="19" cy="54" r="3" fill="#ff8a1a" stroke="#1d0f09" stroke-width="2.2"/><circle cx="45" cy="54" r="3" fill="#ff8a1a" stroke="#1d0f09" stroke-width="2.2"/></g></symbol>
+ <symbol id="s7" viewBox="0 0 64 64"><g filter="url(#roughS)"><!-- ember core sigil (wild) -->
   <circle cx="32" cy="31" r="27" fill="#3a1d14" stroke="#1d0f09" stroke-width="4"/>
   <circle cx="32" cy="31" r="22" fill="none" stroke="#ff9a2a" stroke-width="3" stroke-dasharray="5 4"/>
   <path d="M32 7 C36 19 46 22 44 34 C43 43 38 48 32 48 C26 48 21 43 20 34 C18 24 28 20 32 7Z" fill="#ff5a14" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
   <path d="M32 24 C35 31 39 33 38 38 C37 43 35 45 32 45 C29 45 27 43 26 38 C25 33 30 30 32 24Z" fill="#ffd23a"/>
   <path d="M27 34 L31 36 M37 34 L33 36" stroke="#1d0f09" stroke-width="2.6" stroke-linecap="round"/>
   <path d="M6 47 L58 47 L55 58 L9 58Z" fill="#ffc83a" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
-  <text x="32" y="56" text-anchor="middle" font-size="11" fill="#1d0f09" font-family="Luckiest Guy,Impact,Arial Black">WILD</text></symbol>
- <symbol id="s8" viewBox="0 0 64 64"><!-- forgefire gem (scatter) -->
+  <text x="32" y="56" text-anchor="middle" font-size="11" fill="#1d0f09" font-family="Luckiest Guy,Impact,Arial Black">WILD</text></g></symbol>
+ <symbol id="s8" viewBox="0 0 64 64"><g filter="url(#roughS)"><!-- forgefire gem (scatter) -->
   <path d="M18 9 H46 L60 25 L32 57 L4 25Z" fill="#ff4d7a" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
   <path d="M4 25 H60 L32 57Z" fill="#e02a62"/>
   <path d="M18 9 L25 25 L4 25Z" fill="#ff8aa8"/><path d="M46 9 L60 25 L39 25Z" fill="#c4204f"/><path d="M18 9 H46 L39 25 H25Z" fill="#ff6e92"/>
@@ -313,7 +337,7 @@ button:disabled{cursor:not-allowed}
   <path d="M22 14 L28 14" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
   <path d="M54 6 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#fff" stroke="#1d0f09" stroke-width="1.6" stroke-linejoin="round"/>
   <rect x="21" y="42" width="22" height="16" rx="4" fill="#ffc83a" stroke="#1d0f09" stroke-width="3"/>
-  <text x="32" y="55" text-anchor="middle" font-size="13" fill="#1d0f09" font-family="Luckiest Guy,Impact,Arial Black">FS</text></symbol>
+  <text x="32" y="55" text-anchor="middle" font-size="13" fill="#1d0f09" font-family="Luckiest Guy,Impact,Arial Black">FS</text></g></symbol>
 </defs></svg>
 
 <div id="shaker"><div id="stage">
@@ -325,13 +349,15 @@ button:disabled{cursor:not-allowed}
   <g id="cloudA"><circle cx="0" cy="0" r="46"/><circle cx="55" cy="-20" r="56"/><circle cx="115" cy="0" r="46"/><circle cx="55" cy="22" r="42"/></g>
  </defs>
  <rect x="-1500" y="-1200" width="4600" height="3200" fill="url(#sky)"/>
+ <rect x="-500" y="-60" width="2700" height="640" fill="url(#dots)"/>
  <circle cx="560" cy="430" r="300" fill="#ffd36a" opacity=".22"/>
+ <g filter="url(#roughL)">
  <!-- smoke -->
  <g fill="#5a2f4a" stroke="#1d0f09" stroke-width="12" stroke-linejoin="round"><use href="#cloudA" transform="translate(200 120) scale(1.5)"/><use href="#cloudA" transform="translate(1180 80) scale(1.2)"/><use href="#cloudA" transform="translate(760 40)"/></g>
  <g fill="#5a2f4a"><use href="#cloudA" transform="translate(200 120) scale(1.5)"/><use href="#cloudA" transform="translate(1180 80) scale(1.2)"/><use href="#cloudA" transform="translate(760 40)"/></g>
  <g fill="#7d4668"><circle cx="250" cy="96" r="24"/><circle cx="1220" cy="62" r="20"/><circle cx="800" cy="26" r="16"/></g>
  <!-- far ridge -->
- <path d="M-1500 560 L-200 520 L120 430 L330 520 L460 430 L520 380 L600 300 L640 300 L720 380 L800 440 L1000 560 L1180 470 L1330 540 L1500 450 L1700 520 L3100 560 V900 H-1500Z" fill="#3b1a38" stroke="#1d0f09" stroke-width="7" stroke-linejoin="round"/>
+ <path d="M-500 560 L-200 520 L120 430 L330 520 L460 430 L520 380 L600 300 L640 300 L720 380 L800 440 L1000 560 L1180 470 L1330 540 L1500 450 L1700 520 L2100 560 V900 H-500Z" fill="#3b1a38" stroke="#1d0f09" stroke-width="7" stroke-linejoin="round"/>
  <!-- volcano -->
  <path d="M200 700 L410 360 Q440 300 480 298 L650 298 Q690 300 720 360 L980 700Z" fill="#432338" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
  <path d="M650 298 Q690 300 720 360 L980 700 L820 700 L690 420Z" fill="#331a2c"/>
@@ -344,27 +370,28 @@ button:disabled{cursor:not-allowed}
  <path d="M1000 700 L1230 470 Q1260 440 1300 470 L1560 700Z" fill="#40213a" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
  <path d="M1300 470 L1560 700 L1400 700 L1290 520Z" fill="#311a2d"/>
  <!-- left cliff -->
- <path d="M-1500 900 V560 L-300 560 L40 440 Q120 410 170 470 L250 600 L320 640 L340 760 L300 900Z" fill="#2c1820" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
+ <path d="M-500 900 V560 L-300 560 L40 440 Q120 410 170 470 L250 600 L320 640 L340 760 L300 900Z" fill="#2c1820" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
  <path d="M40 440 Q120 410 170 470 L250 600 L190 600 L120 500Z" fill="#442736"/>
  <path d="M60 520 L90 590 M130 640 L170 700 M30 700 L70 760" stroke="#1d0f09" stroke-width="5" stroke-linecap="round"/>
  <path d="M60 520 L90 590 M130 640 L170 700 M30 700 L70 760" stroke="#ff7a1a" stroke-width="2.6" stroke-linecap="round" opacity=".9"/>
  <g stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"><path d="M250 640 L272 580 L296 640Z" fill="#ffae2e"/><path d="M286 650 L312 560 L336 650Z" fill="#ff8a1a"/><path d="M226 650 L238 612 L254 650Z" fill="#ffd23a"/></g>
  <!-- right ledge for the smith -->
- <path d="M1090 900 L1110 780 Q1150 770 1200 790 L1600 770 L3100 770 V900Z" fill="#2c1820" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
- <path d="M1110 780 Q1150 770 1200 790 L1600 770 L3100 770 L3100 800 L1600 800 L1200 818 Q1150 800 1105 810Z" fill="#442736"/>
+ <path d="M1090 900 L1110 780 Q1150 770 1200 790 L1600 770 L2100 770 V900Z" fill="#2c1820" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
+ <path d="M1110 780 Q1150 770 1200 790 L1600 770 L2100 770 L2100 800 L1600 800 L1200 818 Q1150 800 1105 810Z" fill="#442736"/>
  <path d="M1300 840 L1330 880 M1500 830 L1470 880" stroke="#1d0f09" stroke-width="5" stroke-linecap="round"/>
  <!-- lava river -->
- <path d="M-1500 820 Q-300 790 120 830 Q380 860 640 836 Q900 812 1100 860 L1100 900 H-1500Z" fill="#ff7a1a" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
- <path d="M-1500 850 Q-200 830 130 858 Q380 878 640 862 Q880 850 1090 884 V900 H-1500Z" fill="#e0460a"/>
+ <path d="M-500 820 Q-300 790 120 830 Q380 860 640 836 Q900 812 1100 860 L1100 900 H-500Z" fill="#ff7a1a" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
+ <path d="M-500 850 Q-200 830 130 858 Q380 878 640 862 Q880 850 1090 884 V900 H-500Z" fill="#e0460a"/>
  <g fill="#ffd23a" stroke="#1d0f09" stroke-width="4"><circle cx="150" cy="848" r="12"/><circle cx="420" cy="868" r="9"/><circle cx="700" cy="852" r="14"/><circle cx="930" cy="866" r="8"/></g>
  <!-- hanging chains behind the frame -->
  <g stroke="#1d0f09" stroke-width="14" stroke-linecap="round"><path d="M520 -400 V130" stroke-dasharray="14 8"/><path d="M1080 -400 V130" stroke-dasharray="14 8"/></g>
  <g stroke="#8d93a2" stroke-width="7" stroke-linecap="round"><path d="M520 -400 V130" stroke-dasharray="14 15"/><path d="M1080 -400 V130" stroke-dasharray="14 15"/></g>
+ <path d="M410 360 Q440 300 480 298 L520 298 L400 700 L200 700Z" fill="url(#hatchL)"/><path d="M-500 560 L-300 560 L40 440 L170 470 L250 600 L190 760 L-500 760Z" fill="url(#hatchL)"/></g>
 </svg>
 <div class="heatwash"></div>
 
 <!-- ============ logo ============ -->
-<svg id="logo" viewBox="0 0 660 150">
+<svg id="logo" viewBox="0 0 660 150" filter="url(#roughC)">
  <defs><linearGradient id="lgf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2a0"/><stop offset=".5" stop-color="#ffb02e"/><stop offset="1" stop-color="#ee4a0c"/></linearGradient></defs>
  <g font-family="Luckiest Guy,Impact,Arial Black,sans-serif" text-anchor="middle" stroke-linejoin="round">
   <text x="330" y="78" font-size="82" rotate="-3 2 -2 3 -3 1" dy="0 -4 3 -3 2 0" letter-spacing="3" stroke="#1d0f09" stroke-width="22" fill="#1d0f09">EMBERCLAW</text>
@@ -375,7 +402,7 @@ button:disabled{cursor:not-allowed}
 </svg>
 
 <!-- frame -->
-<svg id="frameArt" viewBox="0 0 704 594">
+<svg id="frameArt" viewBox="0 0 704 594" filter="url(#roughC)">
  <path d="M5 11 L350 3 L699 9 L702 582 L350 592 L3 586Z" fill="#4c3a34" stroke="#1d0f09" stroke-width="8" stroke-linejoin="round"/>
  <path d="M10 16 L350 8 L694 14 L694 21 L10 27Z" fill="#6f544a"/>
  <path d="M8 570 L350 578 L696 568 L696 580 L350 588 L8 582Z" fill="#35271f"/>
@@ -388,14 +415,14 @@ button:disabled{cursor:not-allowed}
 <!-- ============ character: Brann the smith ============ -->
 <div id="char"><svg viewBox="0 0 480 500">
  <ellipse cx="250" cy="488" rx="190" ry="14" fill="#000" opacity=".35"/>
- <g id="anvil">
+ <g id="anvil" filter="url(#roughC)">
   <path d="M18 438 Q58 432 70 446 H238 L230 470 H184 L198 488 H100 L114 470 H74 Q40 468 18 438Z" fill="#5d6577" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
   <path d="M72 449 H236 L233 457 H74Z" fill="#8f99ad"/>
   <path d="M30 442 Q56 438 66 449 L38 450Z" fill="#8f99ad"/>
   <ellipse id="cHot" cx="86" cy="440" rx="22" ry="9" fill="#ffb02e"/>
   <circle id="hotspot" cx="90" cy="440" r="2" fill="none"/>
  </g>
- <g id="cBody">
+ <g id="cBody" filter="url(#roughC)">
   <path d="M206 436 H254 V474 Q254 488 240 488 H214 Q202 488 202 476Z" fill="#3b2418" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
   <path d="M266 436 H314 V476 Q314 488 300 488 H274 Q262 488 262 474Z" fill="#3b2418" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
   <path d="M190 296 Q184 380 198 440 H322 Q336 380 330 296 Q260 268 190 296Z" fill="#c4502c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
@@ -408,14 +435,15 @@ button:disabled{cursor:not-allowed}
   <path d="M198 418 H322 V434 H198Z" fill="#2b1a10" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
   <rect x="250" y="415" width="22" height="22" rx="3" fill="#ffc83a" stroke="#1d0f09" stroke-width="4"/>
   <path d="M290 360 q8 -6 14 4 q-8 8 -14 -4z M214 380 q-4 -8 6 -10 q4 8 -6 10z" fill="#2a1710" opacity=".55"/>
+  <path d="M286 304 Q326 372 318 440 H296 Q306 380 280 312Z" fill="url(#hatchC)"/><path d="M296 302 Q336 330 330 296 Q316 330 296 302Z" fill="url(#hatchC)"/>
  </g>
- <g id="cArmL">
+ <g id="cArmL" filter="url(#roughC)">
   <path d="M312 288 Q354 296 364 340 Q368 374 350 380 L326 368 Q324 336 304 316Z" fill="#c4502c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
   <path d="M330 366 Q348 380 366 362" fill="none" stroke="#1d0f09" stroke-width="5" stroke-linecap="round"/>
   <circle cx="350" cy="388" r="20" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
   <path d="M340 380 q8 4 6 14 M352 378 q8 4 6 14" fill="none" stroke="#1d0f09" stroke-width="3" stroke-linecap="round"/>
  </g>
- <g id="cArmR">
+ <g id="cArmR" filter="url(#roughC)">
   <path d="M196 284 Q158 290 132 324 L160 352 Q186 328 214 324Z" fill="#c4502c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
   <path d="M138 326 Q150 346 164 346" fill="none" stroke="#1d0f09" stroke-width="5" stroke-linecap="round"/>
   <rect x="143" y="318" width="14" height="98" rx="5" fill="#b9733a" stroke="#1d0f09" stroke-width="5"/>
@@ -427,7 +455,7 @@ button:disabled{cursor:not-allowed}
   <circle cx="150" cy="336" r="20" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
   <path d="M138 330 q10 -4 14 4 M140 342 q10 -2 14 4" fill="none" stroke="#1d0f09" stroke-width="3" stroke-linecap="round"/>
  </g>
- <g id="cHead">
+ <g id="cHead" filter="url(#roughC)">
   <circle cx="192" cy="182" r="15" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/><circle cx="328" cy="182" r="15" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
   <ellipse cx="260" cy="172" rx="70" ry="62" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
   <ellipse cx="212" cy="202" rx="13" ry="9" fill="#3a2a24" opacity=".4"/><ellipse cx="308" cy="202" rx="13" ry="9" fill="#3a2a24" opacity=".4"/>
@@ -448,6 +476,7 @@ button:disabled{cursor:not-allowed}
   <ellipse cx="260" cy="199" rx="21" ry="17" fill="#e08a64" stroke="#1d0f09" stroke-width="5"/><path d="M250 192 q6 -4 12 -1" stroke="#f7c0a2" stroke-width="4" fill="none" stroke-linecap="round"/>
   <path d="M260 210 Q226 198 204 218 Q198 236 216 238 Q224 226 242 224 Q254 224 260 216 Q266 224 278 224 Q296 226 304 238 Q322 236 316 218 Q294 198 260 210Z" fill="#e0561c" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
   <path d="M200 216 Q188 274 220 322 Q238 354 260 376 Q282 354 300 322 Q332 274 320 216 Q300 240 260 240 Q220 240 200 216Z" fill="#e0561c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M276 246 Q312 262 300 322 Q286 352 262 372 Q290 330 276 246Z" fill="url(#hatchC)"/>
   <path d="M232 252 Q238 296 254 336 M288 252 Q282 296 266 336" fill="none" stroke="#a63a0f" stroke-width="5" stroke-linecap="round"/>
   <path d="M214 232 Q208 262 222 292" fill="none" stroke="#ff9a3a" stroke-width="5" stroke-linecap="round"/>
   <g id="cMouth"><path d="M234 234 Q260 280 286 234 Q260 244 234 234Z" fill="#4a0f0a" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/><path d="M246 252 Q260 266 274 252 Q260 258 246 252Z" fill="#ff7a8a"/></g>
@@ -471,9 +500,9 @@ button:disabled{cursor:not-allowed}
 <div id="barL">
   <button id="menuBtn" title="Menu"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
   <div class="fld"><label>BALANCE</label><div class="v" id="bal">–</div></div>
-  <div class="fld"><label>WIN</label><div class="v gold" id="win">0.00</div></div>
+  <div class="fld"><label>WIN</label><div class="v gold" id="win">$0.00</div></div>
 </div>
-<div id="barR"><label style="font-size:17px;font-weight:700;color:#9b8c80;display:block">BET</label><div id="betV"><span id="bet">1.00</span></div><div id="betBar"></div>
+<div id="barR"><label style="font-size:14px;font-weight:900;color:#b79a82;display:block;letter-spacing:2px">BET</label><div id="betV"><span id="bet">$1.00</span></div><div id="betBar"></div>
   <div id="chev"><button id="p" title="Raise bet"><svg viewBox="0 0 34 20"><path d="M4 16 L17 4 L30 16"/></svg></button><button id="m" title="Lower bet"><svg viewBox="0 0 34 20"><path d="M4 4 L17 16 L30 4"/></svg></button></div></div>
 <button id="spin" title="Spin (Space)"><svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-3-6.5"/><path d="M20.5 3.5v5.5h-5.5"/></svg><span class="cnt" id="spinCnt" hidden></span></button>
 <button id="bAuto" title="Autoplay"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
@@ -485,18 +514,18 @@ button:disabled{cursor:not-allowed}
 </div>
 
 </div></div>
-<canvas id="fx"></canvas><div id="flash"></div>
+<div id="grain"></div><canvas id="fx"></canvas><div id="flash"></div>
 <div id="auth" hidden><div><h1>EMBERCLAW</h1><p style="font-family:var(--ui)">Sign in to Nebula first, then reopen this game.</p></div></div>
 <div id="big"><div id="bigT"></div><div id="bigA"></div><div id="bigX"></div></div>
 
 <!-- bonus buy screen -->
 <div class="modal bb" id="buyM" hidden>
   <h2 class="bbT">BONUS BUY</h2><button class="bbX" data-close>×</button>
-  <div class="bbBet"><small>BET</small><b id="bbBet">1.00</b><div><button id="bbM">−</button><button id="bbP">+</button></div></div>
+  <div class="bbBet"><button id="bbM">−</button><div><small>YOUR BET</small><b id="bbBet">$1.00</b></div><button id="bbP">+</button></div>
   <div class="bbRow">
-    <div class="bbc"><h3>Double Chance<br>FeatureSpins™</h3><p>Each spin costs 25% more and is about twice as likely to trigger the bonus game!</p><div class="ic"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div><em>Volatility: High</em><div class="pr" id="pa">+25% BET</div><button class="go or" id="ante">ACTIVATE</button></div>
-    <div class="bbc"><h3>The Reforging<br>FeatureSpins™</h3><p>10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.</p><div class="ic"><svg viewBox="0 0 64 64"><use href="#s6"/></svg></div><em>Volatility: High</em><div class="pr" id="p1">100.00</div><button class="go gr" id="buy1">BUY</button></div>
-    <div class="bbc"><h3>Pre-Heated<br>Reforging™</h3><p>The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.</p><div class="ic"><svg viewBox="0 0 64 64"><use href="#s7"/></svg></div><em>Volatility: Very high</em><div class="pr" id="p2">500.00</div><button class="go gr" id="buy2">BUY</button></div>
+    <div class="bbc"><div class="med"><svg viewBox="0 0 64 64"><use href="#s8"/></svg></div><h3>Double Chance</h3><p>Each spin costs 25% more, but the bonus game is about twice as likely to trigger.</p><div class="vol" data-n="3"><span>VOLATILITY</span></div><div class="price" id="pa">+25% BET</div><button class="go or" id="ante">ACTIVATE</button></div>
+    <div class="bbc"><div class="med"><svg viewBox="0 0 64 64"><use href="#s6"/></svg></div><h3>The Reforging</h3><p>10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.</p><div class="vol" data-n="4"><span>VOLATILITY</span></div><div class="price" id="p1">$100.00</div><button class="go gd" id="buy1">BUY</button></div>
+    <div class="bbc"><div class="med"><svg viewBox="0 0 64 64"><use href="#s7"/></svg></div><h3>Pre-Heated</h3><p>The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.</p><div class="vol" data-n="5"><span>VOLATILITY</span></div><div class="price" id="p2">$500.00</div><button class="go gd" id="buy2">BUY</button></div>
   </div>
 </div>
 <!-- buy confirm -->
@@ -515,9 +544,9 @@ button:disabled{cursor:not-allowed}
   <div class="row2"><button class="btn" data-close>CANCEL</button><button class="btn pri" id="autoGo">START</button></div>
 </div></div>
 <!-- bonus intro / outro: tap anywhere -->
-<div class="modal tap" id="introM" hidden><div class="mbox"><h2>THE REFORGING</h2><div class="big-n"><span id="introN">10</span><small>FREE SPINS</small></div>
+<div class="modal tap splash" id="introM" hidden><div class="rays"></div><div class="sp"><div class="spT">THE REFORGING</div><div class="spN"><small>YOU WON</small><span id="introN">10</span> <span style="font-size:.4em">FREE SPINS</span></div>
   <p>The Forge Core keeps its heat between spins. Every 3rd spin opens with a guaranteed detonation.</p><div class="tapHint">TAP ANYWHERE TO START</div></div></div>
-<div class="modal tap" id="outroM" hidden><div class="mbox"><h2>BONUS COMPLETE</h2><div class="big-n"><small>TOTAL WIN</small><span id="outroV">0.00</span></div><div class="tapHint">TAP ANYWHERE TO CONTINUE</div></div></div>
+<div class="modal tap splash" id="outroM" hidden><div class="rays"></div><div class="sp"><div class="spT">BONUS COMPLETE</div><div class="spN"><small>TOTAL WIN</small><span id="outroV">$0.00</span></div><div class="tapHint">TAP ANYWHERE TO CONTINUE</div></div></div>
 <!-- info -->
 <div class="modal" id="infoM" hidden><div class="mbox wide">
   <button class="x" data-close>×</button><h2>EMBERCLAW · MOLTEN REFORGE</h2>
@@ -547,7 +576,7 @@ let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = fal
 const T = () => turbo ? .45 : 1;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const wait = ms => sleep(ms * T());
-const fmt = n => Number(n).toFixed(2);
+const fmt = n => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 /* the 1600x900 stage is scaled to fit the window */
 function fit() { STAGE_S = Math.min(innerWidth / 1600, innerHeight / 900); $('stage').style.setProperty('--s', STAGE_S); }
@@ -733,7 +762,7 @@ function tierOf(x) { return x >= 100 ? 'LEGENDARY' : x >= 25 ? 'FORGED' : x >= 1
 async function bigWin(x, amt) {
   const t = tierOf(x); if (!t) return null;
   const lv = { SPARK: 1, MOLTEN: 2, FORGED: 3, LEGENDARY: 4 }[t];
-  $('bigT').textContent = t + ' WIN'; $('bigA').textContent = '0.00'; $('bigX').textContent = x.toFixed(1) + 'x BET';
+  $('bigT').textContent = t + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET';
   $('big').classList.add('show'); char('big', 3300); shake(lv > 2); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
   sfx.big(lv);
   await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => sfx.tick(k)), sleep(20000)]);
@@ -760,7 +789,7 @@ function setBusy(b) {
 
 async function go(buy) {
   if (busy) return; setBusy(true); sfx.swing(); closeMenu();
-  $('win').textContent = '0.00'; $('fsBox').hidden = true;
+  $('win').textContent = fmt(0); $('fsBox').hidden = true;
   const stake = BETS[bi]; let out = { payout: 0, bonus: false, tier: null };
   try {
     setHeat(0);
@@ -784,7 +813,7 @@ async function go(buy) {
         first = false;
         run = await playSpin(sp, run, stake, live); await wait(300);
       }
-      $('fsBox').hidden = true; $('char').classList.remove('bonusmode'); $('outroV').textContent = '0.00';
+      $('fsBox').hidden = true; $('char').classList.remove('bonusmode'); $('outroV').textContent = fmt(0);
       openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
       await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);
       await tapWait('outroM', auto.left > 0 ? 1500 : 0);
@@ -843,7 +872,7 @@ function refreshUi() {
   const s = BETS[bi]; $('bet').textContent = fmt(s); $('bbBet').textContent = fmt(s);
   $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
   $('p1').textContent = fmt(s * 100); $('p2').textContent = fmt(s * 500);
-  $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('gr', ante);
+  $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante);
   $('bAuto').classList.toggle('on', auto.left > 0);
   $('spinCnt').hidden = !(auto.left > 0); $('spinCnt').textContent = auto.left; $('spin').querySelector('svg').style.visibility = auto.left > 0 ? 'hidden' : '';
   $('bTurbo').classList.toggle('on', turbo); $('bTurbo').querySelector('i').textContent = turbo ? 'ON' : 'OFF'; $('turboBadge').hidden = !turbo;
@@ -872,6 +901,7 @@ $('ptab').innerHTML = '<tr><th>SYMBOL</th><th>5-7</th><th>8-9</th><th>10-12</th>
   [6, 5, 4, 3, 2, 1, 0].map(i => `<tr><td><div class="nm"><svg viewBox="0 0 64 64"><use href="#s${i}"/></svg>${NAMES[i]}</div></td>${PT[i].map(v => `<td>${v}x</td>`).join('')}</tr>`).join('') +
   `<tr><td><div class="nm"><svg viewBox="0 0 64 64"><use href="#s7"/></svg>Ember Core Sigil (Wild)</div></td><td colspan="4">Substitutes for all symbols</td></tr><tr><td><div class="nm"><svg viewBox="0 0 64 64"><use href="#s8"/></svg>Forgefire Gem (Scatter)</div></td><td colspan="4">3+ trigger The Reforging</td></tr>`;
 
+document.querySelectorAll('.vol').forEach(v => { for (let i = 1; i <= 5; i++) v.insertAdjacentHTML('beforeend', `<i class="${i <= +v.dataset.n ? 'on' : ''}"></i>`); });
 paint(Array.from({ length: 5 }, (_, r) => Array.from({ length: 6 }, (_, c) => (r * 2 + c) % 7))); dropAll();
 refreshUi();
 if (!TOKEN) $('auth').hidden = false;

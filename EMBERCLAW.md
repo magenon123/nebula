@@ -39,3 +39,7 @@ The game lives on a fixed 1600x900 stage that is scaled to fit the window, so po
 - **Per-slot art (swap for each new slot):** the scene, logo, frame, symbols (`<symbol id="s0..s8">`), the character on the right, and the side mechanic (here the Forge Core tube on the left).
 - **Character:** Brann the dwarf smith. `char('swing' | 'win' | 'big' | 'boom')` plays his reactions; `bonusmode` makes his eyes glow. A new slot gets its own character with the same state names.
 - Sounds are synthesised in `makeSfx()` (no audio files). `node build-standalone.py` builds the offline demo.
+
+## Look & feel notes
+- Money is shown in USD (`fmt()` -> `$1,234.56`).
+- Hand-inked look: SVG displacement filters (`roughS/C/L/U`) wobble every outline, pen-hatch patterns shade the art, a paper-grain overlay and halftone dots sit over the scene. Modals are forged plaques; bonus intro/outro are full-screen splashes (tap anywhere).
