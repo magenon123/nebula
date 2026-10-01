@@ -137,6 +137,7 @@ async function launchGame(gameKey) {
       webSecurity: false,
       allowRunningInsecureContent: true,
       partition: 'persist:game',
+      nodeIntegrationInSubFrames: true,
       preload: path.join(__dirname, 'game-preload.js')
     }
   });
