@@ -56,14 +56,15 @@ async function run(file, outDir, label) {
   const mark = async (name, withShot = true, volatile = false) => { const s = await state(); if (withShot) await shot(name, volatile); marks.push({ name, volatile, ...s }); return s; };
   /* wait until the round is over: clicks splash screens / big-win overlay when they show */
   const settle = async (maxMs = 240000) => {
-    const t0 = Date.now(); let lastSplash = 0;
+    const t0 = Date.now(); let lastSplash = 0, idle = 0;
     while (Date.now() - t0 < maxMs) {
-      const st = await page.evaluate(() => ({ busy: document.getElementById('spin').classList.contains('busy') || (document.getElementById('spin').disabled),
-        intro: !document.getElementById('introM').hidden, outro: !document.getElementById('outroM').hidden, big: document.getElementById('big').classList.contains('show'),
-        auto: !document.getElementById('spinCnt').hidden }));
-      if (st.intro || st.outro) { if (Date.now() - lastSplash > 700) { await sleep(600); await clk(st.intro ? '#introM' : '#outroM', { position: { x: 60, y: 60 } }).catch(() => {}); lastSplash = Date.now(); } }
-      else if (st.big) await clk('#big').catch(() => {});
-      else if (!st.busy) { await sleep(250); return true; }
+      // a round is running while the chevrons are disabled (setBusy); autoplay has a ~450ms gap between rounds, so require a quiet streak
+      const st = await page.evaluate(() => ({ busy: document.getElementById('p').disabled,
+        intro: !document.getElementById('introM').hidden, outro: !document.getElementById('outroM').hidden, big: document.getElementById('big').classList.contains('show') }));
+      if (st.intro || st.outro) { idle = 0; if (Date.now() - lastSplash > 700) { await sleep(600); await clk(st.intro ? '#introM' : '#outroM', { position: { x: 60, y: 60 } }).catch(() => {}); lastSplash = Date.now(); } }
+      else if (st.big) { idle = 0; await clk('#big').catch(() => {}); }
+      else if (!st.busy) { if (++idle >= 6) return true; }
+      else idle = 0;
       await sleep(120);
     }
     return false;
@@ -83,7 +84,7 @@ async function run(file, outDir, label) {
   const pos = await page.evaluate(() => { const r = id => { const b = document.getElementById(id).getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)].join(','); }; return ['buyOpen', 'barL', 'barR', 'spin', 'bAuto', 'msg', 'chev'].map(i => i + ':' + r(i)).join(' '); });
   marks.push({ name: 'layout-boxes', pos });
   const dom = await page.evaluate(() => { const b = document.body.cloneNode(true); b.querySelectorAll('script,canvas').forEach(e => e.remove()); const pt = b.querySelector('#ptab'); if (pt) pt.innerHTML = '';   // paytable numbers are engine-derived now
-    return b.innerHTML.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+</g, '><').replace(/\s+/g, ' ').replace(/color: ?var\(--muted\)/g, 'color: #b79a82').replace(/ style=""/g, ''); });
+    return b.innerHTML.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+</g, '><').replace(/\s+/g, ' ').replace(/color: ?(var\(--muted\)|#b79a82)/g, 'color:#b79a82').replace(/ id="(authName|bbRow|introGems|introLbl|introRibbon|introChips|outroRibbon|swBigTxt)"/g, '').replace(/ style=""/g, ''); });
   fs.writeFileSync(path.join(outDir, 'dom-idle.html'), dom.replace(/></g, '>\n<'));
 
   // ---- 2. menu toggles ----
