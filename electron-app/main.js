@@ -223,6 +223,10 @@ function stopBalanceTracking() {
 app.whenReady().then(() => {
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
     details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+    if (details.url.includes('pragmaticplay')) {
+      details.requestHeaders['Referer'] = 'https://clienthub.pragmaticplay.com/';
+      details.requestHeaders['Origin'] = 'https://clienthub.pragmaticplay.com';
+    }
     callback({ requestHeaders: details.requestHeaders });
   });
   createMainWindow();
