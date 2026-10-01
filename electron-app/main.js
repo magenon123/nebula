@@ -10,7 +10,7 @@ const DEMO_GAMES = {
   },
   fisherman: {
     name: 'Le Fisherman',
-    url: 'https://static-live.hacksawgaming.com/launcher/static-launcher.html?gameid=2057&channel=mobile&language=en&partner=demo&mode=demo&token=123'
+    url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur=USD&gameSymbol=vs10fishin&jurisdiction=99&stylename=demo_clienthub&websiteUrl=https%3A%2F%2Fwww.pragmaticplay.com'
   }
 };
 
