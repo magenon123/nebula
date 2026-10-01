@@ -154,20 +154,20 @@ async function launchGame(gameKey) {
   // show 100k on Nebula while playing
   await syncNebulaBalance(DEMO_START_BALANCE);
 
-  // Use CDP to intercept WebSocket frames and XHR responses for balance
+  // Use CDP to intercept reloadBalance.do XHR responses for live balance
   try {
     gameWin.webContents.debugger.attach('1.3');
     gameWin.webContents.debugger.sendCommand('Network.enable');
-    gameWin.webContents.debugger.on('message', (event, method, params) => {
+    gameWin.webContents.debugger.on('message', async (event, method, params) => {
       try {
-        let text = null;
-        if (method === 'Network.webSocketFrameReceived') {
-          text = params.response && params.response.payloadData;
-        }
-        if (!text) return;
-        const d = JSON.parse(text);
+        if (method !== 'Network.responseReceived') return;
+        if (!params.response.url.includes('reloadBalance')) return;
+        const body = await gameWin.webContents.debugger.sendCommand(
+          'Network.getResponseBody', { requestId: params.requestId }
+        );
+        const d = JSON.parse(body.body);
         const bal = findBalanceInObject(d, 0);
-        if (bal !== undefined) lastDemoBalance = bal;
+        if (bal !== undefined && bal >= 0) lastDemoBalance = bal;
       } catch (_) {}
     });
   } catch (e) {}
