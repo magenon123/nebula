@@ -36,23 +36,38 @@ function createMainWindow() {
   mainWin.loadURL(CASINO_URL);
   mainWin.setMenuBarVisibility(false);
 
-  // intercept SPA navigation to detect game URLs
+  // intercept clicks on game buttons using data-go attribute
   mainWin.webContents.on('did-finish-load', () => {
     mainWin.webContents.executeJavaScript(`
       (function(){
-        const orig = history.pushState.bind(history);
-        history.pushState = function(state, title, url) {
-          orig(state, title, url);
-          document.title = '__URL__' + encodeURIComponent(url || location.href);
-          setTimeout(function(){ document.title = 'Nebula Casino'; }, 1000);
-        };
+        function hookButtons() {
+          document.querySelectorAll('button[data-go]').forEach(function(btn){
+            if(btn.__nebulaDemoHooked) return;
+            const slug = btn.getAttribute('data-go') || '';
+            if(slug.includes('gates') || slug.includes('olympus') || slug.includes('scatter')){
+              btn.__nebulaDemoHooked = true;
+              btn.addEventListener('click', function(e){
+                e.preventDefault(); e.stopPropagation();
+                document.title = '__LAUNCH__gates';
+                setTimeout(function(){ document.title = 'Nebula Casino'; }, 500);
+              }, true);
+            }
+            if(slug.includes('fisherman') || slug.includes('fish')){
+              btn.__nebulaDemoHooked = true;
+              btn.addEventListener('click', function(e){
+                e.preventDefault(); e.stopPropagation();
+                document.title = '__LAUNCH__fisherman';
+                setTimeout(function(){ document.title = 'Nebula Casino'; }, 500);
+              }, true);
+            }
+          });
+        }
+        hookButtons();
+        const obs = new MutationObserver(hookButtons);
+        obs.observe(document.body, { childList: true, subtree: true });
+        setInterval(hookButtons, 2000);
       })();
     `);
-  });
-
-  mainWin.webContents.on('did-navigate-in-page', (e, url) => {
-    const path = url.replace('https://nebula-4ggz.onrender.com', '');
-    mainWin.webContents.executeJavaScript(`alert('URL changed to:\\n' + ${JSON.stringify(path)})`);
   });
 
   mainWin.webContents.on('page-title-updated', (e, title) => {
@@ -60,10 +75,6 @@ function createMainWindow() {
       const key = title.replace('__LAUNCH__', '');
       e.preventDefault();
       launchGame(key);
-    } else if (title.startsWith('__URL__')) {
-      e.preventDefault();
-      const url = decodeURIComponent(title.replace('__URL__', ''));
-      mainWin.webContents.executeJavaScript(`alert('SPA navigated to:\\n' + ${JSON.stringify(url)})`);
     }
   });
 }
