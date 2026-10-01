@@ -31,9 +31,11 @@ Known gaps vs. the design doc: the bonus share is ~20% rather than 29%, and Buy 
 (the doc also says 1-in-180 in one place).
 
 ## Shared slot layout (use for every new slot)
-`emberclaw.html` marks the reusable "SHELL" pieces. Keep them in the same place in every slot:
-- **Left of the board:** Bonus Buy card (two buy buttons, each opens a confirm popup) and the Double Chance / ante switch.
-- **Bottom bar:** balance (left); bet `-` / bet / `+`, round spin button, Auto and Turbo (centre); win and free-spin win (right).
-- **Top right:** sound, info, fullscreen. Bonus intro/outro screens are "tap anywhere to continue".
-- **Right of the board:** slot-specific side panel (here: the Forge Core meter).
-Sounds are synthesised in `makeSfx()` (no audio files).
+The game lives on a fixed 1600x900 stage that is scaled to fit the window, so positions are identical in every slot.
+`emberclaw.html` marks the reusable "SHELL" pieces; keep them exactly here:
+- **Bottom bar:** round yellow BUY BONUS button (far left); hamburger menu + balance + win; bet panel with up/down chevrons and a progress bar; big ring-shaped spin button; small autoplay button.
+- **Bonus Buy screen:** full-screen row of white cards (title, text, icon, volatility, price, ACTIVATE/BUY) with the bet adjuster on top. Ante / double-chance is a card here. BUY opens a confirm popup.
+- **Menu:** sound, turbo, game info (paytable), fullscreen. Bonus intro/outro screens are "tap anywhere to continue".
+- **Per-slot art (swap for each new slot):** the scene, logo, frame, symbols (`<symbol id="s0..s8">`), the character on the right, and the side mechanic (here the Forge Core tube on the left).
+- **Character:** Brann the dwarf smith. `char('swing' | 'win' | 'big' | 'boom')` plays his reactions; `bonusmode` makes his eyes glow. A new slot gets its own character with the same state names.
+- Sounds are synthesised in `makeSfx()` (no audio files). `node build-standalone.py` builds the offline demo.
