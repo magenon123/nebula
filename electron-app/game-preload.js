@@ -1,23 +1,32 @@
-// intercept WebSocket to read Pragmatic Play balance updates
+// Intercept WebSocket to read Pragmatic Play balance updates
+// Recursively scan messages for any key containing 'bal', 'credit', 'cash', 'coin'
+function findBalance(obj, depth) {
+  if (!obj || typeof obj !== 'object' || depth > 6) return undefined;
+  for (const k of Object.keys(obj)) {
+    const kl = k.toLowerCase();
+    if ((kl.includes('bal') || kl.includes('credit') || kl.includes('cash') || kl.includes('coin')) &&
+        typeof obj[k] === 'number' && obj[k] >= 0 && obj[k] <= 2000000) {
+      return obj[k];
+    }
+  }
+  for (const k of Object.keys(obj)) {
+    if (typeof obj[k] === 'object') {
+      const found = findBalance(obj[k], depth + 1);
+      if (found !== undefined) return found;
+    }
+  }
+  return undefined;
+}
+
 const _WS = window.WebSocket;
 window.WebSocket = function(url, proto) {
   const ws = proto ? new _WS(url, proto) : new _WS(url);
   ws.addEventListener('message', function(e) {
     try {
-      const d = typeof e.data === 'string' ? JSON.parse(e.data) : null;
-      if (!d) return;
-      const bal =
-        d.balance ??
-        d.credits ??
-        d.credit ??
-        d.bal ??
-        d.balanceAmount ??
-        (d.data && d.data.balance) ??
-        (d.result && d.result.balance) ??
-        (d.gameData && d.gameData.balance);
-      if (bal !== undefined && bal !== null) {
-        window.__ppBalance = parseFloat(bal);
-      }
+      if (typeof e.data !== 'string') return;
+      const d = JSON.parse(e.data);
+      const bal = findBalance(d, 0);
+      if (bal !== undefined) window.__ppBalance = bal;
     } catch (_) {}
   });
   return ws;
