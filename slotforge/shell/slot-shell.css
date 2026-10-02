@@ -194,3 +194,8 @@ button:disabled{cursor:not-allowed}
 #bigTag{margin-top:8px;text-align:center;font-family:var(--toon);font-size:clamp(20px,3vw,34px);color:#fff;text-shadow:2px 3px 0 var(--ink)}
 .splashArt{position:relative;z-index:3}
 .splashArt:empty{display:none}
+
+/* during the bonus the Bonus Buy sign (and its chains) leave the screen so the spin/dive counter is never covered */
+#buyOpen{transition:opacity .3s,transform .3s}
+#stage:has(#fsBox:not([hidden])) #buyOpen{opacity:0;pointer-events:none;transform:translateY(-40px)}
+#fsBox{z-index:30}

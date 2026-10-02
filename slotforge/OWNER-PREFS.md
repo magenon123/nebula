@@ -37,3 +37,11 @@ Agents: read this before every design or build decision. The lead keeps it updat
 - The **doodle style is accepted** ("completely fine"). Do not move away from it.
 - **Side characters (Brann the dwarf, Captain Barnacle the crab) need MORE DETAIL and to look better**: richer costume/props/texture, more expressive faces and poses, better proportions and line quality, within the doodle style.
 - **Symbols must be drawn ONE BY ONE** (each symbol on its own: sketch, render large and at game size, critique, refine, then move on), not as a batch. The batch-made symbols "don't look the best".
+
+## Owner notes, round 3 (2026-10-02): "the slots still look AI" (applies to ALL slots)
+1. **Animations of the connections** feel AI: transitions between animation phases and the way winning symbols are shown connected. Needs: anticipation before a spin, staggered drops with overshoot and settle (squash and stretch), clearly drawn LINKS/connection highlights between the winning symbols (animated glow travelling along the path, popping in order), symbols that react (not just glow), refills that flow straight out of the clear without dead pauses, character reactions synced to these beats.
+2. **Not enough detail** anywhere: symbols, characters, scene.
+3. **The UI of the symbols looks too simple**: bare symbols on dark cells. Each symbol needs richer drawing and a proper presentation (tile/plate, rim, tier colour, depth).
+4. **Backgrounds contain small things that obviously do not belong** (props that float, ungrounded, wrong scale/perspective, random gags). Everything in a scene must have a reason to be there, sit on a ground plane with a contact shadow, share one light direction and scale logic, and belong to the story.
+5. **Sound has no MUSIC.** Real slots have a music loop matching the vibe. Each slot needs a themed base-game track, a bonus track, and stingers, all synthesised, with a separate Music on/off + volume.
+6. **The top-left spin/dive counter must never be covered** (fixed: the Bonus Buy sign hides during the bonus).

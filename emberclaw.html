@@ -202,6 +202,11 @@ button:disabled{cursor:not-allowed}
 .splashArt{position:relative;z-index:3}
 .splashArt:empty{display:none}
 
+/* during the bonus the Bonus Buy sign (and its chains) leave the screen so the spin/dive counter is never covered */
+#buyOpen{transition:opacity .3s,transform .3s}
+#stage:has(#fsBox:not([hidden])) #buyOpen{opacity:0;pointer-events:none;transform:translateY(-40px)}
+#fsBox{z-index:30}
+
 /* EmberClaw slot CSS: scene wash, frame/grid/cells, Forge Core (side mechanic), Brann (character). The shell CSS loads first.
    NOTE: the eyes use the shell's @keyframes blink (the original file had two 'blink' keyframes and the later, opacity one won; kept identical). */
 .heatwash{left:-1500px;top:-1000px;width:4600px;height:2900px;pointer-events:none;background:radial-gradient(60% 50% at 50% 100%,rgba(255,80,10,calc(var(--heat)*.025)),transparent 70%);transition:background .6s}

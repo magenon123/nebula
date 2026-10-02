@@ -202,6 +202,11 @@ button:disabled{cursor:not-allowed}
 .splashArt{position:relative;z-index:3}
 .splashArt:empty{display:none}
 
+/* during the bonus the Bonus Buy sign (and its chains) leave the screen so the spin/dive counter is never covered */
+#buyOpen{transition:opacity .3s,transform .3s}
+#stage:has(#fsBox:not([hidden])) #buyOpen{opacity:0;pointer-events:none;transform:translateY(-40px)}
+#fsBox{z-index:30}
+
 /* Grumble & Brine ART CSS (leo). Concatenate into slot.css (or load after the shell CSS). Layout, scene motion, board/cells, Current Strip,
    Tide Gauge and Captain Barnacle states. Keyframes are prefixed gb* (shell owns blink/rot/flick/wob/bigin: not redefined). */
 :root{--ink:#0b1820;--gold:#ffb938;--accent:#ffb938;--panel1:#1b2d36;--panel2:#13222a;--rim:#b88a3e;--rivet:#e8c46a;--bevel:#6b4a1c;--btn:#2c7a62;--txt:#f2e5c2;--muted:#9fc2c0;--acc1:#5df2e0;--acc2:#ff6f7d;
