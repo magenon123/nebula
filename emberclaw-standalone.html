@@ -2147,7 +2147,7 @@ async function go(buy) {
       let total = R.bonus.spins.length;
       for (const sp of R.bonus.spins) {
         if (cfg.fsCounter === 'running' && sp.spinsLeft != null) total = sp.spinIndex + sp.spinsLeft;   // optional: N grows with retriggers (default: final total, as EmberClaw)
-        $('fs').textContent = `${sp.spinIndex} / ${total}` + (sp.retrigger ? '  +' + sp.retrigger : ''); say(tpl(cfg.text.freeSpin, { n: sp.spinIndex, total }) + (sp.retrigger ? tpl(cfg.text.freeSpinRetrigger, { r: sp.retrigger }) : ''), !!sp.retrigger);
+        if (!cfg.ownCounter) $('fs').textContent = `${sp.spinIndex} / ${total}` + (sp.retrigger ? '  +' + sp.retrigger : ''); if (!cfg.ownCounter) say(tpl(cfg.text.freeSpin, { n: sp.spinIndex, total }) + (sp.retrigger ? tpl(cfg.text.freeSpinRetrigger, { r: sp.retrigger }) : ''), !!sp.retrigger);
         await hooks.clearBoard();
         run = await hooks.playSpin(sp, run, ctx); await wait(300);
       }
