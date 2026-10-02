@@ -5,7 +5,7 @@ import * as T from '../engines/cloudtop-tea-house.js';
 import { mulberry } from './sim.js';
 import { checkRound } from './check-round.js';
 
-const W = 8, BUN = 9, TIN = 10, P = T.CFG.pay, S = T.CFG.payScale, near = (a, b) => Math.abs(a - b) < 1e-9;
+const W = 8, BUN = 9, TIN = 10, FS = 16, P = T.CFG.pay, S = T.CFG.payScale, near = (a, b) => Math.abs(a - b) < 1e-9;
 const blank = () => Array.from({ length: 4 }, () => new Array(5).fill(TIN));   // all tins = all blanks
 const seq = a => { let i = 0; return () => { const v = a[i % a.length]; i++; return v; }; };
 
@@ -47,7 +47,7 @@ test('all bundles flip to the SAME pay symbol; flipped grid has no bundles', () 
 test('trigger needs >= 6 tins; tins pay nothing by themselves', () => {
   for (let i = 0; i < 20000; i++) {
     const r = T.playRound(mulberry(100 + i));
-    assert.equal(r.bonusTriggered, r.tins.count >= 6);
+    assert.equal(r.bonusType === 'tin', r.tins.count >= 6); assert.equal(r.bonusTriggered, r.tins.count >= 6 || r.fsScatter.count >= 3);
     assert.equal(r.initialGrid.flat().filter(x => x === TIN).length, r.tins.count);
     assert.ok(near(r.basePayout, r.cascadeSteps[0].payout));
   }
@@ -118,19 +118,155 @@ test('bought round: trigger spin pays exactly 0, no bundles/wilds, >= 6 tins, ca
 });
 test('buy start distribution = natural trigger distribution (tin count)', () => {
   const rng = mulberry(77), nat = new Array(21).fill(0), buy = new Array(21).fill(0); let nn = 0;
-  for (let i = 0; i < 400000; i++) { const r = T.playRound(rng); if (r.bonusTriggered) { nat[r.tins.count]++; nn++; } }
+  for (let i = 0; i < 400000; i++) { const r = T.playRound(rng); if (r.bonusType === 'tin') { nat[r.tins.count]++; nn++; } }
   for (let i = 0; i < nn; i++) buy[T.playRound(rng, { buy: 'tin' }).tins.count]++;
   for (const k of [6, 7, 8]) assert.ok(Math.abs(nat[k] / nn - buy[k] / nn) < 0.05, `count ${k}: ${nat[k] / nn} vs ${buy[k] / nn}`);
 });
 test('CONTRACT v1 on random rounds, base and buy; JSON-safe; bounded respins', () => {
   const rng = mulberry(2024);
-  for (const mode of ['base', 'buy']) for (let i = 0; i < 6000; i++) {
-    const o = mode === 'buy' ? { buy: 'tin' } : {}, r = T.playRound(rng, o);
+  for (const mode of ['base', 'buy', 'fs', 'super']) for (let i = 0; i < 6000; i++) {
+    const o = mode === 'base' ? {} : { buy: mode === 'buy' ? 'tin' : mode }, r = T.playRound(rng, o);
     assert.deepEqual(checkRound(r, T.CFG, { buy: o.buy || null }), [], `${mode} ${i}`);
     assert.ok(r.bonus === null || r.bonus.spins.length <= 1 + T.CFG.maxRespins);
     assert.doesNotThrow(() => JSON.stringify(r));
   }
 });
-test('no ante/luck in CFG; only the one buy', () => {
-  assert.ok(!T.CFG.anteCost && !T.CFG.luckCost); assert.deepEqual(Object.keys(T.CFG.buy), ['tin']); assert.equal(T.CFG.maxWin, 5000);
+test('no ante/luck in CFG; three buys, Tin Rush stays 60x', () => {
+  assert.ok(!T.CFG.anteCost && !T.CFG.luckCost); assert.deepEqual(Object.keys(T.CFG.buy), ['tin', 'fs', 'super']); assert.equal(T.CFG.buy.tin.cost, 60); assert.equal(T.CFG.maxWin, 5000);
+});
+
+/* ---------------- Free Spins / Super Free Spins (Steeping Drawers) ---------------- */
+const withCfg = (patch, fn) => { const save = JSON.parse(JSON.stringify(T.CFG)); for (const [k, v] of Object.entries(patch)) T.CFG[k] = v; try { return fn(); } finally { for (const k of Object.keys(T.CFG)) delete T.CFG[k]; Object.assign(T.CFG, save); } };
+const fsRounds = (n, seed, mode) => { const rng = mulberry(seed), out = []; for (let i = 0; i < n; i++) { const r = T.playRound(rng, mode === 'base' ? {} : { buy: mode }); if (r.bonusType === 'fs' || r.bonusType === 'super') out.push(r); } return out; };
+
+test('FS scatter id 16 pays nothing, is a blank for lines, wild never substitutes it', () => {
+  const g = blank(); g[0][0] = 7; g[0][1] = 7; g[0][2] = FS; g[0][3] = 7; g[0][4] = 7;
+  assert.equal(T.evaluateLines(g).wins.filter(x => x.line === 0).length, 0);
+  const g2 = blank(); g2[0][0] = 7; g2[0][1] = 7; g2[0][2] = W; g2[0][3] = FS; g2[0][4] = FS;
+  assert.equal(T.evaluateLines(g2).wins.find(x => x.line === 0).len, 3, 'wild counts, FS stops the line');
+  const g3 = blank(); g3[0][0] = FS; g3[0][1] = W; g3[0][2] = W; g3[0][3] = W;
+  assert.equal(T.evaluateLines(g3).wins.filter(x => x.line === 0).length, 0);
+  assert.equal(T.info().fsScatter, 16);
+});
+test('boost formula: line pays mult * (1 + sum of boost[level] over the cells of the win, wild cells included)', () => {
+  const lv = Array.from({ length: 4 }, () => new Array(5).fill(0)), boost = [0, 1, 2, 4];
+  const g = blank(); g[1][0] = 5; g[1][1] = W; g[1][2] = 5; g[1][3] = 5; g[1][4] = 2;
+  lv[1][0] = 3; lv[1][1] = 2; lv[1][3] = 1; lv[1][4] = 3;   // reel 5 drawer is not part of the win (len 4): must not count
+  const w = T.evaluateSteep(g, lv, boost).wins.find(x => x.line === 1);
+  assert.equal(w.len, 4); assert.equal(w.boost, 4 + 2 + 0 + 1); assert.ok(near(w.payout, P[5][1] * S * 8)); assert.ok(near(w.mult, P[5][1] * S));
+  assert.ok(near(T.evaluateSteep(g, Array.from({ length: 4 }, () => new Array(5).fill(0)), boost).total, P[5][1] * S), 'level 0 = plain pay');
+});
+test('FS/Super rounds replay exactly from the JSON: pay uses levels BEFORE the spin; level-up once per drawer per spin; capped at max level', () => {
+  let nFs = 0, nSup = 0, ups = 0, multi = 0;
+  const rs = [...fsRounds(40000, 11, 'base'), ...fsRounds(400, 12, 'fs'), ...fsRounds(300, 13, 'super')];
+  for (const r of rs) {
+    const b = r.bonus, T_ = T.CFG[b.type]; b.type === 'fs' ? nFs++ : nSup++;
+    const lv = Array.from({ length: 4 }, () => new Array(5).fill(0)); for (const p of b.preSteep) lv[p.r][p.c] = p.level;
+    assert.equal(b.type === 'fs' ? b.preSteep.length === 0 : b.preSteep.length === T.CFG.super.preSteep, true);
+    let left = b.startSpins, run = 0;
+    for (const s of b.spins) {
+      assert.deepEqual(s.levels, lv, 'levels field = state before the spin');
+      const ev = T.evaluateSteep(s.grid, lv, T_.boost);
+      assert.equal(s.wins.length, ev.wins.length);
+      if (!r.capped) assert.ok(near(s.payout, ev.total) && near(s.totalPayout, ev.total));
+      const cnt = new Map(); for (const w of s.wins) for (const [y, x] of w.cells) cnt.set(y * 5 + x, (cnt.get(y * 5 + x) || 0) + 1);
+      assert.equal(s.levelUps.length, [...cnt.keys()].filter(k => lv[Math.floor(k / 5)][k % 5] < T_.maxLevel).length);
+      for (const u of s.levelUps) { assert.equal(u.to, u.from + 1); assert.equal(lv[u.r][u.c], u.from); assert.ok(u.to <= T_.maxLevel); assert.equal(u.popKite, u.to === T_.maxLevel); lv[u.r][u.c] = u.to; ups++; if (cnt.get(u.r * 5 + u.c) > 1) multi++; }
+      for (let y = 0; y < 4; y++) for (let x = 0; x < 5; x++) assert.ok(lv[y][x] <= T_.maxLevel);
+      assert.ok(!s.grid.flat().includes(BUN) && !s.grid.flat().includes(TIN), 'no bundle after flip, no tins in the bonus');
+      left = left - 1 + (s.retrigger || 0); if (!r.capped || s !== b.spins[b.spins.length - 1]) assert.equal(s.spinsLeft, left);
+      run += s.totalPayout; assert.ok(near(s.runningTotal, run));
+    }
+    assert.ok(near(b.totalPayout, Math.min(T.CFG.maxWin - r.basePayout, run)));
+  }
+  assert.ok(nFs > 50 && nSup > 20 && ups > 500 && multi > 20, `fs ${nFs} super ${nSup} ups ${ups} drawers on several lines ${multi}`);
+});
+test('retrigger table: 3/4/5 FS on a bonus board add the table spins, once per spin, never upgrade FS to Super, belt respected', () => {
+  const seen = { fs: {}, super: {} };
+  withCfg({ fsPBonus: 0.12 }, () => {
+    for (const r of [...fsRounds(3000, 21, 'fs'), ...fsRounds(3000, 22, 'super')]) {
+      const T_ = T.CFG[r.bonus.type]; let total = r.bonus.startSpins;
+      for (const s of r.bonus.spins) {
+        if (s.fsCount >= 3) { const want = Math.min(T_.retrig[Math.min(5, s.fsCount)], T_.maxSpins - total); if (want > 0) { assert.equal(s.retrigger, want); seen[r.bonus.type][s.fsCount] = 1; } total += s.retrigger || 0; }
+        else assert.equal(s.retrigger, undefined);
+        assert.ok(s.fsCells.length === s.fsCount && s.fsCells.every(([y, x]) => s.grid[y][x] === FS));
+      }
+      assert.ok(total <= T_.maxSpins); assert.equal(r.bonus.spins.length + (r.capped ? 0 : 0) <= T_.maxSpins, true);
+      assert.equal(r.bonus.type, r.bought);   // retrigger never changes the type
+      if (!r.capped) assert.equal(r.bonus.spins.length, total, 'every awarded spin is played');
+    }
+  });
+  assert.ok(seen.fs[3] && seen.fs[4] && seen.super[3] && seen.super[4], JSON.stringify(seen));
+});
+test('trigger counts: exactly 3 FS = Free Spins (10), 4 = Super (12), 5+ = Super with 16; FS pays nothing in base; 1-2 FS never trigger', () => {
+  const rng = mulberry(31), seen = {};
+  withCfg({ fsP: 0.12 }, () => {
+    for (let i = 0; i < 20000; i++) {
+      const r = T.playRound(rng), n = r.fsScatter.count; assert.equal(r.initialGrid.flat().filter(x => x === FS).length, n);
+      assert.ok(near(r.basePayout, r.cascadeSteps[0].payout));
+      if (r.tins.count >= 6) { assert.equal(r.bonusType, 'tin'); continue; }
+      if (n < 3) { assert.ok(r.bonusType === null && !r.bonusTriggered); continue; }
+      assert.equal(r.bonusType, n === 3 ? 'fs' : 'super'); assert.equal(r.bonus.startSpins, n === 3 ? 10 : n === 4 ? 12 : 16); seen[Math.min(n, 5)] = 1;
+    }
+  });
+  assert.ok(seen[3] && seen[4] && seen[5]);
+});
+test('priority rule: 6+ tins and 3+ FS on one spin = Tin Rush only, FS cells rewritten to pay symbols before output; 5 tins + 3 FS = FS only', () => {
+  let tinWins = 0, fsOnly = 0;
+  withCfg({ coinP: 0.2, fsP: 0.15 }, () => {
+    const rng = mulberry(41);
+    for (let i = 0; i < 20000; i++) {
+      const r = T.playRound(rng);
+      if (r.tins.count >= 6) { assert.equal(r.bonusType, 'tin'); assert.ok(r.fsScatter.count < 3, '1-2 FS stay'); assert.equal(r.initialGrid.flat().filter(x => x === FS).length, r.fsScatter.count);
+      if (r.fsScatter.suppressed >= 3) { tinWins++; assert.equal(r.fsScatter.count, 0); assert.ok(!r.initialGrid.flat().includes(FS) && !r.cascadeSteps[0].grid.flat().includes(FS)); } }
+      else { assert.equal(r.fsScatter.suppressed, 0); if (r.tins.count === 5 && r.fsScatter.count >= 3) { assert.ok(r.bonusType === 'fs' || r.bonusType === 'super'); fsOnly++; } }
+      assert.ok(near(r.cascadeSteps[0].payout, T.evaluateLines(r.cascadeSteps[0].grid).total));
+    }
+  });
+  assert.ok(tinWins > 20 && fsOnly > 5, `${tinWins} ${fsOnly}`);
+});
+test('Tin trigger rate is not moved by FS scatters (P(>=6 tins) equals the binomial of coinP)', () => {
+  const p = T.CFG.coinP, rng = mulberry(51); let pk = 0, c = 1;
+  for (let k = 0; k < 20; k++) { if (k >= 6) pk += c * p ** k * (1 - p) ** (20 - k); c = c * (20 - k) / (k + 1); }
+  let n = 0; const N = 600000; for (let i = 0; i < N; i++) if (T.playRound(rng).bonusType === 'tin') n++;
+  assert.ok(Math.abs(n / N - pk) < 5 * Math.sqrt(pk * (1 - pk) / N), `${n / N} vs ${pk}`);
+});
+test('cap: FS bonus with absurd boosts ends on the crossing spin, totals clamp to 5000, running total never decreases', () => {
+  let capped = 0;
+  withCfg({ fs: { ...T.CFG.fs, boost: [0, 50, 500, 5000] }, super: { ...T.CFG.super, boost: [0, 50, 500, 5000, 50000] } }, () => {
+    for (const mode of ['fs', 'super']) for (let i = 0; i < 300; i++) {
+      const r = T.playRound(mulberry(900 + i), { buy: mode });
+      assert.deepEqual(checkRound(r, T.CFG, { buy: mode }), []);
+      let prev = 0; for (const s of r.bonus.spins) { assert.ok(s.runningTotal >= prev - 1e-9 && s.runningTotal <= T.CFG.maxWin + 1e-9); prev = s.runningTotal; }
+      if (r.capped) { capped++; assert.equal(r.totalPayout, T.CFG.maxWin); const l = r.bonus.spins[r.bonus.spins.length - 1]; assert.equal(l.spinsLeft, 0); assert.ok(near(l.runningTotal, T.CFG.maxWin)); }
+    }
+  });
+  assert.ok(capped > 100, 'cap reached ' + capped);
+});
+test('cap is shared with the base spin: totalPayout = min(5000, base + bonus)', () => {
+  withCfg({ fs: { ...T.CFG.fs, boost: [0, 50, 500, 5000] }, fsP: 0.1, payScale: 5 }, () => {
+    for (const r of fsRounds(3000, 61, 'base')) {
+      assert.deepEqual(checkRound(r, T.CFG, {}), []);
+      assert.ok(near(r.bonus.totalPayout, Math.min(r.bonus.spins.reduce((a, s) => a + s.totalPayout, 0), T.CFG.maxWin - r.basePayout)));
+    }
+  });
+});
+test('FS buys: trigger spin = exactly 3 FS (fs) / 4 or 5 (super), pays 0, no tins/bundles/wilds/lines; super keeps the natural 4:5 mix; pre-warm = 4 distinct drawers at level 2', () => {
+  let c4 = 0, c5 = 0;
+  for (let i = 0; i < 3000; i++) for (const k of ['fs', 'super']) {
+    const r = T.playRound(mulberry(7000 + i), { buy: k }), g = r.initialGrid, n = g.flat().filter(x => x === FS).length;
+    assert.equal(r.cost, T.CFG.buy[k].cost); assert.equal(r.bought, k); assert.equal(r.bonusType, k); assert.equal(r.basePayout, 0); assert.deepEqual(r.cascadeSteps, []);
+    assert.equal(T.evaluateLines(g).total, 0); assert.ok(!g.flat().some(x => x === BUN || x === W || x === TIN)); assert.equal(r.fsScatter.count, n); assert.equal(r.tins.count, 0);
+    if (k === 'fs') { assert.equal(n, 3); assert.equal(r.bonus.startSpins, 10); assert.equal(r.bonus.preSteep.length, 0); assert.deepEqual(r.bonus.spins[0].levels.flat().filter(Boolean), []); }
+    else { assert.ok(n >= 4); n === 4 ? c4++ : c5++; assert.equal(r.bonus.startSpins, n === 4 ? 12 : 16);
+      assert.equal(new Set(r.bonus.preSteep.map(p => p.r * 5 + p.c)).size, 4); assert.ok(r.bonus.preSteep.every(p => p.level === 2 && r.bonus.spins[0].levels[p.r][p.c] === 2));
+      assert.equal(r.bonus.spins[0].levels.flat().filter(Boolean).length, 4); }
+  }
+  assert.ok(c4 > 2000 && c5 < c4 / 8 && c5 > 0, `4FS ${c4} 5FS ${c5}`);
+});
+test('info() exposes buy prices, level tables, retrigger tables and FS rates', () => {
+  const i = T.info();
+  assert.deepEqual(i.buy, T.CFG.buy); assert.deepEqual(i.fsBonus.fs.boost, T.CFG.fs.boost); assert.deepEqual(i.fsBonus.super.boost, T.CFG.super.boost);
+  assert.deepEqual(i.fsBonus.fs.retrigger, T.CFG.fs.retrig); assert.equal(i.fsBonus.super.startSpins5, 16); assert.equal(i.fsBonus.fs.maxLineMult, 1 + 5 * T.CFG.fs.boost[3]);
+  assert.ok(i.fsRates.oneIn3 > 150 && i.fsRates.oneIn3 < 260 && i.fsRates.oneIn4 > 2000 && i.fsRates.oneIn4 < 3500);
 });

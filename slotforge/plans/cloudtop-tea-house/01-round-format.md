@@ -94,3 +94,102 @@ See the section at the end (filled after the final sims).
 Decomposition (base): line wins incl. bundles (base-game RTP) **57.0%**; trigger (>= 6 tins) **1 in 148**; average bonus **57.9x** (buy start is the same distribution: 57.7x measured in the buy sim; E[buy] / 60 = 96.2%); bonus share of return **40.7%**; hit rate **25.27%**; P(bonus >= 1000x) about **1.8e-4 per bonus** (1 in ~5,500 buys, ~1 in 820k base spins); 5,000x cap reached about once per 1.7M bonuses (4 cap hits in 16M buys, 0 in 100M base spins); largest base-sim win 3,745x; best observed line win 184x.
 Pay table: pays were scaled up from the concept sketch (x8.85) because with 30 lines and a 25% hit rate the 3-of-a-kind pays of 0.04 would give only a 6% base RTP. Symbol weights are flat (10 each on 8 pay symbols, wild 1 on reels 2-4, bundle 3, tin 9% per cell) to keep the hit rate at 25%.
 Tooling note: `tools/sim.js` now seeds with sfc32 instead of mulberry32. Mulberry has a 2^32 period, and a buy sim uses > 1G draws per seed, so seeds overlapped (identical max wins across seeds, RTP too tight). Older sims of the other slots are statistically unaffected but the exact numbers will differ from their recorded ones.
+
+---
+
+# Round 7 additions: FREE SPINS, SUPER FREE SPINS, three buys (for kai)
+
+Spec: `02-new-bonuses.md` (maya). Everything above (Tin Rush, its JSON, the 60x buy) is UNCHANGED. Differences vs the spec doc, decided by rin: the FS scatter id is **16** (not 11; 11 is the Collector kettle art); FS/Super use the normal `bonus` field (CONTRACT v1 needs it) with `bonus.type`, there is no separate `fsBonus`; `retrigger` on a spin is the plain integer of added spins (contract), not an object. Request: `{stake}` or `{stake, buy:"tin"|"fs"|"super"}`. Prices: **tin 60x, fs 21x, super 75x** (read `CFG.buy` / `info().buy`, never retype).
+
+## New / changed top-level fields (every round)
+| field | meaning |
+|---|---|
+| `bonusType` | `null` (no bonus), `"tin"`, `"fs"` or `"super"`. Use this to choose the intro/bonus screen. `bonusTriggered` is true for all three. |
+| `fsScatter` | `{count, cells:[[r,c]...], suppressed}`: FS scatters (id 16) on `initialGrid`. `count` 2 = tease (slow last reel), 3 = FREE SPINS, 4 = SUPER, 5 = SUPER with 16 spins. `suppressed` = 0 normally; if 3+ FS landed together with 6+ tins on the same spin (priority rule: **Tin Rush wins**) the FS cells were already turned into ordinary symbols in `initialGrid`: then `count` 0, `cells []`, `suppressed` = how many FS there would have been (the client just plays Tin Rush; it never sees a dead FS). 1-2 FS next to 6+ tins stay on the grid as a plain tease. |
+| `tins` | unchanged (`count 0` on fs/super buys) |
+| `cost` | 1 / 60 / 21 / 75 |
+| `bought` | `null`, `"tin"`, `"fs"`, `"super"` |
+
+Symbol `16` = FS scatter (plaque with the letters FS). It pays nothing, is a blank for lines, the wild does not substitute it, a bundle never flips into it. It can land on all 5 reels. In `info()`: `fsScatter: 16`.
+
+## Triggers
+- Exactly 3 FS on the opening grid: **FREE SPINS**, 10 spins. Exactly 4: **SUPER FREE SPINS**, 12 spins. 5 or more: SUPER with **16** spins.
+- Natural rates (fsP 0.018 per cell): 3 FS about 1 in 204 spins, 4 FS about 1 in 2,680, 5+ FS about 1 in 41,000. Base line wins of the trigger spin are paid as usual (`basePayout`), then the bonus.
+- Bought rounds: **FS buy** = visible no-win trigger spin with exactly 3 FS, **SUPER buy** = 4 FS (about 94% of buys) or 5 FS (about 6%, then 16 spins). No tins, no bundles, no wilds, no line win on the buy trigger spin, `cascadeSteps: []`, `basePayout 0`, `fsScatter.cells` = the FS cells (other cells are plain symbols).
+
+## `bonus` for fs / super
+```
+bonus: { type: "fs"|"super", startSpins,          // 10 | 12 | 16
+         preSteep: [ {r,c,level} ],               // Super only: 4 drawers Koji pre-warms at level 2 (empty array for fs)
+         extraSpinsTotal,                          // sum of all retriggers
+         maxLevel, boost: [..],                    // level table of this bonus (copy of info().fsBonus[type]); boost[level] = extra multiplier points
+         totalPayout,                              // min(5000 - basePayout, sum of spins)
+         spins: [ ... ] }
+```
+Level tables (read from `info().fsBonus`): FREE SPINS max level 3, `boost [0,1,2,4]`. SUPER max level 4, `boost [0,1,3,5,8]` (level 4 = gold). Retrigger tables: FS `{3:+4, 4:+7, 5:+10}`, Super `{3:+5, 4:+8, 5:+12}`; max total spins 40 / 50.
+
+### `bonus.spins[i]`
+```
+{ spinIndex,            // 1-based
+  spinsLeft,            // spins left AFTER this one, retrigger already added; 0 on the last spin (also 0 on the cap spin)
+  landed,               // 4x5 grid as it lands: bundles (9) and FS (16) visible
+  grid,                 // after the bundle flip (== landed when bundle is null). Lines are evaluated on this grid. No tins ever.
+  bundle,               // null | {cells:[[r,c]..], flipTo}  (same as the base spin)
+  wins: [ {line, sym, len, mult, boost, payout, cells:[[r,c]..]} ],
+                        // mult = plain pay of the line (paytable x payScale), boost = SUM of boost[level] of the drawers in `cells` (wild cells included, levels as they were BEFORE this spin), payout = mult * (1 + boost). Show the chip "x(1+boost)" at the end of the string.
+  levels,               // 4x5 drawer levels BEFORE this spin (use these to draw the tags/colours while the string runs)
+  levelUps: [ {r,c,from,to,popKite} ],   // AFTER paying: every drawer that took part in at least one win goes up exactly 1 level (once per spin, capped at maxLevel). popKite true when it reached maxLevel (kite flies into the sky). The next spin's `levels` = levels + levelUps.
+  fsCount, fsCells,     // FS scatters on this spin's grid (3+ = retrigger)
+  retrigger?,           // present only when added: integer = spins added (contract field). Levels are kept; a retrigger never upgrades FREE SPINS to SUPER
+  payout,               // sum of wins[].payout (uncapped)
+  totalPayout,          // payout clamped to the remaining cap (== payout unless the cap spin)
+  runningTotal }        // bonus total so far (never above 5000 - basePayout)
+```
+Order for the client: land `landed` -> bundle flip -> win strings with the x chips (`wins`) -> count `totalPayout` -> pour (`levelUps`) -> if `retrigger`: +N flies into the counter -> next spin. FS plaques on a bonus board only count for the retrigger (they never pay). On the 5,000x cap the crossing spin is the last one (`capped:true`, `spinsLeft 0`).
+
+## Real examples (engine output, shortened)
+Natural FREE SPINS (seed 671, mulberry): 3 FS landed with 3 tins and 2 bundles; the base line pays 0.37575, bonus 6.26 in 10 spins. Top level (bonus without spins listed):
+```json
+{"v":1,"cost":1,"bought":null,"bonusType":"fs",
+ "initialGrid":[[10,1,10,16,10],[0,1,9,0,5],[2,9,0,16,2],[0,16,5,6,5]],
+ "cascadeSteps":[{"grid":[[10,1,10,16,10],[0,1,2,0,5],[2,2,0,16,2],[0,16,5,6,5]],"bundle":{"cells":[[1,2],[2,1]],"flipTo":2},
+   "wins":[{"line":12,"sym":2,"len":3,"mult":0.37575,"payout":0.37575,"cells":[[2,0],[2,1],[1,2]]}],"payout":0.37575}],
+ "tins":{"count":3,"cells":[[0,0],[0,2],[0,4]]},"fsScatter":{"count":3,"cells":[[0,3],[2,3],[3,1]],"suppressed":0},
+ "basePayout":0.37575,"bonusTriggered":true,"totalPayout":6.638249999999999,"capped":false,
+ "bonus":{"type":"fs","startSpins":10,"preSteep":[],"extraSpinsTotal":0,"maxLevel":3,"boost":[0,1,2,4],"totalPayout":6.2625,"spins":[ ... 10 items ... ]}}
+```
+`bonus.spins[0]` and `[1]` of the same round: spin 1 wins 0.7515 on line 13 and three drawers go up; spin 2 has one FS (no retrigger) and no win:
+```json
+{"spinIndex":1,"spinsLeft":9,"landed":[[3,5,4,1,6],[4,4,1,0,6],[2,1,7,3,3],[3,7,0,0,5]],"grid":[[3,5,4,1,6],[4,4,1,0,6],[2,1,7,3,3],[3,7,0,0,5]],"bundle":null,
+ "wins":[{"line":13,"sym":4,"len":3,"mult":0.7515,"boost":0,"payout":0.7515,"cells":[[1,0],[1,1],[0,2]]}],
+ "levels":[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+ "levelUps":[{"r":0,"c":2,"from":0,"to":1,"popKite":false},{"r":1,"c":0,"from":0,"to":1,"popKite":false},{"r":1,"c":1,"from":0,"to":1,"popKite":false}],
+ "fsCount":0,"fsCells":[],"payout":0.7515,"totalPayout":0.7515,"runningTotal":0.7515}
+{"spinIndex":2,"spinsLeft":8,"landed":[[7,4,16,3,7],[2,2,1,6,6],[5,0,4,4,5],[0,6,4,4,6]],"grid":[[7,4,16,3,7],[2,2,1,6,6],[5,0,4,4,5],[0,6,4,4,6]],"bundle":null,"wins":[],
+ "levels":[[0,0,1,0,0],[1,1,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],"levelUps":[],"fsCount":1,"fsCells":[[0,2]],"payout":0,"totalPayout":0,"runningTotal":0.7515}
+```
+SUPER buy (seed 82, mulberry): trigger spin shows 4 FS and nothing else special, 4 pre-warmed drawers, 17 spins played (12 + 5 retrigger), 231.5x total.
+```json
+{"v":1,"cost":75,"bought":"super","bonusType":"super",
+ "initialGrid":[[2,7,3,2,5],[3,7,4,6,1],[16,16,5,16,3],[6,16,0,1,7]],"cascadeSteps":[],"tins":{"count":0,"cells":[]},
+ "fsScatter":{"count":4,"cells":[[2,0],[2,1],[2,3],[3,1]],"suppressed":0},"basePayout":0,"bonusTriggered":true,"totalPayout":231.462,"capped":false,
+ "bonus":{"type":"super","startSpins":12,"preSteep":[{"r":1,"c":1,"level":2},{"r":1,"c":2,"level":2},{"r":2,"c":0,"level":2},{"r":3,"c":3,"level":2}],
+          "extraSpinsTotal":5,"maxLevel":4,"boost":[0,1,3,5,8],"totalPayout":231.462,"spins":[ ... 17 items ... ]}}
+```
+Its spin 1 (a drawer at level 2 is on the winning line: boost 3, so the 0.29225 line pays x4) and its spin 8 (two lines through steeped drawers, a drawer reaches gold level 4 and pops its kite, 3 FS retrigger +5 spins):
+```json
+{"spinIndex":1,"spinsLeft":11,"landed":[[5,5,16,6,5],[2,1,4,5,0],[1,1,5,0,0],[2,7,1,1,0]],"grid":[[5,5,16,6,5],[2,1,4,5,0],[1,1,5,0,0],[2,7,1,1,0]],"bundle":null,
+ "wins":[{"line":10,"sym":1,"len":3,"mult":0.29225,"boost":3,"payout":1.169,"cells":[[2,0],[2,1],[3,2]]}],
+ "levels":[[0,0,0,0,0],[0,2,2,0,0],[2,0,0,0,0],[0,0,0,2,0]],
+ "levelUps":[{"r":2,"c":0,"from":2,"to":3,"popKite":false},{"r":2,"c":1,"from":0,"to":1,"popKite":false},{"r":3,"c":2,"from":0,"to":1,"popKite":false}],
+ "fsCount":1,"fsCells":[[0,2]],"payout":1.169,"totalPayout":1.169,"runningTotal":1.169}
+{"spinIndex":8,"spinsLeft":9,"landed":[[5,0,9,3,3],[2,16,8,16,4],[16,2,8,7,5],[0,6,0,5,5]],"grid":[[5,0,4,3,3],[2,16,8,16,4],[16,2,8,7,5],[0,6,0,5,5]],"bundle":{"cells":[[0,2]],"flipTo":4},
+ "wins":[{"line":15,"sym":2,"len":3,"mult":0.37575,"boost":8,"payout":3.38175,"cells":[[1,0],[2,1],[2,2]]},{"line":21,"sym":2,"len":3,"mult":0.37575,"boost":11,"payout":4.509,"cells":[[1,0],[2,1],[1,2]]}],
+ "levels":[[0,3,3,1,0],[3,2,2,0,0],[3,2,0,0,0],[1,0,2,2,0]],
+ "levelUps":[{"r":1,"c":0,"from":3,"to":4,"popKite":true},{"r":1,"c":2,"from":2,"to":3,"popKite":false},{"r":2,"c":1,"from":2,"to":3,"popKite":false},{"r":2,"c":2,"from":0,"to":1,"popKite":false}],
+ "fsCount":3,"fsCells":[[1,1],[1,3],[2,0]],"retrigger":5,"payout":7.89075,"totalPayout":7.89075,"runningTotal":40.70625}
+```
+(Note drawer (1,0) sits on both winning lines but rises only one level, 3 -> 4.)
+
+## Rules for the info screen (numbers from `info()`)
+FS plaque scatters: 3 = FREE SPINS (10 spins), 4 = SUPER FREE SPINS (12 spins, 4 drawers pre-steeped), 5 = SUPER with 16 spins. In the bonuses every drawer that helps a win gets steeped one level darker; a later win through steeped drawers pays x(1 + sum of the drawers' boosts). 3/4/5 FS inside a bonus add spins. Tea Tins do not appear inside these bonuses. Max win 5,000x.

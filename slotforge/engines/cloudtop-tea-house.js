@@ -21,9 +21,9 @@ import crypto from 'crypto';
 export const id = 'cloudtop-tea-house';
 export const name = "Koji's Cloudtop Tea House";
 
-const ROWS = 4, COLS = 5, CELLS = 20, WILD = 8, BUNDLE = 9, TIN = 10;
+const ROWS = 4, COLS = 5, CELLS = 20, WILD = 8, BUNDLE = 9, TIN = 10, FS = 16;   // 11..15 are art-only ids (11 = Collector kettle); 16 = FS scatter
 export const SYMBOLS = ['Dango', 'Onigiri', 'Paper Fan', 'Paper Lantern', 'Plum Blossom', 'Iron Teapot', 'Lucky Cat', 'Golden Koi', 'Smiling Kite', 'Furoshiki Bundle', 'Tea Tin']
-  .map((n, i) => ({ id: i, name: n }));
+  .map((n, i) => ({ id: i, name: n })).concat([{ id: FS, name: 'FS Scatter' }]);
 /* 30 fixed paylines: LINES[l][c] = row on reel c */
 export const LINES = [
   [0,0,0,0,0],[1,1,1,1,1],[2,2,2,2,2],[3,3,3,3,3],
@@ -38,15 +38,16 @@ export const CFG = {
   rows: ROWS, reels: COLS, lines: 30,
   bets: [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000],
   maxWin: 5000,
-  buy: { tin: { cost: 60 } },
+  buy: { tin: { cost: 60 }, fs: { cost: 21 }, super: { cost: 75 } },
   // base game
   coinP: 0.09,
+  fsP: 0.018,                                 // FS scatter, per cell, all reels; rolled AFTER the tin test with the SAME draw (tin odds never move)
   triggerTins: 6,
   symW: [10, 10, 10, 10, 10, 10, 10, 10],     // pay symbols 0..7
   wildW: 1, bundleW: 3,                       // wild only reels 2-4
   flipW: [16, 15, 14, 11, 10, 9, 6, 4],       // what a bundle can flip into (pay symbols only)
   pay: [[0.35, 1.0, 3], [0.35, 1.2, 3.5], [0.45, 1.4, 4.5], [0.7, 2.5, 8], [0.9, 3, 10.5], [1.1, 4, 16], [1.3, 5.3, 22], [2.2, 9, 44]],
-  payScale: 1,
+  payScale: 0.835,
   // Tin Rush
   startRespins: 3,
   q: 0.0732,
@@ -55,7 +56,11 @@ export const CFG = {
   collectorP: 0.012, collectorBase: 2,
   miniP: 0.004, minorP: 0.0015, majorP: 0.0003,
   jackpots: { mini: 10, minor: 25, major: 250 },
-  grandBonus: 500
+  grandBonus: 500,
+  // Free Spins / Super Free Spins (Steeping Drawers). boost[level] = extra multiplier points of a drawer at that level.
+  fsPBonus: 0.026,                            // FS scatter per cell inside the bonuses (retrigger); no tins there
+  fs:    { spins: 10, maxLevel: 3, boost: [0, 1, 2, 4],     wildW: 1.9, retrig: { 3: 4, 4: 7, 5: 10 },  maxSpins: 40 },
+  super: { spins: 12, spins5: 16, maxLevel: 4, boost: [0, 1, 3, 5, 8], wildW: 2.86, retrig: { 3: 5, 4: 8, 5: 12 }, maxSpins: 50, preSteep: 4, preLevel: 2 }
 };
 
 const pickW = (rng, tbl) => { let t = 0; for (const e of tbl) t += e[1]; let u = rng() * t; for (const e of tbl) { u -= e[1]; if (u < 0) return e[0]; } return tbl[tbl.length - 1][0]; };
@@ -64,8 +69,8 @@ const sum = a => a.reduce((x, y) => x + y, 0);
 const emptyGrid = () => Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
 
 /* One cell of the opening grid (no tin draw): weighted symbol for reel c. */
-function drawCell(rng, c, noSpecial) {
-  const w = CFG.symW, wild = !noSpecial && c >= 1 && c <= 3 ? CFG.wildW : 0, bun = noSpecial ? 0 : CFG.bundleW;
+function drawCell(rng, c, noSpecial, wildW = CFG.wildW) {
+  const w = CFG.symW, wild = !noSpecial && c >= 1 && c <= 3 ? wildW : 0, bun = noSpecial ? 0 : CFG.bundleW;
   const tot = sum(w) + wild + bun; let u = rng() * tot;
   for (let i = 0; i < w.length; i++) { u -= w[i]; if (u < 0) return i; }
   u -= 0; if (wild && (u -= wild) < 0) return WILD;
@@ -144,8 +149,93 @@ function playRush(rng, startCells, capLeft) {
   return { spins, total: prevTotal, capped };
 }
 
-/* bonus-only helper for tools: bonus value with a conditioned start (same as a bought round, uncapped by the base) */
-export function bonusOnly(rng) { return Math.min(CFG.maxWin, playRush(rng, startTins(rng), CFG.maxWin).total); }
+/* bonus-only helper for tools: bonus value with a conditioned start (same as a bought round, uncapped by the base). type: 'tin' | 'fs' | 'super' */
+export function bonusOnly(rng, type = 'tin') {
+  if (type === 'tin') return Math.min(CFG.maxWin, playRush(rng, startTins(rng), CFG.maxWin).total);
+  const n = type === 'fs' ? 3 : superCount(rng);
+  return Math.min(CFG.maxWin, playSteep(rng, n === 3 ? 'fs' : 'super', n, CFG.maxWin).total);
+}
+
+/* ---------- Free Spins / Super Free Spins: Steeping Drawers ---------- */
+/* Line evaluation with drawer levels: each winning line pays mult * (1 + sum of boost[level] of the cells that formed it). Grid has no bundles. */
+export function evaluateSteep(grid, levels, boost) {
+  const wins = []; let total = 0;
+  for (let l = 0; l < LINES.length; l++) {
+    const L = LINES[l], s = grid[L[0]][0];
+    if (s > 7) continue;
+    let len = 1;
+    while (len < COLS) { const x = grid[L[len]][len]; if (x === s || x === WILD) len++; else break; }
+    if (len < 3) continue;
+    const mult = CFG.pay[s][len - 3] * CFG.payScale;
+    if (!(mult > 0)) continue;
+    const cells = L.slice(0, len).map((r, c) => [r, c]);
+    let b = 0; for (const [r, c] of cells) b += boost[levels[r][c]];
+    const payout = mult * (1 + b);
+    wins.push({ line: l, sym: s, len, mult, boost: b, payout, cells });
+    total += payout;
+  }
+  return { total, wins };
+}
+
+/* FS count of a natural SUPER trigger: Binomial(20, fsP) conditioned on >= 4 (inverse CDF, one draw). */
+function superCount(rng) {
+  const p = CFG.fsP, w = []; let tot = 0, comb = 1;
+  for (let k = 1; k <= 4; k++) comb = comb * (CELLS - k + 1) / k;     // C(20,4)
+  for (let k = 4; k <= CELLS; k++) { const v = comb * p ** k * (1 - p) ** (CELLS - k); w.push(v); tot += v; comb = comb * (CELLS - k) / (k + 1); }
+  let u = rng() * tot;
+  for (let i = 0; i < w.length; i++) { u -= w[i]; if (u < 0) return 4 + i; }
+  return 4;
+}
+
+/* The bonus. type 'fs' | 'super'; n = FS count on the trigger grid (5+ in super = 16 spins). capLeft = remaining cap. Returns { spins, total (uncapped sum), capped, info } */
+function playSteep(rng, type, n, capLeft) {
+  const T = CFG[type], levels = Array.from({ length: ROWS }, () => new Array(COLS).fill(0)), preSteep = [];
+  if (type === 'super') {
+    const all = []; for (let i = 0; i < CELLS; i++) all.push(i);
+    for (let k = 0; k < T.preSteep; k++) { const j = k + Math.floor(rng() * (CELLS - k)); const t = all[k]; all[k] = all[j]; all[j] = t; }
+    for (const i of all.slice(0, T.preSteep).sort((a, b) => a - b)) { const r = Math.floor(i / COLS), c = i % COLS; levels[r][c] = T.preLevel; preSteep.push({ r, c, level: T.preLevel }); }
+  }
+  const startSpins = type === 'super' && n >= 5 ? T.spins5 : T.spins;
+  let left = startSpins, awarded = startSpins, run = 0, capped = false, extra = 0;
+  const spins = [];
+  while (left > 0) {
+    left--;
+    const landed = emptyGrid(), fsCells = [], bundleCells = [];
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      if (rng() < CFG.fsPBonus) { landed[r][c] = FS; fsCells.push([r, c]); }
+      else { const s = drawCell(rng, c, false, T.wildW); landed[r][c] = s; if (s === BUNDLE) bundleCells.push([r, c]); }
+    }
+    const grid = landed.map(r => r.slice()); let bundle = null;
+    if (bundleCells.length) { const flipTo = drawIdx(rng, CFG.flipW, sum(CFG.flipW)); for (const [r, c] of bundleCells) grid[r][c] = flipTo; bundle = { cells: bundleCells, flipTo }; }
+    const before = levels.map(r => r.slice()), ev = evaluateSteep(grid, levels, T.boost);
+    const hit = new Set(); for (const w of ev.wins) for (const [r, c] of w.cells) hit.add(r * COLS + c);
+    const levelUps = [];
+    for (const i of [...hit].sort((a, b) => a - b)) {
+      const r = Math.floor(i / COLS), c = i % COLS;
+      if (levels[r][c] < T.maxLevel) { levelUps.push({ r, c, from: levels[r][c], to: levels[r][c] + 1, popKite: levels[r][c] + 1 === T.maxLevel }); levels[r][c]++; }
+    }
+    let add = 0;
+    if (fsCells.length >= 3) add = Math.max(0, Math.min(T.retrig[Math.min(5, fsCells.length)], T.maxSpins - awarded));
+    awarded += add; extra += add; left += add;
+    const room = capLeft - run, pay = Math.min(ev.total, room); run += pay;
+    const hitCap = ev.total >= room - 1e-12;
+    if (hitCap) { capped = true; left = 0; }
+    const item = { spinIndex: spins.length + 1, spinsLeft: left, landed, grid, bundle, wins: ev.wins, levels: before, levelUps, fsCount: fsCells.length, fsCells };
+    if (add) item.retrigger = add;
+    item.payout = ev.total; item.totalPayout = pay; item.runningTotal = run;
+    spins.push(item);
+  }
+  return { spins, total: run, capped, info: { type, startSpins, preSteep, extraSpinsTotal: extra, maxLevel: T.maxLevel, boost: T.boost.slice() } };
+}
+
+const fsBonusObj = (b, total) => ({ type: b.info.type, startSpins: b.info.startSpins, preSteep: b.info.preSteep, extraSpinsTotal: b.info.extraSpinsTotal,
+  maxLevel: b.info.maxLevel, boost: b.info.boost, totalPayout: total, spins: b.spins });
+
+function fsStart(rng, n) {   // n FS cells at uniform positions
+  const all = []; for (let i = 0; i < CELLS; i++) all.push(i);
+  for (let k = 0; k < n; k++) { const j = k + Math.floor(rng() * (CELLS - k)); const t = all[k]; all[k] = all[j]; all[j] = t; }
+  return all.slice(0, n).sort((a, b) => a - b).map(i => [Math.floor(i / COLS), i % COLS]);
+}
 
 function startTins(rng) {   // natural tin-count distribution conditioned on >= triggerTins, positions uniform
   let n;
@@ -161,21 +251,37 @@ export function playRound(rng, { buy = null } = {}) {
   const maxWin = CFG.maxWin;
   if (buy) {
     const bc = CFG.buy[buy]; if (!bc) throw new Error('unknown buy ' + buy);
-    const cells = startTins(rng); let grid;
-    const isT = new Set(cells.map(([r, c]) => r * COLS + c));
-    for (let tries = 0; tries < 1000; tries++) {   // no line wins on the trigger spin (rejection; tins are blanks)
+    const fsBuy = buy === 'fs' || buy === 'super', n = buy === 'fs' ? 3 : buy === 'super' ? superCount(rng) : 0;
+    const cells = fsBuy ? fsStart(rng, n) : startTins(rng); let grid;
+    const isT = new Set(cells.map(([r, c]) => r * COLS + c)), mark = fsBuy ? FS : TIN;
+    for (let tries = 0; tries < 1000; tries++) {   // no line wins on the trigger spin (rejection; tins and FS are blanks)
       grid = emptyGrid();
-      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) grid[r][c] = isT.has(r * COLS + c) ? TIN : drawCell(rng, c, true);
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) grid[r][c] = isT.has(r * COLS + c) ? mark : drawCell(rng, c, true);
       if (evaluateLines(grid).total === 0) break;
     }
+    const noTins = { count: 0, cells: [] };
+    if (fsBuy) {
+      const b = playSteep(rng, buy, n, maxWin), total = Math.min(maxWin, b.total);
+      return { v: 1, cost: bc.cost, bought: buy, bonusType: buy, initialGrid: grid, cascadeSteps: [], tins: noTins, fsScatter: { count: n, cells, suppressed: 0 }, basePayout: 0,
+        bonusTriggered: true, bonus: fsBonusObj(b, total), totalPayout: total, capped: b.capped || total >= maxWin };
+    }
     const b = playRush(rng, cells, maxWin), total = Math.min(maxWin, b.total);
-    return { v: 1, cost: bc.cost, bought: buy, initialGrid: grid, cascadeSteps: [], tins: { count: cells.length, cells }, basePayout: 0,
+    return { v: 1, cost: bc.cost, bought: buy, bonusType: 'tin', initialGrid: grid, cascadeSteps: [], tins: { count: cells.length, cells }, fsScatter: { count: 0, cells: [], suppressed: 0 }, basePayout: 0,
       bonusTriggered: true, bonus: bonusObj(b, total), totalPayout: total, capped: b.capped || total >= maxWin };
   }
-  const grid = emptyGrid(), tinCells = [], bundleCells = [];
+  const grid = emptyGrid(), tinCells = [], bundleCells = []; let fsCells = [], suppressed = 0;
   for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
-    if (rng() < CFG.coinP) { grid[r][c] = TIN; tinCells.push([r, c]); } else { const s = drawCell(rng, c, false); grid[r][c] = s; if (s === BUNDLE) bundleCells.push([r, c]); }
+    const u = rng();
+    if (u < CFG.coinP) { grid[r][c] = TIN; tinCells.push([r, c]); }
+    else if (u < CFG.coinP + CFG.fsP) { grid[r][c] = FS; fsCells.push([r, c]); }
+    else grid[r][c] = drawCell(rng, c, false);
   }
+  if (tinCells.length >= CFG.triggerTins && fsCells.length >= 3) {   // priority rule: Tin Rush wins, FS cells become ordinary symbols before output
+    suppressed = fsCells.length;
+    for (const [r, c] of fsCells) grid[r][c] = drawCell(rng, c, false);
+    fsCells = [];
+  }
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (grid[r][c] === BUNDLE) bundleCells.push([r, c]);
   const initialGrid = grid.map(r => r.slice());
   const step = { grid: grid.map(r => r.slice()), bundle: null, wins: [], payout: 0 };
   if (bundleCells.length) {
@@ -185,21 +291,37 @@ export function playRound(rng, { buy = null } = {}) {
   }
   const ev = evaluateLines(step.grid); step.wins = ev.wins; step.payout = ev.total;
   const base = Math.min(maxWin, ev.total);
-  const round = { v: 1, cost: 1, bought: null, initialGrid, cascadeSteps: [step], tins: { count: tinCells.length, cells: tinCells }, basePayout: base,
+  const round = { v: 1, cost: 1, bought: null, bonusType: null, initialGrid, cascadeSteps: [step], tins: { count: tinCells.length, cells: tinCells }, fsScatter: { count: fsCells.length, cells: fsCells, suppressed }, basePayout: base,
     bonusTriggered: false, bonus: null, totalPayout: base, capped: false };
   if (ev.total >= maxWin) { round.capped = true; return round; }
   if (tinCells.length >= CFG.triggerTins) {
     const b = playRush(rng, tinCells, maxWin - base), total = Math.min(maxWin - base, b.total);
-    round.bonusTriggered = true; round.bonus = bonusObj(b, total);
+    round.bonusTriggered = true; round.bonus = bonusObj(b, total); round.bonusType = 'tin';
+    round.totalPayout = Math.min(maxWin, base + total); round.capped = b.capped || round.totalPayout >= maxWin;
+  } else if (fsCells.length >= 3) {
+    const n = fsCells.length, type = n === 3 ? 'fs' : 'super', b = playSteep(rng, type, n, maxWin - base), total = Math.min(maxWin - base, b.total);
+    round.bonusTriggered = true; round.bonus = fsBonusObj(b, total); round.bonusType = type;
     round.totalPayout = Math.min(maxWin, base + total); round.capped = b.capped || round.totalPayout >= maxWin;
   }
   return round;
 }
 
+/* Natural FS trigger rates from CFG.fsP (Binomial over 20 cells; the Tin-priority suppression is ~1e-6 and ignored here). Shown to the player only as "about 1 in N". */
+function fsRates() {
+  const p = CFG.fsP, pk = k => { let c = 1; for (let i = 1; i <= k; i++) c = c * (CELLS - i + 1) / i; return c * p ** k * (1 - p) ** (CELLS - k); };
+  let p5 = 0; for (let k = 5; k <= CELLS; k++) p5 += pk(k);
+  return { p3: pk(3), p4: pk(4), p5plus: p5, oneIn3: 1 / pk(3), oneIn4: 1 / pk(4), oneIn5plus: 1 / p5 };
+}
+
 export function info() {
+  const bonus = t => { const T = CFG[t]; return { startSpins: T.spins, ...(T.spins5 ? { startSpins5: T.spins5 } : {}), maxLevel: T.maxLevel, boost: T.boost.slice(), retrigger: { ...T.retrig }, maxSpins: T.maxSpins,
+    ...(T.preSteep ? { preSteep: T.preSteep, preLevel: T.preLevel } : {}),
+    maxLineMult: 1 + 5 * T.boost[T.maxLevel] }; };   // x(1+sum of 5 top drawers) at most
   return { lines: LINES, paytable: CFG.pay.map((p, i) => ({ id: i, name: SYMBOLS[i].name, pays: { 3: p[0] * CFG.payScale, 4: p[1] * CFG.payScale, 5: p[2] * CFG.payScale } })),
-    symbols: SYMBOLS, wild: WILD, bundle: BUNDLE, tin: TIN, triggerTins: CFG.triggerTins, startRespins: CFG.startRespins, jackpots: CFG.jackpots,
-    grandBonus: CFG.grandBonus, maxWin: CFG.maxWin, buy: CFG.buy };
+    symbols: SYMBOLS, wild: WILD, bundle: BUNDLE, tin: TIN, fsScatter: FS, triggerTins: CFG.triggerTins, startRespins: CFG.startRespins, jackpots: CFG.jackpots,
+    grandBonus: CFG.grandBonus, maxWin: CFG.maxWin, buy: CFG.buy,
+    fsRates: fsRates(), fsBonus: { fs: bonus('fs'), super: bonus('super'), triggers: { fs: 3, super: 4, super16: 5 }, fsPBonus: CFG.fsPBonus },
+    buyNames: { tin: 'Tin Rush', fs: 'Free Spins', super: 'Super Free Spins' } };
 }
 
 export function cryptoRng() { return crypto.randomBytes(6).readUIntBE(0, 6) / 281474976710656; }

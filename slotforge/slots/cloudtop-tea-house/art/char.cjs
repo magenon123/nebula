@@ -17,23 +17,40 @@ let body=sh(bodyD,FUR,{hi:'#d2b088'})
  +s.fill('M238 358 Q220 348 226 330 Q238 334 238 358Z','#4f7d3a')+s.fill('M242 358 Q260 348 254 330 Q242 334 242 358Z','#79a85a')+s.ink('M240 360 V334',2.4)
  // neck strap
  +s.ink('M178 272 Q240 300 302 272',5,'#1c2340')+s.ink('M178 272 Q240 300 302 272',2.6,'#5a6ec0');
-// hat (straw kasa) pushed back, behind the head
-const hatD='M130 138 Q160 36 244 22 Q328 36 358 138 Q244 112 130 138Z';
-function hat(c1,c2,hi,id){const line=c2==='#b88a2a'?'#8a5a14':'#8a6a24';return `<g id="${id}">`
- +sh('M96 134 Q244 98 392 134 Q380 160 244 168 Q108 160 96 134Z',c2,{sh:mix(c2,'#2a1f4a',.3),sw:5,lit:[2,3]})
- +sh(hatD,c1,{hi:hi,sh:c2,lit:[7,7]})
- +s.ink('M150 112 Q244 84 338 112 M170 88 Q244 62 318 88 M196 60 Q244 44 292 60',2.6,line)
- +s.ink('M244 26 V108 M200 36 L170 118 M288 36 L318 118 M222 30 L200 112 M266 30 L288 112',2.2,line)
- +s.ink('M104 140 Q244 112 384 140',2.4,line)
- +`</g>`;}
-let hatSvg=`<g id="cHat" transform="rotate(-9 244 150)">`+hat('#e8c46a','#b88a2a','#fff0a0','hatStraw')+`</g>`;
-let goldHat=`<g id="cGoldHat" opacity="0" transform="rotate(-9 244 150)">`+hat('#ffd23a','#b8860b','#fffbd0','hatGold')+s.circ(244,56,8,'#d9432e',{sw:3,sh:'#8a2218'})+`</g>`;
-// hat strings (flutter)
-const strings=`<g id="cHatStr">`+s.ln('M160 140 Q148 190 190 252','#8a2218',3.2,{ow:2.6})+s.ln('M326 140 Q338 190 292 252','#8a2218',3.2,{ow:2.6})+`</g>`;
+// hat: a woven conical straw KASA (round cone, visible radial + ring weave, bound brim, chin cord). Sits ON the head; the ears poke through slits.
+const AX=244, AY=-26, BY=94, BRX=152, BRY=22;
+const coneD=`M${AX-BRX} ${BY} Q180 56 ${AX} ${AY} Q308 56 ${AX+BRX} ${BY} A${BRX} ${BRY} 0 0 1 ${AX-BRX} ${BY}Z`;
+function hat(c1,c2,hi,id,lineC,ringC){
+  let w=''; const rings=[.2,.34,.48,.62,.76,.9,1];
+  // alternate lighter / darker woven bands (wide soft strokes under the thin weave lines)
+  rings.forEach((t,i)=>{const rx=BRX*t,ry=BRY*t,yc=AY+(BY-AY)*t; if(i%2===0) w+=`<path d="M${AX-rx} ${yc} A${rx} ${ry} 0 0 0 ${AX+rx} ${yc}" fill="none" stroke="${ringC}" stroke-width="9" opacity=".35"/>`;});
+  // radial strands (apex to the front rim)
+  let sp=''; for(let k=0;k<=26;k++){const al=Math.PI*k/26; sp+=`M${AX} ${AY} L${(AX+BRX*Math.cos(al)).toFixed(1)} ${(BY+BRY*Math.sin(al)).toFixed(1)} `;}
+  w+=`<path d="${sp}" fill="none" stroke="${lineC}" stroke-width="1.7" opacity=".85"/>`;
+  // rings + stitch dashes between them = visible basket weave
+  rings.forEach(t=>{const rx=BRX*t,ry=BRY*t,yc=AY+(BY-AY)*t; w+=`<path d="M${AX-rx} ${yc} A${rx} ${ry} 0 0 0 ${AX+rx} ${yc}" fill="none" stroke="${lineC}" stroke-width="2.3"/>`;});
+  [.27,.41,.55,.69,.83,.95].forEach((t,i)=>{const rx=BRX*t,ry=BRY*t,yc=AY+(BY-AY)*t; w+=`<path d="M${AX-rx} ${yc} A${rx} ${ry} 0 0 0 ${AX+rx} ${yc}" fill="none" stroke="${lineC}" stroke-width="3.4" stroke-dasharray="2.4 ${5+i*.7}" opacity=".8"/>`;});
+  const lip=`M${AX-BRX} ${BY} A${BRX} ${BRY} 0 0 0 ${AX+BRX} ${BY} L${AX+BRX} ${BY+9} A${BRX} ${BRY} 0 0 1 ${AX-BRX} ${BY+9}Z`;
+  return `<g id="${id}">`
+   +sh(lip,mix(c2,'#2a1f4a',.18),{sh:mix(c2,'#2a1f4a',.45),sw:5,lit:[2,3]})
+   +s.ink(`M${AX-BRX+4} ${BY+5} A${BRX-4} ${BRY} 0 0 0 ${AX+BRX-4} ${BY+5}`,3,lineC,'stroke-dasharray="3 5"')            // bound rim stitches
+   +sh(coneD,c1,{hi:hi,sh:c2,lit:[8,6],sw:0})
+   +`<clipPath id="${id}C"><path d="${coneD}"/></clipPath><g clip-path="url(#${id}C)">${w}</g>`
+   +s.ink(coneD,5)
+   +s.circ(AX,AY+1,6,mix(c2,'#2a1f4a',.2),{sw:3.4,sh:false})                                                                   // finial knot
+   +`</g>`;}
+let hatSvg=`<g id="cHat">`+hat('#e6c068','#b8862c','#fff0a8','hatStraw','#8f5d18','#c99a3c')+`</g>`;
+let goldHat=`<g id="cGoldHat" opacity="0">`+hat('#ffd23a','#b8860b','#fffbd0','hatGold','#9a6a08','#e0a820')+s.circ(AX,AY-7,8,'#d9432e',{sw:3,sh:'#8a2218'})+`</g>`;
+// chin cord (himo): from the brim, down the cheeks, under the chin; sways a little
+const strings=`<g id="cHatStr">`+s.ln('M104 104 Q100 218 156 248 Q200 270 244 270 Q288 270 332 248 Q388 218 384 104','#9a2a1c',4.2,{ow:3.2})
+  +s.circ(104,104,5,'#e9b43c',{sw:2.4,sh:false})+s.circ(384,104,5,'#e9b43c',{sw:2.4,sh:false})
+  +s.circ(244,271,7,'#e9b43c',{sw:2.8,sh:'#b7801f'})+s.ln('M244 276 Q240 288 236 298 M244 276 Q248 288 252 298','#9a2a1c',3.4,{ow:2.6})+`</g>`;
 // head
 const headD='M146 176 Q144 100 244 98 Q344 100 342 176 Q346 250 244 254 Q142 250 146 176Z';
-let ears=`<g id="cEarL">`+sh('M162 132 Q150 78 192 70 Q222 78 216 116Z',FURD,{hi:'#9a7458'})+s.fill('M172 118 Q168 88 192 84 Q206 92 202 112Z','#d79a8a')+`</g>`
- +`<g id="cEarR">`+sh('M326 132 Q338 78 296 70 Q266 78 272 116Z',FURD,{hi:'#9a7458'})+s.fill('M316 118 Q320 88 296 84 Q282 92 286 112Z','#d79a8a')+`</g>`;
+const slit=(x,y)=>s.ell(x,y,28,8,'#3a2216',{sw:3,sh:false});
+let ears=slit(190,86)+slit(298,86)
+ +`<g id="cEarL"><g transform="translate(0 -26)">`+sh('M166 116 Q148 64 190 52 Q224 60 216 112Z',FURD,{hi:'#9a7458'})+s.fill('M176 106 Q170 76 192 68 Q208 76 204 104Z','#d79a8a')+`</g></g>`
+ +`<g id="cEarR"><g transform="translate(0 -26)">`+sh('M322 116 Q340 64 298 52 Q264 60 272 112Z',FURD,{hi:'#9a7458'})+s.fill('M312 106 Q318 76 296 68 Q280 76 284 104Z','#d79a8a')+`</g></g>`;
 // cheek fur tufts
 const tufts=s.fill('M146 176 L128 190 L148 196 L132 214 L156 214Z','#a07c58')+s.fill('M342 176 L360 190 L340 196 L356 214 L332 214Z','#a07c58')
  +s.ink('M146 176 L128 190 L148 196 L132 214 L156 214 M342 176 L360 190 L340 196 L356 214 L332 214',4);
@@ -62,11 +79,11 @@ let head=sh(headD,FUR,{hi:'#d2b088'})+tufts
 // ladle (right hand, viewer right) and cup (left hand)
 const ladle=`<g id="cLadle">`+s.ln('M356 332 L402 224','#c18a55',9,{ow:3.6})+sh('M388 208 Q418 190 430 214 Q432 240 408 246 Q384 238 388 208Z','#c18a55',{hi:'#e8b982',sh:'#7a4a2e',sw:4.4})+s.ell(410,222,12,10,'#3f6b34',{sw:2.6,sh:false}).replace('fill="#3f6b34"','fill="#8fc060"')+`</g>`;
 const paw=(x,y,r=17)=>sh(`M${x-r} ${y} Q${x-r} ${y-r} ${x} ${y-r} Q${x+r} ${y-r} ${x+r} ${y} Q${x+r} ${y+r} ${x} ${y+r} Q${x-r} ${y+r} ${x-r} ${y}Z`,FURD,{hi:'#9a7458',sw:4.4,lit:[4,4]})+s.ink(`M${x-5} ${y+r-2} V${y+r-8} M${x+3} ${y+r-1} V${y+r-8}`,2,'#3a2a28');
-const armR=`<g id="cArmR">`+ladle+s.ln('M312 270 Q356 292 352 336','#a07c58',34,{ow:5})+s.ink('M326 276 Q350 292 348 318',3,'#d2b088',' opacity=".6"')+paw(354,340)+`</g>`;
+const armR=`<g id="cArmR">`+s.ln('M312 270 Q342 276 356 300','#a07c58',34,{ow:5})+`<g id="cForeR">`+ladle+s.ln('M356 300 Q360 318 352 336','#a07c58',34,{ow:5})+s.ink('M326 276 Q346 284 352 304',3,'#d2b088',' opacity=".6"')+paw(354,340)+`</g></g>`;
 const cup=`<g id="cCup">`+sh('M120 322 H160 L156 358 Q140 366 124 358Z','#fbf1dc',{hi:'#ffffff',sh:'#cdbf9f',sw:4,lit:[4,4]})+sh('M121 332 H159 L158 342 H122Z','#3a4a8c',{sw:2.6,sh:'#27346a'})+s.ell(140,322,20,5,'#bfd98a',{sw:3.4,sh:'#79a85a'})+`</g>`;
 const steam=`<g id="cSteam"><path d="M132 312 Q122 296 134 282 Q146 268 134 252" fill="none" stroke="#fffaf0" stroke-width="8" stroke-linecap="round" opacity=".92"/><path d="M148 310 Q158 294 148 280" fill="none" stroke="#fffaf0" stroke-width="6" stroke-linecap="round" opacity=".7"/></g>`;
 const stream=`<g id="cStream" opacity="0"><path d="M106 242 Q100 310 104 388" fill="none" stroke="${INK}" stroke-width="9" stroke-linecap="round"/><path d="M106 242 Q100 310 104 388" fill="none" stroke="#9bc46a" stroke-width="4.4" stroke-linecap="round"/></g>`;
-const armL=`<g id="cArmL">`+s.ln('M168 270 Q118 292 134 330','#a07c58',34,{ow:5})+s.ink('M150 280 Q126 296 136 312',3,'#d2b088',' opacity=".6"')+cup+paw(140,340)+steam+`</g>`;
+const armL=`<g id="cArmL">`+s.ln('M168 270 Q140 276 126 300','#a07c58',34,{ow:5})+s.ink('M152 278 Q134 286 128 300',3,'#d2b088',' opacity=".6"')+`<g id="cForeL">`+s.ln('M126 300 Q122 318 134 330','#a07c58',34,{ow:5})+cup+paw(140,340)+steam+`</g></g>`;
 // counter, bell, tins
 const counter=`<g id="cCounter">`+s.ell(240,494,210,10,'#2a1a40',{sw:0,sh:false}).replace('fill="#2a1a40"','fill="#2a1a40" opacity=".3"')
  +sh('M54 410 H426 V490 H54Z','#8a5532',{hi:'#c18a55',sh:'#5a3520',sw:5.4,lit:[6,6]})
@@ -80,9 +97,7 @@ const bell=`<g id="cBell">`+s.ell(330,390,28,6,'#b7801f',{sw:3.4,sh:false})+`<g 
 const tins=`<g id="cTins">`+sh('M64 392 L66 352 Q92 346 118 352 L120 392Z','#b4402c',{hi:'#e87a5a',sh:'#7a2418',sw:4.2,lit:[5,5]})+s.ell(92,352,28,7,'#7a2418',{sw:3.4,sh:false})+s.ell(92,351,23,5,'#b4402c',{sw:2,sh:false})+s.circ(92,368,8,'#fbf1dc',{sw:2.6,sh:false})
  +sh('M118 392 L120 364 Q140 360 158 364 L160 392Z','#8f3a28',{hi:'#c4604a',sh:'#5e2218',sw:4,lit:[4,4]})+s.ell(139,364,21,5.4,'#5e2218',{sw:3,sh:false})+`</g>`;
 // maxwin: dragon kite behind him
-const dragon=`<g id="cKite" opacity="0">`+sh('M240 -60 Q330 -20 380 60 Q320 110 240 160 Q160 110 100 60 Q150 -20 240 -60Z','#d9432e',{hi:'#ff8a6a',sh:'#8a2218',sw:5.4})
- +s.ink('M240 -6 Q320 30 362 100 Q310 140 240 184 Q170 140 118 100 Q160 30 240 -6Z',3,'#e9b43c')+sh('M214 80 Q214 40 244 40 Q274 40 274 80 Q274 120 244 124 Q214 120 214 80Z','#f0b83c',{sw:4,sh:'#b7801f'})
- +s.ell(230,70,6,7,'#fbf1dc',{sw:2.6,sh:false})+s.ell(258,70,6,7,'#fbf1dc',{sw:2.6,sh:false})+s.circ(231,71,3,INK,{sw:0,sh:false})+s.circ(257,71,3,INK,{sw:0,sh:false})+s.ink('M228 98 Q244 110 260 98',3)+s.ink('M214 90 Q190 92 180 108 M274 90 Q298 92 308 108',3,'#fbf1dc')+`</g>`;
+const dragon=`<g id="cKite" opacity="0"><use href="#s15" x="60" y="-130" width="360" height="360"/></g>`;
 const bang=`<g id="cBang" opacity="0"><g transform="translate(96 84) rotate(-14)"><path d="M-11 -4 Q0 -10 11 -4 L7 40 Q0 44 -7 40Z" fill="#d9432e" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/><circle cx="0" cy="58" r="8" fill="#d9432e" stroke="${INK}" stroke-width="4.4"/></g></g>`;
 const sparks=`<g id="cSpark" opacity="0">${[[120,100],[360,80],[400,260],[90,250],[250,40]].map(([x,y],i)=>`<path d="M${x} ${y-14} L${x+4} ${y-4} L${x+14} ${y} L${x+4} ${y+4} L${x} ${y+14} L${x-4} ${y+4} L${x-14} ${y} L${x-4} ${y-4}Z" fill="#ffe28a" stroke="${INK}" stroke-width="2.6"/>`).join('')}</g>`;
 const svg=`<div id="char"><svg viewBox="0 0 480 500" filter="url(#roughU)" stroke-linejoin="round" stroke-linecap="round">
@@ -90,13 +105,12 @@ const svg=`<div id="char"><svg viewBox="0 0 480 500" filter="url(#roughU)" strok
  <g id="cAll">
   <g id="cTail">${tail}</g>
   <g id="cBody">${body}</g>
-  <g id="cHatWrap">${hatSvg}${goldHat}</g>
-  ${strings}
-  <g id="cHead">${ears}${head}</g>
+  <g id="cHead">${head}<g id="cHatWrap">${hatSvg}${goldHat}</g>${ears}${strings}</g>
   ${armL}${stream}${armR}
  </g>
  ${counter}${tins}${bell}
  ${bang}${sparks}
 </svg></div>`;
+module.exports={s,sh,hat,head,ears,body,tail,strings,paw,cup,steam,FUR,FURD,PATCH,CREAM,hatSvg,goldHat,coneD,INK};
 fs.writeFileSync('/home/user/nebula/slotforge/slots/cloudtop-tea-house/character.html','<!-- Koji the tanuki. viewBox 480x500 at stage (1130,300). Ids: cAll cTail cBody cHatWrap(cHat,cGoldHat) cHatStr cHead(cEarL,cEarR,cEyes,cPupils,cLids,cBrows,cMouth,cMouthOpen,cCheeks,cBand) cArmL(cCup,cSteam) cStream cArmR(cLadle) cCounter cTins cBell(cBellTop,cDing) cKite(maxwin) cBang cSpark -->\n'+svg);
 console.log('char ok');

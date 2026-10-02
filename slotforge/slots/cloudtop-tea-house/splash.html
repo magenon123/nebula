@@ -1,0 +1,6 @@
+<!-- Koji splash portrait (leo). NOT a build part: the art lives in symbols.svg as <symbol id="kojiSplash"> (cheerful) and <symbol id="kojiSplashSuper"> (excited, gold glow, headband, gold hat, fists up).
+     The shell form is the hook `splashArt(kind)` -> HTML string (see shell/README.md). Use exactly these two snippets; CSS is in slot.css (ART-GEN splash). Animations run by themselves (bob, ear twitch, wave / fist pumps, twinkles, rotating rays).
+     normal bonus (Tin Rush, Free Spins):  <svg class="kojiSplash" viewBox="30 -50 420 390"><use href="#kojiSplash"/></svg>
+     SUPER bonus (4 FS):                   <svg class="kojiSplash super" viewBox="30 -50 420 390"><use href="#kojiSplashSuper"/></svg>
+     slot.js:  splashArt: kind => `<svg class="kojiSplash${isSuper ? ' super' : ''}" viewBox="30 -50 420 390"><use href="#kojiSplash${isSuper ? 'Super' : ''}"/></svg>`
+-->

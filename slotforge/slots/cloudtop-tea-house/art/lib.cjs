@@ -1,6 +1,7 @@
 const INK = '#1c2340';
 function hex2(c){c=c.replace('#','');return [0,2,4].map(i=>parseInt(c.substr(i,2),16))}
 function mix(a,b,t){const x=hex2(a),y=hex2(b);return '#'+x.map((v,i)=>Math.round(v+(y[i]-v)*t).toString(16).padStart(2,'0')).join('')}
+let FIT=null;function fitAttr(id){if(FIT===null){try{FIT=JSON.parse(require('fs').readFileSync(require('path').join(__dirname,'fit.json'),'utf8'))}catch(e){FIT={}}}const f=FIT[id];return f?` transform="translate(${f[1]} ${f[2]}) scale(${f[0]})"`:''}
 function mk(id){
   const o={id,n:0,css:[],names:{}};
   const u=p=>p+id+'_'+(o.n++);
@@ -29,12 +30,14 @@ function mk(id){
   // animated group. kf: keyframe body. opt: o=transform-origin, dur, d(delay ms), ease
   o.g=(name,kf,inner,opt={})=>{
     const dur=opt.dur||1.1, dl=opt.d||0, ease=opt.ease||'cubic-bezier(.3,.7,.3,1)', org=opt.o||'50% 50%';
-    const an=`sy${id}_${name}`;
-    o.css.push(`.sy${id} .a-${name}{animation:${an} calc(${dur}s*var(--spd,1)) ${ease} calc(var(--delay,0ms) + ${dl}ms) both;animation-play-state:var(--win,paused)}@keyframes ${an}{${kf}}`);
+    const an=`sy${id}_${name}`; (o.names[name]=an);
+    {let z=null;for(const m of kf.matchAll(/(?:^|\})\s*([^{}]*)\{([^{}]*)\}/g)){if(m[1].split(',').map(x=>x.trim()).some(x=>x==='0%'||x==='from')){z=m[2];break;}}
+     if(z)o.css.push(`.sy${id} .a-${name}{${z}}`);}   // rest pose = the 0% frame (no animation exists while idle)
+    o.css.push(`.sy${id} .a-${name}{animation:var(--k${id}_${name},none) calc(${dur}s*var(--spd,1)) ${ease} calc(var(--delay,0ms) + ${dl}ms) both;animation-play-state:var(--win,paused)}@keyframes ${an}{${kf}}`);
     return `<g class="a-${name}" style="transform-box:fill-box;transform-origin:${org}"${opt.attr?' '+opt.attr:''}>${inner}</g>`;
   };
   o.shadow=(cx=64,cy=119,rx=40,ry=5)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#2a1f4a" opacity=".28"/>`;
-  o.out=(body)=>`<symbol id="s${id}" viewBox="0 0 128 128"><style>${o.css.join('')}</style><g class="sy${id}"><g filter="url(#roughS)">${body}</g></g></symbol>`;
+  o.out=(body)=>{(module.exports.registry=module.exports.registry||{})[id]=Object.entries(o.names).map(([n,a])=>`--k${id}_${n}:${a}`);return `<symbol id="s${id}" viewBox="0 0 128 128"><style>${o.css.join('')}</style><g class="sy${id}"><g filter="url(#roughS)"${fitAttr(id)}>${body}</g></g></symbol>`};
   return o;
 }
 module.exports={mk,mix,INK};
