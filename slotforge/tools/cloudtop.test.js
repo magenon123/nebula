@@ -131,8 +131,8 @@ test('CONTRACT v1 on random rounds, base and buy; JSON-safe; bounded respins', (
     assert.doesNotThrow(() => JSON.stringify(r));
   }
 });
-test('no ante/luck in CFG; three buys, Tin Rush stays 60x', () => {
-  assert.ok(!T.CFG.anteCost && !T.CFG.luckCost); assert.deepEqual(Object.keys(T.CFG.buy), ['tin', 'fs', 'super']); assert.equal(T.CFG.buy.tin.cost, 60); assert.equal(T.CFG.maxWin, 5000);
+test('FS Luck (ante 2x), no MAX LUCK; three buys, Tin Rush stays 60x', () => {
+  assert.equal(T.CFG.anteCost, 2); assert.ok(!T.CFG.luckCost); assert.deepEqual(Object.keys(T.CFG.buy), ['tin', 'fs', 'super']); assert.equal(T.CFG.buy.tin.cost, 60); assert.equal(T.CFG.maxWin, 5000);
 });
 
 /* ---------------- Free Spins / Super Free Spins (Steeping Drawers) ---------------- */
