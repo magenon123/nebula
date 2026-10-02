@@ -133,16 +133,6 @@
    "text": "The premium ticket. 12 dives, the Tide already at +2, a Jelly on every dive and more Jellies in the herd.",
    "confirmTitle": "SIGN THE TICKET?",
    "confirmText": "ABYSS PASS: 12 dives, Tide starts at +2, a guaranteed Jelly every dive. Only for the brave (and the broke)."
-  },
-  {
-   "key": "max",
-   "mult": 390,
-   "sym": 11,
-   "vol": 5,
-   "name": "MAX or NOTHING",
-   "text": "One reveal. Land 3 golden MAX coins and win 7,500x your bet. Anything less pays nothing. About 1 in 20.",
-   "confirmTitle": "GO ALL IN?",
-   "confirmText": "MAX OR NOTHING: 3 MAX coins pay 7,500x your bet, otherwise you win nothing. Chance: 4.99%."
   }
  ],
  "intro": {
@@ -169,5 +159,15 @@
    "wet": 0.34,
    "lp": 0.37
   }
+ },
+ "luckCost": 5,
+ "luck": {
+  "name": "MAX LUCK",
+  "sym": 11,
+  "vol": 5,
+  "text": "Pay 5x per spin for a golden shot at the jackpot. Land 3 MAX coins anywhere on the board and win 7,500x your bet. About 1 spin in 1,950.",
+  "badge": "MAX LUCK \u00d75",
+  "onMsg": "MAX LUCK ON. TOTAL BET x5",
+  "offMsg": "MAX LUCK OFF"
  }
 }

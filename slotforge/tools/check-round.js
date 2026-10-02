@@ -7,10 +7,10 @@ import { fileURLToPath } from 'node:url';
 const num = x => typeof x === 'number' && Number.isFinite(x);
 const near = (a, b) => Math.abs(a - b) <= 1e-6 * Math.max(1, Math.abs(a), Math.abs(b));
 
-export function checkRound(r, CFG, { ante = false, buy = null } = {}) {
+export function checkRound(r, CFG, { ante = false, buy = null, luck = false } = {}) {
   const e = [], bad = m => e.push(m);
   if (!r || typeof r !== 'object') return ['round is not an object'];
-  const expCost = buy ? CFG.buy?.[buy]?.cost : ante ? CFG.anteCost : 1;
+  const expCost = buy ? CFG.buy?.[buy]?.cost : ante ? CFG.anteCost : luck ? CFG.luckCost : 1;
   if (!num(r.cost) || r.cost <= 0) bad('cost must be a positive number');
   else if (!near(r.cost, expCost)) bad(`cost ${r.cost} != expected ${expCost}`);
   if (!num(r.totalPayout) || r.totalPayout < 0) bad('totalPayout must be a number >= 0');
@@ -63,7 +63,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   if (!file || !slot) { console.error('usage: check-round.js <round.json> <slot> [ante|buy:<key>]'); process.exit(2); }
   const { getEngine } = await import('../engines/index.js');
   const eng = getEngine(slot); let j = JSON.parse(fs.readFileSync(file, 'utf8')); if (j.round) j = j.round;   // accepts a full API response
-  const errs = checkRound(j, eng.CFG, { ante: mode === 'ante', buy: mode.startsWith('buy:') ? mode.slice(4) : null });
+  const errs = checkRound(j, eng.CFG, { ante: mode === 'ante', luck: mode === 'luck', buy: mode.startsWith('buy:') ? mode.slice(4) : null });
   console.log(errs.length ? 'INVALID:\n- ' + errs.join('\n- ') : 'OK');
   process.exit(errs.length ? 1 : 0);
 }

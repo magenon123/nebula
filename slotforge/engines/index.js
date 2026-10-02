@@ -16,6 +16,7 @@ export const listEngines = () => Object.keys(ENGINES);
 export function listModes(e) {
   const m = ['base'];
   if (e.CFG.anteCost) m.push('ante');
+  if (e.CFG.luckCost) m.push('luck');
   for (const k of Object.keys(e.CFG.buy || {})) m.push('buy:' + k);
   return m;
 }
@@ -24,6 +25,7 @@ export function modeOpts(e, mode = 'base') {
   const buys = Object.keys(e.CFG.buy || {});
   if (mode === 'base' || mode === 'standard') return {};   // 'standard' = legacy emberclaw-sim name for the base game; buy it with 'buy' or 'buy:standard'
   if (mode === 'ante') return { ante: true };
+  if (mode === 'luck') return { luck: true };
   if (mode === 'buy') return { buy: buys[0] };
   const key = mode.startsWith('buy:') ? mode.slice(4) : mode;
   if (buys.includes(key)) return { buy: key };
@@ -31,5 +33,5 @@ export function modeOpts(e, mode = 'base') {
 }
 export function modeCost(e, mode) {
   const o = modeOpts(e, mode);
-  return o.buy ? e.CFG.buy[o.buy].cost : o.ante ? e.CFG.anteCost : 1;
+  return o.buy ? e.CFG.buy[o.buy].cost : o.ante ? e.CFG.anteCost : o.luck ? e.CFG.luckCost : 1;
 }

@@ -21,7 +21,7 @@ for (const id of listEngines()) {
     test(`${id}: CONTRACT v1 on ${ROUNDS} random rounds, mode ${mode}`, () => {
       const rng = mulberry(777), o = modeOpts(eng, mode); let trig = 0;
       for (let i = 0; i < ROUNDS; i++) {
-        const r = eng.playRound(rng, o), errs = checkRound(r, eng.CFG, { ante: !!o.ante, buy: o.buy || null });
+        const r = eng.playRound(rng, o), errs = checkRound(r, eng.CFG, { ante: !!o.ante, buy: o.buy || null, luck: !!o.luck });
         assert.deepEqual(errs, [], `round ${i}: ${errs.join('; ')}`);
         if (r.bonusTriggered) trig++;
         assert.doesNotThrow(() => JSON.stringify(r));

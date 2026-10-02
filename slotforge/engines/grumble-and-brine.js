@@ -29,10 +29,13 @@ export const CFG = {
   anteScatterP: 0.0342,
   buy: {
     dive: { cost: 100, buoys: 3, tide: 0 },
-    abyss: { cost: 500, buoys: 5, tide: 2, tideMax: 3, jellyFactor: 1.25, guaranteeEvery: 1 },
-    // MAX or nothing: one reveal, 3+ golden MAX symbols pay the cap, anything else pays 0. hitP = 0.96 * cost / maxWin (RTP 96.00% by construction)
-    max: { cost: 390, maxRun: true, hitP: 0.04992, hitCounts: [[3, 85], [4, 12], [5, 3]], missCounts: [[0, 55], [1, 35], [2, 10]] }
+    abyss: { cost: 500, buoys: 5, tide: 2, tideMax: 3, jellyFactor: 1.25, guaranteeEvery: 1 }
   },
+  // MAX LUCK (optional per-spin mode, like Deep Pressure): costs luckCost x bet. Each spin has luckP to show 3 golden MAX coins and pay the cap.
+  // Total return = (1-luckP)*normal + luckP*maxWin = 0.96*luckCost  =>  luckP = 0.96*(luckCost-1)/(maxWin-0.96)
+  luckCost: 5,
+  luckP: 0.00051207,
+  luckTease: [[0, 88], [1, 9], [2, 3]],   // coins shown on a miss: cosmetic only (they replace non-winning cells in the opening board)
   weights: [11, 11, 11, 11, 11, 10, 10, 9, 8],
   pay: [[0, 0.12, 0.35], [0, 0.14, 0.45], [0.04, 0.14, 0.41], [0.05, 0.17, 0.55], [0.07, 0.21, 0.70], [0.10, 0.35, 1.10], [0.17, 0.55, 1.70], [0.27, 1.00, 3.40], [0.55, 2.05, 8.20]],
   payScale: 1,
@@ -68,7 +71,8 @@ export const info = () => ({
   scatterPay: CFG.scatterPay, payScale: CFG.payScale, maxWin: CFG.maxWin,
   dives: CFG.bonus.dives, retrigger: CFG.bonus.retrigger, maxDives: CFG.bonus.maxDives, tideMax: CFG.bonus.tideMax, jellyMax: CFG.jellyMax,
   anteCost: CFG.anteCost, anteTriggerMultiple: null,
-  buy: Object.fromEntries(Object.entries(CFG.buy).map(([k, b]) => [k, b.maxRun ? { cost: b.cost, maxRun: true, hitP: b.hitP } : { cost: b.cost, buoys: b.buoys, startDives: CFG.bonus.dives[b.buoys], tide: b.tide }]))
+  buy: Object.fromEntries(Object.entries(CFG.buy).map(([k, b]) => [k, { cost: b.cost, buoys: b.buoys, startDives: CFG.bonus.dives[b.buoys], tide: b.tide }])),
+  luckCost: CFG.luckCost, luckP: CFG.luckP
 });
 
 /* ---------- helpers ---------- */
@@ -189,29 +193,46 @@ function playBonus(rng, startDives, ov, room) {
 
 const pickW = (rng, tab) => { const t = tab.reduce((a, x) => a + x[1], 0); let u = rng() * t; for (const [v, w] of tab) { if ((u -= w) < 0) return v; } return tab[tab.length - 1][0]; };
 
-/* MAX or nothing. The only outcome decision is `rng() < hitP`; the MAX count shown on a miss (0-2) is cosmetic and pays nothing. */
-function playMaxRun(rng, buy, bc) {
-  const hit = rng() < bc.hitP, count = pickW(rng, hit ? bc.hitCounts : bc.missCounts), w = CFG.weights, wt = w.reduce((a, b) => a + b, 0);
-  let grid, maxCells;
-  for (let tries = 0; tries < 1000; tries++) {
-    grid = emptyGrid(); maxCells = [];
-    const all = []; for (let i = 0; i < ROWS * COLS; i++) all.push(i);
-    for (let k = 0; k < count; k++) { const j = k + Math.floor(rng() * (all.length - k)); const t = all[k]; all[k] = all[j]; all[j] = t; }
-    const isM = new Set(all.slice(0, count));
-    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) grid[r][c] = isM.has(r * COLS + c) ? MAXSYM : drawSym(rng, w, wt);
-    if (evaluate(grid, []).payout === 0) break;
-  }
-  for (let c = 0; c < COLS; c++) for (let r = 0; r < ROWS; r++) if (grid[r][c] === MAXSYM) maxCells.push([r, c]);
-  const pay = hit ? CFG.maxWin : 0, spin = { spinIndex: 1, spinsLeft: 0, totalPayout: pay, initialGrid: grid, steps: [], maxRun: { hit, count, cells: maxCells } };
-  return { v: 1, cost: bc.cost, ante: false, bought: buy, initialGrid: emptyGrid(), cascadeSteps: [], scatter: { count: 0, cells: [], payout: 0 }, basePayout: 0, maxRun: spin.maxRun,
-    bonusTriggered: true, bonus: { startSpins: 1, startTide: 0, tideMax: 0, totalPayout: pay, spins: [spin] }, totalPayout: pay, capped: hit };
+/* Cells of an opening grid that may hold a MAX coin without changing the result: not part of a win, not a Buoy, not a Jelly. */
+function coinSpots(grid, wins) {
+  const used = new Set(); wins.forEach(w => w.cells.forEach(([r, c]) => used.add(r * COLS + c)));
+  const free = [], rest = [];
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { const id = grid[r][c]; if (id === BUOY || id === JELLY) continue; (used.has(r * COLS + c) ? rest : free).push([r, c]); }
+  return { free, rest };
 }
+const shuffled = (rng, a) => { a = a.slice(); for (let i = 0; i < a.length - 1; i++) { const j = i + Math.floor(rng() * (a.length - i)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
 
-export function playRound(rng, { ante = false, buy = null } = {}) {
+export function playRound(rng, { ante = false, buy = null, luck = false } = {}) {
   const maxWin = CFG.maxWin, B = CFG.bonus;
+  if (luck) {
+    if (ante || buy) throw new Error('luck cannot combine with ante or buy');
+    const hit = rng() < CFG.luckP, gr = rollGrid(rng, CFG.scatterP, CFG.jellyP, 0, null);
+    if (hit) {   // a fresh board, three coins, nothing else: the normal spin is replaced by the cap
+      const grid = emptyGrid(), w = CFG.weights, wt = w.reduce((a, b) => a + b, 0);
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) grid[r][c] = drawSym(rng, w, wt);
+      const pool = shuffled(rng, [].concat(...grid.map((row, r) => row.map((_, c) => [r, c])))), cells = pool.slice(0, 3).sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+      cells.forEach(([r, c]) => { grid[r][c] = MAXSYM; });
+      return { v: 1, cost: CFG.luckCost, ante: false, bought: null, luck: { hit: true, cells }, initialGrid: grid, cascadeSteps: [], scatter: { count: 0, cells: [], payout: 0 },
+        basePayout: maxWin, bonusTriggered: false, bonus: null, totalPayout: maxWin, capped: true };
+    }
+    const count = pickW(rng, CFG.luckTease), count2 = gr.buoyCells.length, scPay = count2 >= 3 ? CFG.scatterPay[Math.min(5, count2)] : 0;
+    const run = runSpin(rng, gr.grid, gr.jel, maxWin - scPay), base = scPay + run.total;
+    const round = { v: 1, cost: CFG.luckCost, ante: false, bought: null, luck: { hit: false, cells: [] }, initialGrid: run.steps[0].grid, cascadeSteps: run.steps,
+      scatter: { count: count2, cells: gr.buoyCells, payout: scPay }, basePayout: Math.min(maxWin, base), bonusTriggered: false, bonus: null, totalPayout: 0, capped: false };
+    if (base >= maxWin) { round.totalPayout = maxWin; round.capped = true; return round; }
+    if (count2 >= 3) {
+      const b = playBonus(rng, B.dives[Math.min(5, count2)], {}, maxWin - base), bonusTotal = Math.min(maxWin - base, b.total);
+      round.bonusTriggered = true; round.bonus = { startSpins: B.dives[Math.min(5, count2)], startTide: b.startTide, tideMax: b.tideMax, totalPayout: bonusTotal, spins: b.spins };
+      round.totalPayout = Math.min(maxWin, base + bonusTotal); round.capped = b.capped || round.totalPayout >= maxWin;
+    } else round.totalPayout = base;
+    if (count > 0 && !round.bonusTriggered) {   // teaser coins: only on spins without a bonus, only over cells that were not part of any win (display only)
+      const sp = coinSpots(round.initialGrid, run.steps[0].wins), order = shuffled(rng, sp.free), cells = order.slice(0, count).sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+      if (cells.length === count) { cells.forEach(([r, c]) => { round.initialGrid[r][c] = MAXSYM; run.steps[0].grid[r][c] = MAXSYM; }); round.luck.cells = cells; }
+    }
+    return round;
+  }
   if (buy) {
     const bc = CFG.buy[buy]; if (!bc) throw new Error('unknown buy ' + buy);
-    if (bc.maxRun) return playMaxRun(rng, buy, bc);
     // trigger spin: `buoys` Buoys on random cells, no Jelly, zero ways wins (rejection sampling), pays nothing
     const w = CFG.weights, wt = w.reduce((a, b) => a + b, 0);
     let grid, cells;

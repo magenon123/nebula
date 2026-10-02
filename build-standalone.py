@@ -38,7 +38,7 @@ def bundle_engine(path):
 
 def check_against_engine(cfg, path):
     """slot.json is the client's copy of a few engine numbers; fail the build if they drift."""
-    js = ("import(process.argv[1]).then(m=>{const C=m.CFG;console.log(JSON.stringify({bets:C.bets,maxWin:C.maxWin,anteCost:C.anteCost||0,"
+    js = ("import(process.argv[1]).then(m=>{const C=m.CFG;console.log(JSON.stringify({bets:C.bets,maxWin:C.maxWin,anteCost:C.anteCost||0,luckCost:C.luckCost||0,"
           "buy:Object.fromEntries(Object.entries(C.buy||{}).map(([k,v])=>[k,v.cost])),paytable:m.PAYTABLE||null,payScale:C.payScale||1,scatterPay:m.SCATTER_PAY||C.scatterPay||null}))})")
     r = subprocess.run(['node', '-e', js, 'file://' + os.path.join(ROOT, path)], capture_output=True, text=True)
     if r.returncode:
@@ -48,6 +48,7 @@ def check_against_engine(cfg, path):
     if e['bets'] != cfg['bets']: bad.append('bets differ (slot.json vs engine CFG.bets)')
     if e['maxWin'] != cfg['maxWin']: bad.append(f"maxWin {cfg['maxWin']} != engine {e['maxWin']}")
     if e['anteCost'] != cfg.get('anteCost', 0): bad.append(f"anteCost {cfg.get('anteCost')} != engine {e['anteCost']}")
+    if e['luckCost'] != cfg.get('luckCost', 0): bad.append(f"luckCost {cfg.get('luckCost')} != engine {e['luckCost']}")
     mine = {b['key']: b['mult'] for b in cfg.get('buys', [])}
     if mine != e['buy']: bad.append(f'buys {mine} != engine CFG.buy costs {e["buy"]}')
     if bad:

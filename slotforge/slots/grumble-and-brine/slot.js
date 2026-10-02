@@ -98,6 +98,19 @@ function dropCells(list, base = 0, fast = false) {
 }
 const ALL = [].concat(...Array.from({ length: ROWS }, (_, r) => Array.from({ length: COLS }, (_, c) => [r, c])));
 const dropAll = () => dropCells(ALL);
+/* Reel-by-reel drop with the classic near-miss slowdown: once two Buoys (or two MAX coins) have landed, the remaining reels hang a beat
+ * with a heartbeat before each lands. Returns {end, tease}: ms to the last touchdown, and whether the slowdown ran. */
+function dropTease(grid) {
+  let base = 0, end = 0, tease = false; const seen = {}; [BUOY, MAXS].forEach(k => seen[k] = 0);
+  for (let c = 0; c < COLS; c++) {
+    const hot = [BUOY, MAXS].find(k => seen[k] >= 2 && c < COLS);
+    if (hot != null) { tease = true; base += 620; const b0 = base; after(b0 - 560, () => { sfx.maxBeat(2); say('ONE MORE...', true); shake(.3); }); }
+    const e = dropCells([[0, c], [1, c], [2, c]], base + c * 0); end = Math.max(end, e);
+    [BUOY, MAXS].forEach(k => { const n = [0, 1, 2].filter(r => grid[r][c] === k).length; seen[k] += n; });
+    base += 0;
+  }
+  return { end, tease };
+}
 async function dropOut() {
   setStrip([], 0); clearLinks(); GRID.classList.remove('focus'); let end = 0;
   ALL.forEach(([r, c]) => { const o = { delay: c * 52 + (2 - r) * 30, dist: (3 - r) * CHT + 90, rot: (c % 2 ? 1 : -1) * (2 + c % 3), dur: 420 }; FX.out(at(r, c), o); end = Math.max(end, o.delay + o.dur); });
@@ -251,11 +264,21 @@ async function playSpin(sp, run, ctx) {
   const stake = ctx.stake, steps = sp.steps || [], open = steps[0], jel = open ? open.jellies : [];
   char('spin', 950 * T());
   if (sp.tideBefore != null) setTide(sp.tideBefore, true);
-  paint(sp.initialGrid, jel); setStrip(jel, 0); sfx.drop(); const e0 = dropAll();
-  const buoys = buoyCells(sp.initialGrid);
+  paint(sp.initialGrid, jel); setStrip(jel, 0); sfx.drop(); const dt = dropTease(sp.initialGrid), e0 = dt.end;
+  const buoys = buoyCells(sp.initialGrid), coins = ALL.filter(([r, c]) => sp.initialGrid[r][c] === MAXS);
+  coins.forEach(([r, c], i) => after(e0 - 120 + i * 40, () => { sfx.maxLand(i); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 12, SHARD[3], { power: 1 }); flash(1.2); }));
   if (buoys.length) pingBuoys(buoys);
   if (jel.length) after(520, () => sfx.jelly());
   await wait(e0 + 200);
+  if (coins.length) {
+    if (coins.length >= 3) {
+      GRID.classList.add('focus'); const Rp = rope(coins, 0, 0); presentList(coins, Rp); coins.forEach(([r, c]) => at(r, c).classList.add('scat'));
+      sfx.maxWin(); char('big', 3000 * T()); shake(true); flash(); embers(220); say('MAX WIN!!!', true);
+      after(Rp.end - 100, () => { const [x, y] = ctr(coins); pop(x, y, '+' + fmt((sp.maxPay * stake))); ctx.onWin(0, (sp.maxPay * stake)); });
+      await wait(Rp.end + 900); fadeLinks(240); GRID.classList.remove('focus'); restCells(); return (sp.maxPay * stake);
+    }
+    sfx.maxMiss(); say(coins.length === 2 ? 'SO CLOSE... TWO MAX COINS' : 'ONE MAX COIN', true); await wait(coins.length === 2 ? 900 : 400);
+  }
   if (buoys.length && sp.tideBefore != null && buoys.length >= 2) { char('special', 900 * T()); }
   if (sp.retrigger) { say(`+${sp.retrigger} DIVES!`, true); const R = rope(buoys, 0, 0); presentList(buoys, R); buoys.forEach(([r, c]) => at(r, c).classList.add('scat')); sfx.retrigger(); await wait(R.end + 600); fadeLinks(200); restCells(); }
   else if (sp.scatter && sp.scatter.count === 2 && !sp.bought) { say('ONE MORE BUOY...', true); char('wince', 1100 * T()); await wait(500); }
@@ -276,32 +299,6 @@ async function playSpin(sp, run, ctx) {
   }
   if (!steps.length && !buoys.length) await wait(100);
   return run;
-}
-
-/* MAX or NOTHING: the five reels land one by one; after two golden coins the next reels hang in the air with a heartbeat */
-async function playMax(R, ctx) {
-  const sp = R.bonus.spins[0], mr = sp.maxRun, grid = sp.initialGrid, stake = ctx.stake;
-  char('spin', 900 * T()); say('MAX OR NOTHING...', true); paint(grid, []); GRID.classList.remove('focus');
-  let base = 250, got = 0, end = 0; const lands = [];
-  for (let c = 0; c < COLS; c++) {
-    const col = [[0, c], [1, c], [2, c]], mHere = col.filter(([r]) => grid[r][c] === MAXS), tense = got >= 2 && c < COLS;
-    if (tense) { base += 700; after(base - 650, () => { sfx.maxBeat(2); say(got >= 2 ? 'ONE MORE...' : '', true); shake(.3); }); }
-    const e = dropCells(col, base); end = Math.max(end, base + e);
-    if (mHere.length) { got += mHere.length; const k = got; mHere.forEach(([r]) => after(base + 360, () => { sfx.maxLand(k - 1); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 14, SHARD[3], { power: 1.1 }); flash(1.5); shake(.35 + k * .15); pop(b.left + b.width / 2, b.top, k + ' / 3'); })); lands.push([c, k]); }
-    base += 330;
-  }
-  await wait(end + 500);
-  if (mr.hit) {
-    const list = mr.cells; GRID.classList.add('focus'); const Rp = rope(list, 0, 0); presentList(list, Rp); list.forEach(([r, c]) => at(r, c).classList.add('scat'));
-    sfx.maxWin(); char('big', 3000 * T()); shake(true); flash(); embers(220); say('MAX WIN!!!', true);
-    after(Rp.end - 100, () => { const [x, y] = ctr(list); pop(x, y, '+' + fmt(R.totalPayout * stake)); ctx.onWin(0, R.totalPayout * stake); });
-    await wait(Rp.end + 900); fadeLinks(240); GRID.classList.remove('focus'); restCells();
-    return R.totalPayout * stake;
-  }
-  sfx.maxMiss(); char('wince', 1400 * T()); say(mr.count >= 2 ? 'SO CLOSE... NOT THIS TIME' : 'NOT THIS TIME', true);
-  cells.forEach(d => { if (!d.classList.contains('maxs')) d.animate([{ opacity: 1 }, { opacity: .35 }], { duration: 500 * T(), fill: 'forwards' }); });
-  await wait(1300); cells.forEach(d => { d.getAnimations().forEach(a => { if (a.fill === 'forwards') a.cancel(); }); });
-  return 0;
 }
 
 /* the Sonar Buoys that triggered the Deep Dive ping on the board before the splash: a rope is pulled through them */
@@ -405,9 +402,8 @@ return {
   roundStart() { setStrip([], 0); },
   clearBoard: dropOut,
   restoreBoard() { if (lastGrid) paint(lastGrid, lastJ); },
-  baseSpin: R => ({ initialGrid: R.initialGrid, steps: R.cascadeSteps, scatter: R.scatter, bought: R.bought }),
+  baseSpin: R => ({ initialGrid: R.initialGrid, steps: R.cascadeSteps, scatter: R.scatter, bought: R.bought, maxPay: R.luck && R.luck.hit ? R.totalPayout : 0 }),
   playSpin,
-  playMax,
   showTrigger,
   bonusMode(on) { $('tide').classList.toggle('on', on); setTide(0, false); }
 };

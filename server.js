@@ -224,14 +224,18 @@ async function slotSpin(slotId, req, res) {
     if (body.ante !== undefined && typeof body.ante !== 'boolean') return res.status(400).json({ error: 'ante must be true or false' });
     if (body.buy != null && typeof body.buy !== 'string') return res.status(400).json({ error: 'Unknown bonus buy' });
     const stake = money(body.stake);
+    if (body.luck !== undefined && typeof body.luck !== 'boolean') return res.status(400).json({ error: 'luck must be true or false' });
     const ante  = body.ante === true;
+    const luck  = body.luck === true;
     const buy   = body.buy ? body.buy : null;
     if (!C.bets.includes(stake)) return res.status(400).json({ error: 'Invalid bet size' });
     if (buy && !hasOwn(C.buy, buy)) return res.status(400).json({ error: 'Unknown bonus buy' });
     if (ante && !C.anteCost) return res.status(400).json({ error: 'This slot has no ante mode' });
     if (buy && ante) return res.status(400).json({ error: 'Ante cannot be combined with Buy Bonus' });
+    if (luck && !C.luckCost) return res.status(400).json({ error: 'This slot has no Max Luck mode' });
+    if (luck && (ante || buy)) return res.status(400).json({ error: 'Max Luck cannot be combined with Ante or Buy Bonus' });
 
-    const round = eng.playRound(eng.cryptoRng, { ante, buy });
+    const round = eng.playRound(eng.cryptoRng, { ante, buy, luck });
     const cost = money(stake * round.cost);
     const payout = money(stake * round.totalPayout);
     if (!(cost > 0) || !Number.isFinite(payout) || payout < 0) return res.status(500).json({ error: 'Engine returned an invalid round' });

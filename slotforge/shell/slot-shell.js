@@ -18,9 +18,9 @@ const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
 const shellApi = { boot, $, store, fmt, betLbl, sleep, hooks: null, S: null };
 function boot(cfg, factory) {
 const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : null;   // standalone build: engine embedded, play money
-const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, BUYS = cfg.buys || [], P = cfg.storage || cfg.id;
+const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, LUCK_COST = cfg.luckCost || 0, BUYS = cfg.buys || [], P = cfg.storage || cfg.id;
 let hooks = {};
-let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, busy = false, balance = 0, STAGE_S = 1;
+let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, luck = false, busy = false, balance = 0, STAGE_S = 1;
 let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false), musicOn = store.get(P + '_mus', true), sndVol = store.get(P + '_sndv', .85), musVol = store.get(P + '_musv', .7);
 const MUS_GAIN = .9;   // slider 100% = this much of the music bus; calibrated so the soundtrack sits well below the effects
 let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
@@ -248,7 +248,7 @@ const webRng = () => { const a = new Uint32Array(2); crypto.getRandomValues(a); 
 async function api(body) {
   if (LOCAL) {
     const stake = _r2(body.stake), buy = body.buy || null;
-    const round = LOCAL.playRound(webRng, { ante: !!body.ante, buy });
+    const round = LOCAL.playRound(webRng, { ante: !!body.ante, buy, luck: !!body.luck });
     const cost = _r2(stake * round.cost), payout = _r2(stake * round.totalPayout);
     if (cost > wallet + 1e-9) throw new Error('Not enough balance (clear site data to reset play money)');
     wallet = _r2(wallet - cost + payout); try { localStorage.setItem(cfg.walletKey, wallet); } catch {}
@@ -296,14 +296,14 @@ async function go(buy) {
   try {
     hooks.roundStart();
     let j;
-    try { [j] = await Promise.all([api({ stake, ante: buy ? false : ante, buy }), hooks.clearBoard()]); }
+    try { [j] = await Promise.all([api({ stake, ante: buy ? false : ante, luck: buy ? false : luck, buy }), hooks.clearBoard()]); }
     catch (e) { hooks.restoreBoard(); throw e; }
     const R = j.round; let run = 0;
     balance = j.user.balance - j.payout;  // show the stake leaving now, the win as it lands
     $('bal').textContent = fmt(balance);
     const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b); } };
-    run = R.maxRun && hooks.playMax ? await hooks.playMax(R, ctx) : await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);   // maxRun: a slot's all-or-nothing buy, own reveal, no bonus round
-    if (R.bonusTriggered && !R.maxRun) {
+    run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
+    if (R.bonusTriggered) {
       out.bonus = true;
       await hooks.showTrigger(R); sfx.bonus(); music.duck(.12, 2.6, 1.6); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
       $('introN').textContent = R.bonus.startSpins; music.theme('bonus', 2.6); music.stinger('bonus'); await tapWait('introM', auto.left > 0 ? 1800 : 0);
@@ -334,7 +334,7 @@ async function runAuto() {
     if (o.err) break;
     auto.left--;
     if ((o.bonus && auto.stopFeat) || (o.tier && auto.stopBig && cfg.tiers.find(t => t.name === o.tier).lv >= cfg.autoBigLv)) break;
-    if (BETS[bi] * (ante ? ANTE_COST : 1) > balance + 1e-9) { say('Not enough balance — autoplay stopped.'); break; }
+    if (BETS[bi] * mult() > balance + 1e-9) { say('Not enough balance — autoplay stopped.'); break; }
     await wait(450);
   }
   auto.left = 0; refreshUi();
@@ -355,16 +355,18 @@ function askBuy(kind) {
   const short = cost > balance + 1e-9; $('cWarn').textContent = short ? 'Not enough balance.' : ''; $('cYes').disabled = short;
   openM('confirm');
 }
-function closeBuy(ok) { if (ok) { sfx.hit(); ante = false; refreshUi(); } const k = pendingBuy; pendingBuy = null; closeM('confirm'); if (ok && k) go(k); }
+function closeBuy(ok) { if (ok) { sfx.hit(); ante = false; luck = false; refreshUi(); } const k = pendingBuy; pendingBuy = null; closeM('confirm'); if (ok && k) go(k); }
 $('cYes').onclick = () => closeBuy(true);
 $('cNo').onclick = () => closeBuy(false);
 $('buyOpen').onclick = () => { if (busy) return; sfx.ui(); refreshUi(); openM('buyM'); };
 $('bbM').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
 $('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
 
+const mult = () => luck ? LUCK_COST : ante ? ANTE_COST : 1;
 function refreshUi() {
-  const s = BETS[bi], risk = s * (ante ? ANTE_COST : 1); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
-  $('barR').classList.toggle('hot', ante); $('betLbl').textContent = ante ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !ante;
+  const s = BETS[bi], risk = s * mult(); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
+  $('barR').classList.toggle('hot', ante || luck); $('betLbl').textContent = ante || luck ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !(ante || luck); $('feverBadge').textContent = luck ? cfg.luck.badge : cfg.fever.badge;
+  if (LUCK_COST) { $('luck').textContent = luck ? 'DEACTIVATE' : 'ACTIVATE'; $('luck').classList.toggle('or', !luck); $('luck').classList.toggle('off', luck); }
   const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
   $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
   BUYS.forEach((b, i) => fitTxt($('p' + (i + 1)), fmt(s * b.mult), 34, '23px'));
@@ -397,6 +399,7 @@ $('vMus').oninput = e => { musVol = e.target.value / 100; if (mus) mus.volume(mu
 $('vMus').onchange = () => { store.set(P + '_musv', musVol); if (musicOn) music.start(); };
 $('vSnd').oninput = e => { sndVol = e.target.value / 100; if (sfxG) sfxG.gain.value = sndVol; };
 $('vSnd').onchange = () => { store.set(P + '_sndv', sndVol); sfx.ui(); };
+if (LOCAL) { $('bFill').hidden = false; $('bFill').onclick = () => { sfx.hit(); wallet = _r2(wallet + 100000); try { localStorage.setItem(cfg.walletKey, wallet); } catch {} balance = wallet; $('bal').textContent = fmt(balance); closeMenu(); say('+$100,000 PLAY MONEY ADDED', true); }; }
 $('bInfo').onclick = () => { closeMenu(); openM('infoM'); };
 $('bFs').onclick = () => { closeMenu(); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch {} };
 addEventListener('keydown', e => {
@@ -423,10 +426,12 @@ $('feverBadge').textContent = cfg.fever.badge;
 const bigTier = cfg.tiers.find(t => t.lv === cfg.autoBigLv); $('swBigTxt').textContent = `Stop on a big win (${bigTier.min}x+)`;
 $('bbRow').innerHTML =
   `<div class="bbc"><div class="med">${sym(cfg.fever.sym)}</div><h3>${cfg.fever.name}</h3><p>${cfg.fever.text}</p><div class="vol" data-n="${cfg.fever.vol}"><span>VOLATILITY</span></div><div class="price" id="pa">${ANTE_COST}x BET</div><button class="go or" id="ante">ACTIVATE</button></div>` +
+  (LUCK_COST ? `<div class="bbc"><div class="med">${sym(cfg.luck.sym)}</div><h3>${cfg.luck.name}</h3><p>${cfg.luck.text}</p><div class="vol" data-n="${cfg.luck.vol}"><span>VOLATILITY</span></div><div class="price" id="pl">${LUCK_COST}x BET</div><button class="go or" id="luck">ACTIVATE</button></div>` : '') +
   BUYS.map((b, i) => `<div class="bbc"><div class="med">${sym(b.sym)}</div><h3>${b.name}</h3><p>${b.text}</p><div class="vol" data-n="${b.vol}"><span>VOLATILITY</span></div><div class="price" id="p${i + 1}">$${b.mult}.00</div><button class="go gd" id="buy${i + 1}">BUY</button></div>`).join('');
 document.querySelectorAll('.vol').forEach(v => { for (let i = 1; i <= 5; i++) v.insertAdjacentHTML('beforeend', `<i class="${i <= +v.dataset.n ? 'on' : ''}"></i>`); });
 BUYS.forEach((b, i) => { $('buy' + (i + 1)).onclick = () => { closeM('buyM'); askBuy(b.key); }; });
-$('ante').onclick = () => { sfx.ui(); ante = !ante; refreshUi(); closeM('buyM'); if (ante) { say(cfg.fever.onMsg, true); sfx.feverOn(); } else say(cfg.fever.offMsg); };
+if (LUCK_COST) $('luck').onclick = () => { sfx.ui(); luck = !luck; if (luck) ante = false; refreshUi(); closeM('buyM'); if (luck) { say(cfg.luck.onMsg, true); sfx.feverOn(); } else say(cfg.luck.offMsg); };
+$('ante').onclick = () => { sfx.ui(); ante = !ante; if (ante) luck = false; refreshUi(); closeM('buyM'); if (ante) { say(cfg.fever.onMsg, true); sfx.feverOn(); } else say(cfg.fever.offMsg); };
 $('introGems').innerHTML = [1, 2, 3].map(() => `<div class="g">${sym(cfg.scatterSym)}</div>`).join('');
 $('introLbl').textContent = cfg.intro.unit; $('introRibbon').textContent = cfg.intro.ribbon;
 $('introChips').innerHTML = cfg.intro.chips.map(c => `<span>${c}</span>`).join('');
