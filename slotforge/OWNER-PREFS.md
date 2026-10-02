@@ -67,3 +67,8 @@ Owner approved the concept with the notes in STATUS.md. The lead calls itself "T
 2. Need MORE TYPES OF BONUSES. KEEP Tin Rush exactly as it is (owner: "it's fine").
 3. Bonus scatters carry ONLY the text "FS". 3 FS = normal free-spins bonus, 4 FS = SUPER bonus. (Tea Tins stay the Tin Rush trigger, 6+.)
 4. BUG: in the bonus, every spin the shell counter flashes "n / 14" for a split second before the slot's "POURS LEFT" counter. Fixed by cfg.ownCounter (shell no longer writes the counter or the message when a slot owns its counter). Verify it is gone.
+
+## Round 8 (owner): bet-up "luck" mode in EVERY slot, from now on
+Every slot gets a bet-up bonus-chance toggle ("Deep Pressure", "Forge Fever", "FS Luck" for the Tea House: 2x cost, bonus much likelier, RTP 96% in that mode too). Other extras still vary per slot. The Tea House has it as of this round (2x, FS drums ~6x as likely).
+Also: Tin Rush slow-drop tease starts at the 5th tin (one short of 6), FS tease stays at the 2nd drum. Tin value chips sit in the top-left of the cell, never over the TIN tag. Tea House max win = 5,000x.
+Weekly limit is nearly used up (resets next day 6pm UTC): keep work small and commit/push every step.

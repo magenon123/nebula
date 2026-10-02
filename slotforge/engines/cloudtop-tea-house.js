@@ -41,6 +41,8 @@ export const CFG = {
   buy: { tin: { cost: 60 }, fs: { cost: 21 }, super: { cost: 75 } },
   // base game
   coinP: 0.09,
+  anteCost: 2,                                // FS LUCK (bet-up): every spin costs 2x and the FS drums land far more often
+  anteFsP: 0.0379,                             // FS scatter per cell in FS LUCK mode (tuned with tools/sim.js so the mode returns ~96.1%)
   fsP: 0.018,                                 // FS scatter, per cell, all reels; rolled AFTER the tin test with the SAME draw (tin odds never move)
   triggerTins: 6,
   symW: [10, 10, 10, 10, 10, 10, 10, 10],     // pay symbols 0..7
@@ -247,8 +249,8 @@ function startTins(rng) {   // natural tin-count distribution conditioned on >= 
 
 const bonusObj = (b, total) => ({ startSpins: CFG.startRespins, totalPayout: total, spins: b.spins });
 
-export function playRound(rng, { buy = null } = {}) {
-  const maxWin = CFG.maxWin;
+export function playRound(rng, { buy = null, ante = false } = {}) {
+  const maxWin = CFG.maxWin, fsPHere = ante ? CFG.anteFsP : CFG.fsP;
   if (buy) {
     const bc = CFG.buy[buy]; if (!bc) throw new Error('unknown buy ' + buy);
     const fsBuy = buy === 'fs' || buy === 'super', n = buy === 'fs' ? 3 : buy === 'super' ? superCount(rng) : 0;
@@ -273,7 +275,7 @@ export function playRound(rng, { buy = null } = {}) {
   for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
     const u = rng();
     if (u < CFG.coinP) { grid[r][c] = TIN; tinCells.push([r, c]); }
-    else if (u < CFG.coinP + CFG.fsP) { grid[r][c] = FS; fsCells.push([r, c]); }
+    else if (u < CFG.coinP + fsPHere) { grid[r][c] = FS; fsCells.push([r, c]); }
     else grid[r][c] = drawCell(rng, c, false);
   }
   if (tinCells.length >= CFG.triggerTins && fsCells.length >= 3) {   // priority rule: Tin Rush wins, FS cells become ordinary symbols before output
@@ -291,7 +293,7 @@ export function playRound(rng, { buy = null } = {}) {
   }
   const ev = evaluateLines(step.grid); step.wins = ev.wins; step.payout = ev.total;
   const base = Math.min(maxWin, ev.total);
-  const round = { v: 1, cost: 1, bought: null, bonusType: null, initialGrid, cascadeSteps: [step], tins: { count: tinCells.length, cells: tinCells }, fsScatter: { count: fsCells.length, cells: fsCells, suppressed }, basePayout: base,
+  const round = { v: 1, cost: ante ? CFG.anteCost : 1, ante: !!ante, bought: null, bonusType: null, initialGrid, cascadeSteps: [step], tins: { count: tinCells.length, cells: tinCells }, fsScatter: { count: fsCells.length, cells: fsCells, suppressed }, basePayout: base,
     bonusTriggered: false, bonus: null, totalPayout: base, capped: false };
   if (ev.total >= maxWin) { round.capped = true; return round; }
   if (tinCells.length >= CFG.triggerTins) {

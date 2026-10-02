@@ -2,7 +2,7 @@
  "id": "cloudtop-tea-house",
  "title": "Koji's Cloudtop Tea House",
  "logoText": "CLOUDTOP TEA HOUSE",
- "infoTitle": "CLOUDTOP TEA HOUSE · BONUSES",
+ "infoTitle": "CLOUDTOP TEA HOUSE \u00b7 BONUSES",
  "api": "/api/slot/cloudtop-tea-house/spin",
  "engineSource": "slotforge/engines/cloudtop-tea-house.js",
  "storage": "ct",
@@ -54,7 +54,7 @@
  ],
  "defaultBet": 1,
  "maxWin": 5000,
- "anteCost": 0,
+ "anteCost": 2,
  "scatterSym": 10,
  "char": {
   "el": "char",
@@ -164,5 +164,14 @@
    "lp": 0.5
   }
  },
- "ownCounter": true
+ "ownCounter": true,
+ "fever": {
+  "name": "FS Luck",
+  "sym": 16,
+  "vol": 3,
+  "text": "Pay 2x per spin and the festival drums (FS) land far more often, so Free Spins and Super Free Spins come about 6 times as often. Stays on until you switch it off.",
+  "badge": "FS LUCK \u00d72",
+  "onMsg": "FS LUCK ON. TOTAL BET x2",
+  "offMsg": "FS LUCK OFF"
+ }
 }
