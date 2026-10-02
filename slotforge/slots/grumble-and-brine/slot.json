@@ -160,14 +160,14 @@
    "lp": 0.37
   }
  },
- "luckCost": 5,
+ "luckCost": 392,
  "luck": {
   "name": "MAX LUCK",
   "sym": 11,
   "vol": 5,
-  "text": "Pay 5x per spin for a golden shot at the jackpot. Land 3 MAX coins anywhere on the board and win 7,500x your bet. About 1 spin in 1,950.",
-  "badge": "MAX LUCK \u00d75",
-  "onMsg": "MAX LUCK ON. TOTAL BET x5",
+  "text": "Pay 392x per spin and keep it on. Every spin has a 5% chance of landing 3 golden MAX coins and winning 7,500x your bet. Leave it on for as many spins as you like.",
+  "badge": "MAX LUCK \u00d7392",
+  "onMsg": "MAX LUCK ON. TOTAL BET x392",
   "offMsg": "MAX LUCK OFF"
  }
 }
