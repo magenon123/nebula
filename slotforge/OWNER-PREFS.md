@@ -46,3 +46,6 @@ Agents: read this before every design or build decision. The lead keeps it updat
 5. **Sound has no MUSIC.** Real slots have a music loop matching the vibe. Each slot needs a themed base-game track, a bonus track, and stingers, all synthesised, with a separate Music on/off + volume.
 6. **The top-left spin/dive counter must never be covered** (fixed: the Bonus Buy sign hides during the bonus).
 - **Clarification of note 1:** the problem is not the yellow/gold colour but the generic glow/pulse animation that every winning symbol gets when symbols connect. Each symbol must instead ACT with its own hand-animated win motion (wind-up, snap, squash, overshoot, settle), connections between winners are a thematic physical element, not a glowing line.
+
+## Round 4: MAX or NOTHING buy
+Owner wants a max-win-or-nothing bonus feature: a golden MAX symbol, 3 of them = max win, about 5% chance, RTP 96%. Built for Grumble & Brine first (390x, 4.99%, 7,500x); EmberClaw (495x, 9,500x) after owner approval.

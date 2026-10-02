@@ -291,3 +291,15 @@
 #grid .cell.hit{background:transparent}
 #grid .cell.hit::before{border-color:#ffd95e;transition:border-color .15s}
 #grid .cell.wild.hit{background:transparent}
+
+/* MAX-or-nothing buy: golden plate for the MAX coin */
+#grid .cell.maxs{--tr:#ffd23a;--tg:rgba(255,210,58,.6);--p1:#5a3a0c;--p2:#24140a;--rv:#ffe9a0}
+#grid .cell.maxs::before{background:
+  radial-gradient(circle at 9px 9px,var(--rv) 0 2.2px,#1d1004 2.6px 3.4px,transparent 3.8px),
+  radial-gradient(circle at calc(100% - 9px) 9px,var(--rv) 0 2.2px,#1d1004 2.6px 3.4px,transparent 3.8px),
+  radial-gradient(circle at 9px calc(100% - 9px),var(--rv) 0 2.2px,#1d1004 2.6px 3.4px,transparent 3.8px),
+  radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),var(--rv) 0 2.2px,#1d1004 2.6px 3.4px,transparent 3.8px),
+  radial-gradient(circle at 50% 50%,rgba(255,210,58,.5),rgba(255,210,58,.1) 60%,transparent 78%),
+  linear-gradient(160deg,var(--p1),var(--p2));
+ border-style:double;border-width:5px;border-color:#ffd23a}
+#grid .cell.maxs svg.g{filter:drop-shadow(0 0 14px rgba(255,210,58,.8));animation:wob 1.6s ease-in-out infinite alternate}

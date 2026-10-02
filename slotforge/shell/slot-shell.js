@@ -302,8 +302,8 @@ async function go(buy) {
     balance = j.user.balance - j.payout;  // show the stake leaving now, the win as it lands
     $('bal').textContent = fmt(balance);
     const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b); } };
-    run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
-    if (R.bonusTriggered) {
+    run = R.maxRun && hooks.playMax ? await hooks.playMax(R, ctx) : await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);   // maxRun: a slot's all-or-nothing buy, own reveal, no bonus round
+    if (R.bonusTriggered && !R.maxRun) {
       out.bonus = true;
       await hooks.showTrigger(R); sfx.bonus(); music.duck(.12, 2.6, 1.6); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
       $('introN').textContent = R.bonus.startSpins; music.theme('bonus', 2.6); music.stinger('bonus'); await tapWait('introM', auto.left > 0 ? 1800 : 0);

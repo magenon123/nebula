@@ -2,7 +2,7 @@
  "id": "grumble-and-brine",
  "title": "Grumble & Brine: Deep Salvage",
  "logoText": "GRUMBLE & BRINE",
- "infoTitle": "GRUMBLE & BRINE · DEEP SALVAGE",
+ "infoTitle": "GRUMBLE & BRINE \u00b7 DEEP SALVAGE",
  "api": "/api/slot/grumble-and-brine/spin",
  "engineSource": "slotforge/engines/grumble-and-brine.js",
  "storage": "gb",
@@ -100,7 +100,7 @@
   "win": "SALVAGED {amt}",
   "lose": "JUST JUNK",
   "freeSpin": "DEEP DIVE: DIVE {n} OF {total}",
-  "freeSpinRetrigger": "  ·  +{r} DIVES!"
+  "freeSpinRetrigger": "  \u00b7  +{r} DIVES!"
  },
  "fsLabel": "DIVE",
  "fsCounter": "running",
@@ -109,7 +109,7 @@
   "sym": 4,
   "vol": 3,
   "text": "Bet more, dive deeper. Each spin costs 2x your bet, and the Deep Dive becomes about 3.3 times as likely.",
-  "badge": "DEEP PRESSURE ×2",
+  "badge": "DEEP PRESSURE \u00d72",
   "onMsg": "DEEP PRESSURE ON. TOTAL BET x2",
   "offMsg": "PRESSURE RELEASED"
  },
@@ -133,6 +133,16 @@
    "text": "The premium ticket. 12 dives, the Tide already at +2, a Jelly on every dive and more Jellies in the herd.",
    "confirmTitle": "SIGN THE TICKET?",
    "confirmText": "ABYSS PASS: 12 dives, Tide starts at +2, a guaranteed Jelly every dive. Only for the brave (and the broke)."
+  },
+  {
+   "key": "max",
+   "mult": 390,
+   "sym": 11,
+   "vol": 5,
+   "name": "MAX or NOTHING",
+   "text": "One reveal. Land 3 golden MAX coins and win 7,500x your bet. Anything less pays nothing. About 1 in 20.",
+   "confirmTitle": "GO ALL IN?",
+   "confirmText": "MAX OR NOTHING: 3 MAX coins pay 7,500x your bet, otherwise you win nothing. Chance: 4.99%."
   }
  ],
  "intro": {

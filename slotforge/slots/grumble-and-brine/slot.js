@@ -3,7 +3,7 @@
  * Round payload: see plans/grumble-and-brine/01-features-math.md section 11 (initialGrid, cascadeSteps[]/steps[] of {kind, grid, jellies, moves, wins, exits}). */
 SlotShell.boot(SLOT_CFG, S => {
 const { $, sfx, wait, T, say, shake, flash, embers, char, pop, fmt, sleep } = S;
-const ROWS = 3, COLS = 5, JELLY = 9, BUOY = 10;
+const ROWS = 3, COLS = 5, JELLY = 9, BUOY = 10, MAXS = 11;
 const NAMES = ['Old Boot', 'Tin Can', 'Message Bottle', 'Rusty Key', 'Brass Compass', 'Barnacle Anchor', 'Coin Purse', 'Rusty Harpoon', 'Pearl Clam'];
 const ED = S.cfg.engineData;
 let lastGrid = null, lastJ = [], tideNow = 0;
@@ -80,7 +80,7 @@ function paint(grid, jellies = []) {
   lastGrid = grid; lastJ = jellies;
   const jm = {}; jellies.forEach(j => jm[j.r * COLS + j.c] = j.v);
   grid.forEach((row, r) => row.forEach((s, c) => {
-    const d = at(r, c); FX.reset(d); d.className = 'cell' + (s === JELLY ? ' wild' : s === BUOY ? ' scatter' : '');
+    const d = at(r, c); FX.reset(d); d.className = 'cell' + (s === JELLY ? ' wild' : s === BUOY ? ' scatter' : s === MAXS ? ' maxs' : '');
     d.innerHTML = `<svg class="g"><use href="#s${s}"/></svg>` + (s === JELLY && jm[r * COLS + c] != null ? `<span class="m">x${jm[r * COLS + c]}</span>` : '');
   }));
   GRID.classList.remove('focus'); clearLinks();
@@ -278,6 +278,32 @@ async function playSpin(sp, run, ctx) {
   return run;
 }
 
+/* MAX or NOTHING: the five reels land one by one; after two golden coins the next reels hang in the air with a heartbeat */
+async function playMax(R, ctx) {
+  const sp = R.bonus.spins[0], mr = sp.maxRun, grid = sp.initialGrid, stake = ctx.stake;
+  char('spin', 900 * T()); say('MAX OR NOTHING...', true); paint(grid, []); GRID.classList.remove('focus');
+  let base = 250, got = 0, end = 0; const lands = [];
+  for (let c = 0; c < COLS; c++) {
+    const col = [[0, c], [1, c], [2, c]], mHere = col.filter(([r]) => grid[r][c] === MAXS), tense = got >= 2 && c < COLS;
+    if (tense) { base += 700; after(base - 650, () => { sfx.maxBeat(2); say(got >= 2 ? 'ONE MORE...' : '', true); shake(.3); }); }
+    const e = dropCells(col, base); end = Math.max(end, base + e);
+    if (mHere.length) { got += mHere.length; const k = got; mHere.forEach(([r]) => after(base + 360, () => { sfx.maxLand(k - 1); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 14, SHARD[3], { power: 1.1 }); flash(1.5); shake(.35 + k * .15); pop(b.left + b.width / 2, b.top, k + ' / 3'); })); lands.push([c, k]); }
+    base += 330;
+  }
+  await wait(end + 500);
+  if (mr.hit) {
+    const list = mr.cells; GRID.classList.add('focus'); const Rp = rope(list, 0, 0); presentList(list, Rp); list.forEach(([r, c]) => at(r, c).classList.add('scat'));
+    sfx.maxWin(); char('big', 3000 * T()); shake(true); flash(); embers(220); say('MAX WIN!!!', true);
+    after(Rp.end - 100, () => { const [x, y] = ctr(list); pop(x, y, '+' + fmt(R.totalPayout * stake)); ctx.onWin(0, R.totalPayout * stake); });
+    await wait(Rp.end + 900); fadeLinks(240); GRID.classList.remove('focus'); restCells();
+    return R.totalPayout * stake;
+  }
+  sfx.maxMiss(); char('wince', 1400 * T()); say(mr.count >= 2 ? 'SO CLOSE... NOT THIS TIME' : 'NOT THIS TIME', true);
+  cells.forEach(d => { if (!d.classList.contains('maxs')) d.animate([{ opacity: 1 }, { opacity: .35 }], { duration: 500 * T(), fill: 'forwards' }); });
+  await wait(1300); cells.forEach(d => { d.getAnimations().forEach(a => { if (a.fill === 'forwards') a.cancel(); }); });
+  return 0;
+}
+
 /* the Sonar Buoys that triggered the Deep Dive ping on the board before the splash: a rope is pulled through them */
 async function showTrigger(R0) {
   const list = (R0.scatter && R0.scatter.cells) || buoyCells(lastGrid);
@@ -344,6 +370,10 @@ return {
       tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .12, .001); noise(t, .02, .08, 'highpass', 6000, 0); },
       /* the rope reaches a reel: a taut twang and a knot thunk, rising along the reels */
       link: c => { const t = T0(), f = 220 * st(SC[Math.min(c * 2, 7)]); osc('triangle', f, t, .22, .09, .004, f * .97); osc('sine', 120, t, .08, .12, .002, 80); noise(t, .05, .09, 'bandpass', 900, 500, 1.2, .002); blup(t + .03, 500 + c * 90, 900, .04, .05); },
+      maxLand: k => { const t = T0(), f = 520 * st(SC[Math.min(k * 2, 7)]); bell(f, t, 1, 1.4); metal(f * 2, t + .05, .5, .07); noise(t, .12, .14, 'highpass', 5000, 9000, .7); osc('sine', 90, t, .2, .3, .005, 50); },
+      maxBeat: n => { const t = T0(); osc('sine', 62, t, .16, .34, .004, 42); osc('sine', 62, t + .2, .12, .24, .004, 42); if (n > 1) noise(t, .5, .05 * n, 'bandpass', 400, 2400, 1.2, .2); },
+      maxWin: () => { const t = T0(); [0, 4, 7, 12, 16, 19, 24, 28].forEach((n, i) => bell(262 * st(n), t + i * .09, 1, 1.8)); horn(t, 2.4, .06, 82.5); flurry(t + .3, 26, 2); osc('sine', 100, t, 1.8, .55, .01, 26); },
+      maxMiss: () => { const t = T0(); osc('triangle', 300, t, .5, .16, .01, 120); blup(t + .1, 400, 140, .1, .3); noise(t, .6, .08, 'lowpass', 600, 120, .8, .05); },
       feverOn: () => { const t = T0(); noise(t, .5, .12, 'highpass', 3000, 800, .8); osc('sine', 90, t, .5, .14, .02, 140); metal(260, t + .1, .8, .1); }
     };
     return R;
@@ -377,6 +407,7 @@ return {
   restoreBoard() { if (lastGrid) paint(lastGrid, lastJ); },
   baseSpin: R => ({ initialGrid: R.initialGrid, steps: R.cascadeSteps, scatter: R.scatter, bought: R.bought }),
   playSpin,
+  playMax,
   showTrigger,
   bonusMode(on) { $('tide').classList.toggle('on', on); setTide(0, false); }
 };

@@ -14,7 +14,7 @@ import crypto from 'crypto';
 export const id = 'grumble-and-brine';
 export const name = 'Grumble & Brine: Deep Salvage';
 
-const ROWS = 3, COLS = 5, JELLY = 9, BUOY = 10;
+const ROWS = 3, COLS = 5, JELLY = 9, BUOY = 10, MAXSYM = 11;
 export const SYMBOLS = [
   { id: 0, name: 'Old Boot' }, { id: 1, name: 'Tin Can' }, { id: 2, name: 'Message Bottle' }, { id: 3, name: 'Rusty Key' },
   { id: 4, name: 'Brass Compass' }, { id: 5, name: 'Barnacle Anchor' }, { id: 6, name: 'Coin Purse' }, { id: 7, name: 'Rusty Harpoon' },
@@ -29,7 +29,9 @@ export const CFG = {
   anteScatterP: 0.0342,
   buy: {
     dive: { cost: 100, buoys: 3, tide: 0 },
-    abyss: { cost: 500, buoys: 5, tide: 2, tideMax: 3, jellyFactor: 1.25, guaranteeEvery: 1 }
+    abyss: { cost: 500, buoys: 5, tide: 2, tideMax: 3, jellyFactor: 1.25, guaranteeEvery: 1 },
+    // MAX or nothing: one reveal, 3+ golden MAX symbols pay the cap, anything else pays 0. hitP = 0.96 * cost / maxWin (RTP 96.00% by construction)
+    max: { cost: 390, maxRun: true, hitP: 0.04992, hitCounts: [[3, 85], [4, 12], [5, 3]], missCounts: [[0, 55], [1, 35], [2, 10]] }
   },
   weights: [11, 11, 11, 11, 11, 10, 10, 9, 8],
   pay: [[0, 0.12, 0.35], [0, 0.14, 0.45], [0.04, 0.14, 0.41], [0.05, 0.17, 0.55], [0.07, 0.21, 0.70], [0.10, 0.35, 1.10], [0.17, 0.55, 1.70], [0.27, 1.00, 3.40], [0.55, 2.05, 8.20]],
@@ -66,7 +68,7 @@ export const info = () => ({
   scatterPay: CFG.scatterPay, payScale: CFG.payScale, maxWin: CFG.maxWin,
   dives: CFG.bonus.dives, retrigger: CFG.bonus.retrigger, maxDives: CFG.bonus.maxDives, tideMax: CFG.bonus.tideMax, jellyMax: CFG.jellyMax,
   anteCost: CFG.anteCost, anteTriggerMultiple: null,
-  buy: Object.fromEntries(Object.entries(CFG.buy).map(([k, b]) => [k, { cost: b.cost, buoys: b.buoys, startDives: CFG.bonus.dives[b.buoys], tide: b.tide }]))
+  buy: Object.fromEntries(Object.entries(CFG.buy).map(([k, b]) => [k, b.maxRun ? { cost: b.cost, maxRun: true, hitP: b.hitP } : { cost: b.cost, buoys: b.buoys, startDives: CFG.bonus.dives[b.buoys], tide: b.tide }]))
 });
 
 /* ---------- helpers ---------- */
@@ -185,10 +187,31 @@ function playBonus(rng, startDives, ov, room) {
   return { spins, total, capped, startTide: ov.tide || 0, tideMax };
 }
 
+const pickW = (rng, tab) => { const t = tab.reduce((a, x) => a + x[1], 0); let u = rng() * t; for (const [v, w] of tab) { if ((u -= w) < 0) return v; } return tab[tab.length - 1][0]; };
+
+/* MAX or nothing. The only outcome decision is `rng() < hitP`; the MAX count shown on a miss (0-2) is cosmetic and pays nothing. */
+function playMaxRun(rng, buy, bc) {
+  const hit = rng() < bc.hitP, count = pickW(rng, hit ? bc.hitCounts : bc.missCounts), w = CFG.weights, wt = w.reduce((a, b) => a + b, 0);
+  let grid, maxCells;
+  for (let tries = 0; tries < 1000; tries++) {
+    grid = emptyGrid(); maxCells = [];
+    const all = []; for (let i = 0; i < ROWS * COLS; i++) all.push(i);
+    for (let k = 0; k < count; k++) { const j = k + Math.floor(rng() * (all.length - k)); const t = all[k]; all[k] = all[j]; all[j] = t; }
+    const isM = new Set(all.slice(0, count));
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) grid[r][c] = isM.has(r * COLS + c) ? MAXSYM : drawSym(rng, w, wt);
+    if (evaluate(grid, []).payout === 0) break;
+  }
+  for (let c = 0; c < COLS; c++) for (let r = 0; r < ROWS; r++) if (grid[r][c] === MAXSYM) maxCells.push([r, c]);
+  const pay = hit ? CFG.maxWin : 0, spin = { spinIndex: 1, spinsLeft: 0, totalPayout: pay, initialGrid: grid, steps: [], maxRun: { hit, count, cells: maxCells } };
+  return { v: 1, cost: bc.cost, ante: false, bought: buy, initialGrid: emptyGrid(), cascadeSteps: [], scatter: { count: 0, cells: [], payout: 0 }, basePayout: 0, maxRun: spin.maxRun,
+    bonusTriggered: true, bonus: { startSpins: 1, startTide: 0, tideMax: 0, totalPayout: pay, spins: [spin] }, totalPayout: pay, capped: hit };
+}
+
 export function playRound(rng, { ante = false, buy = null } = {}) {
   const maxWin = CFG.maxWin, B = CFG.bonus;
   if (buy) {
     const bc = CFG.buy[buy]; if (!bc) throw new Error('unknown buy ' + buy);
+    if (bc.maxRun) return playMaxRun(rng, buy, bc);
     // trigger spin: `buoys` Buoys on random cells, no Jelly, zero ways wins (rejection sampling), pays nothing
     const w = CFG.weights, wt = w.reduce((a, b) => a + b, 0);
     let grid, cells;
