@@ -33,7 +33,7 @@ Numbers are a first sketch; final values come from `tools/solve.js` + `tools/sim
 - **Trigger:** **>= 6 Tins** anywhere on the opening grid starts Tin Rush. The number of tins on the grid is the start of the hold board.
 - **No bet-up mode, no buy-rate changes** in the base game: one RNG path, easy to verify.
 
-### 4. Bonus: LANTERN LIFT (hold & win / link-and-lock)
+### 4. Bonus: TIN RUSH (hold & win / link-and-lock)
 
 State: 20 cells, each empty or holding a **Tin** (value or special), `respins` counter (starts 3).
 
