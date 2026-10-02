@@ -69,6 +69,7 @@ def assemble(slug, standalone):
     if standalone:
         scripts += ("/* ---- STANDALONE MODE: the server engine is embedded and runs locally with play money. ---- */\nconst SLOT_ENGINE = "
                     + bundle_engine(engine_path) + ";\n")
+    scripts += '/* ---- shell music engine ---- */\n' + read(SF, 'shell', 'slot-music.js') + '\n'
     scripts += '/* ---- shell ---- */\n' + re.sub(r"^'use strict';\n", '', read(SF, 'shell', 'slot-shell.js'), count=1)
     scripts += '\n/* ---- slot: %s ---- */\n' % slug + read(sd, 'slot.js')
     title = cfg['title'] + (' (offline demo)' if standalone else '')

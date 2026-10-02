@@ -88,9 +88,10 @@ button:disabled{cursor:not-allowed}
 #fsBox::before{content:"FS";position:absolute;left:8px;top:5px;width:38px;height:38px;border-radius:50%;background:var(--gold);color:var(--ink);display:grid;place-items:center;font-size:18px;border:3px solid #7a4a00}
 #fsBox small{display:block;font-family:var(--ui);font-size:11px;font-weight:900;letter-spacing:2px;color:#b8a89a;margin-bottom:-2px}
 @keyframes pillin{from{transform:translateY(-12px);opacity:0}}
-#menu{left:154px;top:560px;width:230px;padding:10px;background:linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px var(--rim),0 8px 0 rgba(0,0,0,.4);z-index:20;filter:url(#roughU)}
+#menu{left:154px;top:478px;width:230px;padding:10px;background:linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px var(--rim),0 8px 0 rgba(0,0,0,.4);z-index:20;filter:url(#roughU)}
 #menu button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:11px 12px;border-radius:9px;font-size:17px;font-weight:700}
 #menu button:hover{background:var(--hover)}
+#menu .vrow{padding:0 12px 8px}#menu input[type=range]{width:100%;height:18px;accent-color:var(--accent);cursor:pointer}
 #menu i{font-style:normal;font-size:13px;font-weight:900;letter-spacing:1px;padding:2px 9px;border-radius:99px;background:#3a2a24;color:#b8a89a}
 #menu button.on i{background:var(--accent);color:#fff}
 
@@ -218,17 +219,43 @@ button:disabled{cursor:not-allowed}
 #grid{position:relative;display:grid;grid-template-columns:repeat(6,110px);grid-template-rows:repeat(5,110px);width:660px;height:550px;overflow:hidden;background:#1b100c}
 #grid.focus .cell:not(.hit):not(.shatter){opacity:.35;filter:saturate(.4) brightness(.75);transition:.25s}
 #fxl{left:0;top:0;width:660px;height:550px;pointer-events:none;z-index:6;overflow:visible}
-.cell{position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,196,130,.13);background:#27160f}
-.cell:nth-child(2n){background:#2b1a12}
-.cell svg.g{position:absolute;left:6%;top:6%;width:88%;height:88%;overflow:visible;filter:drop-shadow(0 4px 0 rgba(0,0,0,.55))}
-.cell.wild{background:radial-gradient(circle,#7a2a0a,#2b140c 75%)}
+/* ---- symbol presentation: forged basalt plate, tier rim, contact shadow ---- */
+.cell{position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;background:#1b100c;border:0;
+ --plate-a:#3b2b27;--plate-b:#1f1411;--rim:#5a463f;--rim-w:2px;--glow:rgba(0,0,0,0);--edge:rgba(255,110,30,.3)}
+.cell::before{content:"";position:absolute;left:5px;top:5px;right:5px;bottom:5px;border-radius:13px;z-index:0;
+ background:
+  radial-gradient(circle at 9px 9px,rgba(255,255,255,.16) 0 1.6px,transparent 2.2px),radial-gradient(circle at calc(100% - 9px) 9px,rgba(255,255,255,.16) 0 1.6px,transparent 2.2px),
+  radial-gradient(circle at 9px calc(100% - 9px),rgba(255,255,255,.16) 0 1.6px,transparent 2.2px),radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),rgba(255,255,255,.16) 0 1.6px,transparent 2.2px),
+  linear-gradient(180deg,rgba(255,255,255,.07),transparent 28%),
+  linear-gradient(150deg,var(--plate-a),var(--plate-b));
+ box-shadow:0 0 0 var(--rim-w) var(--rim),0 0 0 calc(var(--rim-w) + 2px) #120a07,inset 0 4px 7px rgba(0,0,0,.65),inset 0 -3px 0 -1px var(--edge),inset 0 0 18px var(--glow),0 0 12px var(--glow)}
+.cell:nth-child(2n)::before{--plate-a:#40302b}
+.cell::after{content:"";position:absolute;left:21%;right:21%;bottom:11px;height:11px;border-radius:50%;z-index:0;background:radial-gradient(ellipse,rgba(0,0,0,.62),rgba(0,0,0,0) 70%)}
+.cell.reforged::after{left:auto;right:auto;bottom:auto;height:auto;background:none}
+.cell.t-mid{--plate-a:#4a2f22;--plate-b:#25140e;--rim:#c4702f;--rim-w:2px;--glow:rgba(214,120,48,.22);--edge:rgba(255,150,60,.5)}
+.cell.t-high{--plate-a:#5a4318;--plate-b:#2a1b0a;--rim:#ffd04a;--rim-w:3px;--glow:rgba(255,196,60,.34);--edge:rgba(255,210,90,.7)}
+.cell.t-high::before{background:
+  radial-gradient(circle at 10px 10px,#ffe9a0 0 2px,transparent 2.6px),radial-gradient(circle at calc(100% - 10px) 10px,#ffe9a0 0 2px,transparent 2.6px),
+  radial-gradient(circle at 10px calc(100% - 10px),#ffe9a0 0 2px,transparent 2.6px),radial-gradient(circle at calc(100% - 10px) calc(100% - 10px),#ffe9a0 0 2px,transparent 2.6px),
+  radial-gradient(ellipse at 50% 108%,rgba(255,150,40,.45),transparent 62%),linear-gradient(180deg,rgba(255,240,170,.14),transparent 30%),linear-gradient(150deg,var(--plate-a),var(--plate-b))}
+.cell.t-mid::before{background:
+  radial-gradient(circle at 9px 9px,#f0a064 0 1.8px,transparent 2.4px),radial-gradient(circle at calc(100% - 9px) 9px,#f0a064 0 1.8px,transparent 2.4px),
+  radial-gradient(circle at 9px calc(100% - 9px),#f0a064 0 1.8px,transparent 2.4px),radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),#f0a064 0 1.8px,transparent 2.4px),
+  radial-gradient(ellipse at 50% 108%,rgba(255,110,30,.28),transparent 62%),linear-gradient(180deg,rgba(255,255,255,.08),transparent 28%),linear-gradient(150deg,var(--plate-a),var(--plate-b))}
+.cell svg.g{position:absolute;left:8%;top:5%;width:84%;height:84%;overflow:visible;z-index:1;filter:drop-shadow(0 3px 0 rgba(0,0,0,.5))}
+#grid.focus .cell:not(.hit):not(.shatter){opacity:.35;filter:saturate(.4) brightness(.75);transition:.25s}
+.cell.wild{--plate-a:#a8390e;--plate-b:#3a140a;--rim:#ffb02e;--rim-w:3px;--glow:rgba(255,120,30,.55);--edge:rgba(255,220,100,.8)}
+.cell.wild::before{background:radial-gradient(circle at 50% 46%,#ff9a2a,#c4400f 38%,#4a170b 78%);animation:plateGlow 1.4s ease-in-out infinite alternate}
 .cell.wild svg.g{animation:wob 1.5s ease-in-out infinite alternate}
-.cell.scatter{background:radial-gradient(circle,#6a1840,#2b140c 75%)}
+.cell.scatter{--plate-a:#8e2a63;--plate-b:#2c0e26;--rim:#ff6ea0;--rim-w:3px;--glow:rgba(255,80,150,.55);--edge:rgba(255,150,200,.8)}
+.cell.scatter::before{background:radial-gradient(circle at 50% 46%,#ff7aa8,#a8245a 40%,#35102e 80%);animation:plateGlow 1.8s ease-in-out infinite alternate}
 .cell.scatter svg.g{animation:wob 1.9s ease-in-out infinite alternate}
+@keyframes plateGlow{to{filter:brightness(1.22);box-shadow:0 0 0 var(--rim-w) var(--rim),0 0 0 calc(var(--rim-w) + 2px) #120a07,inset 0 4px 7px rgba(0,0,0,.4),inset 0 0 26px var(--glow),0 0 20px var(--glow)}}
 .cell .m{position:absolute;right:4px;bottom:4px;min-width:34px;text-align:center;padding:1px 6px;border-radius:99px;border:3px solid var(--ink);font-family:var(--toon);font-size:19px;color:var(--ink);background:var(--gold);z-index:3}
 .cell.scat svg.g{animation:scatp .55s ease-in-out infinite alternate;filter:drop-shadow(0 0 14px #ff4a8a)}
 @keyframes scatp{to{transform:scale(1.22) rotate(6deg)}}
-.cell.hit{z-index:2;background:radial-gradient(circle,#8a5410,#2b140c 80%)}
+.cell.hit{z-index:2}
+.cell.hit::before{--plate-a:#9a6212;--plate-b:#3a200a;--rim:#fff0a0;--glow:rgba(255,220,100,.7);filter:brightness(1.15)}
 .cell.hit svg.g{animation:hitg .5s ease-in-out infinite alternate}
 @keyframes hitg{to{transform:scale(1.13)}}
 .cell.shatter{animation:shatter calc(.34s*var(--spd)) forwards}
@@ -323,77 +350,323 @@ button:disabled{cursor:not-allowed}
  <pattern id="hatchL" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><line x1="0" y1="0" x2="0" y2="12" stroke="#1d0f09" stroke-width="3" opacity=".4"/></pattern>
  <pattern id="dots" width="15" height="15" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.7" fill="#1d0f09" opacity=".2"/></pattern>
 
- <symbol id="s0" viewBox="0 0 64 64"><g><!-- iron shard -->
-  <path d="M7 45 L15 27 L27 39 L22 57 L8 55Z" fill="#7c889e" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
-  <path d="M15 27 L22 38 L11 47Z" fill="#a5b1c6"/>
-  <path d="M23 54 L19 30 L32 7 L47 26 L53 54Z" fill="#9aa7bd" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M32 7 L47 26 L53 54 L41 54 L36 31Z" fill="#6a7790"/>
-  <path d="M32 7 L19 30 L28 34 L35 14Z" fill="#dbe3f0"/>
-  <path d="M29 33 L35 43 L30 54" stroke="#1d0f09" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M47 13 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2z" fill="#fff" stroke="#1d0f09" stroke-width="1.5" stroke-linejoin="round"/></g></symbol>
- <symbol id="s1" viewBox="0 0 64 64"><g><!-- copper ingot -->
-  <path d="M12 24 L52 25 L59 40 L5 41Z" fill="#f2a95e" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M5 41 L59 40 L58 54 Q58 57 55 57 L9 57 Q6 57 6 54Z" fill="#c4682b" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M7 50 L58 49 L58 54 Q58 57 55 57 L9 57 Q6 57 6 54Z" fill="#9c4a1c"/>
-  <path d="M13 30 L47 31" stroke="#ffe0b4" stroke-width="3" stroke-linecap="round"/>
-  <path d="M32 29 Q38 34 32 40 Q27 34 32 29Z" fill="#8a3c12" stroke="#1d0f09" stroke-width="2"/>
-  <path d="M10 46 L18 46" stroke="#e58a46" stroke-width="3" stroke-linecap="round"/></g></symbol>
- <symbol id="s2" viewBox="0 0 64 64"><g><!-- silver chain -->
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-   <rect x="5" y="19" width="31" height="22" rx="11" stroke="#1d0f09" stroke-width="13" transform="rotate(-26 20 30)"/>
-   <rect x="28" y="24" width="31" height="22" rx="11" stroke="#1d0f09" stroke-width="13" transform="rotate(-26 43 35)"/>
-   <rect x="5" y="19" width="31" height="22" rx="11" stroke="#c7d0dd" stroke-width="6.5" transform="rotate(-26 20 30)"/>
-   <rect x="28" y="24" width="31" height="22" rx="11" stroke="#aab5c6" stroke-width="6.5" transform="rotate(-26 43 35)"/>
-   <path d="M12 20 Q16 14 24 15" stroke="#fff" stroke-width="2.6" transform="rotate(-26 20 30)"/>
-   <path d="M30 31 L40 24" stroke="#1d0f09" stroke-width="13"/><path d="M30 31 L40 24" stroke="#c7d0dd" stroke-width="6.5"/></g></g></symbol>
- <symbol id="s3" viewBox="0 0 64 64"><g><!-- molten hammer -->
-  <g transform="rotate(36 32 32)">
-   <rect x="28" y="17" width="8" height="43" rx="3" fill="#b9733a" stroke="#1d0f09" stroke-width="3.5"/>
-   <path d="M33 22 V58" stroke="#8a4f22" stroke-width="2.5"/>
-   <rect x="9" y="5" width="46" height="21" rx="4" fill="#737d8f" stroke="#1d0f09" stroke-width="4"/>
-   <path d="M11 8 H53 V13 H11Z" fill="#a7b1c3"/>
-   <path d="M11 20 H53 V24 Q53 25 52 25 H12 Q11 25 11 24Z" fill="#ff8a1a"/>
-   <path d="M18 25 V31 Q18 34 21 31 V25 M40 25 V30 Q40 33 43 30 V25" fill="#ff8a1a" stroke="#1d0f09" stroke-width="2"/></g></g></symbol>
- <symbol id="s4" viewBox="0 0 64 64"><g><!-- rune tongs -->
-  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-   <path d="M20 60 L33 33 L21 8" stroke="#1d0f09" stroke-width="12"/><path d="M44 60 L31 33 L43 8" stroke="#1d0f09" stroke-width="12"/>
-   <path d="M20 60 L33 33 L21 8" stroke="#aeb8c8" stroke-width="6"/><path d="M44 60 L31 33 L43 8" stroke="#8d98ab" stroke-width="6"/>
-   <path d="M22 54 L28 41 M42 54 L36 41" stroke="#e6ecf5" stroke-width="2"/></g>
-  <circle cx="32" cy="33" r="6" fill="#ffc83a" stroke="#1d0f09" stroke-width="3.5"/>
-  <circle cx="21" cy="9" r="5" fill="#ff7a1a" stroke="#1d0f09" stroke-width="3"/><circle cx="43" cy="9" r="5" fill="#ff5a14" stroke="#1d0f09" stroke-width="3"/>
-  <path d="M25 47 l3 -3 M39 47 l-3 -3 M24 53 h4 M40 53 h-4" stroke="#ff8a1a" stroke-width="2.4" stroke-linecap="round"/></g></symbol>
- <symbol id="s5" viewBox="0 0 64 64"><g><!-- dragonbone blade -->
-  <path d="M32 3 L40 13 L37 19 L41 29 L37 35 L38 45 L32 51 L26 45 L27 35 L23 29 L27 19 L24 13Z" fill="#f6edd6" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
-  <path d="M32 3 L40 13 L37 19 L41 29 L37 35 L38 45 L32 51Z" fill="#d6c6a2"/>
-  <path d="M32 9 V43" stroke="#1d0f09" stroke-width="2.4" stroke-linecap="round"/>
-  <path d="M8 49 L22 44 L32 48 L42 44 L56 49 L48 55 L32 51 L16 55Z" fill="#ffc83a" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
-  <rect x="29" y="51" width="6" height="9" rx="2" fill="#7a3d1c" stroke="#1d0f09" stroke-width="3"/>
-  <circle cx="32" cy="61" r="3" fill="#e0281c" stroke="#1d0f09" stroke-width="2.5"/>
-  <circle cx="32" cy="48.5" r="3" fill="#e0281c" stroke="#1d0f09" stroke-width="2.2"/></g></symbol>
- <symbol id="s6" viewBox="0 0 64 64"><g><!-- crown of cinders -->
-  <path d="M7 50 L5 19 L20 32 L32 11 L44 32 L59 19 L57 50Z" fill="#ffcf3d" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M32 11 L44 32 L59 19 L57 50 L40 50 L38 30Z" fill="#e8a516"/>
-  <path d="M8 50 H56 V58 Q56 60 54 60 H10 Q8 60 8 58Z" fill="#f0b02a" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M12 26 L18 38 M30 22 L28 36" stroke="#fff3b0" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="5" cy="17" r="4.5" fill="#ff6a14" stroke="#1d0f09" stroke-width="3"/><circle cx="32" cy="9" r="4.5" fill="#ff6a14" stroke="#1d0f09" stroke-width="3"/><circle cx="59" cy="17" r="4.5" fill="#ff6a14" stroke="#1d0f09" stroke-width="3"/>
-  <circle cx="32" cy="54" r="4" fill="#e0281c" stroke="#1d0f09" stroke-width="2.6"/><circle cx="19" cy="54" r="3" fill="#ff8a1a" stroke="#1d0f09" stroke-width="2.2"/><circle cx="45" cy="54" r="3" fill="#ff8a1a" stroke="#1d0f09" stroke-width="2.2"/></g></symbol>
- <symbol id="s7" viewBox="0 0 64 64"><g><!-- ember core sigil (wild) -->
-  <circle cx="32" cy="31" r="27" fill="#3a1d14" stroke="#1d0f09" stroke-width="4"/>
-  <circle cx="32" cy="31" r="22" fill="none" stroke="#ff9a2a" stroke-width="3" stroke-dasharray="5 4"/>
-  <path d="M32 7 C36 19 46 22 44 34 C43 43 38 48 32 48 C26 48 21 43 20 34 C18 24 28 20 32 7Z" fill="#ff5a14" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
-  <path d="M32 24 C35 31 39 33 38 38 C37 43 35 45 32 45 C29 45 27 43 26 38 C25 33 30 30 32 24Z" fill="#ffd23a"/>
-  <path d="M27 34 L31 36 M37 34 L33 36" stroke="#1d0f09" stroke-width="2.6" stroke-linecap="round"/>
-  <path d="M6 47 L58 47 L55 58 L9 58Z" fill="#ffc83a" stroke="#1d0f09" stroke-width="3.5" stroke-linejoin="round"/>
-  <text x="32" y="56" text-anchor="middle" font-size="11" fill="#1d0f09" font-family="Luckiest Guy,Impact,Arial Black">WILD</text></g></symbol>
- <symbol id="s8" viewBox="0 0 64 64"><g><!-- forgefire gem (scatter) -->
-  <path d="M18 9 H46 L60 25 L32 57 L4 25Z" fill="#ff4d7a" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M4 25 H60 L32 57Z" fill="#e02a62"/>
-  <path d="M18 9 L25 25 L4 25Z" fill="#ff8aa8"/><path d="M46 9 L60 25 L39 25Z" fill="#c4204f"/><path d="M18 9 H46 L39 25 H25Z" fill="#ff6e92"/>
-  <path d="M25 25 L32 57 L39 25 M18 9 L25 25 M46 9 L39 25" stroke="#1d0f09" stroke-width="2.4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-  <path d="M22 14 L28 14" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
-  <path d="M54 6 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#fff" stroke="#1d0f09" stroke-width="1.6" stroke-linejoin="round"/>
-  <rect x="21" y="42" width="22" height="16" rx="4" fill="#ffc83a" stroke="#1d0f09" stroke-width="3"/>
-  <text x="32" y="55" text-anchor="middle" font-size="13" fill="#1d0f09" font-family="Luckiest Guy,Impact,Arial Black">FS</text></g></symbol>
+ <symbol id="s0" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><!-- iron shard: slate-teal ore crystals on rock -->
+  <!-- left small crystal -->
+  <path d="M9 27 L15 33 L16 49 L5 49 L5 36Z" fill="#4f7a8c" stroke="#1d0f09" stroke-width="2.8"/>
+  <path d="M9 27 L5 36 L5 49 L9 49 L10 34Z" fill="#8ec3cf"/>
+  <path d="M9 27 L15 33 L16 49 L12 49 L12 34Z" fill="#2f5262"/>
+  <!-- right small crystal -->
+  <path d="M51 19 L57 31 L58 49 L45 49 L44 31Z" fill="#4f7a8c" stroke="#1d0f09" stroke-width="2.8"/>
+  <path d="M51 19 L44 31 L45 49 L50 49 L50 32Z" fill="#8ec3cf"/>
+  <path d="M51 19 L57 31 L58 49 L53 49 L52 33Z" fill="#2f5262"/>
+  <path d="M53 49 L58 49 L57 31" fill="none" stroke="#ff9a3a" stroke-width="1.2"/>
+  <!-- main crystal -->
+  <path d="M30 4 L40 13 L42 49 L20 51 L17 14Z" fill="#6aa0b3" stroke="#1d0f09" stroke-width="3.4"/>
+  <path d="M30 4 L17 14 L20 51 L28 52 L29 22Z" fill="#9fd3de"/>
+  <path d="M30 4 L40 13 L42 49 L33 51 L29 22Z" fill="#3b6577"/>
+  <path d="M30 4 L22 11 L29 22 L35 10Z" fill="#eaffff"/>
+  <path d="M29 22 L28 52 M29 22 L17 14 M29 22 L40 13" fill="none" stroke="#1d0f09" stroke-width="1.6"/>
+  <path d="M42 49 L40 13" fill="none" stroke="#ff9a3a" stroke-width=".9" opacity=".85"/>
+  <!-- rust ore veins -->
+  <path d="M33 20 L36 28 L32 34 L37 44" fill="none" stroke="#1d0f09" stroke-width="3.6"/>
+  <path d="M33 20 L36 28 L32 34 L37 44" fill="none" stroke="#e8701c" stroke-width="1.9"/>
+  <path d="M33.5 21 L35.5 27" fill="none" stroke="#ffd36a" stroke-width=".9"/>
+  <path d="M22 34 L25 38 M21 25 L23 28" stroke="#d9f6fa" stroke-width="1.3" fill="none"/>
+  <!-- rock base -->
+  <path d="M2 57 L5 49 L16 47 L24 51 L38 49 L48 47 L59 49 L62 57 Q62 60 58 60 L6 60 Q2 60 2 57Z" fill="#6a5a5c" stroke="#1d0f09" stroke-width="3.2"/>
+  <path d="M5 49 L16 47 L24 51 L22 55 L4 56Z" fill="#9a8a88"/>
+  <path d="M38 49 L48 47 L59 49 L62 57 Q62 60 58 60 L44 60 L46 54Z" fill="#473a3e"/>
+  <path d="M10 53 L14 56 M30 55 L34 57 M50 53 L54 56" stroke="#1d0f09" stroke-width="1.4" fill="none"/>
+  <path d="M26 56 L30 53" stroke="#e8701c" stroke-width="1.8" fill="none"/>
+  <path d="M10 56 l1 -3 M42 57 l1 -2" stroke="#e8701c" stroke-width="1.6" fill="none"/>
+  <path d="M52 5 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z" fill="#fff" stroke="#1d0f09" stroke-width="1.2"/>
+ </g></symbol>
+ <symbol id="s1" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><!-- copper ingots: stack with stamp and patina -->
+  <!-- lower ingot -->
+  <path d="M10 37 L54 37 L61 47 L3 47Z" fill="#ffc780" stroke="#1d0f09" stroke-width="3.2"/>
+  <path d="M3 47 L61 47 L59 58 Q59 60 56 60 L8 60 Q5 60 5 58Z" fill="#e07a35" stroke="#1d0f09" stroke-width="3.2"/>
+  <path d="M40 47 L61 47 L59 58 Q59 60 56 60 L40 60Z" fill="#a8481c"/>
+  <path d="M7 55 L59 55" stroke="#ff9a3a" stroke-width="1.1" opacity=".0"/>
+  <path d="M6 58 Q6 59.5 8 59.5 L56 59.5" fill="none" stroke="#ffb040" stroke-width="1.3"/>
+  <path d="M13 41 L36 41 M20 44 L28 44" stroke="#fff0cf" stroke-width="2" fill="none"/>
+  <!-- stamp: ring with flame -->
+  <circle cx="22" cy="53" r="5.2" fill="#c0612a" stroke="#1d0f09" stroke-width="1.8"/>
+  <path d="M22 49.5 Q25 53 22.6 56 Q19 54 20.6 51.5 Q21.4 52.6 22 49.5Z" fill="#7e3410"/>
+  <path d="M30 51 h7 M30 54.5 h5" stroke="#7e3410" stroke-width="1.8"/>
+  <!-- patina drips -->
+  <path d="M46 47 Q47 52 45 55 Q48 56 50 52 Q51 56 54 55 Q55 50 53 47Z" fill="#46b79b" stroke="#1d0f09" stroke-width="1.3"/>
+  <path d="M47 48 Q47.5 51 46.5 53" stroke="#a6f0d8" stroke-width="1" fill="none"/>
+  <path d="M5 50 Q8 51 8 55 Q5 55 5 50Z" fill="#46b79b"/>
+  <!-- upper ingot -->
+  <path d="M17 18 L47 18 L53 27 L11 27Z" fill="#ffd596" stroke="#1d0f09" stroke-width="3"/>
+  <path d="M11 27 L53 27 L51 39 L13 39Z" fill="#ee8a3c" stroke="#1d0f09" stroke-width="3"/>
+  <path d="M36 27 L53 27 L51 39 L36 39Z" fill="#b5501f"/>
+  <path d="M19 22 L34 22" stroke="#fffaf0" stroke-width="1.8" fill="none"/>
+  <path d="M50 28 L51 38" stroke="#ff9a3a" stroke-width="1" fill="none"/>
+  <!-- upper stamp: embossed bar and dents -->
+  <rect x="18" y="30" width="12" height="5.5" rx="1.5" fill="#cf6a2a" stroke="#7e3410" stroke-width="1.3"/>
+  <path d="M20.5 33 h7" stroke="#ffc780" stroke-width="1.2"/>
+  <path d="M40 31 l2 2 M45 30.5 l1.6 1.6 M43 35.5 l2 1.6" stroke="#7e3410" stroke-width="1.3" fill="none"/>
+  <path d="M33 37 l3 -2" stroke="#46b79b" stroke-width="2"/>
+  <path d="M55 9 l1.5 3.8 3.8 1.5 -3.8 1.5 -1.5 3.8 -1.5 -3.8 -3.8 -1.5 3.8 -1.5z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
+ </g></symbol>
+ <symbol id="s2" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round" fill="none"><g transform="translate(32 33) scale(.88) translate(-32 -32)"><!-- silver chain -->
+  <!-- edge-on middle link (behind) -->
+  <g transform="rotate(45 32 32)">
+   <rect x="16" y="27.5" width="32" height="9" rx="4.5" stroke="#1d0f09" stroke-width="10"/>
+   <rect x="16" y="27.5" width="32" height="9" rx="4.5" stroke="#6f7ea3" stroke-width="5.6"/>
+   <rect x="16" y="27.5" width="32" height="9" rx="4.5" stroke="#c9d4e6" stroke-width="3.4" transform="translate(-.7 -.9)"/>
+   <path d="M22 28.4 H36" stroke="#fff" stroke-width="1.3"/>
+  </g>
+  <!-- face-on top-left link -->
+  <g transform="rotate(45 17 17)">
+   <rect x="4" y="8" width="26" height="18" rx="9" stroke="#1d0f09" stroke-width="10.5"/>
+   <rect x="4" y="8" width="26" height="18" rx="9" stroke="#6f7ea3" stroke-width="6.4"/>
+   <rect x="4" y="8" width="26" height="18" rx="9" stroke="#e4ecf8" stroke-width="4.4" transform="translate(-.9 -.9)"/>
+   <path d="M9 12.5 Q14 9.2 22 9.4" stroke="#fff" stroke-width="1.5"/>
+   <path d="M25 22 Q29 19 29 15" stroke="#ff9a3a" stroke-width="1" opacity=".85"/>
+   <path d="M15 24 l3 -1.6 M10 17 l1 -2.4" stroke="#7a89ac" stroke-width="1"/>
+  </g>
+  <!-- face-on bottom-right link -->
+  <g transform="rotate(45 47 47)">
+   <rect x="34" y="38" width="26" height="18" rx="9" stroke="#1d0f09" stroke-width="10.5"/>
+   <rect x="34" y="38" width="26" height="18" rx="9" stroke="#6f7ea3" stroke-width="6.4"/>
+   <rect x="34" y="38" width="26" height="18" rx="9" stroke="#e4ecf8" stroke-width="4.4" transform="translate(-.9 -.9)"/>
+   <path d="M39 42.5 Q44 39.2 52 39.4" stroke="#fff" stroke-width="1.5"/>
+   <path d="M55 52 Q59 49 59 45" stroke="#ff9a3a" stroke-width="1.2" opacity=".9"/>
+   <path d="M45 54 l3 -1.6 M40 47 l1 -2.4" stroke="#7a89ac" stroke-width="1"/>
+   <circle cx="60" cy="47" r="1.5" fill="#ffb040" stroke="none"/>
+  </g>
+  </g>
+
+    <path d="M55 8 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z" fill="#fff" stroke="#1d0f09" stroke-width="1.2"/>
+ </g></symbol>
+ <symbol id="s3" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><!-- molten hammer -->
+  <g transform="translate(30 37) rotate(34) scale(.82) translate(-32 -34)">
+   <!-- handle -->
+   <path d="M27 22 H37 V55 Q37 58 32 58 Q27 58 27 55Z" fill="#b9733a" stroke="#1d0f09" stroke-width="3.2"/>
+   <path d="M27 24 H31 V56 Q27 56 27 54Z" fill="#e2a066"/>
+   <path d="M34 24 H37 V55 Q37 57 34 57Z" fill="#7a4119"/>
+   <path d="M30.6 28 V36 M33 44 V52" stroke="#8a4f22" stroke-width="1" fill="none"/>
+   <!-- leather wrap -->
+   <path d="M27 38 L37 34 V39 L27 43Z M27 46 L37 42 V47 L27 51Z" fill="#5a3320" stroke="#1d0f09" stroke-width="1.8"/>
+   <path d="M28 39 L35 36.5 M28 47 L35 44.5" stroke="#9a6038" stroke-width="1" fill="none"/>
+   <!-- pommel -->
+   <path d="M25.5 56 H38.5 V60 Q38.5 63 32 63 Q25.5 63 25.5 60Z" fill="#6c768a" stroke="#1d0f09" stroke-width="3"/>
+   <path d="M27 57.5 H32 V59.5 H27Z" fill="#b6c0d2"/>
+   <circle cx="32" cy="60.6" r="1.6" fill="#ff8a1a"/>
+   <!-- head body -->
+   <path d="M11 6 H53 Q55 6 55 8 V24 Q55 26 53 26 H11 Q9 26 9 24 V8 Q9 6 11 6Z" fill="#7b8699" stroke="#1d0f09" stroke-width="3.4"/>
+   <path d="M12 8 H52 V12.5 H12Z" fill="#c3cddd"/>
+   <path d="M12 21 H52 V24 H12Z" fill="#4a5368"/>
+   <path d="M30 12.5 H52 V21 H30Z" fill="#636e84"/>
+   <!-- left peen cap, rivets -->
+   <path d="M5 8 Q5 6 7 6 H13 V26 H7 Q5 26 5 24Z" fill="#5a6378" stroke="#1d0f09" stroke-width="3"/>
+   <path d="M7 9 H10 V12 H7Z" fill="#9aa5b9"/>
+   <circle cx="9.4" cy="16" r="1.6" fill="#b6c0d2" stroke="#1d0f09" stroke-width="1"/>
+   <circle cx="9.4" cy="22" r="1.6" fill="#b6c0d2" stroke="#1d0f09" stroke-width="1"/>
+   <!-- molten face (right) -->
+   <path d="M49 6 H57 Q60 6 60 9 V23 Q60 26 57 26 H49Z" fill="#ff7a14" stroke="#1d0f09" stroke-width="3"/>
+   <path d="M50 8 H57 Q58 8 58 10 V13 H50Z" fill="#ffd23a"/>
+   <path d="M50 20 H58 V23 Q58 24 56 24 H50Z" fill="#d8350a"/>
+   <!-- drips (counter-rotated to hang down) --><g transform="rotate(-34 54 26)">
+   <path d="M52 26 Q52 34 54 35 Q57 34 56 26Z" fill="#ff8a1a" stroke="#1d0f09" stroke-width="2"/>
+   <path d="M53.4 27.5 V31" stroke="#ffd23a" stroke-width="1.2" fill="none"/>
+   <path d="M44 26 Q44 31 45.6 31.6 Q47.4 31 47 26Z" fill="#ff7a14" stroke="#1d0f09" stroke-width="1.8" transform="rotate(34 46 28)"/></g>
+   <!-- glowing cracks and dents -->
+   <path d="M33 14 L36 17 L34 20 L38 22" stroke="#1d0f09" stroke-width="3.2" fill="none"/>
+   <path d="M33 14 L36 17 L34 20 L38 22" stroke="#ff8a1a" stroke-width="1.5" fill="none"/>
+   <path d="M18 15.5 q3 -2 6 0" stroke="#3b4357" stroke-width="1.4" fill="none"/>
+   <path d="M20 19 l3 -.5" stroke="#3b4357" stroke-width="1.2" fill="none"/>
+   <path d="M26 9.6 H44" stroke="#fff" stroke-width="1.3" fill="none"/>
+   <!-- rune on head -->
+   <path d="M17 11.2 l2 0 -1 3z" fill="none" stroke="#ffb040" stroke-width="1"/>
+  </g>
+  <path d="M10 7 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
+ </g></symbol>
+ <symbol id="s4" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round" fill="none"><g transform="translate(32 34) scale(.94) translate(-32 -33)">
+  <!-- glow behind the held ember -->
+  <circle cx="32" cy="9" r="8" fill="#ff7a14" opacity=".35" stroke="none"/>
+  <!-- arm A: bottom-left handle to right jaw -->
+  <path d="M13 58 L31 37 Q39 28 37 15 L33 7" stroke="#1d0f09" stroke-width="11.5"/>
+  <path d="M13 58 L31 37 Q39 28 37 15 L33 7" stroke="#38425a" stroke-width="7.5"/>
+  <path d="M13.8 57 L31.4 36.4 Q38.6 27.6 36.2 15" stroke="#6b7897" stroke-width="5"/>
+  <path d="M13 56 L29 38 Q35 31 34.6 24" stroke="#a9b6d0" stroke-width="1.6"/>
+  <!-- arm B: bottom-right handle to left jaw (on top) -->
+  <path d="M51 58 L33 37 Q25 28 27 15 L31 7" stroke="#1d0f09" stroke-width="11.5"/>
+  <path d="M51 58 L33 37 Q25 28 27 15 L31 7" stroke="#38425a" stroke-width="7.5"/>
+  <path d="M50.2 57 L32.6 36.4 Q25.4 27.6 27.8 15" stroke="#7d8aa9" stroke-width="5"/>
+  <path d="M49 55 L35 39 Q28 31 28.6 24" stroke="#b8c4dc" stroke-width="1.6"/>
+  <!-- leather grips -->
+  <path d="M13 58 L19.5 50.4" stroke="#1d0f09" stroke-width="12.5"/><path d="M13 58 L19.5 50.4" stroke="#8a4f26" stroke-width="8.6"/>
+  <path d="M51 58 L44.5 50.4" stroke="#1d0f09" stroke-width="12.5"/><path d="M51 58 L44.5 50.4" stroke="#8a4f26" stroke-width="8.6"/>
+  <path d="M11.5 55.5 L15.5 58.5 M15.5 52.5 L19.5 55.5 M19 48.8 L23.2 51.6 M52.5 55.5 L48.5 58.5 M48.5 52.5 L44.5 55.5 M45 48.8 L40.8 51.6" stroke="#4d2a14" stroke-width="1.8"/>
+  <path d="M14 53.4 L19 47.5 M50 53.4 L45 47.5" stroke="#d29a62" stroke-width="1.3"/>
+  <!-- pommel balls -->
+  <circle cx="11.5" cy="59.5" r="4.4" fill="#566079" stroke="#1d0f09" stroke-width="2.6"/><circle cx="10.2" cy="58.2" r="1.4" fill="#c4d0e6" stroke="none"/>
+  <circle cx="52.5" cy="59.5" r="4.4" fill="#566079" stroke="#1d0f09" stroke-width="2.6"/><circle cx="51.2" cy="58.2" r="1.4" fill="#c4d0e6" stroke="none"/>
+  <!-- glowing runes etched on the arms -->
+  <g transform="rotate(-50 24.5 45.5)"><path d="M24.5 41.5 v8 M24.5 43 l3 -1.8 M24.5 46.4 l3 -1.8" stroke="#1d0f09" stroke-width="3.4"/><path d="M24.5 41.5 v8 M24.5 43 l3 -1.8 M24.5 46.4 l3 -1.8" stroke="#ffd23a" stroke-width="1.5"/></g>
+  <g transform="rotate(50 39.5 45.5)"><path d="M39.5 41.5 v8 M39.5 43 l-3 -1.8 M39.5 46.4 l-3 -1.8" stroke="#1d0f09" stroke-width="3.4"/><path d="M39.5 41.5 v8 M39.5 43 l-3 -1.8 M39.5 46.4 l-3 -1.8" stroke="#ffd23a" stroke-width="1.5"/></g>
+  <g transform="rotate(14 36 24)"><path d="M36 20 v8 M33.4 22.4 l2.6 2 2.6 -2" stroke="#ffd23a" stroke-width="1.3" opacity=".95"/></g>
+  <!-- pivot rivet -->
+  <circle cx="32" cy="35.5" r="5.6" fill="#e5a727" stroke="#1d0f09" stroke-width="3"/>
+  <path d="M29 33 a4 4 0 0 1 4 -1.6" stroke="#fff3b0" stroke-width="1.5"/>
+  <circle cx="32.6" cy="36.4" r="1.3" fill="#8a5a10" stroke="none"/>
+  <!-- held ember nugget -->
+  <path d="M32 1 L38.5 7 L35.5 13 L28.5 13 L25.5 7Z" fill="#ff6a14" stroke="#1d0f09" stroke-width="2.8"/>
+  <path d="M32 1 L25.5 7 L28.5 13 L32 8Z" fill="#ffd23a"/>
+  <path d="M32 8 L38.5 7 L35.5 13Z" fill="#d8350a"/>
+  <path d="M29.5 5 l2 -1.5" stroke="#fff" stroke-width="1.1"/>
+  <path d="M50 14 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1"/>
+  </g>
+ </g></symbol>
+ <symbol id="s5" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><!-- dragonbone blade -->
+  <g transform="translate(0 1.5) scale(1 .88) translate(0 -1.5)"><!-- blade -->
+  <path d="M32 1.5 L26 11 L28 13 L23.5 22 L25.5 24 L22 34 L24 36 L22.5 45 H41.5 L40 36 L42 30 L38.5 22 L40 14Z" fill="#f1e2bd" stroke="#1d0f09" stroke-width="3.2"/>
+  <path d="M32 1.5 L26 11 L28 13 L23.5 22 L25.5 24 L22 34 L24 36 L22.5 45 H31 L31.5 20Z" fill="#fff3d2"/>
+  <path d="M32 1.5 L40 14 L38.5 22 L42 30 L40 36 L41.5 45 H31 L31.5 20Z" fill="#cdb585"/>
+  <path d="M32 1.5 L35.5 7 L31.5 20 L29 9Z" fill="#fffdf2"/>
+  <!-- bone grain and cracks -->
+  <path d="M27 18 Q28.5 26 26 34 M36 20 Q37.5 28 36.4 36 M33.6 24 L35 28" fill="none" stroke="#b79d6a" stroke-width="1" />
+  <path d="M26.2 40 l2.4 -2" fill="none" stroke="#b79d6a" stroke-width="1"/>
+  <!-- glowing fuller with runes -->
+  <path d="M31.4 12 V43" fill="none" stroke="#1d0f09" stroke-width="4.4"/>
+  <path d="M31.4 12 V43" fill="none" stroke="#9c1c12" stroke-width="2.2"/>
+  <path d="M31.4 15 V19 M31.4 22 V25 M31.4 28 V33 M31.4 36 V40" fill="none" stroke="#ff8a1a" stroke-width="1.5"/>
+  <path d="M33.8 12 L31.4 15" fill="none" stroke="#fff3d2" stroke-width="0"/>
+  </g>
+  <!-- crossguard: dragon-claw wings -->
+  <path d="M32 39.5 L22 38 Q12 37 7 43 L4.5 51 L10.5 46.5 Q15.5 44.5 20.5 45.5 L26 48 L32 46.5 L38 48 L43.5 45.5 Q48.5 44.5 53.5 46.5 L59.5 51 L57 43 Q52 37 42 38Z" fill="#ffc83a" stroke="#1d0f09" stroke-width="3.2"/>
+  <path d="M32 39.5 L22 38 Q12 37 7 43 L4.5 51 L9 44.5 Q14 41.5 21 42 L32 43Z" fill="#fff0a0"/>
+  <path d="M32 46.5 L38 48 L43.5 45.5 Q48.5 44.5 53.5 46.5 L59.5 51 L57 43 Q56 41.5 54 40.5 Q50 44 44 43 L32 43Z" fill="#d89a14"/>
+  <path d="M13 43.5 l4 0 M51 43.5 l-4 0" stroke="#1d0f09" stroke-width="1.4" fill="none"/>
+  <!-- guard gem -->
+  <path d="M32 37.5 L36.8 43 L32 49 L27.2 43Z" fill="#e0281c" stroke="#1d0f09" stroke-width="2.6"/>
+  <path d="M32 39.4 L29.4 43 L32 43Z" fill="#ff9a8a"/>
+  <path d="M32 43 L36.2 43.4 L32 47.6Z" fill="#8e1010"/>
+  <!-- grip -->
+  <path d="M28.6 48 H35.4 V57 H28.6Z" fill="#6a3a1c" stroke="#1d0f09" stroke-width="2.8"/>
+  <path d="M29 50.4 H35 M29 53 H35 M29 55.4 H35" stroke="#ffc83a" stroke-width="1.3" fill="none"/>
+  <path d="M30 49 V56" stroke="#a8683a" stroke-width="1" fill="none"/>
+  <!-- pommel -->
+  <path d="M25.5 59.2 Q25.5 56.5 32 56.5 Q38.5 56.5 38.5 59.2 Q38.5 62.8 32 62.8 Q25.5 62.8 25.5 59.2Z" fill="#ffc83a" stroke="#1d0f09" stroke-width="2.6"/>
+  <path d="M28 58 Q30 57 33 57.2" stroke="#fff0a0" stroke-width="1.2" fill="none"/>
+  <circle cx="32" cy="59.8" r="2" fill="#e0281c" stroke="#1d0f09" stroke-width="1.2"/>
+  <path d="M49 6 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
+ </g></symbol>
+ <symbol id="s6" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><g transform="translate(32 34) scale(.9) translate(-32 -32)">
+  <!-- velvet cap behind the points -->
+  <path d="M16 40 Q20 24 32 22 Q44 24 48 40Z" fill="#9c1c3a" stroke="#1d0f09" stroke-width="2.6"/>
+  <path d="M22 38 Q24 28 31 25" fill="none" stroke="#d8506a" stroke-width="1.6"/>
+  <!-- crown body -->
+  <path d="M8 49 L5 18 L12 34 L19 21 L26 34 L32 8 L38 34 L45 21 L52 34 L59 18 L56 49Z" fill="#ffd13f" stroke="#1d0f09" stroke-width="3.4"/>
+  <!-- shade: right half of every point -->
+  <path d="M32 8 L38 34 L45 21 L52 34 L59 18 L56 49 L38 49Z" fill="#e5a115"/>
+  <path d="M19 21 L26 34 L22 49 L17 49Z M5 18 L12 34 L9 49 L8 49Z" fill="#ffe88a"/>
+  <path d="M32 8 L26 34 L28 49 L33 49Z" fill="#ffea92"/>
+  <path d="M5 18 L12 34 L19 21 L26 34 L32 8 L38 34 L45 21 L52 34 L59 18" fill="none" stroke="#1d0f09" stroke-width="3.4"/>
+  <!-- filigree swirls -->
+  <path d="M14.5 37.5 l3 3.5 -3 3.5 -3 -3.5z M49.5 37.5 l3 3.5 -3 3.5 -3 -3.5z" fill="none" stroke="#a8700e" stroke-width="1.5"/><path d="M23 42 h3 M38 42 h3" stroke="#a8700e" stroke-width="1.5"/>
+  <!-- cinder cracks, glowing -->
+  <path d="M32 14 L30.6 21 L33 26 L31.4 31" fill="none" stroke="#1d0f09" stroke-width="3.4"/>
+  <path d="M32 14 L30.6 21 L33 26 L31.4 31" fill="none" stroke="#ff7a14" stroke-width="1.4"/>
+  <path d="M19.4 26 L18.4 30 L20.4 33" fill="none" stroke="#ff7a14" stroke-width="1.3"/>
+  <!-- band -->
+  <path d="M6 47 H58 V57 Q58 60 55 60 H9 Q6 60 6 57Z" fill="#f2b32a" stroke="#1d0f09" stroke-width="3.4"/>
+  <path d="M9 49.4 H55 V51.6 H9Z" fill="#fff0a8"/>
+  <path d="M37 53 H58 V57 Q58 60 55 60 H37Z" fill="#d38f10"/>
+  <path d="M6 47 H58" stroke="#1d0f09" stroke-width="3.4"/>
+  <!-- gems: ruby centre, amber and emerald flanks -->
+  <path d="M32 46.6 L38.4 53.6 L32 61 L25.6 53.6Z" fill="#e0281c" stroke="#1d0f09" stroke-width="2.4"/>
+  <path d="M32 48.2 L27.8 53.4 L32 53.6Z" fill="#ff9a86"/>
+  <path d="M32 53.6 L37.4 53.6 L32 59.4Z" fill="#8e1010"/>
+  <path d="M25.6 53.6 H38.4" stroke="#1d0f09" stroke-width="1.1"/>
+  <ellipse cx="18" cy="53.6" rx="4" ry="3.2" fill="#ffab26" stroke="#1d0f09" stroke-width="2"/><path d="M15.6 52.6 q1.6 -1.4 3.2 -.6" stroke="#fff3c0" stroke-width="1.1" fill="none"/>
+  <ellipse cx="46" cy="53.6" rx="4" ry="3.2" fill="#2fbf8a" stroke="#1d0f09" stroke-width="2"/><path d="M43.6 52.6 q1.6 -1.4 3.2 -.6" stroke="#d6ffee" stroke-width="1.1" fill="none"/>
+  <circle cx="10.4" cy="53.6" r="1.4" fill="#8a5a10"/><circle cx="53.6" cy="53.6" r="1.4" fill="#8a5a10"/>
+  <!-- ember orbs on the tips -->
+  <circle cx="5" cy="15.5" r="4.4" fill="#ff7a14" stroke="#1d0f09" stroke-width="2.6"/><circle cx="3.8" cy="14.2" r="1.4" fill="#ffe0a0"/>
+  <circle cx="59" cy="15.5" r="4.4" fill="#ff7a14" stroke="#1d0f09" stroke-width="2.6"/><circle cx="57.8" cy="14.2" r="1.4" fill="#ffe0a0"/>
+  <circle cx="32" cy="5.5" r="4.8" fill="#ff5a14" stroke="#1d0f09" stroke-width="2.6"/><circle cx="30.6" cy="4" r="1.6" fill="#ffe0a0"/>
+  <circle cx="19" cy="18.6" r="3.2" fill="#ff9a2a" stroke="#1d0f09" stroke-width="2.2"/><circle cx="45" cy="18.6" r="3.2" fill="#ff9a2a" stroke="#1d0f09" stroke-width="2.2"/>
+  <path d="M52 3 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2z" fill="#fff" stroke="#1d0f09" stroke-width="1"/>
+  </g>
+ </g></symbol>
+ <symbol id="s7" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><g transform="translate(32 36) scale(.9) translate(-32 -31)">
+  <!-- flame crest breaking the ring -->
+  <path d="M16 16 Q10 6 19 -1 Q19 8 26 11Z M48 16 Q54 6 45 -1 Q45 8 38 11Z M24 12 Q25 0 32 -6 Q39 0 40 12Z" fill="#ff6a14" stroke="#1d0f09" stroke-width="2.4"/>
+  <path d="M28.5 10 Q29.5 3 32 -1 Q34.5 3 35.5 10Z" fill="#ffd23a"/>
+  <!-- iron ring -->
+  <circle cx="32" cy="31" r="26.5" fill="#5a5266" stroke="#1d0f09" stroke-width="3.6"/>
+  <path d="M9 24 A24 24 0 0 1 28 7.5" fill="none" stroke="#a79db8" stroke-width="2.6"/>
+  <path d="M55 38 A24 24 0 0 1 36 54.5" fill="none" stroke="#35303f" stroke-width="3"/>
+  <path d="M56 33 A24.5 24.5 0 0 1 48 49" fill="none" stroke="#ff8a1a" stroke-width="1" opacity=".9"/>
+  <g fill="#c3bad2" stroke="#1d0f09" stroke-width="1.1">
+   <circle cx="32" cy="9.4" r="1.9"/><circle cx="48.3" cy="16" r="1.9"/><circle cx="54.6" cy="31" r="1.9"/><circle cx="48.3" cy="46" r="1.9"/><circle cx="32" cy="52.6" r="1.9"/><circle cx="15.7" cy="46" r="1.9"/><circle cx="9.4" cy="31" r="1.9"/><circle cx="15.7" cy="16" r="1.9"/>
+  </g>
+  <!-- rune disc -->
+  <circle cx="32" cy="31" r="19.5" fill="#2a1210" stroke="#1d0f09" stroke-width="2.6"/>
+  <circle cx="32" cy="31" r="16.4" fill="none" stroke="#ff8a1a" stroke-width="2.2" stroke-dasharray="3.2 3"/>
+  <circle cx="32" cy="31" r="14" fill="#ff7a14" opacity=".35"/>
+  <!-- core flame -->
+  <path d="M32 11 C34 20 44 22 42.4 33 C41.4 40.4 37.6 45 32 45 C26.4 45 22.6 40.4 21.6 33 C20 24 29 20 32 11Z" fill="#ff5a14" stroke="#1d0f09" stroke-width="3"/>
+  <path d="M32 11 C29 20 20 24 21.6 33 C22 36 23 39 25 41.6 C23.5 33 28 22 32 11Z" fill="#ff8a2a"/>
+  <path d="M32 22 C34.6 28 38.4 30 37.6 35.6 C37 40 35 42.4 32 42.4 C29 42.4 27 40 26.4 35.6 C25.6 30 29.6 28 32 22Z" fill="#ffb02e"/>
+  <path d="M32 31 C33.4 34 35.2 35 34.8 38 C34.4 40 33.4 41 32 41 C30.6 41 29.6 40 29.2 38 C28.8 35 30.6 34 32 31Z" fill="#fff2a0"/>
+  <!-- angry eyes -->
+  <path d="M26.6 31.6 L30.6 33.6 M37.4 31.6 L33.4 33.6" stroke="#1d0f09" stroke-width="2.4" fill="none"/>
+  <circle cx="29.6" cy="34.6" r=".9" fill="#1d0f09"/><circle cx="34.4" cy="34.6" r=".9" fill="#1d0f09"/>
+  <!-- ribbon -->
+  <path d="M3 47 H61 L57.6 53.4 L61 60 H3 L6.4 53.4Z" fill="#ffc83a" stroke="#1d0f09" stroke-width="3.2"/>
+  <path d="M6 49 H58 V51 H6Z" fill="#fff0a0"/>
+  <path d="M6.6 57.6 H57.4 L58.6 59 H5.4Z" fill="#d89a14"/>
+  <text x="32" y="58" text-anchor="middle" font-size="11.5" fill="#1d0f09" stroke="#1d0f09" stroke-width=".4" font-family="Luckiest Guy,Impact,Arial Black" letter-spacing=".6">WILD</text>
+  <path d="M55 6 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2z" fill="#fff" stroke="#1d0f09" stroke-width="1"/>
+  </g>
+ </g></symbol>
+ <symbol id="s8" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><!-- forgefire gem (scatter) -->
+  <!-- glow -->
+  <!-- iron claws behind pavilion -->
+  <path d="M4.6 16 L4.6 25 Q8 36 20 46" fill="none" stroke="#1d0f09" stroke-width="7"/><path d="M4.6 16 L4.6 25 Q8 36 20 46" fill="none" stroke="#8c829c" stroke-width="3.4"/>
+  <path d="M59.4 16 L59.4 25 Q56 36 44 46" fill="none" stroke="#1d0f09" stroke-width="7"/><path d="M59.4 16 L59.4 25 Q56 36 44 46" fill="none" stroke="#403a4c" stroke-width="3.6"/>
+  <!-- gem body -->
+  <path d="M19 5 H45 L58 19 L32 47 L6 19Z" fill="#ff4d7a" stroke="#1d0f09" stroke-width="3.6"/>
+  <!-- crown facets -->
+  <path d="M19 5 H45 L39 13 H25Z" fill="#ffbcd0"/>
+  <path d="M19 5 L25 13 L15 19 H6Z" fill="#ff86a8"/>
+  <path d="M25 13 H39 V19 H25Z" fill="#ff5a86"/>
+  <path d="M25 13 L25 19 L15 19Z" fill="#ff6e96"/>
+  <path d="M39 13 L49 19 H39Z" fill="#e03664"/>
+  <path d="M45 5 L58 19 H49 L39 13Z" fill="#c4204f"/>
+  <!-- pavilion facets -->
+  <path d="M6 19 H15 L32 47Z" fill="#ec4272"/>
+  <path d="M15 19 H25 L32 47Z" fill="#ff6a92"/>
+  <path d="M25 19 H39 L32 47Z" fill="#f0406e"/>
+  <path d="M39 19 H49 L32 47Z" fill="#b81c48"/>
+  <path d="M49 19 H58 L32 47Z" fill="#8e1038"/>
+  <!-- fire inclusion -->
+  <path d="M32 21 C33 26 37 27 36.4 31.4 C36 34.6 34.4 36 32 36 C29.6 36 28 34.6 27.6 31.4 C27 27.6 30.6 26 32 21Z" fill="#ff9a2a" stroke="#8e1038" stroke-width="1.2"/>
+  <path d="M32 27 C32.8 29.6 34.4 30 34.1 32.4 C33.9 34 33 34.6 32 34.6 C31 34.6 30.1 34 29.9 32.4 C29.6 30.4 31.4 29.6 32 27Z" fill="#fff0a0"/>
+  <!-- facet edges -->
+  <path d="M19 5 L25 13 H39 L45 5 M25 13 L15 19 M39 13 L49 19 M25 13 V19 M39 13 V19 M6 19 H58 M15 19 L32 47 M25 19 L32 47 M39 19 L32 47 M49 19 L32 47" fill="none" stroke="#1d0f09" stroke-width="1.5"/>
+  <path d="M6 19 L19 5 H45 L58 19 L32 47Z" fill="none" stroke="#1d0f09" stroke-width="3.6"/>
+  <!-- highlights and rim -->
+  <path d="M22 8 H31" stroke="#fff" stroke-width="2.4" fill="none"/>
+  <path d="M10 18 L14 13" stroke="#fff" stroke-width="1.6" fill="none"/>
+  <path d="M55.6 21 L36 43.6" stroke="#ff9a2a" stroke-width="1.1" fill="none" opacity=".9"/>
+  <!-- claw tips over the girdle -->
+  
+  
+  <!-- cradle + plaque -->
+  <path d="M17 49 H47 L44 58 Q43.6 60 41.6 60 H22.4 Q20.4 60 20 58Z" fill="#5a5266" stroke="#1d0f09" stroke-width="3"/>
+  <path d="M19 51 H45 L44 53 H19.6Z" fill="#a79db8"/>
+  <path d="M33 53 H46 L44 58 Q43.6 60 41.6 60 H33Z" fill="#403a4c"/>
+  <rect x="22.4" y="51.2" width="19.2" height="9.6" rx="3" fill="#ffc83a" stroke="#1d0f09" stroke-width="2.4"/>
+  <path d="M24.4 53 H39" stroke="#fff0a0" stroke-width="1.2"/>
+  <text x="32" y="59.6" text-anchor="middle" font-size="8.6" fill="#1d0f09" font-family="Luckiest Guy,Impact,Arial Black">FS</text>
+  <path d="M54 5 l1.4 3.6 3.6 1.4 -3.6 1.4 -1.4 3.6 -1.4 -3.6 -3.6 -1.4 3.6 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
+ </g></symbol>
 
 </defs></svg>
 
@@ -759,74 +1032,210 @@ button:disabled{cursor:not-allowed}
 <div id="frame"><div id="grid"></div><div id="fxl"></div></div>
 
 <div id="char"><svg viewBox="0 0 480 500">
- <ellipse cx="250" cy="488" rx="190" ry="14" fill="#000" opacity=".35"/>
+ <ellipse cx="250" cy="489" rx="205" ry="13" fill="#000" opacity=".4"/>
+ <!-- ANVIL -->
  <g id="anvil">
-  <path d="M18 438 Q58 432 70 446 H238 L230 470 H184 L198 488 H100 L114 470 H74 Q40 468 18 438Z" fill="#5d6577" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M72 449 H236 L233 457 H74Z" fill="#8f99ad"/>
-  <path d="M30 442 Q56 438 66 449 L38 450Z" fill="#8f99ad"/>
-  <ellipse id="cHot" cx="86" cy="440" rx="22" ry="9" fill="#ffb02e"/>
+  <path d="M96 470 H196 L186 487 H106Z" fill="#3e4455" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M96 470 H196 L192 477 H100Z" fill="#6c7589"/>
+  <path d="M18 438 Q58 430 72 446 H238 L230 470 H184 L196 482 H104 L116 470 H74 Q40 468 18 438Z" fill="#5d6577" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M72 449 H236 L233 457 H74Z" fill="#9ca6bb"/>
+  <path d="M28 441 Q56 436 68 449 L38 450Z" fill="#9ca6bb"/>
+  <path d="M120 462 H224 L220 468 H186 L194 476 H110 L118 468Z" fill="#454c5e"/>
+  <path d="M226 449 L222 466" stroke="#ff8a1a" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".8"/>
+  <path d="M146 452 q6 -2 12 0 M190 453 q5 -2 10 0" stroke="#3a4152" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="206" cy="441" rx="7" ry="3" fill="#2c3140" stroke="#1d0f09" stroke-width="2.4"/>
+  <path d="M120 448 H152" stroke="#e4ebf7" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse id="cHot" cx="86" cy="440" rx="24" ry="10" fill="#ffb02e"/>
   <circle id="hotspot" cx="90" cy="440" r="2" fill="none"/>
+  <!-- hot ingot lying on the face -->
+  <path d="M60 440 L112 439 L108 448 L56 449Z" fill="#ff7a14" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M62 441 L108 440.5 L107 443 L61 443.6Z" fill="#ffe27a"/>
+  <path d="M57 448 L109 447 L108 449 L56 450Z" fill="#c63a0a"/>
  </g>
+ <!-- BODY -->
  <g id="cBody">
-  <path d="M206 436 H254 V474 Q254 488 240 488 H214 Q202 488 202 476Z" fill="#3b2418" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M266 436 H314 V476 Q314 488 300 488 H274 Q262 488 262 474Z" fill="#3b2418" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <!-- boots -->
+  <path d="M199 438 H256 V474 Q256 488 242 488 H212 Q198 488 198 474Z" fill="#4a2c1b" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M263 438 H320 V474 Q320 488 306 488 H276 Q262 488 262 474Z" fill="#4a2c1b" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M203 441 H221 V472 Q221 484 212 484 Q203 484 203 474Z" fill="#74482a"/>
+  <path d="M267 441 H285 V472 Q285 484 276 484 Q267 484 267 474Z" fill="#74482a"/>
+  <path d="M200 478 H256 V486 Q256 488 252 488 H204 Q200 488 200 486Z" fill="#241309" opacity=".9"/><path d="M264 478 H320 V486 Q320 488 316 488 H268 Q264 488 264 486Z" fill="#241309" opacity=".9"/>
+  <rect x="200" y="446" width="56" height="12" rx="3" fill="#2f1b10" stroke="#1d0f09" stroke-width="4"/><rect x="264" y="446" width="56" height="12" rx="3" fill="#2f1b10" stroke="#1d0f09" stroke-width="4"/>
+  <rect x="246" y="446" width="9" height="12" rx="1.5" fill="#ffc83a" stroke="#1d0f09" stroke-width="2.4"/><rect x="310" y="446" width="9" height="12" rx="1.5" fill="#ffc83a" stroke="#1d0f09" stroke-width="2.4"/>
+  <path d="M206 466 q5 4 12 0 M270 466 q5 4 12 0" stroke="#241309" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <path d="M236 474 q8 -4 16 2 M300 474 q8 -4 16 2" stroke="#2c1a0e" stroke-width="5" fill="none" opacity=".5" stroke-linecap="round"/>
+  <!-- shirt / torso -->
   <path d="M190 296 Q184 380 198 440 H322 Q336 380 330 296 Q260 268 190 296Z" fill="#c4502c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M190 296 Q184 380 198 440 H212 Q202 380 206 300Z" fill="#e07448"/>
+  <path d="M306 304 Q334 330 322 440 H306Z" fill="#94361a"/>
+  <!-- apron -->
   <path d="M214 312 H306 L324 440 H196Z" fill="#6d4526" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M224 300 H296 V354 H224Z" fill="#82552f" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M228 304 L212 290 M292 304 L308 290" stroke="#1d0f09" stroke-width="16" stroke-linecap="round"/><path d="M228 304 L212 290 M292 304 L308 290" stroke="#5a371c" stroke-width="8" stroke-linecap="round"/>
-  <circle cx="236" cy="322" r="5" fill="#ffc83a" stroke="#1d0f09" stroke-width="3"/><circle cx="284" cy="322" r="5" fill="#ffc83a" stroke="#1d0f09" stroke-width="3"/>
-  <path d="M226 394 H266 V428 H226Z" fill="#5a381e" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M231 399 H261 M231 423 H261" stroke="#c89a6a" stroke-width="2.4" stroke-dasharray="4 4"/>
-  <path d="M198 418 H322 V434 H198Z" fill="#2b1a10" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
-  <rect x="250" y="415" width="22" height="22" rx="3" fill="#ffc83a" stroke="#1d0f09" stroke-width="4"/>
-  <path d="M290 360 q8 -6 14 4 q-8 8 -14 -4z M214 380 q-4 -8 6 -10 q4 8 -6 10z" fill="#2a1710" opacity=".55"/>
-  
+  <path d="M214 312 H228 L214 440 H196Z" fill="#8f6137"/>
+  <path d="M290 312 H306 L324 440 H300Z" fill="#4d2f19"/>
+  <path d="M221 322 L206 430 M299 322 L314 430" stroke="#c89a6a" stroke-width="2.6" stroke-dasharray="5 4" fill="none" stroke-linecap="round"/>
+  <!-- bib -->
+  <path d="M224 300 H296 V356 Q260 366 224 356Z" fill="#82552f" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M224 300 H238 V358 Q230 358 224 356Z" fill="#a37444"/>
+  <path d="M230 306 H290 M230 350 Q260 358 290 350" stroke="#d3a674" stroke-width="2.2" stroke-dasharray="5 4" fill="none" stroke-linecap="round"/>
+  <!-- shoulder straps -->
+  <path d="M228 304 L210 288 M292 304 L310 288" stroke="#1d0f09" stroke-width="17" stroke-linecap="round"/><path d="M228 304 L210 288 M292 304 L310 288" stroke="#5a371c" stroke-width="9" stroke-linecap="round"/><path d="M226 300 L212 287" stroke="#8a5a30" stroke-width="2.6" stroke-linecap="round"/>
+  <circle cx="236" cy="322" r="6" fill="#ffc83a" stroke="#1d0f09" stroke-width="3"/><circle cx="284" cy="322" r="6" fill="#ffc83a" stroke="#1d0f09" stroke-width="3"/>
+  <circle cx="234.5" cy="320.5" r="2" fill="#fff0a0"/><circle cx="282.5" cy="320.5" r="2" fill="#fff0a0"/>
+  <!-- pocket with tools -->
+  <path d="M232 389 L246 372 M239 392 L256 378" stroke="#1d0f09" stroke-width="9" stroke-linecap="round"/><path d="M232 389 L246 372 M239 392 L256 378" stroke="#8d98ab" stroke-width="4.4" stroke-linecap="round"/>
+  <circle cx="246" cy="371" r="5" fill="#ff7a1a" stroke="#1d0f09" stroke-width="3"/><circle cx="256" cy="377" r="4" fill="#ff5a14" stroke="#1d0f09" stroke-width="3"/>
+  <path d="M226 392 H268 V430 H226Z" fill="#5a381e" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M226 392 H238 V430 H226Z" fill="#7a4f2c"/>
+  <path d="M231 397 H263 M231 424 H263" stroke="#c89a6a" stroke-width="2.4" stroke-dasharray="4 4" fill="none"/>
+  <path d="M270 360 q8 -6 14 4 q-8 8 -14 -4z M214 382 q-5 -9 6 -11 q5 9 -6 11z M296 398 q8 -3 12 5 q-8 6 -12 -5z" fill="#1c0f09" opacity=".42"/>
+  <path d="M240 340 l9 -3 M250 346 l8 -1" stroke="#1c0f09" stroke-width="3" opacity=".3" stroke-linecap="round"/>
+  <path d="M300 410 l8 -6 M303 418 l9 -5" stroke="#ffb040" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+  <!-- belt -->
+  <path d="M198 418 H322 V436 H198Z" fill="#2b1a10" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M200 420 H320" stroke="#5b3b24" stroke-width="2.4"/>
+  <rect x="248" y="413" width="26" height="28" rx="4" fill="#ffc83a" stroke="#1d0f09" stroke-width="4"/>
+  <rect x="254" y="420" width="14" height="14" rx="2" fill="#c9922c" stroke="#1d0f09" stroke-width="2.4"/>
+  <path d="M250 417 H268" stroke="#fff0a0" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M286 424 l24 0 M210 424 l24 0" stroke="#7a5030" stroke-width="2" stroke-dasharray="3 3"/>
+  <circle cx="296" cy="427" r="2.4" fill="#c89a6a"/><circle cx="224" cy="427" r="2.4" fill="#c89a6a"/>
  </g>
+ <!-- LEFT ARM (viewer's right) -->
  <g id="cArmL">
-  <path d="M312 288 Q354 296 364 340 Q368 374 350 380 L326 368 Q324 336 304 316Z" fill="#c4502c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M330 366 Q348 380 366 362" fill="none" stroke="#1d0f09" stroke-width="5" stroke-linecap="round"/>
-  <circle cx="350" cy="388" r="20" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
-  <path d="M340 380 q8 4 6 14 M352 378 q8 4 6 14" fill="none" stroke="#1d0f09" stroke-width="3" stroke-linecap="round"/>
+  <path d="M312 288 Q356 296 366 342 Q370 376 350 382 L326 368 Q324 336 304 316Z" fill="#c4502c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M312 288 Q336 292 350 306 Q326 304 312 316Z" fill="#e07448"/>
+  <path d="M356 332 Q366 352 352 380 L330 368 Q348 356 356 332Z" fill="#94361a"/>
+  <path d="M330 306 q10 6 14 18 M338 322 q8 6 10 16" stroke="#7a2a12" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <!-- bracer -->
+  <path d="M330 364 Q352 384 366 358 L372 372 Q356 402 326 380Z" fill="#7d8496" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M330 364 Q350 380 362 360 L365 366 Q352 386 332 372Z" fill="#c2cad9"/>
+  <circle cx="338" cy="378" r="3" fill="#ffc83a" stroke="#1d0f09" stroke-width="2"/><circle cx="362" cy="372" r="3" fill="#ffc83a" stroke="#1d0f09" stroke-width="2"/>
+  <!-- fist -->
+  <circle cx="350" cy="394" r="20" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
+  <path d="M356 380 Q368 394 356 412 Q372 402 368 388Z" fill="#cf7f5c"/>
+  <path d="M338 386 q9 5 7 16 M349 383 q9 5 7 16 M360 387 q6 4 4 12" fill="none" stroke="#1d0f09" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="341" cy="408" rx="8" ry="5" fill="#f9c9a4" stroke="#1d0f09" stroke-width="3" transform="rotate(-20 341 408)"/>
  </g>
+ <!-- RIGHT ARM (viewer's left) with hammer -->
  <g id="cArmR">
-  <path d="M196 284 Q158 290 132 324 L160 352 Q186 328 214 324Z" fill="#c4502c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M138 326 Q150 346 164 346" fill="none" stroke="#1d0f09" stroke-width="5" stroke-linecap="round"/>
-  <rect x="143" y="318" width="14" height="98" rx="5" fill="#b9733a" stroke="#1d0f09" stroke-width="5"/>
-  <path d="M150 330 V410" stroke="#8a4f22" stroke-width="3"/>
+  <path d="M196 284 Q156 290 130 326 L160 354 Q186 330 214 326Z" fill="#c4502c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M196 284 Q168 290 148 314 Q172 306 190 304Z" fill="#e07448"/>
+  <path d="M196 326 Q180 336 160 354 L170 358 Q192 342 214 332Z" fill="#94361a"/>
+  <path d="M172 304 q-8 8 -10 20 M184 312 q-6 8 -6 16" stroke="#7a2a12" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <!-- hammer handle -->
+  <rect x="142" y="316" width="16" height="102" rx="6" fill="#b9733a" stroke="#1d0f09" stroke-width="5"/>
+  <path d="M146 322 V412" stroke="#e2a066" stroke-width="3.4" stroke-linecap="round"/>
+  <path d="M154 322 V412" stroke="#8a4f22" stroke-width="3"/>
+  <path d="M142 372 L158 366 M142 384 L158 378 M142 396 L158 390" stroke="#4d2a14" stroke-width="3.4" stroke-linecap="round"/>
+  <rect x="139" y="310" width="22" height="9" rx="4" fill="#6c768a" stroke="#1d0f09" stroke-width="4"/>
+  <!-- hammer head -->
   <rect x="104" y="394" width="92" height="52" rx="8" fill="#727b8d" stroke="#1d0f09" stroke-width="6"/>
-  <path d="M110 400 H190 V412 H110Z" fill="#a8b2c5"/>
+  <path d="M110 400 H190 V412 H110Z" fill="#b6c0d3"/>
+  <path d="M154 412 H190 V434 H154Z" fill="#5d667a"/>
   <path d="M110 434 H190 V441 Q190 442 188 442 H112 Q110 442 110 441Z" fill="#ff8a1a"/>
-  <rect x="100" y="396" width="14" height="48" rx="4" fill="#5c6577" stroke="#1d0f09" stroke-width="5"/>
-  <circle cx="150" cy="336" r="20" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
-  <path d="M138 330 q10 -4 14 4 M140 342 q10 -2 14 4" fill="none" stroke="#1d0f09" stroke-width="3" stroke-linecap="round"/>
+  <path d="M116 436 H184" stroke="#ffe27a" stroke-width="2.2" stroke-linecap="round"/>
+  <rect x="98" y="396" width="16" height="48" rx="4" fill="#5c6577" stroke="#1d0f09" stroke-width="5"/>
+  <rect x="180" y="396" width="14" height="48" rx="4" fill="#5c6577" stroke="#1d0f09" stroke-width="4"/>
+  <circle cx="106" cy="410" r="2.6" fill="#b6c0d3" stroke="#1d0f09" stroke-width="1.6"/><circle cx="106" cy="430" r="2.6" fill="#b6c0d3" stroke="#1d0f09" stroke-width="1.6"/>
+  <path d="M170 418 l4 5 -4 5 M178 418 l-4 5 4 5" stroke="#ff9a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M124 420 q6 -3 12 0" stroke="#434b5e" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <!-- bracer + fist -->
+  <path d="M130 328 L160 356 L150 366 L120 340Z" fill="#7d8496" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M130 328 L154 350 L150 354 L128 336Z" fill="#c2cad9"/>
+  <circle cx="141" cy="347" r="2.8" fill="#ffc83a" stroke="#1d0f09" stroke-width="2"/>
+  <circle cx="150" cy="338" r="21" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
+  <path d="M158 322 Q172 338 158 358 Q176 346 170 328Z" fill="#cf7f5c"/>
+  <path d="M137 332 q10 -5 15 4 M138 344 q10 -3 15 5 M139 354 q8 -2 12 4" fill="none" stroke="#1d0f09" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="160" cy="324" rx="9" ry="5.4" fill="#f9c9a4" stroke="#1d0f09" stroke-width="3" transform="rotate(30 160 324)"/>
  </g>
+ <!-- HEAD -->
  <g id="cHead">
-  <circle cx="192" cy="182" r="15" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/><circle cx="328" cy="182" r="15" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
+  <!-- ears + earrings -->
+  <circle cx="192" cy="184" r="15" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/><circle cx="328" cy="184" r="15" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
+  <path d="M186 178 q-4 6 0 12 M334 178 q4 6 0 12" stroke="#cf7f5c" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+  <circle cx="189" cy="204" r="6" fill="none" stroke="#1d0f09" stroke-width="6"/><circle cx="189" cy="204" r="6" fill="none" stroke="#ffc83a" stroke-width="2.6"/>
+  <circle cx="331" cy="204" r="6" fill="none" stroke="#1d0f09" stroke-width="6"/><circle cx="331" cy="204" r="6" fill="none" stroke="#ffc83a" stroke-width="2.6"/>
+  <!-- horns -->
+  <path d="M204 120 Q160 122 142 86 Q132 68 140 46 Q154 66 176 80 Q200 92 226 100Z" fill="#f1e6c8" stroke="#1d0f09" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M204 120 Q172 120 152 98 Q180 104 218 108Z" fill="#cdbb8c"/>
+  <path d="M146 78 Q158 82 166 76 M158 94 Q170 98 180 90 M176 106 Q188 108 198 100" stroke="#a89466" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <path d="M140 52 Q144 66 156 76" stroke="#fff9e8" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <path d="M316 120 Q360 122 378 86 Q388 68 380 46 Q366 66 344 80 Q320 92 294 100Z" fill="#f1e6c8" stroke="#1d0f09" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M316 120 Q348 120 368 98 Q340 104 302 108Z" fill="#cdbb8c"/><path d="M344 80 Q320 92 294 100 L300 108 Q336 104 366 96 Q362 84 344 80Z" fill="#cdbb8c" opacity=".7"/>
+  <path d="M374 78 Q362 82 354 76 M362 94 Q350 98 340 90 M344 106 Q332 108 322 100" stroke="#a89466" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <!-- face -->
   <ellipse cx="260" cy="172" rx="70" ry="62" fill="#eba37c" stroke="#1d0f09" stroke-width="6"/>
-  <ellipse cx="212" cy="202" rx="13" ry="9" fill="#3a2a24" opacity=".4"/><ellipse cx="308" cy="202" rx="13" ry="9" fill="#3a2a24" opacity=".4"/>
-  <path d="M200 114 Q166 112 158 70 Q190 80 216 102Z" fill="#f1e6c8" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M320 114 Q354 112 362 70 Q330 80 304 102Z" fill="#f1e6c8" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M190 152 Q194 94 260 88 Q326 94 330 152 Q298 134 260 134 Q222 134 190 152Z" fill="#7d8496" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M198 128 Q214 100 260 96 Q250 112 226 124Z" fill="#a9b2c4"/>
-  <path d="M190 150 Q260 128 330 150 L328 164 Q260 144 192 164Z" fill="#4e5465" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
-  <g stroke="#1d0f09" stroke-width="3"><circle cx="214" cy="152" r="4" fill="#ffc83a"/><circle cx="260" cy="146" r="4" fill="#ffc83a"/><circle cx="306" cy="152" r="4" fill="#ffc83a"/></g>
-  <path d="M228 120 L292 120" stroke="#1d0f09" stroke-width="8"/>
-  <circle cx="236" cy="116" r="17" fill="#7fd6ee" stroke="#c9922c" stroke-width="6"/><circle cx="284" cy="116" r="17" fill="#7fd6ee" stroke="#c9922c" stroke-width="6"/>
-  <circle cx="236" cy="116" r="17" fill="none" stroke="#1d0f09" stroke-width="2"/><circle cx="284" cy="116" r="17" fill="none" stroke="#1d0f09" stroke-width="2"/>
-  <path d="M228 110 Q234 104 242 106 M276 110 Q282 104 290 106" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M302 118 Q336 140 326 188 Q318 226 272 234 Q314 206 302 118Z" fill="#cf7f5c"/>
+  <ellipse cx="206" cy="146" rx="12" ry="9" fill="#f9c9a4" opacity=".8" transform="rotate(-30 206 146)"/>
+  <ellipse cx="208" cy="204" rx="14" ry="9" fill="#e8826a" opacity=".6"/><ellipse cx="312" cy="204" rx="14" ry="9" fill="#d9705a" opacity=".6"/>
+  <path d="M196 180 l-6 -2 M196 188 l-7 0 M324 180 l6 -2 M324 188 l7 0" stroke="#a55a3a" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M296 204 q8 -2 14 4 q-8 6 -14 -4z" fill="#3a2418" opacity=".3"/>
+  <!-- helmet dome -->
+  <path d="M188 154 Q190 90 260 84 Q330 90 332 154 Q298 136 260 136 Q222 136 188 154Z" fill="#7d8496" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M196 132 Q212 98 258 92 Q248 108 226 122Z" fill="#b7c0d2"/>
+  <path d="M304 100 Q330 116 330 152 Q316 142 296 138 Q312 124 304 100Z" fill="#555c70"/>
+  <path d="M232 100 Q244 94 256 94 M290 106 Q300 110 304 118" stroke="#a3adc0" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M214 112 q8 -5 16 -2 M300 124 q6 3 8 9" stroke="#434b5e" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <ellipse cx="287" cy="110" rx="6" ry="3.4" fill="#4a5164" stroke="#1d0f09" stroke-width="2" transform="rotate(30 287 110)"/>
+  <!-- crest strip -->
+  <path d="M250 142 L252 86 Q260 80 268 86 L270 142Z" fill="#5f677b" stroke="#1d0f09" stroke-width="4.4" stroke-linejoin="round"/>
+  <path d="M253 138 L254 90 L258 88 L258 138Z" fill="#aab3c7"/>
+  <circle cx="260" cy="100" r="2.6" fill="#ffc83a" stroke="#1d0f09" stroke-width="1.6"/><circle cx="260" cy="122" r="2.6" fill="#ffc83a" stroke="#1d0f09" stroke-width="1.6"/>
+  <!-- brim band -->
+  <path d="M188 150 Q260 126 332 150 L330 166 Q260 144 190 166Z" fill="#4e5465" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M192 152 Q260 130 328 152 L328 156 Q260 135 192 157Z" fill="#8791a6"/>
+  <g stroke="#1d0f09" stroke-width="2.6"><circle cx="205" cy="158" r="4.2" fill="#ffc83a"/><circle cx="232" cy="150" r="4.2" fill="#ffc83a"/><circle cx="260" cy="148" r="4.2" fill="#ffc83a"/><circle cx="288" cy="150" r="4.2" fill="#ffc83a"/><circle cx="315" cy="158" r="4.2" fill="#ffc83a"/></g>
+  <!-- goggles on the helmet -->
+  <path d="M190 124 Q260 106 330 124" fill="none" stroke="#1d0f09" stroke-width="13" stroke-linecap="round"/>
+  <path d="M190 124 Q260 106 330 124" fill="none" stroke="#5a3320" stroke-width="7" stroke-linecap="round"/>
+  <path d="M196 120 Q222 112 244 112" fill="none" stroke="#8a5a30" stroke-width="2" stroke-linecap="round"/>
+  <path d="M250 118 H270" stroke="#1d0f09" stroke-width="8" stroke-linecap="round"/><path d="M250 118 H270" stroke="#c9922c" stroke-width="3.6" stroke-linecap="round"/>
+  <circle cx="236" cy="116" r="19" fill="#c9922c" stroke="#1d0f09" stroke-width="5"/><circle cx="284" cy="116" r="19" fill="#c9922c" stroke="#1d0f09" stroke-width="5"/>
+  <circle cx="236" cy="116" r="13" fill="#7fd6ee" stroke="#1d0f09" stroke-width="3"/><circle cx="284" cy="116" r="13" fill="#7fd6ee" stroke="#1d0f09" stroke-width="3"/>
+  <path d="M226 124 Q238 132 248 120 Q244 130 232 130Z M274 124 Q286 132 296 120 Q292 130 280 130Z" fill="#3d9fc0"/>
+  <path d="M227 110 Q232 104 240 105 M275 110 Q280 104 288 105" stroke="#fff" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+  <circle cx="243" cy="112" r="1.8" fill="#fff"/><circle cx="291" cy="112" r="1.8" fill="#fff"/>
+  <path d="M222 100 l3 3 M250 100 l-3 3 M270 100 l3 3 M298 100 l-3 3" stroke="#fff0a0" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- eyes -->
   <g id="cEyes"><ellipse cx="237" cy="178" rx="13" ry="15" fill="#fff" stroke="#1d0f09" stroke-width="5"/><ellipse cx="283" cy="178" rx="13" ry="15" fill="#fff" stroke="#1d0f09" stroke-width="5"/>
    <g id="cPupils"><circle cx="240" cy="182" r="7" fill="#1d0f09"/><circle cx="280" cy="182" r="7" fill="#1d0f09"/><circle cx="242" cy="179" r="2.4" fill="#fff"/><circle cx="282" cy="179" r="2.4" fill="#fff"/></g></g>
   <g id="cEyeGlow"><ellipse cx="237" cy="178" rx="19" ry="21" fill="#ff8a1a" opacity=".45"/><ellipse cx="283" cy="178" rx="19" ry="21" fill="#ff8a1a" opacity=".45"/></g>
-  <g id="cBrows"><path d="M206 160 L256 174 L254 156 L210 144Z" fill="#8a2f0e" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/><path d="M314 160 L264 174 L266 156 L310 144Z" fill="#8a2f0e" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/></g>
-  <ellipse cx="260" cy="199" rx="21" ry="17" fill="#e08a64" stroke="#1d0f09" stroke-width="5"/><path d="M250 192 q6 -4 12 -1" stroke="#f7c0a2" stroke-width="4" fill="none" stroke-linecap="round"/>
-  <path d="M260 210 Q226 198 204 218 Q198 236 216 238 Q224 226 242 224 Q254 224 260 216 Q266 224 278 224 Q296 226 304 238 Q322 236 316 218 Q294 198 260 210Z" fill="#e0561c" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M200 216 Q188 274 220 322 Q238 354 260 376 Q282 354 300 322 Q332 274 320 216 Q300 240 260 240 Q220 240 200 216Z" fill="#e0561c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
-  
-  <path d="M232 252 Q238 296 254 336 M288 252 Q282 296 266 336" fill="none" stroke="#a63a0f" stroke-width="5" stroke-linecap="round"/>
-  <path d="M214 232 Q208 262 222 292" fill="none" stroke="#ff9a3a" stroke-width="5" stroke-linecap="round"/>
-  <g id="cMouth"><path d="M234 234 Q260 280 286 234 Q260 244 234 234Z" fill="#4a0f0a" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/><path d="M246 252 Q260 266 274 252 Q260 258 246 252Z" fill="#ff7a8a"/></g>
-  <ellipse cx="260" cy="316" rx="26" ry="9" fill="#ffc83a" stroke="#1d0f09" stroke-width="5"/>
-  <g id="cFlames" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"><path d="M236 366 Q226 346 246 334 Q246 352 256 360Z" fill="#ff8a1a"/><path d="M252 380 Q238 352 262 336 Q266 360 280 372Z" fill="#ffc83a"/><path d="M270 368 Q272 346 292 340 Q286 358 292 368Z" fill="#ff8a1a"/></g>
+  <!-- bushy brows -->
+  <g id="cBrows">
+   <path d="M205 162 L206 150 L214 154 L217 142 L226 150 L231 140 L240 148 L248 146 L256 170 L246 175Z" fill="#8a2f0e" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
+   <path d="M214 156 L218 148 M228 150 L233 145 M240 153 L246 150" stroke="#d0602a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+   <path d="M315 162 L314 150 L306 154 L303 142 L294 150 L289 140 L280 148 L272 146 L264 170 L274 175Z" fill="#7a2809" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
+   <path d="M306 156 L302 148 M292 150 L287 145 M280 153 L274 150" stroke="#b9501f" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- nose -->
+  <ellipse cx="260" cy="199" rx="22" ry="18" fill="#e08a64" stroke="#1d0f09" stroke-width="5"/>
+  <path d="M262 206 Q278 212 276 196 Q272 214 262 206Z" fill="#c2684a"/>
+  <path d="M248 191 q7 -5 13 -1" stroke="#f9c9a4" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M251 208 q3 3 7 0 M263 208 q3 3 7 0" stroke="#8a3a22" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <!-- moustache -->
+  <path d="M260 210 Q226 198 204 218 Q196 228 202 240 Q208 248 218 240 Q216 232 224 228 Q240 224 254 224 Q258 222 260 216 Q262 222 266 224 Q280 224 296 228 Q304 232 302 240 Q312 248 318 240 Q324 228 316 218 Q294 198 260 210Z" fill="#e0561c" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M214 214 Q232 204 252 212 M306 214 Q288 204 268 212" fill="none" stroke="#ff9a3a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M262 218 Q290 226 302 234 Q312 238 316 236 Q312 228 298 224Z" fill="#a63a0f"/>
+  <circle cx="204" cy="244" r="4.4" fill="#ffc83a" stroke="#1d0f09" stroke-width="2.6"/><circle cx="316" cy="244" r="4.4" fill="#ffc83a" stroke="#1d0f09" stroke-width="2.6"/>
+  <!-- beard -->
+  <path d="M200 216 Q188 276 220 322 Q238 354 260 380 Q282 354 300 322 Q332 276 320 216 Q300 240 260 240 Q220 240 200 216Z" fill="#e0561c" stroke="#1d0f09" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M200 216 Q190 270 214 312 Q230 338 246 364 Q232 330 226 296 Q216 262 224 236 Q208 230 200 216Z" fill="#ff7a2a"/>
+  <path d="M300 322 Q332 276 320 216 Q312 232 296 238 Q310 276 292 330 Q296 336 300 322Z" fill="#a63a0f"/>
+  <path d="M232 252 Q238 296 254 340 M288 252 Q282 296 266 340 M260 250 V300" fill="none" stroke="#a63a0f" stroke-width="4.4" stroke-linecap="round"/>
+  <path d="M216 232 Q210 262 224 294 M244 246 Q246 280 258 318 M276 246 Q274 280 262 318" fill="none" stroke="#ff9a3a" stroke-width="3.4" stroke-linecap="round"/>
+  <!-- side braids with ember beads -->
+  <g stroke="#1d0f09" stroke-width="3.6" stroke-linejoin="round">
+   <path d="M212 270 Q204 290 212 306 Q222 312 226 302 Q230 288 224 270Z" fill="#d9511a"/>
+   <path d="M216 290 Q222 296 226 290 M214 280 Q220 286 226 280 M212 300 Q219 306 226 300" fill="none" stroke-width="2.6"/>
+   <path d="M294 270 Q290 288 294 302 Q300 312 310 306 Q318 290 308 270Z" fill="#d9511a"/>
+   <path d="M294 290 Q300 296 306 290 M296 280 Q302 286 308 280 M296 300 Q302 306 308 300" fill="none" stroke-width="2.6"/>
+  </g>
+  <circle cx="219" cy="314" r="6" fill="#ff7a14" stroke="#1d0f09" stroke-width="3"/><circle cx="217" cy="312" r="1.8" fill="#ffe27a"/>
+  <circle cx="302" cy="314" r="6" fill="#ff7a14" stroke="#1d0f09" stroke-width="3"/><circle cx="300" cy="312" r="1.8" fill="#ffe27a"/>
+  <!-- mouth (shown on wins) -->
+  <g id="cMouth"><path d="M234 234 Q260 282 286 234 Q260 244 234 234Z" fill="#4a0f0a" stroke="#1d0f09" stroke-width="5" stroke-linejoin="round"/><path d="M240 237 Q260 244 280 237 L277 245 Q260 251 243 245Z" fill="#fff4dc"/><path d="M246 256 Q260 270 274 256 Q260 262 246 256Z" fill="#ff7a8a"/></g>
+  <ellipse cx="260" cy="320" rx="27" ry="9" fill="#ffc83a" stroke="#1d0f09" stroke-width="5"/>
+  <path d="M240 317 Q260 312 280 317" stroke="#fff0a0" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <g id="cFlames" stroke="#1d0f09" stroke-width="4" stroke-linejoin="round"><path d="M236 368 Q226 348 246 336 Q246 354 256 362Z" fill="#ff8a1a"/><path d="M252 382 Q238 354 262 338 Q266 362 280 374Z" fill="#ffc83a"/><path d="M270 370 Q272 348 292 342 Q286 360 292 370Z" fill="#ff8a1a"/></g>
  </g>
 </svg></div>
 
@@ -851,7 +1260,10 @@ button:disabled{cursor:not-allowed}
 <button id="spin" title="Spin (Space)"><svg viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-3-6.5"/><path d="M20.5 3.5v5.5h-5.5"/></svg><span class="cnt" id="spinCnt" hidden></span></button>
 <button id="bAuto" title="Autoplay"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
 <div id="menu" hidden>
-  <button id="bSnd"><span>Sound</span><i>ON</i></button>
+  <button id="bMus"><span>Music</span><i>ON</i></button>
+  <div class="vrow"><input type="range" id="vMus" min="0" max="100" step="1" aria-label="Music volume"></div>
+  <button id="bSnd"><span>Sound effects</span><i>ON</i></button>
+  <div class="vrow"><input type="range" id="vSnd" min="0" max="100" step="1" aria-label="Sound effects volume"></div>
   <button id="bTurbo"><span>Turbo spin</span><i>OFF</i></button>
   <button id="bInfo"><span>Game info</span><i>›</i></button>
   <button id="bFs"><span>Fullscreen</span><i>⤢</i></button>
@@ -1135,6 +1547,176 @@ function playRound(rng, { ante = false, buy = null } = {}) {
 
 return { CFG, NAMES, PAYTABLE, ROWS, SYM, cryptoRng, playRound, playSpin };
 })();
+/* ---- shell music engine ---- */
+/* SlotForge music engine: fully synthesised looping soundtracks (Web Audio only, no files).
+ *
+ *   const m = SlotMusic.make(ctx, out, defs, {volume})   // ctx: AudioContext or OfflineAudioContext, out: destination node
+ *   m.start('base'); m.theme('bonus', 2); m.intensity(0..1); m.duck(.3, .6, 1.4); m.stinger('win'); m.volume(.7); m.stop();
+ *   m.renderTo(seconds)       // offline: schedule everything up to `seconds` (used by tests with OfflineAudioContext)
+ *
+ * defs = { base: THEME, bonus: THEME, stingers: { name(K) } }
+ * THEME = { tempo (bpm of the beat), barBeats, spb (steps per bar), swing (0..1 of a step, odd steps), bars (loop length), key (midi of tonic),
+ *           scale [semitones], seed, gain, phrase (walk reset every N bars), layers {name:{int, enter, gain, wet}}, bar(M) }
+ * bar(M) is called once per bar (lookahead scheduler on ctx.currentTime) and calls voices: M.pad('layer', t, dur, midiNotes, opts) ... see V below.
+ * The loop is seamless: bar index wraps modulo `bars`; all variation is a seeded function of the bar index, notes ring across the wrap.
+ * Layers fade in on the first pass (layer.enter = bar index) and with game intensity (layer.int = threshold 0..1). */
+const SlotMusic = (() => {
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+const mb32 = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const VOW = { a: [800, 1150, 2900], o: [450, 800, 2830], u: [325, 700, 2700], e: [400, 1600, 2700] };
+
+function make(ctx, out, defs, opt = {}) {
+  const sr = ctx.sampleRate, LOOK = opt.look || .7, TH = {}, nr = mb32(12345);
+  const master = ctx.createGain(); master.gain.value = opt.volume == null ? .7 : opt.volume; master.connect(out);
+  const duckG = ctx.createGain(); duckG.connect(master);
+  const stingG = ctx.createGain(); stingG.connect(master);
+  const nbuf = ctx.createBuffer(1, sr * 2, sr), nd = nbuf.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = nr() * 2 - 1;
+  /* shared dark hall + a soft feedback delay for sonar pings */
+  const rv = ctx.createConvolver(), rvLen = Math.floor(sr * 2.6), ib = ctx.createBuffer(2, rvLen, sr), rr = mb32(777);
+  for (let c = 0; c < 2; c++) { const d = ib.getChannelData(c); let lp = 0; for (let i = 0; i < rvLen; i++) { lp += ((rr() * 2 - 1) * Math.pow(1 - i / rvLen, 2.4) - lp) * .32; d[i] = lp; } }
+  rv.buffer = ib; const rvIn = ctx.createGain(), rvOut = ctx.createGain(); rvOut.gain.value = .9; rvIn.connect(rv); rv.connect(rvOut); rvOut.connect(duckG);
+  const pingIn = ctx.createGain(), pdl = ctx.createDelay(2), pfb = ctx.createGain(), plp = ctx.createBiquadFilter(), pout = ctx.createGain();
+  pdl.delayTime.value = .4; pfb.gain.value = .42; plp.type = 'lowpass'; plp.frequency.value = 2200; pout.gain.value = .6;
+  pingIn.connect(pdl); pdl.connect(plp); plp.connect(pfb); pfb.connect(pdl); plp.connect(pout); pout.connect(duckG); pout.connect(rvIn);
+
+  /* ---------- building blocks ---------- */
+  const dec = (dest, t, pk, d, a = .004) => { const g = ctx.createGain(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(.0002, pk), t + a); g.gain.exponentialRampToValueAtTime(.0001, t + a + d); g.connect(dest); return g; };
+  const sus = (dest, t, dur, a, pk, r) => { const g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(pk, t + a); g.gain.setValueAtTime(pk, t + Math.max(a, dur)); g.gain.linearRampToValueAtTime(0, t + Math.max(a, dur) + r); g.connect(dest); return g; };
+  const osc = (type, f, t, end, det) => { const o = ctx.createOscillator(); o.type = type; o.frequency.value = f; if (det) o.detune.value = det; o.start(t); o.stop(end); return o; };
+  const sw = (type, f, f2, t, d, end) => { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d); o.start(t); o.stop(end); return o; };
+  const nz = (dest, t, d, pk, type, f1, f2, q = 1, a = .003) => { const s = ctx.createBufferSource(); s.buffer = nbuf; s.loop = true; const f = ctx.createBiquadFilter(); f.type = type; f.frequency.setValueAtTime(f1, t); if (f2) f.frequency.exponentialRampToValueAtTime(f2, t + d); f.Q.value = q; s.connect(f); f.connect(dec(dest, t, pk, d, a)); s.start(t, rr() * 1.5); s.stop(t + a + d + .05); };
+
+  /* ---------- voices: V.name(dest, t, ...) ---------- */
+  const V = {
+    /* detuned-saw pad through a gentle lowpass (brass-like when cut is low); notes = midi[] */
+    pad(dest, t, dur, notes, o = {}) {
+      const k = Object.assign({ wave: 'sawtooth', det: 9, cut: 800, cut2: 0, q: .6, a: .9, r: 1.3, g: .05 }, o), end = t + Math.max(k.a, dur) + k.r + .05;
+      const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.Q.value = k.q; f.frequency.setValueAtTime(k.cut, t); if (k.cut2) f.frequency.linearRampToValueAtTime(k.cut2, t + dur);
+      f.connect(sus(dest, t, dur, k.a, k.g / Math.sqrt(notes.length * 2), k.r));
+      notes.forEach(m => [-k.det, k.det].forEach(d => { const os = ctx.createOscillator(); os.type = k.wave; os.frequency.value = mtof(m); os.detune.value = d; os.connect(f); os.start(t); os.stop(end); }));
+    },
+    /* choir-like formant pad: saws through three bandpass formants, slow vibrato; vow/vow2 = vowel glide */
+    choir(dest, t, dur, notes, o = {}) {
+      const k = Object.assign({ vow: 'a', vow2: '', g: .07, a: .8, r: 1.1, vib: 5.2, vd: 9, det: 8 }, o), end = t + Math.max(k.a, dur) + k.r + .05, s = ctx.createGain(), mix = sus(dest, t, dur, k.a, k.g, k.r);
+      const vg = ctx.createGain(); vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(k.vd, t + 1); const vl = ctx.createOscillator(); vl.frequency.value = k.vib; vl.connect(vg); vl.start(t); vl.stop(end);
+      s.gain.value = 1 / Math.sqrt(notes.length * 2);
+      notes.forEach(m => [-k.det, k.det].forEach(d => { const os = ctx.createOscillator(); os.type = 'sawtooth'; os.frequency.value = mtof(m); os.detune.value = d; vg.connect(os.detune); os.connect(s); os.start(t); os.stop(end); }));
+      [1, .6, .3].forEach((gn, j) => { const bp = ctx.createBiquadFilter(), bg = ctx.createGain(); bp.type = 'bandpass'; bp.Q.value = 5; bp.frequency.setValueAtTime(VOW[k.vow][j], t); if (k.vow2) bp.frequency.linearRampToValueAtTime(VOW[k.vow2][j], t + dur); bg.gain.value = gn * 3.2; s.connect(bp); bp.connect(bg); bg.connect(mix); });
+    },
+    /* accordion-like reed: square + two slightly detuned saws, lowpass + reed formant, delayed vibrato, slow attack */
+    reed(dest, t, dur, m, o = {}) {
+      const k = Object.assign({ g: .05, a: .07, r: .14, vib: 5.3, vd: 7, cut: 2800 }, o), f0 = mtof(m), end = t + Math.max(k.a, dur) + k.r + .05;
+      const lp = ctx.createBiquadFilter(), pk = ctx.createBiquadFilter(), mix = ctx.createGain(), vg = ctx.createGain();
+      lp.type = 'lowpass'; lp.frequency.value = k.cut; lp.Q.value = .5; pk.type = 'peaking'; pk.frequency.value = Math.min(2200, Math.max(900, f0 * 3)); pk.Q.value = 1; pk.gain.value = 5;
+      vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(k.vd, t + Math.min(.5, dur * .6)); const vl = ctx.createOscillator(); vl.frequency.value = k.vib; vl.connect(vg); vl.start(t); vl.stop(end);
+      [['square', 0, .3], ['sawtooth', 5, .4], ['sawtooth', -5, .4]].forEach(([ty, d, gn]) => { const os = ctx.createOscillator(), g = ctx.createGain(); os.type = ty; os.frequency.value = f0; os.detune.value = d; g.gain.value = gn; vg.connect(os.detune); os.connect(g); g.connect(mix); os.start(t); os.stop(end); });
+      mix.connect(lp); lp.connect(pk); pk.connect(sus(dest, t, dur, k.a, k.g, k.r));
+    },
+    /* plucked string: kind 'banjo' (bright saw, fast decay) | 'uke' (soft triangle + octave) | 'bell' */
+    pluck(dest, t, m, o = {}) {
+      const k = Object.assign({ kind: 'banjo', g: .07, d: .3 }, o), f = mtof(m), end = t + k.d + .1, lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass'; lp.Q.value = .5; lp.frequency.setValueAtTime(k.kind === 'banjo' ? 3600 : 2200, t); lp.frequency.exponentialRampToValueAtTime(k.kind === 'banjo' ? 800 : 700, t + k.d * .6);
+      lp.connect(dec(dest, t, k.g, k.d, .003));
+      const a = osc(k.kind === 'banjo' ? 'sawtooth' : 'triangle', f, t, end); a.connect(lp);
+      if (k.kind === 'uke') { const b = osc('sine', f * 2, t, end), bg = ctx.createGain(); bg.gain.value = .3; b.connect(bg); bg.connect(lp); }
+      if (k.kind === 'banjo') nz(dest, t, .02, k.g * .5, 'highpass', 3500, 0, .7, .001);
+    },
+    strum(dest, t, notes, o = {}) { notes.forEach((m, i) => V.pluck(dest, t + i * (o.sp || .012), m, o)); },
+    /* upright bass pluck */
+    upright(dest, t, m, o = {}) {
+      const k = Object.assign({ g: .16, d: .42 }, o), f = mtof(m), end = t + k.d + .1, lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = .6;
+      lp.frequency.setValueAtTime(620, t); lp.frequency.exponentialRampToValueAtTime(240, t + k.d); lp.connect(dec(dest, t, k.g, k.d, .008));
+      osc('triangle', f * 1.012, t, end).connect(lp); const b = osc('sine', f, t, end), bg = ctx.createGain(); bg.gain.value = .7; b.connect(bg); bg.connect(lp); nz(dest, t, .03, k.g * .25, 'lowpass', 900, 0, .6, .002);
+    },
+    sub(dest, t, dur, m, o = {}) { const k = Object.assign({ g: .2, a: .03, r: .25 }, o), e = sus(dest, t, dur, k.a, k.g, k.r), end = t + dur + k.r + .05; osc('sine', mtof(m), t, end).connect(e); const b = osc('triangle', mtof(m), t, end), bg = ctx.createGain(); bg.gain.value = .25; b.connect(bg); bg.connect(e); },
+    kick(dest, t, v = 1, o = {}) { const k = Object.assign({ f0: 120, f1: 46, d: .3, g: .35 }, o); sw('sine', k.f0, k.f1, t, .12, t + k.d + .1).connect(dec(dest, t, k.g * v, k.d, .002)); nz(dest, t, .03, k.g * .25 * v, 'lowpass', 500, 0, .7, .001); },
+    taiko(dest, t, v = 1, o = {}) {
+      const k = Object.assign({ f0: 112, f1: 54, d: .75, g: .4 }, o);
+      sw('sine', k.f0, k.f1, t, .3, t + k.d + .1).connect(dec(dest, t, k.g * v, k.d, .003)); sw('sine', k.f0 * 1.5, k.f1 * 1.5, t, .2, t + .5).connect(dec(dest, t, k.g * .35 * v, .3, .003));
+      nz(dest, t, .1, k.g * .5 * v, 'bandpass', 220, 120, 1.1, .002); nz(dest, t, .03, k.g * .22 * v, 'bandpass', 1500, 0, 1, .001);
+    },
+    metal(dest, t, f, d = 1, pk = .1, R = [1, 2.756, 5.404, 8.933]) { R.forEach((r, i) => osc('sine', f * r, t, t + d + .1).connect(dec(dest, t, pk / (1 + i * 1.1), d / (1 + i * .7), .002))); nz(dest, t, .05, pk * .5, 'bandpass', 3000, 1800, 1.2, .001); },
+    hat(dest, t, v = 1, o = {}) { nz(dest, t, o.d || .04, (o.g || .05) * v, 'highpass', o.f || 6500, 0, .6, .002); },
+    shaker(dest, t, v = 1) { nz(dest, t, .06, .05 * v, 'bandpass', 5200, 0, .8, .014); },
+    crackle(dest, t, v = 1) { nz(dest, t, .012 + rr() * .02, (.025 + rr() * .03) * v, 'bandpass', 3000 + rr() * 3500, 0, 3, .001); },
+    stomp(dest, t, v = 1) { sw('sine', 95, 52, t, .09, t + .25).connect(dec(dest, t, .3 * v, .16, .002)); nz(dest, t, .07, .12 * v, 'lowpass', 1000, 300, .7, .001); },
+    sonar(dest, t, m, v = 1, d = 1.5) { const g = dec(dest, t, .1 * v, d, .01); g.connect(pingIn); osc('sine', mtof(m), t, t + d + .1).connect(g); },
+    bubble(dest, t, m, v = 1) { const f = mtof(m); sw('sine', f, f * 1.6, t, .07, t + .15).connect(dec(dest, t, .028 * v, .07, .004)); },
+    heartbeat(dest, t, v = 1) { [0, .24].forEach((dt, i) => sw('sine', 62, 38, t + dt, .14, t + dt + .4).connect(dec(dest, t + dt, (i ? .16 : .24) * v, .22, .006))); },
+    /* whale call: sine glide (m0 -> m1 -> m2) with slow vibrato, lowpassed */
+    whale(dest, t, dur, m0, m1, m2, o = {}) {
+      const k = Object.assign({ g: .05 }, o), end = t + dur + .3, lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700; lp.connect(sus(dest, t, dur * .7, dur * .3, k.g, dur * .3));
+      [[1, 1], [2, .25]].forEach(([mul, gn]) => { const os = ctx.createOscillator(), g = ctx.createGain(); os.frequency.setValueAtTime(mtof(m0) * mul, t); os.frequency.linearRampToValueAtTime(mtof(m1) * mul, t + dur * .5); os.frequency.linearRampToValueAtTime(mtof(m2) * mul, t + dur); g.gain.value = gn; os.connect(g); g.connect(lp); os.start(t); os.stop(end);
+        if (mul === 1) { const l = ctx.createOscillator(), lg = ctx.createGain(); l.frequency.value = 3.2; lg.gain.value = mtof(m0) * .012; l.connect(lg); lg.connect(os.frequency); l.start(t); l.stop(end); } });
+    },
+    /* lowbrass slide with a lazy wah (grumpy tuba/trombone) */
+    slide(dest, t, dur, m0, m1, o = {}) {
+      const k = Object.assign({ g: .08 }, o), end = t + dur + .3, lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 1; lp.frequency.setValueAtTime(300, t); lp.frequency.linearRampToValueAtTime(900, t + dur * .5); lp.frequency.linearRampToValueAtTime(380, t + dur);
+      lp.connect(sus(dest, t, dur, .06, k.g, .2)); [-6, 6].forEach(d => { const os = ctx.createOscillator(); os.type = 'sawtooth'; os.detune.value = d; os.frequency.setValueAtTime(mtof(m0), t); os.frequency.setValueAtTime(mtof(m0), t + dur * .25); os.frequency.exponentialRampToValueAtTime(mtof(m1), t + dur * .9); os.connect(lp); os.start(t); os.stop(end); });
+    },
+    riser(dest, t, dur, o = {}) { const k = Object.assign({ g: .06, f1: 300, f2: 3800 }, o), s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), e = ctx.createGain(); s.buffer = nbuf; s.loop = true; f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(k.f1, t); f.frequency.exponentialRampToValueAtTime(k.f2, t + dur);
+      e.gain.setValueAtTime(0, t); e.gain.linearRampToValueAtTime(k.g, t + dur * .95); e.gain.linearRampToValueAtTime(0, t + dur); s.connect(f); f.connect(e); e.connect(dest); s.start(t, rr()); s.stop(t + dur + .05); },
+    horn(dest, t, dur, notes, o = {}) { V.pad(dest, t, dur, notes, Object.assign({ cut: 380, cut2: 1100, q: 1, a: dur * .4, r: dur * .5, g: .07, det: 7 }, o)); }
+  };
+
+  /* ---------- themes ---------- */
+  let intensityT = 0, cur = null, timer = 0, started = false;
+  function mk(name, def) {
+    const th = { name, def, bars: def.bars, barSec: def.barBeats * 60 / def.tempo, sd: def.barBeats * 60 / def.tempo / def.spb, gain: ctx.createGain(), L: {}, ls: {}, next: 0, bar: 0, pass: 0, active: false, walk: [] };
+    th.gain.gain.value = 0; th.gain.connect(duckG);
+    const rg = mb32(def.seed || 1); let w = 0; for (let i = 0; i < def.bars; i++) { if (i % (def.phrase || 4) === 0) w = 0; else { const r = rg(); w += r < .3 ? -1 : r > .7 ? 1 : 0; w = Math.max(-2, Math.min(2, w)); } th.walk.push(w); }
+    return th;
+  }
+  const layerNode = (th, name) => {
+    if (th.L[name]) return th.L[name];
+    const L = (th.def.layers || {})[name] || {}, g = ctx.createGain(), s = ctx.createGain(); g.gain.value = (th.def.layers || {})[name] ? 0 : 1; s.gain.value = L.wet == null ? .22 : L.wet; g.connect(th.gain); g.connect(s); s.connect(rvIn); th.L[name] = g; th.ls[name] = false; return g;
+  };
+  function barOn(th, name, M) {
+    const L = (th.def.layers || {})[name]; if (!L) return true;
+    const want = (th.pass > 0 || M.i >= (L.enter || 0)) && intensityT >= (L.int || 0), g = layerNode(th, name), lv = L.gain == null ? 1 : L.gain;
+    if (want && !th.ls[name]) { g.gain.cancelScheduledValues(M.t0); g.gain.setValueAtTime(0, M.t0); g.gain.linearRampToValueAtTime(lv, M.t0 + Math.min(1.2, th.barSec * .8)); th.ls[name] = true; }
+    else if (!want && th.ls[name]) { g.gain.cancelScheduledValues(M.t0); g.gain.setValueAtTime(g.gain.value || lv, M.t0); g.gain.linearRampToValueAtTime(0, M.t0 + th.barSec); th.ls[name] = false; }
+    return want;
+  }
+  function schedBar(th) {
+    const d = th.def, i = th.bar, t0 = th.next, rnd = mb32((d.seed || 1) * 7919 + i * 104729 + 13);
+    const M = { i, pass: th.pass, t0, bd: th.barSec, sd: th.sd, spb: d.spb, rnd, walk: th.walk[i], int: intensityT, key: d.key, scale: d.scale, mtof, bars: th.bars,
+      st: s => t0 + s * th.sd + (s % 2 ? (d.swing || 0) * th.sd : 0),
+      note: (deg, oct = 0) => { const n = d.scale.length; return d.key + 12 * Math.floor(deg / n) + d.scale[((deg % n) + n) % n] + 12 * oct; },
+      on: name => barOn(th, name, M), pick: a => a[Math.floor(rnd() * a.length)] };
+    Object.keys(V).forEach(v => { M[v] = (layer, ...a) => { if (barOn(th, layer, M)) V[v](layerNode(th, layer), ...a); }; });
+    d.bar(M);
+    th.next += th.barSec; if (++th.bar >= th.bars) { th.bar = 0; th.pass++; }
+  }
+  const tick = () => { if (!cur) return; const lim = ctx.currentTime + LOOK; let n = 0; while (cur.next < lim && n++ < 4) schedBar(cur); };
+
+  const API = {
+    V, ctx, master, get current() { return cur && cur.name; },
+    start(name = 'base', fade = .4) {
+      if (!defs[name]) return; if (!started) { started = true; if (!opt.offline) timer = setInterval(tick, 80); }
+      if (cur && cur.name === name && cur.active) return; this.theme(name, fade, true);
+    },
+    stop(fade = .4) { if (cur) { cur.gain.gain.cancelScheduledValues(ctx.currentTime); cur.gain.gain.setTargetAtTime(0, ctx.currentTime, fade / 3); cur.active = false; } clearInterval(timer); timer = 0; started = false; cur = null; },
+    theme(name, xf = 2, fresh) {
+      if (!defs[name]) return; if (cur && cur.name === name && cur.active) return; const now = ctx.currentTime;
+      if (cur) { cur.active = false; cur.gain.gain.cancelScheduledValues(now); cur.gain.gain.setTargetAtTime(0, now, xf / 3.5); const old = cur; setTimeout(() => { if (!old.active) Object.keys(old.L).forEach(k => old.L[k].gain.value = 0); }, (xf + 4) * 1000); }
+      const th = TH[name] = mk(name, defs[name]); th.next = now + .08; th.active = true; th.gain.gain.setValueAtTime(0, now); th.gain.gain.setTargetAtTime(defs[name].gain == null ? 1 : defs[name].gain, now, Math.max(.05, xf / 3.5)); cur = th;
+      if (!started) { started = true; if (!opt.offline) timer = setInterval(tick, 80); } tick();
+    },
+    intensity(x) { intensityT = Math.max(0, Math.min(1, x)); },
+    volume(v) { master.gain.setTargetAtTime(v, ctx.currentTime, .05); },
+    duck(depth = .3, hold = .5, rel = 1.4) { const t = ctx.currentTime; duckG.gain.cancelScheduledValues(t); duckG.gain.setTargetAtTime(depth, t, .04); duckG.gain.setTargetAtTime(1, t + hold, rel / 3); },
+    stinger(name, at) {
+      const f = defs.stingers && defs.stingers[name]; if (!f) return; const t = at == null ? ctx.currentTime + .02 : at, d = (cur && cur.def) || defs.base || defs[Object.keys(defs)[0]];
+      f({ V, dest: stingG, t, key: d.key, scale: d.scale, mtof, note: (deg, oct = 0) => { const n = d.scale.length; return d.key + 12 * Math.floor(deg / n) + d.scale[((deg % n) + n) % n] + 12 * oct; } });
+    },
+    renderTo(sec) { if (!cur) return; while (cur.next < sec) schedBar(cur); }
+  };
+  return API;
+}
+return { make, mtof };
+})();
+
 /* ---- shell ---- */
 /* SlotForge shell: shared logic for every Nebula slot. See shell/README.md for the hook API.
  *
@@ -1152,12 +1734,14 @@ const betLbl = n => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.t
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
 
+const shellApi = { boot, $, store, fmt, betLbl, sleep, hooks: null, S: null };
 function boot(cfg, factory) {
 const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : null;   // standalone build: engine embedded, play money
 const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, BUYS = cfg.buys || [], P = cfg.storage || cfg.id;
 let hooks = {};
 let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, busy = false, balance = 0, STAGE_S = 1;
-let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false);
+let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false), musicOn = store.get(P + '_mus', true), sndVol = store.get(P + '_sndv', .85), musVol = store.get(P + '_musv', .7);
+const MUS_GAIN = .5;   // slider 100% = this much of the music bus; calibrated so the soundtrack sits well below the effects
 let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
 const T = () => turbo ? .45 : 1;
 const wait = ms => sleep(ms * T());
@@ -1204,11 +1788,13 @@ function makeKit(ctx, out) {
     inp.connect(out); inp.connect(dl); dl.connect(f); f.connect(fb); fb.connect(dl); f.connect(w); w.connect(out); pingN = inp; return inp; };
   return { ctx, out, bus, env, osc, noise, metal, st, T0, bed, ping };
 }
-let ac, master, recipes, ambCtl = null;
+let ac, master, sfxG, recipes, ambCtl = null, mus = null, curTheme = 'base';
 function audio() {
   if (!recipes) { ac = new (window.AudioContext || window.webkitAudioContext)();
     const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; master = ac.createGain(); master.gain.value = .9; master.connect(comp).connect(ac.destination);
-    const kit = makeKit(ac, master); recipes = hooks.sfx(kit); if (hooks.ambience) ambCtl = hooks.ambience(kit); }
+    sfxG = ac.createGain(); sfxG.gain.value = sndVol; sfxG.connect(master);
+    const kit = makeKit(ac, sfxG); recipes = hooks.sfx(kit); if (hooks.ambience) ambCtl = hooks.ambience(kit);
+    if (hooks.music && typeof SlotMusic !== 'undefined') mus = SlotMusic.make(ac, master, hooks.music(), { volume: musVol * MUS_GAIN }); }
   if (ac.state === 'suspended') ac.resume(); return recipes;
 }
 const sfx = new Proxy({}, { get: (_, k) => (...a) => { if (!soundOn) return; try { audio()[k](...a); } catch {} } });
@@ -1216,7 +1802,16 @@ const amb = {
   start() { if (!soundOn) return; try { audio(); if (ambCtl) ambCtl.start(); } catch {} },
   stop() { if (ambCtl) ambCtl.stop(); }
 };
-addEventListener('pointerdown', () => amb.start(), { once: true });
+/* music: starts after the first user gesture (browser autoplay rule), separate on/off + volume; themes: 'base' / 'bonus' */
+const music = {
+  start() { if (!musicOn) return; try { audio(); if (mus) mus.start(curTheme); } catch {} },
+  stop() { if (mus) mus.stop(.35); },
+  theme(n, xf = 2.2) { curTheme = n; try { if (mus && musicOn) mus.theme(n, xf); } catch {} },
+  intensity(x) { try { if (mus) mus.intensity(x); } catch {} },
+  duck(d, h, r) { try { if (mus && musicOn) mus.duck(d, h, r); } catch {} },
+  stinger(n) { try { if (mus && musicOn) mus.stinger(n); } catch {} }
+};
+addEventListener('pointerdown', () => { amb.start(); music.start(); }, { once: true });
 
 /* ---------- particles (restrained: small ambient sparks + event bursts) ---------- */
 const cv = $('fx'), cx = cv.getContext('2d'); let parts = [];
@@ -1305,7 +1900,7 @@ async function bigWin(x, amt) {
   const lv = t.lv;
   $('bigT').textContent = t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = t.tag || '';
   $('big').classList.add('show'); char('big', 3300); shake(lv > 2); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
-  sfx.big(lv);
+  sfx.big(lv); music.duck([0, .5, .38, .28, .2][lv] || .3, 1.2 + lv * .8, 1.6); music.stinger('win');
   await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => sfx.tick(k)), sleep(20000)]);
   await sleep(auto.left > 0 ? 700 : 1500 + lv * 300);
   $('big').classList.remove('show'); return t.name;
@@ -1333,8 +1928,8 @@ async function go(buy) {
     run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
     if (R.bonusTriggered) {
       out.bonus = true;
-      await hooks.showTrigger(R); sfx.bonus(); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
-      $('introN').textContent = R.bonus.startSpins; await tapWait('introM', auto.left > 0 ? 1800 : 0);
+      await hooks.showTrigger(R); sfx.bonus(); music.duck(.12, 2.6, 1.6); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
+      $('introN').textContent = R.bonus.startSpins; music.theme('bonus', 2.6); music.stinger('bonus'); await tapWait('introM', auto.left > 0 ? 1800 : 0);
       $('fsBox').hidden = false; $(cc.el).classList.add(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(true); if (ambCtl && ambCtl.bonus) ambCtl.bonus(true);
       let total = R.bonus.spins.length;
       for (const sp of R.bonus.spins) {
@@ -1343,7 +1938,7 @@ async function go(buy) {
         await hooks.clearBoard();
         run = await hooks.playSpin(sp, run, ctx); await wait(300);
       }
-      $('fsBox').hidden = true; $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); if (ambCtl && ambCtl.bonus) ambCtl.bonus(false); $('outroV').textContent = fmt(0);
+      $('fsBox').hidden = true; music.theme('base', 2.4); music.intensity(0); $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); if (ambCtl && ambCtl.bonus) ambCtl.bonus(false); $('outroV').textContent = fmt(0);
       openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
       await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);
       await tapWait('outroM', auto.left > 0 ? 1500 : 0);
@@ -1401,6 +1996,7 @@ function refreshUi() {
   $('spinCnt').hidden = !(auto.left > 0); $('spinCnt').textContent = auto.left; $('spin').querySelector('svg').style.visibility = auto.left > 0 ? 'hidden' : '';
   $('bTurbo').classList.toggle('on', turbo); $('bTurbo').querySelector('i').textContent = turbo ? 'ON' : 'OFF'; $('turboBadge').hidden = !turbo;
   $('bSnd').classList.toggle('on', soundOn); $('bSnd').querySelector('i').textContent = soundOn ? 'ON' : 'OFF';
+  $('bMus').classList.toggle('on', musicOn); $('bMus').querySelector('i').textContent = musicOn ? 'ON' : 'OFF'; $('vMus').value = Math.round(musVol * 100); $('vSnd').value = Math.round(sndVol * 100);
   document.body.style.setProperty('--spd', T());
 }
 function openBets() {
@@ -1419,6 +2015,11 @@ $('menuBtn').onclick = e => { e.stopPropagation(); sfx.ui(); $('menu').hidden = 
 document.addEventListener('click', e => { if (!e.target.closest('#menu') && !e.target.closest('#menuBtn')) closeMenu(); });
 $('bTurbo').onclick = () => { sfx.ui(); turbo = !turbo; store.set(P + '_turbo', turbo); refreshUi(); };
 $('bSnd').onclick = () => { soundOn = !soundOn; store.set(P + '_snd', soundOn); soundOn ? (amb.start(), sfx.ui()) : amb.stop(); refreshUi(); };
+$('bMus').onclick = () => { musicOn = !musicOn; store.set(P + '_mus', musicOn); musicOn ? music.start() : music.stop(); sfx.ui(); refreshUi(); };
+$('vMus').oninput = e => { musVol = e.target.value / 100; if (mus) mus.volume(musVol * MUS_GAIN); };
+$('vMus').onchange = () => { store.set(P + '_musv', musVol); if (musicOn) music.start(); };
+$('vSnd').oninput = e => { sndVol = e.target.value / 100; if (sfxG) sfxG.gain.value = sndVol; };
+$('vSnd').onchange = () => { store.set(P + '_sndv', sndVol); sfx.ui(); };
 $('bInfo').onclick = () => { closeMenu(); openM('infoM'); };
 $('bFs').onclick = () => { closeMenu(); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch {} };
 addEventListener('keydown', e => {
@@ -1429,11 +2030,11 @@ addEventListener('keydown', e => {
 
 /* ---------- the API handed to the slot ---------- */
 const S = {
-  cfg, $, store, fmt, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
+  cfg, $, store, fmt, music, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
   scale: () => STAGE_S, bet: () => BETS[bi], isTurbo: () => turbo, isBusy: () => busy, local: !!LOCAL,
   skipCount: () => { skipBig = true; }
 };
-hooks = factory(S) || {};
+hooks = factory(S) || {}; shellApi.hooks = hooks; shellApi.S = S;
 for (const k of ['sfx', 'init', 'paintIdle', 'roundStart', 'clearBoard', 'restoreBoard', 'playSpin', 'showTrigger'])
   if (typeof hooks[k] !== 'function') throw new Error('slot is missing hook: ' + k);
 /* ---------- static UI generated from slot.json ---------- */
@@ -1472,7 +2073,7 @@ else if (!TOKEN) $('auth').hidden = false;
 else fetch(API + '/api/me', { headers: { authorization: 'Bearer ' + TOKEN } }).then(r => r.json())
   .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); } else $('auth').hidden = false; });
 }
-return { boot, $, store, fmt, betLbl, sleep };
+return shellApi;
 })();
 
 /* ---- slot: emberclaw ---- */
@@ -1488,6 +2089,64 @@ const NAMES = ['Iron Shard','Copper Ingot','Silver Chain','Molten Hammer','Rune-
 const ED = S.cfg.engineData, round2 = v => +v.toFixed(2);
 const PT = ED.paytable.map(r => r.map(v => round2(v * ED.payScale)));
 let lastGrid = null, lastWilds = [];
+
+/* ---------- MUSIC: "dark forge" (base, 80 bpm) and "furnace drive" (bonus, 112 bpm). D phrygian: D Eb F G A Bb C. All synthesised by shell/slot-music.js ---------- */
+const MIN = [0, 3, 7], MAJ = [0, 4, 7], P5 = [0, 7];
+/* chord per bar: [semitones above D, quality]. Only chords built from D phrygian notes (C5 = C+G power chord, no E) */
+const dm = [0, MIN], eb = [1, MAJ], c5 = [10, P5], gm = [5, MIN], bb = [8, MAJ];
+const rootOf = c => 50 + (c[0] > 6 ? c[0] - 12 : c[0]);                      // D3 = 50
+const voicing = c => { const r = rootOf(c), q = c[1]; return [r, r + 7, r + 12, r + 12 + (q[1] === 7 ? 7 : q[1])]; };
+/* motifs: [step, length in steps, scale degree from D4]; strong notes (step 0) never move, others follow the seeded walk (+-1) */
+const EM_A = [[[0, 6, 4], [8, 4, 5], [12, 4, 4]], [[0, 8, 3], [8, 4, 2], [12, 4, 3]]];
+const EM_B = [[[0, 6, 4], [8, 4, 6], [12, 4, 5]], [[0, 12, 4], [12, 4, 1]]];
+const EM_END = [[[0, 6, 4], [8, 4, 5], [12, 4, 4]], [[0, 12, 1], [12, 4, 0]]];
+function musicDefs() {
+  const forgeBase = {
+    tempo: 80, barBeats: 4, spb: 16, swing: .08, bars: 16, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 17, gain: 1, phrase: 4,
+    layers: { pad: { gain: 1 }, sub: { gain: 1 }, taiko: { enter: 2, gain: 1 }, crack: { enter: 4, gain: 1, wet: .1 }, anvil: { enter: 4, int: .15, gain: 1 },
+      lead: { enter: 8, gain: 1, wet: .3 }, choirhi: { int: .5, enter: 12, gain: 1, wet: .35 }, roll: { int: .8, gain: 1 } },
+    bar(M) {
+      const C = [dm, dm, eb, dm, dm, gm, eb, c5, bb, bb, c5, dm, gm, eb, c5, eb][M.i], r = rootOf(C), v = voicing(C), last4 = M.i % 4 === 3;
+      M.pad('pad', M.t0, M.bd * .98, v, { cut: 600, cut2: 880, g: .06, a: 1, r: 1.5, det: 9 });
+      M.sub('sub', M.t0, M.bd * .85, r - 12, { g: .24 });
+      M.taiko('taiko', M.st(0), 1); M.taiko('taiko', M.st(8), .7);
+      if (M.i % 2) M.taiko('taiko', M.st(11), .32);
+      if (last4) [12, 13, 14, 15].forEach((s, k) => M.taiko('taiko', M.st(s), .35 + k * .16 + (M.i === 15 ? .15 : 0)));
+      if (M.i % 2 === 0) M.metal('anvil', M.st(12), M.mtof(r + 12), 1.4, .06);
+      if (M.i === 7 || M.i === 15) M.metal('anvil', M.st(0), M.mtof(r), 2.4, .08);
+      for (let s = 0; s < 16; s++) { if (M.rnd() < .2) M.crackle('crack', M.st(s) + M.rnd() * .05, .5 + M.rnd()); if (s % 4 === 2 && M.rnd() < .7) M.hat('crack', M.st(s), 1, { g: .035, f: 7500 }); }
+      if (M.int > .8) for (let s = 0; s < 16; s += 2) if (s % 8) M.taiko('roll', M.st(s), .22 + (s % 4 ? 0 : .1));
+      const mot = (M.i < 15 ? (M.i % 4 < 2 ? EM_A : (M.i < 12 ? EM_B : EM_END)) : EM_END)[M.i % 2], wk = Math.max(-1, Math.min(1, M.walk));
+      mot.forEach(([s, len, d]) => { const m = M.note(d + (s ? wk : 0)); M.pad('lead', M.st(s), len * M.sd * .92, [m], { det: 6, cut: 1250, cut2: 850, q: .8, a: .14, r: .4, g: .075 }); });
+      if (M.i % 2 === 0) M.choir('choirhi', M.t0, M.bd * 1.9, [r + 24, r + 31, r + 36], { vow: 'o', vow2: 'a', g: .05, a: 1.2, r: 1.6 });
+    }
+  };
+  const forgeBonus = {
+    tempo: 112, barBeats: 4, spb: 16, swing: 0, bars: 24, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 29, gain: 1, phrase: 4,
+    layers: { choir: { gain: 1, wet: .4 }, pad: { gain: 1 }, bass: { gain: 1 }, kick: { enter: 1, gain: 1 }, anvil: { enter: 2, gain: 1 }, hat: { enter: 3, gain: 1, wet: .08 },
+      lead: { enter: 4, gain: 1, wet: .28 }, lead2: { int: .45, enter: 8, gain: 1, wet: .3 }, riser: { gain: 1 }, roll: { int: .7, gain: 1 } },
+    bar(M) {
+      const G = [dm, dm, bb, c5, dm, dm, eb, c5, gm, gm, eb, dm, gm, bb, c5, eb, dm, dm, bb, c5, gm, eb, c5, eb], C = G[M.i], r = rootOf(C), v = voicing(C), g8 = M.i % 8, rise = g8 / 7;
+      M.choir('choir', M.t0, M.bd * .98, [r + 12, r + 19, r + 24, r + 12 + (C[1][1] === 7 ? 7 : C[1][1])], { vow: M.i % 2 ? 'o' : 'a', vow2: M.i % 2 ? 'a' : 'o', g: .06, a: .6, r: .9 });
+      M.pad('pad', M.t0, M.bd * .98, v, { cut: 520 + rise * 380, cut2: 760 + rise * 620, g: .05, a: .5, r: .8 });
+      for (let s = 0; s < 16; s += 2) { const hit = s % 8 === 0 ? 1 : s % 4 === 0 ? .7 : .45, oct = (s === 6 || s === 14) ? 12 : 0; M.sub('bass', M.st(s), M.sd * 1.5, r - 12 + oct, { g: .15 * hit + .05, a: .01, r: .06 }); }
+      [0, 4, 8, 12].forEach((s, k) => M.taiko('kick', M.st(s), k % 2 ? .55 : .85, { d: .5 }));
+      [4, 12].forEach(s => M.metal('anvil', M.st(s), M.mtof(r + 12), .8, .05));
+      for (let s = 0; s < 16; s++) if (s % 2) M.hat('hat', M.st(s), 1, { g: .03, f: 8000 }); else if (M.rnd() < .25) M.crackle('hat', M.st(s), .6);
+      if (M.i % 4 === 3) [10, 11, 12, 13, 14, 15].forEach((s, k) => M.taiko('roll', M.st(s), .3 + k * .11));
+      if (g8 >= 6) M.riser('riser', M.t0, M.bd, { g: .05 + (g8 - 6) * .02, f1: 300 + (g8 - 6) * 500, f2: 2600 + (g8 - 6) * 1200 });
+      if (g8 === 0 && M.i > 0) M.metal('anvil', M.t0, M.mtof(r), 2.2, .07);
+      /* driving fanfare: eighth-note figure on the chord (root, 5th, b2/3rd), the walk nudges the answer bar */
+      const fig = g8 % 2 ? [[0, 2, 4], [2, 2, 5], [4, 2, 4], [6, 2, 3], [8, 4, 4], [12, 2, 3], [14, 2, 1]] : [[0, 2, 4], [2, 2, 4], [4, 2, 6], [6, 2, 5], [8, 4, 4], [12, 4, 4]], wk = Math.max(-1, Math.min(1, M.walk));
+      fig.forEach(([s, len, d]) => { const m = M.note(d + (s ? wk : 0)); M.pad('lead', M.st(s), len * M.sd * .9, [m], { det: 6, cut: 1500, cut2: 1000, q: .8, a: .06, r: .22, g: .07 }); if (M.int > .45) M.pad('lead2', M.st(s), len * M.sd * .85, [m + 12], { det: 5, cut: 1800, cut2: 1300, a: .05, r: .18, g: .035 }); });
+    }
+  };
+  const stingers = {
+    win(K) { const { V, dest, t } = K; V.taiko(dest, t, .9); V.metal(dest, t + .02, K.mtof(62), 1.4, .09); V.pad(dest, t, .3, [K.note(0, -1), K.note(4, -1), K.note(0), K.note(4)], { cut: 900, cut2: 1400, a: .03, r: .7, g: .08 }); },
+    bonus(K) { const { V, dest, t } = K; V.horn(dest, t, 1.6, [K.note(0, -2), K.note(4, -2), K.note(0, -1), K.note(4, -1)], { g: .09 }); [0, .4, .8].forEach((d, i) => V.taiko(dest, t + d, .9 - i * .1)); V.riser(dest, t, 1.4, { g: .05 }); V.metal(dest, t + 1.5, K.mtof(50), 2.2, .09); }
+  };
+  return { base: forgeBase, bonus: forgeBonus, stingers };
+}
 
 /* ---------- the board ---------- */
 const cells = [];
@@ -1610,6 +2269,7 @@ return {
   ambience: kit => kit.bed({ lowpass: 170, gain: .5, level: .02, loopSec: 3 }),
   ambientBoost: () => heatNow * .02,
   particleColor: (p, a) => p.c ? `rgba(255,${190 + (p.l % 50)},60,${a})` : `rgba(255,${100 + Math.min(120, p.l)},20,${a})`,
+  music: musicDefs,
   init() {},
   paintIdle() { paint(Array.from({ length: 5 }, (_, r) => Array.from({ length: 6 }, (_, c) => (r * 2 + c) % 7))); dropAll(); },
   roundStart: () => setHeat(0),

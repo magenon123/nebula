@@ -15,12 +15,14 @@ const betLbl = n => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.t
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
 
+const shellApi = { boot, $, store, fmt, betLbl, sleep, hooks: null, S: null };
 function boot(cfg, factory) {
 const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : null;   // standalone build: engine embedded, play money
 const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, BUYS = cfg.buys || [], P = cfg.storage || cfg.id;
 let hooks = {};
 let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, busy = false, balance = 0, STAGE_S = 1;
-let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false);
+let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false), musicOn = store.get(P + '_mus', true), sndVol = store.get(P + '_sndv', .85), musVol = store.get(P + '_musv', .7);
+const MUS_GAIN = .5;   // slider 100% = this much of the music bus; calibrated so the soundtrack sits well below the effects
 let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
 const T = () => turbo ? .45 : 1;
 const wait = ms => sleep(ms * T());
@@ -67,11 +69,13 @@ function makeKit(ctx, out) {
     inp.connect(out); inp.connect(dl); dl.connect(f); f.connect(fb); fb.connect(dl); f.connect(w); w.connect(out); pingN = inp; return inp; };
   return { ctx, out, bus, env, osc, noise, metal, st, T0, bed, ping };
 }
-let ac, master, recipes, ambCtl = null;
+let ac, master, sfxG, recipes, ambCtl = null, mus = null, curTheme = 'base';
 function audio() {
   if (!recipes) { ac = new (window.AudioContext || window.webkitAudioContext)();
     const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 4; master = ac.createGain(); master.gain.value = .9; master.connect(comp).connect(ac.destination);
-    const kit = makeKit(ac, master); recipes = hooks.sfx(kit); if (hooks.ambience) ambCtl = hooks.ambience(kit); }
+    sfxG = ac.createGain(); sfxG.gain.value = sndVol; sfxG.connect(master);
+    const kit = makeKit(ac, sfxG); recipes = hooks.sfx(kit); if (hooks.ambience) ambCtl = hooks.ambience(kit);
+    if (hooks.music && typeof SlotMusic !== 'undefined') mus = SlotMusic.make(ac, master, hooks.music(), { volume: musVol * MUS_GAIN }); }
   if (ac.state === 'suspended') ac.resume(); return recipes;
 }
 const sfx = new Proxy({}, { get: (_, k) => (...a) => { if (!soundOn) return; try { audio()[k](...a); } catch {} } });
@@ -79,7 +83,16 @@ const amb = {
   start() { if (!soundOn) return; try { audio(); if (ambCtl) ambCtl.start(); } catch {} },
   stop() { if (ambCtl) ambCtl.stop(); }
 };
-addEventListener('pointerdown', () => amb.start(), { once: true });
+/* music: starts after the first user gesture (browser autoplay rule), separate on/off + volume; themes: 'base' / 'bonus' */
+const music = {
+  start() { if (!musicOn) return; try { audio(); if (mus) mus.start(curTheme); } catch {} },
+  stop() { if (mus) mus.stop(.35); },
+  theme(n, xf = 2.2) { curTheme = n; try { if (mus && musicOn) mus.theme(n, xf); } catch {} },
+  intensity(x) { try { if (mus) mus.intensity(x); } catch {} },
+  duck(d, h, r) { try { if (mus && musicOn) mus.duck(d, h, r); } catch {} },
+  stinger(n) { try { if (mus && musicOn) mus.stinger(n); } catch {} }
+};
+addEventListener('pointerdown', () => { amb.start(); music.start(); }, { once: true });
 
 /* ---------- particles (restrained: small ambient sparks + event bursts) ---------- */
 const cv = $('fx'), cx = cv.getContext('2d'); let parts = [];
@@ -168,7 +181,7 @@ async function bigWin(x, amt) {
   const lv = t.lv;
   $('bigT').textContent = t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = t.tag || '';
   $('big').classList.add('show'); char('big', 3300); shake(lv > 2); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
-  sfx.big(lv);
+  sfx.big(lv); music.duck([0, .5, .38, .28, .2][lv] || .3, 1.2 + lv * .8, 1.6); music.stinger('win');
   await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => sfx.tick(k)), sleep(20000)]);
   await sleep(auto.left > 0 ? 700 : 1500 + lv * 300);
   $('big').classList.remove('show'); return t.name;
@@ -196,8 +209,8 @@ async function go(buy) {
     run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
     if (R.bonusTriggered) {
       out.bonus = true;
-      await hooks.showTrigger(R); sfx.bonus(); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
-      $('introN').textContent = R.bonus.startSpins; await tapWait('introM', auto.left > 0 ? 1800 : 0);
+      await hooks.showTrigger(R); sfx.bonus(); music.duck(.12, 2.6, 1.6); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
+      $('introN').textContent = R.bonus.startSpins; music.theme('bonus', 2.6); music.stinger('bonus'); await tapWait('introM', auto.left > 0 ? 1800 : 0);
       $('fsBox').hidden = false; $(cc.el).classList.add(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(true); if (ambCtl && ambCtl.bonus) ambCtl.bonus(true);
       let total = R.bonus.spins.length;
       for (const sp of R.bonus.spins) {
@@ -206,7 +219,7 @@ async function go(buy) {
         await hooks.clearBoard();
         run = await hooks.playSpin(sp, run, ctx); await wait(300);
       }
-      $('fsBox').hidden = true; $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); if (ambCtl && ambCtl.bonus) ambCtl.bonus(false); $('outroV').textContent = fmt(0);
+      $('fsBox').hidden = true; music.theme('base', 2.4); music.intensity(0); $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); if (ambCtl && ambCtl.bonus) ambCtl.bonus(false); $('outroV').textContent = fmt(0);
       openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
       await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);
       await tapWait('outroM', auto.left > 0 ? 1500 : 0);
@@ -264,6 +277,7 @@ function refreshUi() {
   $('spinCnt').hidden = !(auto.left > 0); $('spinCnt').textContent = auto.left; $('spin').querySelector('svg').style.visibility = auto.left > 0 ? 'hidden' : '';
   $('bTurbo').classList.toggle('on', turbo); $('bTurbo').querySelector('i').textContent = turbo ? 'ON' : 'OFF'; $('turboBadge').hidden = !turbo;
   $('bSnd').classList.toggle('on', soundOn); $('bSnd').querySelector('i').textContent = soundOn ? 'ON' : 'OFF';
+  $('bMus').classList.toggle('on', musicOn); $('bMus').querySelector('i').textContent = musicOn ? 'ON' : 'OFF'; $('vMus').value = Math.round(musVol * 100); $('vSnd').value = Math.round(sndVol * 100);
   document.body.style.setProperty('--spd', T());
 }
 function openBets() {
@@ -282,6 +296,11 @@ $('menuBtn').onclick = e => { e.stopPropagation(); sfx.ui(); $('menu').hidden = 
 document.addEventListener('click', e => { if (!e.target.closest('#menu') && !e.target.closest('#menuBtn')) closeMenu(); });
 $('bTurbo').onclick = () => { sfx.ui(); turbo = !turbo; store.set(P + '_turbo', turbo); refreshUi(); };
 $('bSnd').onclick = () => { soundOn = !soundOn; store.set(P + '_snd', soundOn); soundOn ? (amb.start(), sfx.ui()) : amb.stop(); refreshUi(); };
+$('bMus').onclick = () => { musicOn = !musicOn; store.set(P + '_mus', musicOn); musicOn ? music.start() : music.stop(); sfx.ui(); refreshUi(); };
+$('vMus').oninput = e => { musVol = e.target.value / 100; if (mus) mus.volume(musVol * MUS_GAIN); };
+$('vMus').onchange = () => { store.set(P + '_musv', musVol); if (musicOn) music.start(); };
+$('vSnd').oninput = e => { sndVol = e.target.value / 100; if (sfxG) sfxG.gain.value = sndVol; };
+$('vSnd').onchange = () => { store.set(P + '_sndv', sndVol); sfx.ui(); };
 $('bInfo').onclick = () => { closeMenu(); openM('infoM'); };
 $('bFs').onclick = () => { closeMenu(); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch {} };
 addEventListener('keydown', e => {
@@ -292,11 +311,11 @@ addEventListener('keydown', e => {
 
 /* ---------- the API handed to the slot ---------- */
 const S = {
-  cfg, $, store, fmt, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
+  cfg, $, store, fmt, music, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
   scale: () => STAGE_S, bet: () => BETS[bi], isTurbo: () => turbo, isBusy: () => busy, local: !!LOCAL,
   skipCount: () => { skipBig = true; }
 };
-hooks = factory(S) || {};
+hooks = factory(S) || {}; shellApi.hooks = hooks; shellApi.S = S;
 for (const k of ['sfx', 'init', 'paintIdle', 'roundStart', 'clearBoard', 'restoreBoard', 'playSpin', 'showTrigger'])
   if (typeof hooks[k] !== 'function') throw new Error('slot is missing hook: ' + k);
 /* ---------- static UI generated from slot.json ---------- */
@@ -335,5 +354,5 @@ else if (!TOKEN) $('auth').hidden = false;
 else fetch(API + '/api/me', { headers: { authorization: 'Bearer ' + TOKEN } }).then(r => r.json())
   .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); } else $('auth').hidden = false; });
 }
-return { boot, $, store, fmt, betLbl, sleep };
+return shellApi;
 })();

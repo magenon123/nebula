@@ -11,6 +11,64 @@ const ED = S.cfg.engineData, round2 = v => +v.toFixed(2);
 const PT = ED.paytable.map(r => r.map(v => round2(v * ED.payScale)));
 let lastGrid = null, lastWilds = [];
 
+/* ---------- MUSIC: "dark forge" (base, 80 bpm) and "furnace drive" (bonus, 112 bpm). D phrygian: D Eb F G A Bb C. All synthesised by shell/slot-music.js ---------- */
+const MIN = [0, 3, 7], MAJ = [0, 4, 7], P5 = [0, 7];
+/* chord per bar: [semitones above D, quality]. Only chords built from D phrygian notes (C5 = C+G power chord, no E) */
+const dm = [0, MIN], eb = [1, MAJ], c5 = [10, P5], gm = [5, MIN], bb = [8, MAJ];
+const rootOf = c => 50 + (c[0] > 6 ? c[0] - 12 : c[0]);                      // D3 = 50
+const voicing = c => { const r = rootOf(c), q = c[1]; return [r, r + 7, r + 12, r + 12 + (q[1] === 7 ? 7 : q[1])]; };
+/* motifs: [step, length in steps, scale degree from D4]; strong notes (step 0) never move, others follow the seeded walk (+-1) */
+const EM_A = [[[0, 6, 4], [8, 4, 5], [12, 4, 4]], [[0, 8, 3], [8, 4, 2], [12, 4, 3]]];
+const EM_B = [[[0, 6, 4], [8, 4, 6], [12, 4, 5]], [[0, 12, 4], [12, 4, 1]]];
+const EM_END = [[[0, 6, 4], [8, 4, 5], [12, 4, 4]], [[0, 12, 1], [12, 4, 0]]];
+function musicDefs() {
+  const forgeBase = {
+    tempo: 80, barBeats: 4, spb: 16, swing: .08, bars: 16, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 17, gain: 1, phrase: 4,
+    layers: { pad: { gain: 1 }, sub: { gain: 1 }, taiko: { enter: 2, gain: 1 }, crack: { enter: 4, gain: 1, wet: .1 }, anvil: { enter: 4, int: .15, gain: 1 },
+      lead: { enter: 8, gain: 1, wet: .3 }, choirhi: { int: .5, enter: 12, gain: 1, wet: .35 }, roll: { int: .8, gain: 1 } },
+    bar(M) {
+      const C = [dm, dm, eb, dm, dm, gm, eb, c5, bb, bb, c5, dm, gm, eb, c5, eb][M.i], r = rootOf(C), v = voicing(C), last4 = M.i % 4 === 3;
+      M.pad('pad', M.t0, M.bd * .98, v, { cut: 600, cut2: 880, g: .06, a: 1, r: 1.5, det: 9 });
+      M.sub('sub', M.t0, M.bd * .85, r - 12, { g: .24 });
+      M.taiko('taiko', M.st(0), 1); M.taiko('taiko', M.st(8), .7);
+      if (M.i % 2) M.taiko('taiko', M.st(11), .32);
+      if (last4) [12, 13, 14, 15].forEach((s, k) => M.taiko('taiko', M.st(s), .35 + k * .16 + (M.i === 15 ? .15 : 0)));
+      if (M.i % 2 === 0) M.metal('anvil', M.st(12), M.mtof(r + 12), 1.4, .06);
+      if (M.i === 7 || M.i === 15) M.metal('anvil', M.st(0), M.mtof(r), 2.4, .08);
+      for (let s = 0; s < 16; s++) { if (M.rnd() < .2) M.crackle('crack', M.st(s) + M.rnd() * .05, .5 + M.rnd()); if (s % 4 === 2 && M.rnd() < .7) M.hat('crack', M.st(s), 1, { g: .035, f: 7500 }); }
+      if (M.int > .8) for (let s = 0; s < 16; s += 2) if (s % 8) M.taiko('roll', M.st(s), .22 + (s % 4 ? 0 : .1));
+      const mot = (M.i < 15 ? (M.i % 4 < 2 ? EM_A : (M.i < 12 ? EM_B : EM_END)) : EM_END)[M.i % 2], wk = Math.max(-1, Math.min(1, M.walk));
+      mot.forEach(([s, len, d]) => { const m = M.note(d + (s ? wk : 0)); M.pad('lead', M.st(s), len * M.sd * .92, [m], { det: 6, cut: 1250, cut2: 850, q: .8, a: .14, r: .4, g: .075 }); });
+      if (M.i % 2 === 0) M.choir('choirhi', M.t0, M.bd * 1.9, [r + 24, r + 31, r + 36], { vow: 'o', vow2: 'a', g: .05, a: 1.2, r: 1.6 });
+    }
+  };
+  const forgeBonus = {
+    tempo: 112, barBeats: 4, spb: 16, swing: 0, bars: 24, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 29, gain: 1, phrase: 4,
+    layers: { choir: { gain: 1, wet: .4 }, pad: { gain: 1 }, bass: { gain: 1 }, kick: { enter: 1, gain: 1 }, anvil: { enter: 2, gain: 1 }, hat: { enter: 3, gain: 1, wet: .08 },
+      lead: { enter: 4, gain: 1, wet: .28 }, lead2: { int: .45, enter: 8, gain: 1, wet: .3 }, riser: { gain: 1 }, roll: { int: .7, gain: 1 } },
+    bar(M) {
+      const G = [dm, dm, bb, c5, dm, dm, eb, c5, gm, gm, eb, dm, gm, bb, c5, eb, dm, dm, bb, c5, gm, eb, c5, eb], C = G[M.i], r = rootOf(C), v = voicing(C), g8 = M.i % 8, rise = g8 / 7;
+      M.choir('choir', M.t0, M.bd * .98, [r + 12, r + 19, r + 24, r + 12 + (C[1][1] === 7 ? 7 : C[1][1])], { vow: M.i % 2 ? 'o' : 'a', vow2: M.i % 2 ? 'a' : 'o', g: .06, a: .6, r: .9 });
+      M.pad('pad', M.t0, M.bd * .98, v, { cut: 520 + rise * 380, cut2: 760 + rise * 620, g: .05, a: .5, r: .8 });
+      for (let s = 0; s < 16; s += 2) { const hit = s % 8 === 0 ? 1 : s % 4 === 0 ? .7 : .45, oct = (s === 6 || s === 14) ? 12 : 0; M.sub('bass', M.st(s), M.sd * 1.5, r - 12 + oct, { g: .15 * hit + .05, a: .01, r: .06 }); }
+      [0, 4, 8, 12].forEach((s, k) => M.taiko('kick', M.st(s), k % 2 ? .55 : .85, { d: .5 }));
+      [4, 12].forEach(s => M.metal('anvil', M.st(s), M.mtof(r + 12), .8, .05));
+      for (let s = 0; s < 16; s++) if (s % 2) M.hat('hat', M.st(s), 1, { g: .03, f: 8000 }); else if (M.rnd() < .25) M.crackle('hat', M.st(s), .6);
+      if (M.i % 4 === 3) [10, 11, 12, 13, 14, 15].forEach((s, k) => M.taiko('roll', M.st(s), .3 + k * .11));
+      if (g8 >= 6) M.riser('riser', M.t0, M.bd, { g: .05 + (g8 - 6) * .02, f1: 300 + (g8 - 6) * 500, f2: 2600 + (g8 - 6) * 1200 });
+      if (g8 === 0 && M.i > 0) M.metal('anvil', M.t0, M.mtof(r), 2.2, .07);
+      /* driving fanfare: eighth-note figure on the chord (root, 5th, b2/3rd), the walk nudges the answer bar */
+      const fig = g8 % 2 ? [[0, 2, 4], [2, 2, 5], [4, 2, 4], [6, 2, 3], [8, 4, 4], [12, 2, 3], [14, 2, 1]] : [[0, 2, 4], [2, 2, 4], [4, 2, 6], [6, 2, 5], [8, 4, 4], [12, 4, 4]], wk = Math.max(-1, Math.min(1, M.walk));
+      fig.forEach(([s, len, d]) => { const m = M.note(d + (s ? wk : 0)); M.pad('lead', M.st(s), len * M.sd * .9, [m], { det: 6, cut: 1500, cut2: 1000, q: .8, a: .06, r: .22, g: .07 }); if (M.int > .45) M.pad('lead2', M.st(s), len * M.sd * .85, [m + 12], { det: 5, cut: 1800, cut2: 1300, a: .05, r: .18, g: .035 }); });
+    }
+  };
+  const stingers = {
+    win(K) { const { V, dest, t } = K; V.taiko(dest, t, .9); V.metal(dest, t + .02, K.mtof(62), 1.4, .09); V.pad(dest, t, .3, [K.note(0, -1), K.note(4, -1), K.note(0), K.note(4)], { cut: 900, cut2: 1400, a: .03, r: .7, g: .08 }); },
+    bonus(K) { const { V, dest, t } = K; V.horn(dest, t, 1.6, [K.note(0, -2), K.note(4, -2), K.note(0, -1), K.note(4, -1)], { g: .09 }); [0, .4, .8].forEach((d, i) => V.taiko(dest, t + d, .9 - i * .1)); V.riser(dest, t, 1.4, { g: .05 }); V.metal(dest, t + 1.5, K.mtof(50), 2.2, .09); }
+  };
+  return { base: forgeBase, bonus: forgeBonus, stingers };
+}
+
 /* ---------- the board ---------- */
 const cells = [];
 for (let i = 0; i < 30; i++) { const d = document.createElement('div'); d.className = 'cell'; $('grid').append(d); cells.push(d); }
@@ -132,6 +190,7 @@ return {
   ambience: kit => kit.bed({ lowpass: 170, gain: .5, level: .02, loopSec: 3 }),
   ambientBoost: () => heatNow * .02,
   particleColor: (p, a) => p.c ? `rgba(255,${190 + (p.l % 50)},60,${a})` : `rgba(255,${100 + Math.min(120, p.l)},20,${a})`,
+  music: musicDefs,
   init() {},
   paintIdle() { paint(Array.from({ length: 5 }, (_, r) => Array.from({ length: 6 }, (_, c) => (r * 2 + c) % 7))); dropAll(); },
   roundStart: () => setHeat(0),

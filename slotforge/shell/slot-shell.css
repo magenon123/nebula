@@ -81,9 +81,10 @@ button:disabled{cursor:not-allowed}
 #fsBox::before{content:"FS";position:absolute;left:8px;top:5px;width:38px;height:38px;border-radius:50%;background:var(--gold);color:var(--ink);display:grid;place-items:center;font-size:18px;border:3px solid #7a4a00}
 #fsBox small{display:block;font-family:var(--ui);font-size:11px;font-weight:900;letter-spacing:2px;color:#b8a89a;margin-bottom:-2px}
 @keyframes pillin{from{transform:translateY(-12px);opacity:0}}
-#menu{left:154px;top:560px;width:230px;padding:10px;background:linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px var(--rim),0 8px 0 rgba(0,0,0,.4);z-index:20;filter:url(#roughU)}
+#menu{left:154px;top:478px;width:230px;padding:10px;background:linear-gradient(var(--panel1),var(--panel2));border:5px solid var(--ink);border-radius:14px 10px 16px 10px;box-shadow:inset 0 0 0 3px var(--rim),0 8px 0 rgba(0,0,0,.4);z-index:20;filter:url(#roughU)}
 #menu button{width:100%;display:flex;justify-content:space-between;align-items:center;padding:11px 12px;border-radius:9px;font-size:17px;font-weight:700}
 #menu button:hover{background:var(--hover)}
+#menu .vrow{padding:0 12px 8px}#menu input[type=range]{width:100%;height:18px;accent-color:var(--accent);cursor:pointer}
 #menu i{font-style:normal;font-size:13px;font-weight:900;letter-spacing:1px;padding:2px 9px;border-radius:99px;background:#3a2a24;color:#b8a89a}
 #menu button.on i{background:var(--accent);color:#fff}
 
