@@ -112,13 +112,107 @@ const defColor = (p, a) => `rgba(255,255,255,${a})`;
   const col = hooks.particleColor || defColor;
   for (const p of parts) {
     p.x += p.vx + (p.w ? Math.sin((p.l + p.w * 40) / 25) * .4 : 0); p.y += p.vy; p.vy += p.g;
+    if (p.sh) {   // a tumbling chip/shard (polygon), coloured by p.col
+      p.rot += p.vr; p.vx *= .985; const a = Math.min(1, p.l / 22); cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot); cx.globalAlpha = a; cx.fillStyle = p.col; cx.beginPath();
+      p.sh.forEach(([px, py], i) => i ? cx.lineTo(px * p.s, py * p.s) : cx.moveTo(px * p.s, py * p.s)); cx.closePath(); cx.fill();
+      if (p.edge) { cx.strokeStyle = p.edge; cx.lineWidth = 1.2; cx.stroke(); } cx.restore(); continue;
+    }
     const a = Math.min(1, p.l / 70); cx.fillStyle = col(p, a);
     cx.fillRect(p.x, p.y, p.s, p.s);
   }
   requestAnimationFrame(loop);
 })();
-const shake = big => { const a = $('shaker'); a.classList.remove('shake', 'shake2'); void a.offsetWidth; a.classList.add(big ? 'shake2' : 'shake'); };
-const flash = () => { const f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); };
+/* shake(level): true/false (legacy) or 0..4; amplitude and length grow with the level, decaying hand-keyed jolts (no CSS keyframes) */
+let shakeA = null;
+const shake = lv => {
+  const L = lv === true ? 2.5 : lv === false || lv == null ? 1 : Math.max(.2, lv), a = $('shaker'), amp = 2.5 + L * 3.4, n = 6 + Math.round(L * 2), kf = [{ transform: 'none' }];
+  for (let i = 1; i <= n; i++) { const d = Math.pow(1 - i / (n + 1), 1.6); kf.push({ transform: `translate(${((i % 2 ? 1 : -1) * amp * d * (.7 + Math.random() * .6)).toFixed(1)}px,${((Math.random() - .5) * amp * 1.2 * d).toFixed(1)}px) rotate(${((i % 2 ? .1 : -.1) * L * d).toFixed(2)}deg)` }); }
+  kf.push({ transform: 'none' }); if (shakeA) shakeA.cancel(); shakeA = a.animate(kf, { duration: (260 + L * 190) * T(), easing: 'linear' });
+};
+let flashA = null;
+const flash = lv => { const f = $('flash'); if (flashA) flashA.cancel(); const L = lv == null ? 2 : lv; f.classList.remove('go'); flashA = f.animate([{ opacity: Math.min(.95, .25 + L * .17) }, { opacity: 0 }], { duration: (240 + L * 110) * T(), easing: 'cubic-bezier(.2,.7,.3,1)' }); };
+/* FX: hand-timed board choreography (Web Animations: transform/opacity only). Slots pass cells/elements in; nothing here knows a slot. */
+const SVGNS = 'http://www.w3.org/2000/svg';
+const FX = {
+  ease: { gravity: 'cubic-bezier(.55,0,.9,.6)', out: 'cubic-bezier(.2,.75,.3,1)', io: 'cubic-bezier(.65,0,.35,1)', in: 'cubic-bezier(.5,0,.9,.45)', back: 'cubic-bezier(.3,1.6,.5,1)' },
+  el(tag, attrs = {}, parent) { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.append(e); return e; },
+  reset(cell) { cell.getAnimations().forEach(a => a.cancel()); cell.style.cssText = ''; },
+  /* anticipation (a small hop up and a squash), then the cell falls out, faster and faster, tilting a little */
+  out(cell, o = {}) {
+    const k = T(), up = o.up == null ? 11 : o.up, dist = o.dist || 400, rot = o.rot || 0; cell.style.transformOrigin = '50% 80%';
+    return cell.animate([
+      { transform: 'translateY(0) scale(1,1)', opacity: 1, offset: 0, easing: 'cubic-bezier(.3,0,.5,1)' },
+      { transform: 'translateY(3px) scale(1.04,.95)', opacity: 1, offset: .13, easing: 'cubic-bezier(.2,.8,.3,1)' },
+      { transform: `translateY(${-up}px) scale(.96,1.06)`, opacity: 1, offset: .3, easing: FX.ease.in },
+      { transform: `translateY(${dist * .55}px) rotate(${rot * .5}deg) scale(.97,1.08)`, opacity: 1, offset: .82, easing: 'linear' },
+      { transform: `translateY(${dist}px) rotate(${rot}deg) scale(.98,1.1)`, opacity: 0, offset: 1 }
+    ], { duration: (o.dur || 520) * k, delay: (o.delay || 0) * k, fill: 'forwards' });
+  },
+  /* falls from above with gravity, stretches into the landing, squashes, bounces a hair, settles. Contact is at 58% of the duration. */
+  drop(cell, o = {}) {
+    const k = T(), h = o.dist || 300, tilt = o.tilt || 0, e = FX.ease; cell.style.transformOrigin = '50% 100%';
+    return cell.animate([
+      { transform: `translateY(${-h}px) rotate(${tilt}deg) scale(1,1)`, opacity: 0, offset: 0, easing: e.gravity },
+      { transform: `translateY(${-h * .5}px) rotate(${tilt * .5}deg) scale(.98,1.04)`, opacity: 1, offset: .2, easing: e.gravity },
+      { transform: 'translateY(0) rotate(0deg) scale(.94,1.1)', opacity: 1, offset: .58, easing: e.out },
+      { transform: 'translateY(0) scale(1.13,.83)', opacity: 1, offset: .67, easing: e.out },
+      { transform: 'translateY(-10px) scale(.97,1.05)', opacity: 1, offset: .79, easing: 'cubic-bezier(.4,0,.8,.6)' },
+      { transform: 'translateY(0) scale(1.04,.96)', opacity: 1, offset: .9, easing: e.out },
+      { transform: 'none', opacity: 1, offset: 1 }
+    ], { duration: (o.dur || 600) * k, delay: (o.delay || 0) * k, fill: 'both' });
+  },
+  /* ms from now (turbo-scaled) at which a drop() with these options touches down */
+  impact: o => ((o.delay || 0) + (o.dur || 600) * .58) * T(),
+  /* a symbol with no authored win animation still acts: an anticipation squash, a hop, a landing and a little wobble (timing varies with its place in the link) */
+  hop(el, delay = 0, wi = 0) {
+    const s = wi % 2 ? 1 : -1, k = T(), v = 1 + (wi % 3) * .06; el.style.transformOrigin = '50% 90%';
+    return el.animate([
+      { transform: 'none', offset: 0, easing: 'cubic-bezier(.3,0,.4,1)' },
+      { transform: 'translateY(3px) scale(1.09,.88)', offset: .16, easing: 'cubic-bezier(.1,.7,.3,1)' },
+      { transform: `translateY(${-17 * v}px) rotate(${-4 * s}deg) scale(.93,1.12)`, offset: .38, easing: 'cubic-bezier(.4,0,.7,.5)' },
+      { transform: `translateY(0) rotate(${2 * s}deg) scale(1.1,.86)`, offset: .62, easing: 'cubic-bezier(.2,.8,.3,1)' },
+      { transform: `translateY(-4px) rotate(${-2 * s}deg) scale(.98,1.03)`, offset: .78, easing: 'cubic-bezier(.4,0,.6,1)' },
+      { transform: 'none', offset: 1 }
+    ], { duration: 820 * k, delay: delay * k });
+  },
+  /* does the symbol carry authored win parts (class a-*)? */
+  _parts: {},
+  hasParts(id) { if (!(id in FX._parts)) FX._parts[id] = !!document.querySelector(`#${id} [class*="a-"]`); return FX._parts[id]; },
+  /* put a cell into its win pose: the symbol's own animation is released through custom properties (--win, --delay, --wi inherit into <use>) */
+  act(cell, delay = 0, wi = 0) {
+    cell.classList.add('hit'); const st = cell.style; st.setProperty('--win', 'running'); st.setProperty('--delay', delay * T() + 'ms'); st.setProperty('--wi', wi); st.zIndex = 'auto';
+    const g = cell.querySelector('svg.g'); if (!g) return null;
+    const n = g.cloneNode(true); n.style.zIndex = 8; g.replaceWith(n);   // a fresh <use> tree restarts the symbol's CSS animation
+    const m = cell.querySelector('.m'); if (m) m.style.zIndex = 9;
+    const u = n.querySelector('use'), id = u ? (u.getAttribute('href') || '').slice(1) : ''; if (!FX.hasParts(id)) FX.hop(n, delay, wi);
+    return n;
+  },
+  /* the symbol bursts: a quick swell, then it is gone in pieces. colors = chip colours; pieces fly from the cell centre (screen px) */
+  burst(cell, colors, o = {}) {
+    const g = cell.querySelector('svg.g'), k = T(), r = cell.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+    if (g) { g.style.transformOrigin = '50% 55%'; g.animate([{ transform: 'scale(1)', opacity: 1, offset: 0, easing: 'cubic-bezier(.3,0,.5,1)' }, { transform: `scale(${o.swell || 1.18},${(o.swell || 1.18) * .92}) rotate(${(o.rot || -4)}deg)`, opacity: 1, offset: .35, easing: 'cubic-bezier(.5,0,1,.6)' }, { transform: 'scale(.15) rotate(' + (o.rot > 0 ? 40 : -40) + 'deg)', opacity: 0, offset: 1 }], { duration: (o.dur || 300) * k, fill: 'forwards' }); }
+    FX.shards(x, y, o.n || 9, colors, o);
+  },
+  shards(x, y, n, colors, o = {}) {
+    const pw = o.power || 1, sc = STAGE_S;
+    for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = (2 + Math.random() * 6) * pw * sc, tri = Math.random() < .6;
+      parts.push({ x: x + Math.cos(a) * 6 * sc, y: y + Math.sin(a) * 6 * sc, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (2.5 + Math.random() * 3) * pw * sc, g: .34 * sc, l: 34 + Math.random() * 30, s: (4 + Math.random() * 6) * sc,
+        rot: Math.random() * 6.28, vr: (Math.random() - .5) * .5, col: colors[Math.floor(Math.random() * colors.length)], edge: o.edge || 'rgba(20,10,6,.55)',
+        sh: tri ? [[-1, .8], [1, .5], [.1, -1]] : [[-1, -.6], [.9, -.9], [1, .7], [-.7, 1]], c: 0 }); }
+  },
+  /* flexible tween with an easing fn (counters, meters) */
+  tween(ms, fn, ease = t => 1 - Math.pow(1 - t, 3)) { return new Promise(res => { const t0 = performance.now(); (function f(t) { const k = Math.min(1, (t - t0) / ms); fn(ease(k), k); k < 1 ? requestAnimationFrame(f) : res(); })(t0); }); },
+  /* smooth curve through points as cubic Beziers (Catmull-Rom); sag pushes the controls down (a slack line) */
+  curve(pts, sag = 0) {
+    if (pts.length < 2) return ''; let d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+    for (let i = 0; i < pts.length - 1; i++) { const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      d += ` C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)} ${(p1[1] + (p2[1] - p0[1]) / 6 + sag).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)} ${(p2[1] - (p3[1] - p1[1]) / 6 + sag).toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`; }
+    return d;
+  },
+  /* an SVG layer in the board's frame; z below (7) / above (10) the lifted winning symbols (8) */
+  layer(id, z) { let l = document.getElementById(id); if (l) return l; const fr = $('fxl').parentNode, g = $('grid'); l = FX.el('svg', { id, width: g.offsetWidth, height: g.offsetHeight, viewBox: `0 0 ${g.offsetWidth} ${g.offsetHeight}` });
+    l.style.cssText = `position:absolute;left:${g.offsetLeft}px;top:${g.offsetTop}px;pointer-events:none;overflow:visible;z-index:${z}`; fr.append(l); return l; }
+};
 const say = (t, hl) => { $('msg').textContent = t; $('msg').classList.toggle('hl', !!hl); };
 
 /* ---------- character controller: one CSS class per state on #char (states are animated in slot.css) ---------- */
@@ -178,11 +272,11 @@ function tapWait(id, autoMs, minMs = 450) { return new Promise(res => { const m 
 const tierOf = x => cfg.tiers.find(t => x >= t.min) || null;
 async function bigWin(x, amt) {
   const t = tierOf(x); if (!t) return null;
-  const lv = t.lv;
+  const lv = t.lv, bigMark = {};
   $('bigT').textContent = t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = t.tag || '';
-  $('big').classList.add('show'); char('big', 3300); shake(lv > 2); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
+  $('big').classList.add('show'); char('big', 3300); shake(lv + .6); flash(lv); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
   sfx.big(lv); music.duck([0, .5, .38, .28, .2][lv] || .3, 1.2 + lv * .8, 1.6); music.stinger('win');
-  await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => sfx.tick(k)), sleep(20000)]);
+  await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => { sfx.tick(k); if (lv >= 2 && !(bigMark.a) && k > .35) { bigMark.a = 1; shake(lv * .45); } if (lv >= 3 && !bigMark.b && k > .7) { bigMark.b = 1; shake(lv * .6); flash(lv - 1); embers(40 * lv, innerWidth / 2, innerHeight / 2, true); } }), sleep(20000)]);
   await sleep(auto.left > 0 ? 700 : 1500 + lv * 300);
   $('big').classList.remove('show'); return t.name;
 }
@@ -311,7 +405,7 @@ addEventListener('keydown', e => {
 
 /* ---------- the API handed to the slot ---------- */
 const S = {
-  cfg, $, store, fmt, music, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
+  cfg, $, store, fmt, music, fx: FX, shards: FX.shards, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
   scale: () => STAGE_S, bet: () => BETS[bi], isTurbo: () => turbo, isBusy: () => busy, local: !!LOCAL,
   skipCount: () => { skipBig = true; }
 };

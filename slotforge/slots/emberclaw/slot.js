@@ -70,35 +70,111 @@ function musicDefs() {
 }
 
 /* ---------- the board ---------- */
+const FX = S.fx, GRID = $('grid'), CH = 110, CWD = 110;
 const cells = [];
 for (let i = 0; i < 30; i++) { const d = document.createElement('div'); d.className = 'cell'; $('grid').append(d); cells.push(d); }
 const at = (r, c) => cells[r * 6 + c];
+const after = (ms, fn) => setTimeout(fn, ms * T());
 function paint(grid, wilds = []) {
   lastGrid = grid; lastWilds = wilds;
   const wm = {}; wilds.forEach(w => wm[w.r * 6 + w.c] = w.mult);
   grid.forEach((row, r) => row.forEach((s, c) => {
-    const d = at(r, c); d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : ''); d.style.removeProperty('--dl');
+    const d = at(r, c); FX.reset(d); d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : '');
     d.innerHTML = `<svg class="g"><use href="#s${s}"/></svg>` + (s === 7 && wm[r * 6 + c] > 1 ? `<span class="m">x${wm[r * 6 + c]}</span>` : '');
   }));
-  $('grid').classList.remove('focus');
+  GRID.classList.remove('focus'); clearLinks();
 }
-/* bottom row lands first, every row above follows */
-const dropCell = (d, r) => { d.style.setProperty('--dl', (4 - r) * 95 * T() + 'ms'); d.classList.add('drop'); };
-function dropAll() { for (let r = 0; r < 5; r++) for (let c = 0; c < 6; c++) dropCell(at(r, c), r); }
+/* ---------- drops and exits: staggered, with anticipation, squash and stretch, overshoot (see shell FX) ---------- */
+const dropOpt = (r, c, base = 0) => ({ delay: base + (4 - r) * 78 + c * 15 + Math.random() * 24, dist: (r + 1) * CH + 70, tilt: (Math.random() - .5) * 5, dur: 580 });
+/* drop the listed [r,c] cells; plays landing sounds per row; returns the ms (unscaled) until the last touchdown */
+function dropCells(list, base = 0) {
+  let end = 0; const rows = {};
+  list.forEach(([r, c]) => { const o = dropOpt(r, c, base); FX.drop(at(r, c), o); const t = o.delay + o.dur * .58; end = Math.max(end, t); rows[r] = Math.min(rows[r] == null ? 1e9 : rows[r], t); });
+  Object.keys(rows).forEach(r => after(rows[r], () => sfx.land(+r)));
+  return end;
+}
+const ALL = [].concat(...Array.from({ length: 5 }, (_, r) => Array.from({ length: 6 }, (_, c) => [r, c])));
+const dropAll = () => dropCells(ALL);
 async function dropOut() {
-  for (let r = 0; r < 5; r++) for (let c = 0; c < 6; c++) { const d = at(r, c); d.classList.remove('drop'); d.style.setProperty('--dl', (4 - r) * 55 * T() + 'ms'); d.classList.add('out'); }
-  await wait(4 * 55 + 430);
+  clearLinks(); GRID.classList.remove('focus'); let end = 0;
+  ALL.forEach(([r, c]) => { const o = { delay: (4 - r) * 40 + c * 9, dist: (5 - r) * CH + 90, rot: (c % 2 ? 1 : -1) * (2 + (c * 7 % 4)), dur: 440 }; FX.out(at(r, c), o); end = Math.max(end, o.delay + o.dur); });
+  await wait(end * .86);
 }
+
+/* ---------- links: molten seams between connected cells, hammered iron frame, iron chain links ---------- */
+const lnkB = () => FX.layer('lnkB', 7), lnkT = () => FX.layer('lnkT', 10);
+function clearLinks() { ['lnkB', 'lnkT'].forEach(id => { const l = document.getElementById(id); if (l) l.replaceChildren(); }); }
+const ctrOf = (r, c) => [(c + .5) * CWD, (r + .5) * CH];
+function seam(a, b, delay, dur) {
+  const L = lnkB(), g = FX.el('g', {}, L), len = Math.hypot(b[0] - a[0], b[1] - a[1]), nx = -(b[1] - a[1]) / len, ny = (b[0] - a[0]) / len, n = 5, pts = [];
+  for (let i = 0; i <= n; i++) { const t = i / n, j = (i === 0 || i === n) ? 0 : (Math.random() - .5) * 11; pts.push([a[0] + (b[0] - a[0]) * t + nx * j, a[1] + (b[1] - a[1]) * t + ny * j]); }
+  const d = 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L'), mk = (w, col) => FX.el('path', { d, pathLength: 1, fill: 'none', stroke: col, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-dasharray': 1 }, g);
+  const crust = mk(14, '#24100a'), mid = mk(8.5, '#f0561a'), core = mk(3.4, '#ffe39a'), k = T();
+  [crust, mid, core].forEach((p, i) => p.animate([{ strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: .98, opacity: 1, offset: .04 }, { strokeDashoffset: 0, opacity: 1 }], { duration: dur * k, delay: (delay + i * 14) * k, easing: 'cubic-bezier(.25,.7,.35,1)', fill: 'both' }));
+  core.animate([{ stroke: '#ffe39a' }, { stroke: '#f58a30' }], { duration: 900 * k, delay: (delay + dur + 120) * k, fill: 'forwards' });
+  mid.animate([{ stroke: '#f0561a' }, { stroke: '#9c2e12' }], { duration: 900 * k, delay: (delay + dur + 120) * k, fill: 'forwards' });
+  /* an iron link seated across the seam */
+  const T2 = lnkT(), mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI + (Math.random() - .5) * 14;
+  const lk = FX.el('g', { transform: `translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})` }, T2), inner = FX.el('g', {}, lk);
+  FX.el('rect', { x: -11, y: -6, width: 22, height: 12, rx: 6, fill: 'none', stroke: '#15100e', 'stroke-width': 7.5 }, inner); FX.el('rect', { x: -11, y: -6, width: 22, height: 12, rx: 6, fill: 'none', stroke: '#9aa3ad', 'stroke-width': 3.6 }, inner);
+  FX.el('rect', { x: -9, y: -4.6, width: 18, height: 4, rx: 2, fill: 'none', stroke: '#e5eaee', 'stroke-width': 1.2, opacity: .8 }, inner);
+  inner.animate([{ transform: 'scale(1.9,.5)', opacity: 0 }, { transform: 'scale(.82,1.2)', opacity: 1, offset: .45 }, { transform: 'scale(1.08,.94)', offset: .72 }, { transform: 'scale(1)', opacity: 1 }], { duration: 300 * k, delay: (delay + dur * .6) * k, easing: 'cubic-bezier(.3,0,.3,1)', fill: 'both' });
+  return g;
+}
+/* hammered iron frame round the whole cluster (boundary edges only), drawn from the centre outward */
+function frameOf(cs, delay) {
+  const L = lnkB(), set = new Set(cs.map(c => c.r * 6 + c.c)), g = FX.el('g', {}, L), segs = [], i4 = 5;
+  cs.forEach(({ r, c }) => { const x = c * CWD, y = r * CH;
+    if (!set.has((r - 1) * 6 + c) || r === 0) segs.push([x + i4, y + i4, x + CWD - i4, y + i4]);
+    if (!set.has((r + 1) * 6 + c) || r === 4) segs.push([x + i4, y + CH - i4, x + CWD - i4, y + CH - i4]);
+    if (!set.has(r * 6 + c - 1) || c === 0) segs.push([x + i4, y + i4, x + i4, y + CH - i4]);
+    if (!set.has(r * 6 + c + 1) || c === 5) segs.push([x + CWD - i4, y + i4, x + CWD - i4, y + CH - i4]); });
+  const d = segs.map(s => `M${s[0]} ${s[1]} L${s[2]} ${s[3]}`).join(' '), mk = (w, col) => FX.el('path', { d, fill: 'none', stroke: col, 'stroke-width': w, 'stroke-linecap': 'round' }, g);
+  mk(9, '#1a0e0a'); const m = mk(5, '#7b8590'), h = mk(2, '#ff9a3a'), k = T();
+  g.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260 * k, delay: delay * k, fill: 'both', easing: 'ease-out' });
+  h.animate([{ stroke: '#ffd27a' }, { stroke: '#a8421a' }], { duration: 1000 * k, delay: delay * k, fill: 'forwards' }); void m; return g;
+}
+const key = c => c.r * 6 + c.c;
+function planOf(k) {
+  const cs = k.cells, mx = cs.reduce((a, c) => a + c.c, 0) / cs.length, my = cs.reduce((a, c) => a + c.r, 0) / cs.length;
+  const root = cs.reduce((b, c) => Math.hypot(c.c - mx, c.r - my) < Math.hypot(b.c - mx, b.r - my) ? c : b, cs[0]);
+  const depth = new Map([[key(root), 0]]), parent = new Map(), q = [root];
+  while (q.length) { const a = q.shift(); cs.forEach(b => { if (!depth.has(key(b)) && Math.abs(a.r - b.r) + Math.abs(a.c - b.c) === 1) { depth.set(key(b), depth.get(key(a)) + 1); parent.set(key(b), a); q.push(b); } }); }
+  cs.forEach(c => { if (!depth.has(key(c))) depth.set(key(c), 1); });
+  return { root, depth, parent, maxD: Math.max(...depth.values()) };
+}
+const STEP = 82, BURST_AT = 800;
+const SHARD = [['#5a8f9c', '#2f4f5a', '#c9a24a'], ['#e0914f', '#a8582a', '#6aa58a'], ['#d4dbe1', '#8f9aa5', '#f1f5f8'], ['#9aa4af', '#ff8a2a', '#4a525a'], ['#6a7078', '#2f3338', '#c9ced4'],
+  ['#efe3c6', '#bfae8c', '#8a7a5a'], ['#ffcf4a', '#e09a1a', '#d83a4a'], ['#ff7a1a', '#ffd27a', '#b83a10'], ['#ff5a9a', '#c02a6a', '#ffd0e4']];
+
+/* present one cascade step's clusters. Returns {burstAt: Map(cellKey -> ms), last: ms of the last burst} */
+function presentStep(st, stake, n) {
+  const burst = new Map(); let last = 0;
+  st.clusters.forEach((k, ki) => {
+    const pl = planOf(k), base = ki * 150;
+    k.cells.forEach(c => { const d = pl.depth.get(key(c)); FX.act(at(c.r, c.c), base + d * STEP, d); burst.set(key(c), base + d * STEP + BURST_AT); last = Math.max(last, base + d * STEP + BURST_AT); after(base + d * STEP, () => sfx.link(Math.min(d + n, 7))); });
+    k.cells.forEach(c => { const p = pl.parent.get(key(c)); if (p) seam(ctrOf(p.r, p.c), ctrOf(c.r, c.c), base + (pl.depth.get(key(p))) * STEP + 25, STEP * .9); });
+    frameOf(k.cells, base + pl.maxD * STEP + 120);
+    after(base + 330 + pl.maxD * STEP * .4, () => popAt(k, k.payout * stake));
+  });
+  return { burst, last };
+}
+
 
 /* ---------- Forge Core (side mechanic) ---------- */
 const tube = $('tube');
 for (let i = 1; i <= 9; i++) { const e = document.createElement('i'); e.dataset.n = i; tube.append(e); }
 let heatNow = 0;
 function setHeat(h) {
-  const prev = heatNow; if (h > prev) sfx.heat(Math.min(h, 9)); heatNow = h; const lit = Math.min(h, 9);
-  [...tube.children].forEach(e => { const n = +e.dataset.n, on = n <= lit; if (on && n > Math.min(prev, 9)) { e.classList.remove('pulse'); void e.offsetWidth; e.classList.add('pulse'); } e.classList.toggle('on', on); });
-  $('heatV').textContent = h; document.body.style.setProperty('--heat', Math.min(h, 12));
-  $('pk3').classList.toggle('on', h >= 3); $('pk6').classList.toggle('on', h >= 6); $('pk9').classList.toggle('on', h >= 9);
+  const prev = heatNow; if (h > prev) sfx.heat(Math.min(h, 9)); heatNow = h; const lit = Math.min(h, 9), was = Math.min(prev, 9), k = T();
+  /* segments ignite one after the other, each with a hand-keyed flare (swell, over-bright, settle) */
+  [...tube.children].forEach(e => { const n = +e.dataset.n, on = n <= lit;
+    if (on && n > was) { const dl = (n - was - 1) * 85; after(dl, () => e.classList.add('on'));
+      e.animate([{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(1.3,1.5)', filter: 'brightness(2.8)', offset: .28, easing: 'cubic-bezier(.2,.8,.3,1)' }, { transform: 'scale(.94,.92)', filter: 'brightness(1.4)', offset: .6 }, { transform: 'scale(1)', filter: 'brightness(1)' }], { duration: 560 * k, delay: dl * k, easing: 'ease-out' }); }
+    else e.classList.toggle('on', on); });
+  const hv = $('heatV'); document.body.style.setProperty('--heat', Math.min(h, 12));
+  if (h > prev) { FX.tween(380 * k, e => { hv.textContent = Math.round(prev + (h - prev) * e); }); hv.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.5,1.35)', offset: .3 }, { transform: 'scale(.94)', offset: .65 }, { transform: 'scale(1)' }], { duration: 500 * k, easing: 'ease-out' }); } else hv.textContent = h;
+  [['pk3', 3], ['pk6', 6], ['pk9', 9]].forEach(([id, n]) => { const el = $(id), on = h >= n; if (on && !el.classList.contains('on')) after(Math.max(0, (n - was - 1)) * 85, () => el.classList.add('on')); else if (!on) el.classList.remove('on'); });
 }
 
 /* ---------- the smith ---------- */
@@ -119,36 +195,51 @@ async function playEvents(events) {
   }
 }
 
+/* repaint a single cell (a refill or a clean-up) from a grid */
+function paintCell(grid, wilds, r, c) {
+  const wm = {}; wilds.forEach(w => wm[w.r * 6 + w.c] = w.mult); const s = grid[r][c], d = at(r, c); FX.reset(d);
+  d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : '');
+  d.innerHTML = `<svg class="g"><use href="#s${s}"/></svg>` + (s === 7 && wm[r * 6 + c] > 1 ? `<span class="m">x${wm[r * 6 + c]}</span>` : '');
+}
+let lastLand = 0;
+const landOnce = r => { const n = performance.now(); if (n - lastLand > 80) { lastLand = n; sfx.land(r); } };
+function fadeLinks(ms) { ['lnkB', 'lnkT'].forEach(id => { const l = document.getElementById(id); if (!l) return; [...l.children].forEach(g => g.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-3px)' }], { duration: ms * T(), fill: 'forwards', easing: 'ease-in' })); }); setTimeout(clearLinks, (ms + 40) * T()); }
+
 /* step through one spin's cascade sequence */
 async function playSpin(sp, runningFrom, ctx) {
   const stake = ctx.stake, onWin = ctx.onWin;
   smithStrike();
-  paint(sp.initialGrid); dropAll(); sfx.drop(); for (let r = 4; r >= 0; r--) setTimeout(() => sfx.land(r), ((4 - r) * 95 + 330) * T()); await wait(1000);
+  paint(sp.initialGrid); sfx.drop(); const e0 = dropAll(); await wait(e0 + 170);
   if (sp.openingGrid && sp.openingEvents && sp.openingEvents.length) { paint(sp.openingGrid, sp.openingWilds); await playEvents(sp.openingEvents); }
   setHeat(sp.startHeat || 0);
   let run = runningFrom, n = 0;
   for (const st of sp.cascadeSteps) {
-    $('grid').classList.add('focus'); if (n === 0) char('win', 1500);
-    st.clusters.forEach(k => { k.cells.forEach(c => at(c.r, c.c).classList.add('hit')); popAt(k, k.payout * stake); });
-    say(`${st.clusters.length > 1 ? st.clusters.length + ' CLUSTERS' : 'CLUSTER'}  +${fmt(st.payout * stake)}`, true); sfx.win(n++); await wait(750);
-    sfx.shatter(); st.clearedCells.forEach(c => at(c.r, c.c).classList.add('shatter')); await wait(340);
-    const before = run; run += st.payout * stake; onWin(before, run);
-    paint(st.grid, st.wilds);
-    st.newCells.forEach(c => dropCell(at(c.r, c.c), c.r)); setHeat(st.coreHeat); embers(8);
-    sfx.drop(); [...new Set(st.newCells.map(c => c.r))].forEach(r => setTimeout(() => sfx.land(r), ((4 - r) * 95 + 330) * T()));
-    await wait(700);
-    await playEvents(st.reforgeEvents);
-    if (st.reforgeEvents && st.reforgeEvents.length) paint(st.grid, st.wilds);
+    GRID.classList.add('focus'); if (n === 0) char('win', 1500);
+    const pres = presentStep(st, stake, n), first = Math.min(...pres.burst.values()), lvl = st.payout >= 20 ? 1.6 : st.payout >= 6 ? .9 : .4;
+    say(`${st.clusters.length > 1 ? st.clusters.length + ' CLUSTERS' : 'CLUSTER'}  +${fmt(st.payout * stake)}`, true); sfx.win(n++);
+    after(first - 40, () => { sfx.shatter(); const before = run; run += st.payout * stake; onWin(before, run); fadeLinks(240); GRID.classList.remove('focus'); });
+    st.clearedCells.forEach(q => { const tb = pres.burst.get(key(q)); after(tb, () => FX.burst(at(q.r, q.c), SHARD[q.sym] || SHARD[0], { n: 8 + Math.round(lvl * 3), power: .8 + lvl * .3, rot: (q.c % 2 ? 1 : -1) * 5 })); });
+    after(pres.last, () => { shake(lvl); if (lvl > 1) embers(12, innerWidth / 2, innerHeight / 2, true); });
+    /* every cleared cell is refilled right behind its own burst: no dead pause, the board never waits */
+    let end = 0; after(first + 160, () => setHeat(st.coreHeat));
+    st.newCells.forEach(q => { const tb = pres.burst.get(key(q)) + 200, o = { delay: (4 - q.r) * 24 + Math.random() * 30, dist: (q.r + 1) * CH + 70, tilt: (Math.random() - .5) * 5, dur: 560 };
+      after(tb, () => { paintCell(st.grid, st.wilds, q.r, q.c); FX.drop(at(q.r, q.c), o); if (q.r === 0 || Math.random() < .3) sfx.drop(); after(o.delay + o.dur * .58, () => landOnce(q.r)); });
+      end = Math.max(end, tb + o.delay + o.dur * .96); });
+    await wait(end);
+    /* the wilds that took part stay on the board: back to their rest pose */
+    st.clusters.forEach(k => k.cells.forEach(c => { if (!st.clearedCells.some(q => q.r === c.r && q.c === c.c)) paintCell(st.grid, st.wilds, c.r, c.c); })); lastGrid = st.grid; lastWilds = st.wilds;
+    if (st.reforgeEvents && st.reforgeEvents.length) { await playEvents(st.reforgeEvents); paint(st.grid, st.wilds); }
   }
   return run;
 }
 
 /* the Forgefire Gems that triggered the bonus pulse on the board before the splash */
 async function showScatters() {
-  const g = [...cells].filter(d => d.classList.contains('scatter'));
-  $('grid').classList.add('focus'); g.forEach(d => d.classList.add('hit', 'scat'));
+  const g = []; cells.forEach((d, i) => { if (d.classList.contains('scatter')) g.push([Math.floor(i / 6), i % 6]); });
+  GRID.classList.add('focus'); clearLinks();
+  g.forEach(([r, c], i) => { FX.act(at(r, c), i * 240, i); at(r, c).classList.add('scat'); if (i) seam(ctrOf(g[i - 1][0], g[i - 1][1]), ctrOf(r, c), i * 240 - 100, 260); });
   say(`${g.length} GEMS LANDED · THE REFORGING!`, true);
-  g.forEach((d, i) => setTimeout(() => sfx.scatter(i), i * 260 * T())); await wait(260 * g.length + 1000);
+  g.forEach((_, i) => after(i * 240, () => sfx.scatter(i))); await wait(240 * g.length + 1200); fadeLinks(200);
 }
 
 /* paytable (info screen) */
@@ -181,7 +272,9 @@ return {
       outro: () => { const t = T0(); [0, 4, 7, 12, 16].forEach((n, i) => metal(392 * st(n), t + i * .13, 1.3, .1)); horn(t, 1.6, .045, 82.5); },
       big: lv => { const t = T0(); for (let i = 0; i < lv; i++) anvil(.9, 1 + i * .06, t + i * .28); horn(t, 1.6 + lv * .5, .06 + lv * .012, 55 * st(lv)); [0, 4, 7, 12, 16, 19, 24].slice(0, 3 + lv).forEach((n, i) => metal(440 * st(n), t + .3 + i * .1, 1.2, .08)); osc('sine', 60, t, 1.2, .35, .01, 36); },
       scatter: n => { const t = T0(), f = 660 * st([0, 4, 7, 12][Math.min(n, 3)]); metal(f, t, 1.3, .13); osc('triangle', f / 2, t, .5, .07); noise(t, .35, .06, 'highpass', 7000, 0); },
-      tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .12, .001); noise(t, .02, .08, 'highpass', 6000, 0); }
+      tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .12, .001); noise(t, .02, .08, 'highpass', 6000, 0); },
+      /* a link seats: a small hammer tink, climbing the scale with the ring of the cluster */
+      link: d => { const t = T0(); metal(520 * st([0, 2, 3, 5, 7, 8, 10, 12][Math.min(d, 7)]), t, .45, .05, [1, 2.76, 5.4]); noise(t, .03, .05, 'highpass', 4500, 0); osc('sine', 150, t, .06, .08, .002, 90); }
     };
     R.feverOn = () => R.heat(6);
     return R;

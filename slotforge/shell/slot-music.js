@@ -150,7 +150,7 @@ function make(ctx, out, defs, opt = {}) {
     theme(name, xf = 2, fresh) {
       if (!defs[name]) return; if (cur && cur.name === name && cur.active) return; const now = ctx.currentTime;
       if (cur) { cur.active = false; cur.gain.gain.cancelScheduledValues(now); cur.gain.gain.setTargetAtTime(0, now, xf / 3.5); const old = cur; setTimeout(() => { if (!old.active) Object.keys(old.L).forEach(k => old.L[k].gain.value = 0); }, (xf + 4) * 1000); }
-      const th = TH[name] = mk(name, defs[name]); th.next = now + .08; th.active = true; th.gain.gain.setValueAtTime(0, now); th.gain.gain.setTargetAtTime(defs[name].gain == null ? 1 : defs[name].gain, now, Math.max(.05, xf / 3.5)); cur = th;
+      const th = TH[name] = mk(name, defs[name]); th.next = now + .08; th.bar = opt.startBar || 0; th.pass = opt.startPass || 0; th.active = true; th.gain.gain.setValueAtTime(0, now); th.gain.gain.setTargetAtTime(defs[name].gain == null ? 1 : defs[name].gain, now, Math.max(.05, xf / 3.5)); cur = th;
       if (!started) { started = true; if (!opt.offline) timer = setInterval(tick, 80); } tick();
     },
     intensity(x) { intensityT = Math.max(0, Math.min(1, x)); },
