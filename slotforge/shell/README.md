@@ -104,3 +104,10 @@ Fever on/off (TOTAL BET, modal closes), autoplay with the white stop square, Esc
 RNG is seeded (same rounds in baseline and new). It then runs the pre-refactor baseline `baseline/emberclaw-standalone.orig.html` the same way and diffs every checkpoint
 (balance, win, bet, messages, open modals) and every screenshot (CSS animation frozen on static checkpoints; <= 2.5% differing pixels). Artifacts: scratchpad `regress/{new,base}/*.png` + `results.json`.
 Takes ~5 minutes. `node regress.cjs <other-standalone.html>` checks another slot (no baseline); `--compare DIR_A DIR_B` re-diffs two runs. Exit code 1 on any problem.
+
+
+## Slot #3 notes (cloudtop-tea-house)
+* `cfg.fever` is optional (anteCost 0, no Fever card, no `#ante`); a single `buys[]` entry is fine. `luckCost` stays optional too.
+* The build embeds the engine's `info()` as `SLOT_CFG.engineData.info` when the engine has no `PAYTABLE` export (paytable, lines, jackpots for the info screen, also in the server build).
+* `shell/slot-music.js` voices added: `koto`, `shaku` (shakuhachi), `tok` (wood block). Smoke test: `node slotforge/shell/smoke-cloudtop.cjs`.
+* Hold-and-win pattern: `hooks.clearBoard` can be a no-op during the bonus (the shell calls it before every bonus step); `hooks.bonusMode(on)` is the place to set a flag and a dusk class.

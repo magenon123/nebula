@@ -71,7 +71,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
       if (st.kite) { if (!seen.kite) { await sleep(300); await frozen(shots + '-kite-launch'); await sleep(500); await frozen(shots + '-kite-launch2'); } seen.kite++; }
       else if (st.coll && !seen.shotColl) { seen.shotColl = 1; await frozen(shots + '-collector'); }
       else if (st.drag && !seen.shotGrand) { seen.shotGrand = 1; await sleep(400); await frozen(shots + '-grand'); }
-      else if (!seen.shotMid && st.chips >= 8) { seen.shotMid = 1; await frozen(shots + '-bonus-mid'); }
+      else if (!seen.shotMid && st.chips >= 8) { seen.shotMid = 1; console.log('    [char class at mid shot: ' + (await page.$eval('#char', e => e.className)) + ']'); await frozen(shots + '-bonus-mid'); }
       await sleep(40); }
     seen.obs = await page.evaluate(() => JSON.parse(JSON.stringify(__seen))); return seen; };
 
