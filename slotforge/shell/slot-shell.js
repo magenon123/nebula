@@ -255,7 +255,7 @@ $('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); ref
 
 function refreshUi() {
   const s = BETS[bi], risk = s * (ante ? ANTE_COST : 1); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
-  $('barR').classList.toggle('hot', ante); $('betLbl').textContent = ante ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !ante; $('buyPrice').textContent = fmt(s * BUYS[0].mult);
+  $('barR').classList.toggle('hot', ante); $('betLbl').textContent = ante ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !ante;
   const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
   $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
   BUYS.forEach((b, i) => fitTxt($('p' + (i + 1)), fmt(s * b.mult), 34, '23px'));

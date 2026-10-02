@@ -28,3 +28,7 @@ Agents: read this before every design or build decision. The lead keeps it updat
 ## Math (owner decision)
 - **Every mode of every slot must return 96.0-96.5% RTP**, proven by seeded simulation with confidence margins (see reviews/01-acceptance.md). An RTP at or above 100% (or a buy that is far from fair) is a blocking bug, never "good enough".
 - EmberClaw's math was found to be wrong (base ~100.8%, 100x buy ~65%, 500x buy ~99%). The owner wants it **fixed to 96.0-96.5% in every mode** (it is the same slot, not a new one), before more slots are built.
+
+## Owner notes after reviewing Grumble & Brine (2026-10-02)
+- **Backgrounds: not "more realistic", more DETAILED.** The photo-real painted backdrop tried on EmberClaw did not look good. Keep the hand-inked cartoon look and add richness instead: more layers, more props and story details, more depth, more variety of shape and colour, small things to discover; still no floating bubbles/dots, no halftone. Applies to every slot, EmberClaw included.
+- **The Bonus Buy sign on the left shows NO price.** One price on it makes players think there is only one bonus option. It is just the sign ("BONUS BUY"); all options and prices live on the Bonus Buy screen.
