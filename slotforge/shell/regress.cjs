@@ -43,7 +43,7 @@ async function run(file, outDir, label) {
   const state = async () => page.evaluate(() => {
     const g = id => { const e = document.getElementById(id); return e ? e.textContent.trim() : null; };
     const open = [...document.querySelectorAll('.modal')].filter(m => !m.hidden).map(m => m.id);
-    return { bal: g('bal'), win: g('win'), bet: g('bet'), betLbl: g('betLbl'), buyPrice: g('buyPrice'), msg: g('msg'), hot: document.getElementById('barR').classList.contains('hot'),
+    return { bal: g('bal'), win: g('win'), bet: g('bet'), betLbl: g('betLbl'), msg: g('msg'), hot: document.getElementById('barR').classList.contains('hot'),
       fever: !document.getElementById('feverBadge').hidden, turbo: !document.getElementById('turboBadge').hidden, fsBox: !document.getElementById('fsBox').hidden,
       spinCnt: document.getElementById('spinCnt').hidden ? null : g('spinCnt'), open, betBar: document.getElementById('betBar').style.width };
   });
@@ -79,7 +79,7 @@ async function run(file, outDir, label) {
   // ---- 1. idle ----
   let s = await mark('01-idle');
   check('idle: balance is the play-money wallet', s.bal === '$1,000.00', s.bal);
-  check('idle: bet $1.00 and sign shows 100x', s.bet === '$1.00' && s.buyPrice === '$100.00', s.bet + ' / ' + s.buyPrice);
+  check('idle: bet $1.00', s.bet === '$1.00', s.bet);
   check('idle: stage scaled (1600x900)', await page.$eval('#stage', e => Math.abs(e.getBoundingClientRect().width - 1600) < 2));
   const pos = await page.evaluate(() => { const r = id => { const b = document.getElementById(id).getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top), Math.round(b.width), Math.round(b.height)].join(','); }; return ['buyOpen', 'barL', 'barR', 'spin', 'bAuto', 'msg', 'chev'].map(i => i + ':' + r(i)).join(' '); });
   marks.push({ name: 'layout-boxes', pos });
@@ -203,7 +203,7 @@ async function compareDirs(a, b) {
       if (na.length !== nb.length || na.some((v, i) => Math.abs(v - nb[i]) > 3)) problems.push('layout differs:\n  A ' + m.pos + '\n  B ' + o.pos); continue; }
     const same = k => JSON.stringify(m[k]) === JSON.stringify(o[k]);
     if (m.volatile) continue;   // mid-animation frames: timing differs by a few ms, so only the static checkpoints are strict
-    for (const k of ['bal', 'win', 'bet', 'betLbl', 'buyPrice', 'msg', 'hot', 'fever', 'turbo', 'fsBox', 'spinCnt', 'open', 'betBar']) if (!same(k)) problems.push(`${m.name}.${k}: A=${JSON.stringify(m[k])} B=${JSON.stringify(o[k])}`);
+    for (const k of ['bal', 'win', 'bet', 'betLbl', 'msg', 'hot', 'fever', 'turbo', 'fsBox', 'spinCnt', 'open', 'betBar']) if (!same(k)) problems.push(`${m.name}.${k}: A=${JSON.stringify(m[k])} B=${JSON.stringify(o[k])}`);
   }
   // DOM at idle (after init): the shell must generate the same markup the old single file had
   try { const da = fs.readFileSync(path.join(a, 'dom-idle.html'), 'utf8').split('\n'), db = fs.readFileSync(path.join(b, 'dom-idle.html'), 'utf8').split('\n');

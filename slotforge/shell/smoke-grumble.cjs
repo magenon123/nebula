@@ -64,7 +64,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   let s = await state(); await shot('01-idle');
   check('idle: play-money balance $1,000.00', s.bal === '$1,000.00', s.bal);
   check('idle: 5x3 board = 15 cells, strip has 5 lanes', (await page.$$eval('#grid .cell', c => c.length)) === 15 && (await page.$$eval('#strip .lane', c => c.length)) === 5);
-  check('idle: sign shows Dive Ticket price $100.00 and status line', (await txt('#buyPrice')) === '$100.00' && /PLACE YOUR BET, KID/.test(s.msg), s.msg);
+  check('idle: sign shows no price (owner rule) and status line', (await page.$('#buyPrice')) === null && /PLACE YOUR BET, KID/.test(s.msg), s.msg);
   check('idle: Tide Gauge hidden in the base game', !(await page.$eval('#tide', e => e.classList.contains('on'))));
   check('idle: no bubble circles on the crab / board frame', (await page.$$eval('#cBubbles', e => e.length)) === 0);
 
