@@ -59,7 +59,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
     return false; };
   const waitFor = async (sel, ms = 120000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await vis(sel)) return true; await sleep(60); } return false; };
   const waitCond = async (fn, ms = 60000) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await page.evaluate(fn)) return true; await sleep(40); } return false; };
-  const frozen = async name => { await page.evaluate(() => { window.__pz = document.getAnimations().filter(a => a.playState === 'running'); window.__pz.forEach(a => a.pause()); }); await page.screenshot({ path: path.join(outDir, name + '.png') }); await page.evaluate(() => window.__pz.forEach(a => { if (a.playState === 'paused') a.play(); })); };
+  const frozen = async name => { await page.evaluate(() => { window.__pz = document.getAnimations().filter(a => a.playState === 'running'); window.__pz.forEach(a => a.pause()); }); await page.screenshot({ path: path.join(outDir, name + '.png') }); await page.evaluate(() => window.__pz.forEach(a => { if (a.playState !== 'paused') return; if (a.animationName) { const t = a.effect && a.effect.target; if (!t || !t.isConnected || !getComputedStyle(t, a.effect.pseudoElement).animationName.split(',').map(x => x.trim()).includes(a.animationName)) { a.cancel(); return; } } a.play(); })); };
   const watchMsgs = () => page.evaluate(() => { window.__msgs = []; new MutationObserver(() => window.__msgs.push(document.getElementById('msg').textContent)).observe(document.getElementById('msg'), { childList: true, characterData: true, subtree: true }); });
   const sawMsg = async re => (await page.evaluate(() => window.__msgs)).some(m => re.test(m));
   const runBonus = async (tag, shots) => {   // plays an intro-tapped bonus to the outro, collecting what was seen
@@ -208,7 +208,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
     const sh = {}; const t0 = Date.now(); const out = { lvMax: 0, sky: 0 };
     while (Date.now() - t0 < 400000) {
       const st = await page.evaluate(() => ({ outro: !document.getElementById('outroM').hidden, ladle: !!document.querySelector('.ctLadle'), lv: document.querySelectorAll('#grid .cell[data-lv]').length, lv3: document.querySelectorAll('#grid .cell[data-lv="3"],#grid .cell[data-lv="4"]').length,
-        msg: document.getElementById('msg').textContent, sky: document.querySelectorAll('#ctSky .ctSkyK').length, ban: +getComputedStyle(document.getElementById('ctBanner')).opacity > .8 && /SPINS!/.test(document.querySelector('#ctBanner b').textContent), fsBox: !document.getElementById('fsBox').hidden }));
+        msg: document.getElementById('msg').textContent, sky: document.querySelectorAll('#ctKites .ctSkyK').length, ban: +getComputedStyle(document.getElementById('ctBanner')).opacity > .8 && /SPINS!/.test(document.querySelector('#ctBanner b').textContent), fsBox: !document.getElementById('fsBox').hidden }));
       if (st.outro) break; out.lvMax = Math.max(out.lvMax, st.lv); out.sky = Math.max(out.sky, st.sky);
       if (st.fsBox && !sh.cnt) { sh.cnt = 1; await sleep(300); await page.screenshot({ path: path.join(outDir, pre + '-counter.png'), clip: { x: 0, y: 0, width: 420, height: 160 } }); }
       if (st.ladle && !sh.pour) { sh.pour = 1; await sleep(480); await shot(pre + '-levelup-pour'); }
@@ -249,7 +249,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   check('SUPER buy: intro appears', await waitFor('#introM', 60000)); await sleep(2300); await shot('R7-super-intro-presteeped');
   check('SUPER intro: 12 SPINS, SUPER ribbon, gold class, 4 pre-steeped drawers shown, super portrait', (await txt('#introN')) === '12' && /SUPER FREE SPINS/.test(await txt('#introRibbon')) && await page.$eval('#introM', e => e.classList.contains('sup')) && (await page.$$eval('.preMap i.g', i => i.length)) === 4 && !!(await page.$('#introArt svg.kojiSplash.super')));
   await clk('#introM', { position: { x: 80, y: 80 } }); await sleep(900);
-  check('SUPER: gold look on (scene sup) and Koji in bonus mode', await page.$eval('#ctSky', e => e.classList.contains('sup')) && await page.$eval('#char', e => e.classList.contains('bonusmode')));
+  check('SUPER: gold look on (scene sup) and Koji in bonus mode', await page.$eval('#ctKites', e => e.classList.contains('sup')) && await page.$eval('#char', e => e.classList.contains('bonusmode')));
   const fpsBonus = await page.evaluate(() => new Promise(res => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 3000) requestAnimationFrame(f); else res(n / 3); }; requestAnimationFrame(f); }));
   console.log('  bonus (dusk, super) fps while playing, software rendering: ' + fpsBonus.toFixed(1));
   const so = await runFs('R7-super'); const o8 = await page.evaluate(() => window.__r7);

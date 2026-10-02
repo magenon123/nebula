@@ -396,8 +396,8 @@ table.pt.boost th{text-align:center}
 .ctWash{position:absolute;inset:5px;border-radius:10px;z-index:2;pointer-events:none;background:radial-gradient(circle,rgba(150,84,30,.75),rgba(150,84,30,0) 72%)}
 .ctWash.g{background:radial-gradient(circle,rgba(255,214,70,.9),rgba(255,214,70,0) 72%)}
 /* paper kites popped out of top-level drawers join the sky (between the scene and the frame) */
-#ctSky{position:absolute;left:0;top:0;width:1600px;height:900px;pointer-events:none}
-#ctSky.sup::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,150,40,.1),rgba(255,196,80,.3) 55%,rgba(130,40,110,.32))}
+#ctKites{position:absolute;left:0;top:0;width:1600px;height:900px;pointer-events:none}
+#ctKites.sup::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,150,40,.1),rgba(255,196,80,.3) 55%,rgba(130,40,110,.32))}
 .ctSkyK{position:absolute;width:120px;height:250px;transform-origin:60px 70px;filter:drop-shadow(0 4px 0 rgba(28,35,64,.25))}
 .ctSkyK.rest svg{animation:ctSway 3.6s ease-in-out infinite alternate;transform-origin:60px 40px}
 @keyframes ctSway{from{transform:rotate(-6deg) translateY(0)}to{transform:rotate(7deg) translateY(-8px)}}

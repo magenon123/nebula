@@ -620,8 +620,8 @@ table.pt.boost th{text-align:center}
 .ctWash{position:absolute;inset:5px;border-radius:10px;z-index:2;pointer-events:none;background:radial-gradient(circle,rgba(150,84,30,.75),rgba(150,84,30,0) 72%)}
 .ctWash.g{background:radial-gradient(circle,rgba(255,214,70,.9),rgba(255,214,70,0) 72%)}
 /* paper kites popped out of top-level drawers join the sky (between the scene and the frame) */
-#ctSky{position:absolute;left:0;top:0;width:1600px;height:900px;pointer-events:none}
-#ctSky.sup::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,150,40,.1),rgba(255,196,80,.3) 55%,rgba(130,40,110,.32))}
+#ctKites{position:absolute;left:0;top:0;width:1600px;height:900px;pointer-events:none}
+#ctKites.sup::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,150,40,.1),rgba(255,196,80,.3) 55%,rgba(130,40,110,.32))}
 .ctSkyK{position:absolute;width:120px;height:250px;transform-origin:60px 70px;filter:drop-shadow(0 4px 0 rgba(28,35,64,.25))}
 .ctSkyK.rest svg{animation:ctSway 3.6s ease-in-out infinite alternate;transform-origin:60px 40px}
 @keyframes ctSway{from{transform:rotate(-6deg) translateY(0)}to{transform:rotate(7deg) translateY(-8px)}}
@@ -1992,7 +1992,7 @@ function musicDefs() {
     }
   };
   const sup = {
-    tempo: 142, barBeats: 4, spb: 16, swing: 0, bars: 16, key: 59, scale: [0, 2, 3, 7, 8], seed: 97, gain: .8, phrase: 4,
+    tempo: 142, barBeats: 4, spb: 16, swing: 0, bars: 16, key: 59, scale: [0, 2, 3, 7, 8], seed: 97, gain: .62, phrase: 4,
     layers: { drone: { gain: 1, wet: .2 }, taiko: { gain: 1, wet: .22 }, arp: { gain: 1, wet: .25 }, tok: { gain: 1, wet: .1 }, bell: { int: .2, gain: 1, wet: .4 }, shaku: { int: .35, gain: 1, wet: .4 }, hi: { int: .55, gain: 1, wet: .3 }, fill: { int: .8, gain: 1, wet: .2 } },
     bar(M) {
       const k = M.i & 3, ph = (M.i >> 2) & 3, a = ARP[ph], wk = clamp(M.walk, -1, 1), I = M.int;
@@ -2008,7 +2008,7 @@ function musicDefs() {
   };
   stingers.steep = K => { const { V, dest, t } = K; [0, 2, 4].forEach((d, i) => V.koto(dest, t + i * .09, K.note(d + 2, 1), { g: .07, d: .9 })); V.tok(dest, t + .3, .6); };
   stingers.retrig = K => { const { V, dest, t } = K; V.taiko(dest, t, 1, { g: .4 }); [0, 2, 3, 4, 5, 7].forEach((d, i) => V.koto(dest, t + .1 + i * .06, K.note(d, 1), { g: .06, d: 1 })); V.shaku(dest, t + .4, 1.4, K.note(4, 1), { g: .05 }); };
-  return { base: zen, get bonus() { return bType === 'super' ? sup : bType === 'fs' ? steep : rush; }, stingers };
+  return { base: zen, steep, sup, get bonus() { return bType === 'super' ? sup : bType === 'fs' ? steep : rush; }, stingers };
 }
 
 /* ---------- the board: 5 reels x 4 rows ---------- */
@@ -2299,15 +2299,15 @@ function xChip(w, delay, i) {
 }
 const LADLE = `<svg viewBox="0 0 120 90" width="120" height="90" style="overflow:visible"><path d="M112 6 L52 42" stroke="#1c2340" stroke-width="14" stroke-linecap="round"/><path d="M112 6 L52 42" stroke="#b07a4a" stroke-width="7" stroke-linecap="round"/><path d="M12 40 Q12 78 40 78 Q68 78 68 40Z" fill="#d4ae52" stroke="#1c2340" stroke-width="5.5" stroke-linejoin="round"/><ellipse cx="40" cy="40" rx="28" ry="8" fill="#8a4a14" stroke="#1c2340" stroke-width="4.5"/><path d="M22 52 Q26 66 36 68" fill="none" stroke="#fff3c4" stroke-width="3.4" stroke-linecap="round"/></svg>`;
 const KITE_COL = [['#f2d23a', '#d9432e'], ['#f59db8', '#7a3ca6'], ['#79a85a', '#f2d23a'], ['#6aa6d8', '#fbf1dc'], ['#ffd23a', '#fff0a0']];
-const SKY = [[70, 120], [1250, 110], [190, 50], [1440, 230], [290, 170], [1190, 30], [40, 250], [1520, 120], [330, 60], [1340, 30], [120, 190], [1470, 40]];
+const SKY = [[70, 200], [1210, 60], [170, 290], [1555, 85], [50, 360], [1560, 330], [150, 135], [1150, 150], [1500, 20]];
 let skyN = 0;
 function skyKite(r, c, gold) {   // a paper kite pops out of the top-level drawer, flies up and joins the kites in the sky (stays for the rest of the bonus)
-  const sky = $('ctSky'), [sx, sy] = scr(r, c), [x0, y0] = toStage(sx, sy), sp = SKY[skyN++ % SKY.length], col = gold ? KITE_COL[4] : KITE_COL[(skyN + 1) % 4];
+  const sky = $('ctKites'), [sx, sy] = scr(r, c), [x0, y0] = toStage(sx, sy), sp = SKY[skyN++ % SKY.length], col = gold ? KITE_COL[4] : KITE_COL[(skyN + 1) % 4];
   const k = document.createElement('div'); k.className = 'ctSkyK'; k.innerHTML = KITE_SVG.replace('#f2d23a', col[0]).replace('<path d="M60 4 L108 62 L60 62Z M12 62 L60 122 L60 62Z" fill="#d9432e"/>', `<path d="M60 4 L108 62 L60 62Z M12 62 L60 122 L60 62Z" fill="${col[1]}"/>`);
   k.style.left = x0 + 'px'; k.style.top = y0 + 'px'; sky.append(k);
   const mx = (x0 + sp[0]) / 2 + (sp[0] < 800 ? -60 : 60);
-  k.animate([{ transform: 'translate(-60px,-70px) scale(.05) rotate(0)', opacity: 0 }, { transform: 'translate(-60px,-120px) scale(.4) rotate(-12deg)', opacity: 1, offset: .15 }, { transform: `translate(${mx - x0 - 60}px,${(y0 + sp[1]) / 2 - y0 - 130}px) scale(.5) rotate(14deg)`, offset: .55 }, { transform: `translate(${sp[0] - x0 - 60}px,${sp[1] - y0 - 70}px) scale(.38) rotate(0)`, opacity: 1 }], { duration: 1700 * T(), easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards' });
-  after(1700, () => { k.classList.add('rest'); k.style.transform = `translate(${sp[0] - x0 - 60}px,${sp[1] - y0 - 70}px) scale(.38)`; k.getAnimations().forEach(a => a.cancel()); });
+  k.animate([{ transform: 'translate(-60px,-70px) scale(.05) rotate(0)', opacity: 0 }, { transform: 'translate(-60px,-120px) scale(.4) rotate(-12deg)', opacity: 1, offset: .15 }, { transform: `translate(${mx - x0 - 60}px,${(y0 + sp[1]) / 2 - y0 - 130}px) scale(.6) rotate(14deg)`, offset: .55 }, { transform: `translate(${sp[0] - x0 - 60}px,${sp[1] - y0 - 70}px) scale(.38) rotate(0)`, opacity: 1 }], { duration: 1700 * T(), easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards' });
+  after(1700, () => { k.classList.add('rest'); k.style.transform = `translate(${sp[0] - x0 - 60}px,${sp[1] - y0 - 70}px) scale(.5)`; k.getAnimations().forEach(a => a.cancel()); });
 }
 function steepCell(u, gold) {
   const d = at(u.r, u.c), [x, y] = ctrG(u.r, u.c), lad = document.createElement('div'); lad.className = 'ctLadle'; lad.innerHTML = LADLE; lad.style.left = (x + 18) + 'px'; lad.style.top = (y - 92) + 'px'; fxl().append(lad);
@@ -2452,26 +2452,26 @@ return {
   init() {
     for (let i = 0; i < ROWS * COLS; i++) { const d = document.createElement('div'); d.className = 'cell'; $('grid').append(d); cells.push(d); }
     $('fxl').insertAdjacentHTML('beforeend', '<div id="ctBanner"><b></b><small></small></div>');
-    { const sky = document.createElement('div'); sky.id = 'ctSky'; let top = $('scene'); while (top.parentElement && top.parentElement.id !== 'stage') top = top.parentElement; top.after(sky); }   // between the scene and the frame/Koji
+    { const sky = document.createElement('div'); sky.id = 'ctKites'; let top = $('scene'); while (top.parentElement && top.parentElement.id !== 'stage') top = top.parentElement; top.after(sky); }   // between the scene and the frame/Koji
     buildPaytable();
   },
   paintIdle() { paint([[1, 0, 3, 6, 2], [4, 7, 0, 5, 1], [2, 6, 8, 0, 3], [5, 1, 4, 7, 0]]); dropAll(); },
   splashArt: () => splashSvg(false),
-  roundStart() { document.querySelectorAll('#gates .gate').forEach(g => g.classList.remove('on', 'launch')); board.clear(); bType = null; $('ctSky').replaceChildren(); skyN = 0; },
+  roundStart() { document.querySelectorAll('#gates .gate').forEach(g => g.classList.remove('on', 'launch')); board.clear(); bType = null; $('ctKites').replaceChildren(); skyN = 0; },
   clearBoard: async () => { if (inBonus && bType === 'tin') { if (!bonusOpened) { bonusOpened = true; await bonusOpen(); } else await wait(40); return; } await dropOut(); },
   restoreBoard() { if (lastGrid) paint(lastGrid); },
   baseSpin: R => ({ initialGrid: R.initialGrid, step: R.cascadeSteps[0] || null, tins: R.tins, bought: R.bought }),
   playSpin,
   showTrigger,
   bonusMode(on) {
-    inBonus = on; bonusOpened = false; $('scene').classList.toggle('dusk', on); $('scene').classList.toggle('sup', on && bType === 'super'); $('ctSky').classList.toggle('sup', on && bType === 'super'); $('grid').classList.toggle('steepG', on && bType !== 'tin'); $('grid').classList.toggle('supG', on && bType === 'super');
+    inBonus = on; bonusOpened = false; $('scene').classList.toggle('dusk', on); $('scene').classList.toggle('sup', on && bType === 'super'); $('ctKites').classList.toggle('sup', on && bType === 'super'); $('grid').classList.toggle('steepG', on && bType !== 'tin'); $('grid').classList.toggle('supG', on && bType === 'super');
     if (on) {
       char('bonus', 1400 * T()); document.querySelector('#fsBox small').textContent = bType === 'tin' ? S.cfg.fsLabel : 'SPINS LEFT';
       if (bType === 'tin') { S.music.intensity(.12); setFs(3); }
       else { const B = bonusR.bonus; fsBoost = B.boost; fsMax = B.maxLevel; fsLv = null; setFs(B.startSpins); S.music.intensity(bType === 'super' ? .3 : .08); cells.forEach(d => { d.classList.remove('scat'); }); }
     } else {
       S.music.intensity(0); applyLevels(null); setupOutro();
-      const sk = $('ctSky'); if (sk.children.length) sk.animate([{ opacity: 1 }, { opacity: 1, offset: .6 }, { opacity: 0 }], { duration: 3200 * T(), fill: 'forwards' }).finished.then(() => { sk.replaceChildren(); sk.getAnimations().forEach(a => a.cancel()); }, () => {});
+      const sk = $('ctKites'); if (sk.children.length) sk.animate([{ opacity: 1 }, { opacity: 1, offset: .6 }, { opacity: 0 }], { duration: 3200 * T(), fill: 'forwards' }).finished.then(() => { sk.replaceChildren(); sk.getAnimations().forEach(a => a.cancel()); }, () => {});
     }
   }
 };
