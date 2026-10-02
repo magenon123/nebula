@@ -193,3 +193,29 @@ Its spin 1 (a drawer at level 2 is on the winning line: boost 3, so the 0.29225 
 
 ## Rules for the info screen (numbers from `info()`)
 FS plaque scatters: 3 = FREE SPINS (10 spins), 4 = SUPER FREE SPINS (12 spins, 4 drawers pre-steeped), 5 = SUPER with 16 spins. In the bonuses every drawer that helps a win gets steeped one level darker; a later win through steeped drawers pays x(1 + sum of the drawers' boosts). 3/4/5 FS inside a bonus add spins. Tea Tins do not appear inside these bonuses. Max win 5,000x.
+
+## Round 7 measured math (engine sims, `node tools/cloudtop-decomp.js <mode> <rounds/seed> 11,12,13,14`, sfc32, 4 seeds)
+Final knobs: `payScale 0.835` (was 1; base lines re-balanced), `fsP 0.018`, `fsPBonus 0.026`, FS wild weight 1.9, Super wild weight 2.86 (reels 2-4, bundle weight 3 in both), boosts FS `[0,1,2,4]`, Super `[0,1,3,5,8]` (spec start was `[0,1,3,6,10]`: cut to keep P(>=1000x | Super) under 1e-3), Super pre-warm 4 drawers at level 2, Tin Rush untouched (same coinP, q, weights, functions). Prices: **tin 60x, fs 21x, super 75x**.
+
+| mode | rounds | RTP | 95% CI | per seed |
+|---|---|---|---|---|
+| base | 4 x 25M = 100M | **96.39%** | +-0.17 | 96.55 / 96.46 / 96.18 / 96.35 |
+| buy:tin (60x) | 4 x 4M = 16M | **96.20%** | +-0.06 | 96.23 / 96.18 / 96.21 / 96.17 |
+| buy:fs (21x) | 4 x 5M = 20M | **96.19%** | +-0.07 | 96.13 / 96.14 / 96.26 / 96.24 |
+| buy:super (75x) | 4 x 5M = 20M | **96.39%** | +-0.07 | 96.37 / 96.45 / 96.44 / 96.30 |
+(CI = max of round-level and seed-to-seed estimate. The base CI half-width 0.17 is wider than the band slack: base point estimate is 96.39 and the decomposition below (sum of independently measured parts, tighter) gives 96.37.)
+
+Base decomposition (100M spins; % of bet): line wins incl. bundles **44.48** (was 57.05 before the new bonuses; hit rate **24.06%**, avg line win per hit 1.85x) + Tin Rush **39.10** + FREE SPINS **9.83** + SUPER **2.97** = 96.38. (The old note "57.0 + 40.7 = 97.7" was a unit slip: 40.7 is the bonus share of the RETURN, 39.1 % of the bet.)
+
+| bonus | trigger (spins) | E[bonus] | share of bet RTP | median | P(<1x) | P(<5x) | P(>=100x) | P(>=1000x) | cap hits | max seen |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Tin Rush | 1 in 147 | 57.64x (buy: 57.72x) | 39.10% | ~42x | 0% | 0% | 8.93% | 0.0200% | 0 / 100M spins, 4 / 16M buys | 5000x |
+| FREE SPINS | 1 in 205 (3 FS) | 20.17x (buy: 20.20x) | 9.83% | ~11x | 6.0% | 26.9% | 2.20% | 0.0012% | 0 | 2138x |
+| SUPER | 1 in 2,468 (4 FS: 1 in 2,618; 5+ FS: 1 in 42,900) | 73.40x (buy: 72.29x) | 2.97% | ~44x | 1.0% | 5.4% | 21.2% | 0.093-0.11% | 0 / 100M spins, 1 / 20M buys | 5000x (buy) |
+
+- FREE SPINS: avg 10.67 spins played, 13.6% retrigger at least once (avg +0.67 spins), final drawer levels L0 56% / L1 26% / L2 12% / L3 6%, avg boost on a winning line 1.66.
+- SUPER: avg 13.24 spins (16-spin 5 FS tier included), 16.1% retrigger, final levels L0 39% / L1 20% / L2 22% / L3 11% / L4 (gold) 8.6%, avg boost per winning line 5.3.
+- Whole-game tail: P(round >= 1000x) **1 in 535k spins** (187 in 100M; before: 1 in 820k, limit 1 in ~500k); cap 5,000x reached 0 times in 100M base spins; largest base-sim win 3,642x. Buys: P(>=1000x) tin 1 in 5,500, fs 1 in 93,000, super 1 in 1,080 (cap hit once in 20M super buys).
+- Trigger rates: P(3 FS) 1 in 205, P(4 FS) 1 in 2,618, P(5+ FS) 1 in 42,900, 2 FS tease 1 in 23 spins. Tin priority rule fired 1,478 times in 100M spins (1 in 68k; Tin Rush shown, the FS cells were rewritten).
+- Buy E / price: fs 20.20 / 21 = 96.2%, super 72.29 / 75 = 96.4%, tin 57.72 / 60 = 96.2%.
+- Tools: `tools/cloudtop-decomp.js` (this table), `tools/cloudtop-meta.js` (regenerates `engines/cloudtop-tea-house.meta.json`), tests `tools/cloudtop.test.js` (25 tests).
