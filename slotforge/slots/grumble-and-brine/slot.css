@@ -29,7 +29,7 @@
 #frameArt{left:438px;top:158px;width:724px;height:520px;overflow:visible}
 #frame{left:460px;top:222px;width:680px;height:408px}
 #grid{position:relative;display:grid;grid-template-columns:repeat(5,136px);grid-template-rows:repeat(3,136px);width:680px;height:408px;overflow:hidden;background:rgba(4,20,31,.82)}
-#grid.focus .cell:not(.hit):not(.win){opacity:.38;filter:saturate(.45) brightness(.7);transition:.25s}
+#grid.focus .cell:not(.hit):not(.win){opacity:.6;filter:saturate(.7);transition:.25s}
 #fxl{left:0;top:0;width:680px;height:408px;pointer-events:none;z-index:6;overflow:visible}
 #frameFx{position:absolute;left:0;top:0;width:680px;height:408px;pointer-events:none;z-index:4;opacity:.8;overflow:visible}
 #tagArt{left:1020px;top:626px;width:70px;height:78px;pointer-events:none;transform-origin:35px 0;animation:gbTag 5s ease-in-out infinite alternate}
@@ -44,8 +44,7 @@
 .cell.scatter svg.g{animation:wob 1.9s ease-in-out infinite alternate}
 .cell.scat svg.g{animation:gbScat .55s ease-in-out infinite alternate;filter:drop-shadow(0 0 14px #ffb938)}
 @keyframes gbScat{to{transform:scale(1.18) rotate(5deg)}}
-.cell.hit{z-index:2;background:radial-gradient(circle,rgba(255,185,56,.34),rgba(8,30,44,.2) 78%)}
-.cell.hit svg.g{animation:gbHit .5s ease-in-out infinite alternate}
+.cell.hit{z-index:2}
 @keyframes gbHit{to{transform:translateY(-6px) scale(1.08)}}
 .cell.drop{animation:gbDrop calc(.5s*var(--spd,1)) cubic-bezier(.3,1.25,.5,1) backwards;animation-delay:var(--dl,0ms)}
 @keyframes gbDrop{from{transform:translateY(-440%);opacity:0}22%{opacity:1}}
@@ -288,7 +287,7 @@
   repeating-radial-gradient(circle at 50% 56%,transparent 0 13px,rgba(93,242,224,.22) 13px 15px),
   linear-gradient(160deg,var(--p1),var(--p2));
  border-style:dashed}
-/* winning cells: gold plate flare instead of a flat tint */
+/* winning cells: only the plate rim warms up; each symbol animates itself (win anim lives inside the symbol) */
 #grid .cell.hit{background:transparent}
-#grid .cell.hit::before{border-color:#ffd95e;box-shadow:inset 0 0 22px rgba(255,200,70,.65),0 0 0 2px #0b1820,0 0 24px rgba(255,185,56,.85),0 4px 0 rgba(0,0,0,.45)}
+#grid .cell.hit::before{border-color:#ffd95e;transition:border-color .15s}
 #grid .cell.wild.hit{background:transparent}

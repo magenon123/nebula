@@ -8,6 +8,67 @@ const NAMES = ['Old Boot', 'Tin Can', 'Message Bottle', 'Rusty Key', 'Brass Comp
 const ED = S.cfg.engineData;
 let lastGrid = null, lastJ = [], tideNow = 0;
 
+/* ---------- MUSIC: "salvage shanty" (base, 6/8, D dorian) and "deep dive" (bonus, slow swell). All synthesised by shell/slot-music.js ---------- */
+const MIN = [0, 3, 7], MAJ = [0, 4, 7];
+const dm = [0, MIN], gM = [5, MAJ], am = [7, MIN], cM = [10, MAJ];
+const baseOf = c => 50 + (c[0] > 6 ? c[0] - 12 : c[0]);                       // D3 = 50; Am -> A2, C -> C3
+/* melody per bar of an 8-bar phrase: [step (eighths), length, scale degree from D4]; step 0 notes are fixed, others follow the seeded walk */
+const SH_A = [[[0, 3, 4], [3, 1, 5], [4, 1, 4], [5, 1, 3]], [[0, 3, 2], [3, 3, 4]], [[0, 3, 5], [3, 1, 4], [4, 1, 3], [5, 1, 5]], [[0, 3, 4], [3, 3, 3]],
+  [[0, 3, 2], [3, 1, 3], [4, 1, 4], [5, 1, 2]], [[0, 3, 3], [3, 3, 1]], [[0, 3, 4], [3, 1, 6], [4, 1, 5], [5, 1, 4]], [[0, 4, 0], [4, 2, 2]]];
+const SH_B = [[[0, 3, 7], [3, 1, 6], [4, 1, 4], [5, 1, 6]], [[0, 3, 5], [3, 3, 3]], [[0, 3, 6], [3, 3, 3]], [[0, 2, 5], [2, 1, 4], [3, 3, 3]],
+  [[0, 3, 4], [3, 1, 5], [4, 1, 4], [5, 1, 2]], [[0, 3, 4], [3, 3, 6]], [[0, 3, 6], [3, 1, 4], [4, 1, 3], [5, 1, 1]], [[0, 6, 4]]];
+function musicDefs() {
+  const PH_A = [dm, dm, gM, gM, dm, cM, am, dm], PH_B = [dm, gM, cM, gM, dm, am, cM, am];
+  const shanty = {
+    tempo: 100, barBeats: 2, spb: 6, swing: 0, bars: 32, key: 62, scale: [0, 2, 3, 5, 7, 9, 10], seed: 41, gain: 1, phrase: 8,
+    layers: { bass: { gain: 1, wet: .12 }, stomp: { enter: 2, gain: 1, wet: .05 }, strum: { enter: 2, gain: 1, wet: .15 }, reed: { enter: 4, gain: 1, wet: .22 }, reedpad: { enter: 8, int: .3, gain: 1, wet: .3 },
+      banjo: { int: .35, enter: 8, gain: 1, wet: .15 }, perc: { enter: 6, gain: 1, wet: .08 }, hi: { int: .65, gain: 1, wet: .25 }, fx: { gain: 1, wet: .5 } },
+    bar(M) {
+      const ph = M.i >> 3, k = M.i & 7, C = (ph % 2 ? PH_B : PH_A)[k], b = baseOf(C), q = C[1], third = q[1], mel = (ph % 2 ? SH_B : SH_A)[k], wk = Math.max(-1, Math.min(1, M.walk));
+      M.upright('bass', M.st(0), b - 12, { g: .2 }); M.upright('bass', M.st(3), b - 12 + 7, { g: .16 });
+      if (M.rnd() < .3 && k !== 7) M.upright('bass', M.st(5), b - 12 + 7 + (third === 4 ? -2 : -2), { g: .09, d: .25 });
+      M.stomp('stomp', M.st(0), .6); M.stomp('stomp', M.st(3), .45);
+      const ch = [b + 12, b + 12 + third, b + 12 + 7, b + 24];
+      [1, 2, 4, 5].forEach(s => { const soft = (s === 2 || s === 5) ? 1 : .75; if (s === 5 && M.rnd() < .15) return; M.strum('strum', M.st(s), ch.slice(0, 3), { kind: s % 2 ? 'banjo' : 'uke', g: .026 * soft, d: .13, sp: .01 }); });
+      mel.forEach(([s, len, d]) => { const m = M.note(d + (s ? wk : 0)); M.reed('reed', M.st(s), len * M.sd * .96, m, { g: .045, a: .06, r: .14, cut: 2600 });
+        if (M.int > .35 && len >= 1) M.pluck('banjo', M.st(s), m + 12, { kind: 'banjo', g: .028, d: .24 }); });
+      if (M.int > .3) M.reed('reedpad', M.t0, M.bd * .98, ch[1], { g: .022, a: .35, r: .4, cut: 1500, vd: 5 }), M.reed('reedpad', M.t0, M.bd * .98, ch[2], { g: .018, a: .35, r: .4, cut: 1500, vd: 5 });
+      if (M.int > .65 && k % 2 === 0) mel.forEach(([s, len, d]) => { if (len >= 3) M.reed('hi', M.st(s), len * M.sd * .9, M.note(d, 1), { g: .02, a: .12, cut: 2400 }); });
+      for (let s = 0; s < 6; s++) M.shaker('perc', M.st(s) , s % 3 === 0 ? .8 : .45);
+      if (M.int > .35) M.stomp('perc', M.st(1), .15);
+      if (k === 3 && ph % 2 === 0) M.sonar('fx', M.st(0), M.note(4, 1), .8);
+      if (k === 5 && ph % 2 === 1) M.sonar('fx', M.st(0), M.note(7, 1), .6);
+      if (M.rnd() < .35) { const n = 2 + Math.floor(M.rnd() * 3), s0 = Math.floor(M.rnd() * 3); for (let j = 0; j < n; j++) M.bubble('fx', M.st(s0) + j * .09, M.note(4 + Math.floor(M.rnd() * 5), 1), .7 + M.rnd() * .6); }
+      if (k === 7 && ph >= 1) M.slide('fx', M.st(3), 2.2 * M.sd, 57, 50, { g: .05 });
+    }
+  };
+  const PHD = [[dm, dm, cM, cM, am, am, gM, gM], [dm, dm, gM, gM, cM, cM, am, am], [dm, cM, am, gM, dm, am, gM, dm]];
+  const dive = {
+    tempo: 72, barBeats: 2, spb: 6, swing: 0, bars: 24, key: 62, scale: [0, 2, 3, 5, 7, 9, 10], seed: 77, gain: 1, phrase: 4,
+    layers: { pad: { gain: 1, wet: .4 }, drone: { gain: 1, wet: .1 }, heart: { gain: 1, wet: .1 }, whale: { gain: 1, wet: .7 }, reed: { int: .3, gain: 1, wet: .5 }, ping: { int: .6, gain: 1, wet: .3 },
+      uke: { int: .6, gain: 1, wet: .3 }, hi: { int: .95, gain: 1, wet: .5 }, perc: { int: .95, gain: 1, wet: .1 } },
+    bar(M) {
+      const C = PHD[M.i >> 3][M.i & 7], k = M.i & 7, b = baseOf(C), third = C[1][1], wk = Math.max(-1, Math.min(1, M.walk));
+      M.pad('pad', M.t0, M.bd * .98, [b, b + 7, b + 12, b + 12 + third], { wave: 'triangle', det: 6, cut: 650, cut2: 950, q: .5, a: .9, r: 1.2, g: .075 });
+      M.sub('drone', M.t0, M.bd * .97, b - 12, { g: .24, a: .15, r: .4 });
+      M.heartbeat('heart', M.st(0) + .02, .55); if (M.int > .3) M.heartbeat('heart', M.st(3), .3);
+      if (M.i % 4 === 1) M.whale('whale', M.st(1), 4.2, 57, M.i % 8 === 1 ? 64 : 62, M.i % 8 === 1 ? 60 : 57, { g: .055 });
+      if (k % 2 === 0) [[0, 5, 4], [3, 4, 3]].forEach(([s, len, d]) => M.reed('reed', M.st(s), len * M.sd * .92, M.note(d + (s ? wk : 0), 0), { g: .034, a: .45, r: .5, cut: 1500, vd: 6 }));
+      if (k % 2 === 1) M.reed('reed', M.st(0), 5 * M.sd, M.note(k === 7 ? 0 : 2 + wk), { g: .03, a: .5, r: .6, cut: 1400, vd: 6 });
+      if (M.i % 2 === 0) M.sonar('ping', M.st(0), b + 24 + 7, .55, 1.8);
+      if (M.rnd() < .5) for (let j = 0, n = 2 + Math.floor(M.rnd() * 3); j < n; j++) M.bubble('ping', M.st(Math.floor(M.rnd() * 5)) + j * .08, M.note(4 + Math.floor(M.rnd() * 5), 1), .7);
+      [0, 1, 2, 3, 2, 1].forEach((n, j) => M.pluck('uke', M.st(j), [b + 12, b + 12 + third, b + 19, b + 24][n], { kind: 'uke', g: .026, d: .38 }));
+      M.pad('hi', M.t0, M.bd * .98, [b + 24, b + 24 + third, b + 31], { wave: 'sine', det: 4, cut: 2000, a: 1, r: 1.2, g: .05 });
+      M.stomp('perc', M.st(0), .45); M.stomp('perc', M.st(3), .3); for (let s = 0; s < 6; s += 1) M.shaker('perc', M.st(s), .35);
+    }
+  };
+  const stingers = {
+    win(K) { const { V, dest, t } = K; V.metal(dest, t, K.mtof(K.note(4, 0)), 1.1, .07, [1, 2.756, 5.404]); [0, 2, 4].forEach((d, i) => V.pluck(dest, t + i * .09, K.note(d * 1 + 4, 0) + (i ? 12 : 0), { kind: 'uke', g: .06, d: .5 })); V.bubble(dest, t + .3, K.note(8, 0), 1); },
+    bonus(K) { const { V, dest, t } = K; [4, 6, 7].forEach((d, i) => V.sonar(dest, t + i * .34, K.note(d, 1), 1, 1.8)); V.slide(dest, t + .7, 1.4, 62, 38, { g: .07 }); V.heartbeat(dest, t + 1.9, .8); }
+  };
+  return { base: shanty, bonus: dive, stingers };
+}
+
 /* ---------- the board: 5 reels x 3 rows ---------- */
 const cells = [];
 const at = (r, c) => cells[r * COLS + c];
@@ -155,6 +216,7 @@ async function showTrigger(R) {
 /* ---------- sound: sonar pings, brass bells, bubbles and rubbery thunks (all synthesised) ---------- */
 let ambBonus = null;
 return {
+  music: musicDefs,
   sfx(kit) {
     const { ctx, bus, env, osc, noise, metal, st, T0 } = kit;
     const pg = kit.ping({ time: .32, fb: .45, lp: 2500, wet: .5 });

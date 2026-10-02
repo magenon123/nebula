@@ -1,4 +1,10 @@
- <symbol id="s0" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><!-- iron shard: slate-teal ore crystals on rock -->
+ <symbol id="s0" viewBox="0 0 64 64"><style>#s0 [class^="a-"]{animation-duration:calc(1.05s*var(--spd,1));animation-timing-function:cubic-bezier(.3,.7,.3,1);animation-delay:var(--delay,0ms);animation-fill-mode:both;animation-play-state:var(--win,paused);transform-box:view-box}
+#s0 .a-body{animation-name:ec0b;transform-origin:32px 58px}
+@keyframes ec0b{0%,100%{transform:none}18%{transform:scale(1.04,.95)}34%{transform:scale(.97,1.05) rotate(-1.5deg)}46%{transform:rotate(2.2deg) translateX(1px)}58%{transform:rotate(-1.8deg)}72%{transform:rotate(.8deg)}}
+#s0 .a-glint{animation-name:ec0g}
+@keyframes ec0g{0%,26%{transform:translateX(-26px);opacity:0}36%{opacity:.9}62%{transform:translateX(26px);opacity:.9}72%,100%{transform:translateX(32px);opacity:0}}
+#s0 .a-star{animation-name:ec0s;transform-origin:52px 10px}
+@keyframes ec0s{0%,100%{transform:scale(1) rotate(0)}28%{transform:scale(.3)}55%{transform:scale(1.8) rotate(90deg)}80%{transform:scale(.9) rotate(130deg)}}</style><g stroke-linejoin="round" stroke-linecap="round"><g class="a-body"><!-- iron shard: slate-teal ore crystals on rock -->
   <!-- left small crystal -->
   <path d="M9 27 L15 33 L16 49 L5 49 L5 36Z" fill="#4f7a8c" stroke="#1d0f09" stroke-width="2.8"/>
   <path d="M9 27 L5 36 L5 49 L9 49 L10 34Z" fill="#8ec3cf"/>
@@ -20,6 +26,8 @@
   <path d="M33 20 L36 28 L32 34 L37 44" fill="none" stroke="#e8701c" stroke-width="1.9"/>
   <path d="M33.5 21 L35.5 27" fill="none" stroke="#ffd36a" stroke-width=".9"/>
   <path d="M22 34 L25 38 M21 25 L23 28" stroke="#d9f6fa" stroke-width="1.3" fill="none"/>
+  <clipPath id="ec0c"><path d="M30 4 L40 13 L42 49 L20 51 L17 14Z"/><path d="M51 19 L57 31 L58 49 L45 49 L44 31Z"/><path d="M9 27 L15 33 L16 49 L5 49 L5 36Z"/></clipPath>
+  <g clip-path="url(#ec0c)"><g class="a-glint" opacity="0"><path d="M22 0 L30 0 L20 60 L12 60Z" fill="#fff"/><path d="M33 0 L36 0 L26 60 L23 60Z" fill="#fff"/></g></g>
   <!-- rock base -->
   <path d="M2 57 L5 49 L16 47 L24 51 L38 49 L48 47 L59 49 L62 57 Q62 60 58 60 L6 60 Q2 60 2 57Z" fill="#6a5a5c" stroke="#1d0f09" stroke-width="3.2"/>
   <path d="M5 49 L16 47 L24 51 L22 55 L4 56Z" fill="#9a8a88"/>
@@ -27,9 +35,18 @@
   <path d="M10 53 L14 56 M30 55 L34 57 M50 53 L54 56" stroke="#1d0f09" stroke-width="1.4" fill="none"/>
   <path d="M26 56 L30 53" stroke="#e8701c" stroke-width="1.8" fill="none"/>
   <path d="M10 56 l1 -3 M42 57 l1 -2" stroke="#e8701c" stroke-width="1.6" fill="none"/>
-  <path d="M52 5 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z" fill="#fff" stroke="#1d0f09" stroke-width="1.2"/>
+  </g>
+  <path class="a-star" d="M52 5 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z" fill="#fff" stroke="#1d0f09" stroke-width="1.2"/>
  </g></symbol>
- <symbol id="s1" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><!-- copper ingots: stack with stamp and patina -->
+ <symbol id="s1" viewBox="0 0 64 64"><style>#s1 [class^="a-"]{animation-duration:calc(1.05s*var(--spd,1));animation-timing-function:cubic-bezier(.3,.7,.3,1);animation-delay:var(--delay,0ms);animation-fill-mode:both;animation-play-state:var(--win,paused);transform-box:view-box}
+#s1 .a-body{animation-name:ec1b;transform-origin:32px 60px}
+@keyframes ec1b{0%,100%{transform:none}22%{transform:translateY(-3px) scale(.97,1.05)}40%{transform:translateY(1.5px) scale(1.09,.88)}54%{transform:translateY(-1.5px) scale(.98,1.03)}70%{transform:scale(1.02,.99)}}
+#s1 .a-top{animation-name:ec1t;transform-origin:32px 40px;animation-delay:calc(var(--delay,0ms) + 50ms)}
+@keyframes ec1t{0%,100%{transform:none}22%{transform:translateY(-6px) rotate(-3deg)}42%{transform:translateY(2.5px) scale(1.05,.88)}58%{transform:translateY(-2.5px) rotate(2deg)}76%{transform:translateY(.6px)}}
+#s1 .a-shine{animation-name:ec1s}
+@keyframes ec1s{0%,38%{transform:translateX(-14px);opacity:0}48%{opacity:.95}70%{transform:translateX(52px);opacity:.9}80%,100%{transform:translateX(60px);opacity:0}}
+#s1 .a-star{animation-name:ec1p;transform-origin:56px 12px}
+@keyframes ec1p{0%,100%{transform:scale(1)}40%{transform:scale(.3)}62%{transform:scale(1.8) rotate(60deg)}85%{transform:scale(1)}}</style><g stroke-linejoin="round" stroke-linecap="round"><g class="a-body"><!-- copper ingots: stack with stamp and patina -->
   <!-- lower ingot -->
   <path d="M10 37 L54 37 L61 47 L3 47Z" fill="#ffc780" stroke="#1d0f09" stroke-width="3.2"/>
   <path d="M3 47 L61 47 L59 58 Q59 60 56 60 L8 60 Q5 60 5 58Z" fill="#e07a35" stroke="#1d0f09" stroke-width="3.2"/>
@@ -45,7 +62,7 @@
   <path d="M46 47 Q47 52 45 55 Q48 56 50 52 Q51 56 54 55 Q55 50 53 47Z" fill="#46b79b" stroke="#1d0f09" stroke-width="1.3"/>
   <path d="M47 48 Q47.5 51 46.5 53" stroke="#a6f0d8" stroke-width="1" fill="none"/>
   <path d="M5 50 Q8 51 8 55 Q5 55 5 50Z" fill="#46b79b"/>
-  <!-- upper ingot -->
+  <g class="a-top"><!-- upper ingot -->
   <path d="M17 18 L47 18 L53 27 L11 27Z" fill="#ffd596" stroke="#1d0f09" stroke-width="3"/>
   <path d="M11 27 L53 27 L51 39 L13 39Z" fill="#ee8a3c" stroke="#1d0f09" stroke-width="3"/>
   <path d="M36 27 L53 27 L51 39 L36 39Z" fill="#b5501f"/>
@@ -56,18 +73,33 @@
   <path d="M20.5 33 h7" stroke="#ffc780" stroke-width="1.2"/>
   <path d="M40 31 l2 2 M45 30.5 l1.6 1.6 M43 35.5 l2 1.6" stroke="#7e3410" stroke-width="1.3" fill="none"/>
   <path d="M33 37 l3 -2" stroke="#46b79b" stroke-width="2"/>
-  <path d="M55 9 l1.5 3.8 3.8 1.5 -3.8 1.5 -1.5 3.8 -1.5 -3.8 -3.8 -1.5 3.8 -1.5z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
+  </g>
+  <clipPath id="ec1c"><path d="M10 37 L54 37 L61 47 L3 47Z"/><path d="M17 18 L47 18 L53 27 L11 27Z"/></clipPath>
+  <g clip-path="url(#ec1c)"><g class="a-shine" opacity="0"><path d="M18 10 L25 10 L15 50 L8 50Z" fill="#fff"/></g></g>
+  </g>
+  <path class="a-star" d="M55 9 l1.5 3.8 3.8 1.5 -3.8 1.5 -1.5 3.8 -1.5 -3.8 -3.8 -1.5 3.8 -1.5z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
  </g></symbol>
- <symbol id="s2" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round" fill="none"><g transform="translate(32 33) scale(.88) translate(-32 -32)"><!-- silver chain -->
+ <symbol id="s2" viewBox="0 0 64 64"><style>#s2 [class^="a-"]{animation-duration:calc(1.05s*var(--spd,1));animation-timing-function:cubic-bezier(.3,.7,.3,1);animation-delay:var(--delay,0ms);animation-fill-mode:both;animation-play-state:var(--win,paused);transform-box:view-box}
+#s2 .a-body{animation-name:ec2b;transform-origin:12px 12px}
+@keyframes ec2b{0%,100%{transform:none}16%{transform:rotate(7deg)}34%{transform:rotate(-10deg)}52%{transform:rotate(6deg)}70%{transform:rotate(-3deg)}86%{transform:rotate(1deg)}}
+#s2 .a-l1{animation-name:ec2l1;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes ec2l1{0%,100%{transform:none}20%{transform:rotate(-9deg)}40%{transform:rotate(10deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(2deg)}}
+#s2 .a-l3{animation-name:ec2l3;transform-box:fill-box;transform-origin:50% 50%;animation-delay:calc(var(--delay,0ms) + 80ms)}
+@keyframes ec2l3{0%,100%{transform:none}20%{transform:rotate(9deg)}40%{transform:rotate(-10deg)}60%{transform:rotate(6deg)}80%{transform:rotate(-2deg)}}
+#s2 .a-l2{animation-name:ec2l2;animation-delay:calc(var(--delay,0ms) + 40ms)}
+@keyframes ec2l2{0%,100%{transform:none}30%{transform:translate(1.6px,-1.6px)}55%{transform:translate(-1.6px,1.6px)}78%{transform:translate(.6px,-.6px)}}
+#s2 .a-star{animation-name:ec2s;transform-origin:57px 10px}
+@keyframes ec2s{0%,100%{transform:scale(1)}30%{transform:scale(.3)}55%{transform:scale(1.8) rotate(80deg)}85%{transform:scale(1)}}</style><g stroke-linejoin="round" stroke-linecap="round" fill="none"><g class="a-body"><g transform="translate(32 33) scale(.88) translate(-32 -32)"><!-- silver chain -->
   <!-- edge-on middle link (behind) -->
-  <g transform="rotate(45 32 32)">
+  <g class="a-l2"><g transform="rotate(45 32 32)">
    <rect x="16" y="27.5" width="32" height="9" rx="4.5" stroke="#1d0f09" stroke-width="10"/>
    <rect x="16" y="27.5" width="32" height="9" rx="4.5" stroke="#6f7ea3" stroke-width="5.6"/>
    <rect x="16" y="27.5" width="32" height="9" rx="4.5" stroke="#c9d4e6" stroke-width="3.4" transform="translate(-.7 -.9)"/>
    <path d="M22 28.4 H36" stroke="#fff" stroke-width="1.3"/>
   </g>
+  </g>
   <!-- face-on top-left link -->
-  <g transform="rotate(45 17 17)">
+  <g class="a-l1"><g transform="rotate(45 17 17)">
    <rect x="4" y="8" width="26" height="18" rx="9" stroke="#1d0f09" stroke-width="10.5"/>
    <rect x="4" y="8" width="26" height="18" rx="9" stroke="#6f7ea3" stroke-width="6.4"/>
    <rect x="4" y="8" width="26" height="18" rx="9" stroke="#e4ecf8" stroke-width="4.4" transform="translate(-.9 -.9)"/>
@@ -75,8 +107,9 @@
    <path d="M25 22 Q29 19 29 15" stroke="#ff9a3a" stroke-width="1" opacity=".85"/>
    <path d="M15 24 l3 -1.6 M10 17 l1 -2.4" stroke="#7a89ac" stroke-width="1"/>
   </g>
+  </g>
   <!-- face-on bottom-right link -->
-  <g transform="rotate(45 47 47)">
+  <g class="a-l3"><g transform="rotate(45 47 47)">
    <rect x="34" y="38" width="26" height="18" rx="9" stroke="#1d0f09" stroke-width="10.5"/>
    <rect x="34" y="38" width="26" height="18" rx="9" stroke="#6f7ea3" stroke-width="6.4"/>
    <rect x="34" y="38" width="26" height="18" rx="9" stroke="#e4ecf8" stroke-width="4.4" transform="translate(-.9 -.9)"/>
@@ -84,12 +117,17 @@
    <path d="M55 52 Q59 49 59 45" stroke="#ff9a3a" stroke-width="1.2" opacity=".9"/>
    <path d="M45 54 l3 -1.6 M40 47 l1 -2.4" stroke="#7a89ac" stroke-width="1"/>
    <circle cx="60" cy="47" r="1.5" fill="#ffb040" stroke="none"/>
-  </g>
-  </g>
-
-    <path d="M55 8 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z" fill="#fff" stroke="#1d0f09" stroke-width="1.2"/>
+  </g></g>
+  </g></g>
+  <path class="a-star" d="M55 8 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z" fill="#fff" stroke="#1d0f09" stroke-width="1.2"/>
  </g></symbol>
- <symbol id="s3" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><!-- molten hammer -->
+ <symbol id="s3" viewBox="0 0 64 64"><style>#s3 [class^="a-"]{animation-duration:calc(1.05s*var(--spd,1));animation-timing-function:cubic-bezier(.3,.7,.3,1);animation-delay:var(--delay,0ms);animation-fill-mode:both;animation-play-state:var(--win,paused);transform-box:view-box}
+#s3 .a-body{animation-name:ec3b;transform-origin:18px 55px}
+@keyframes ec3b{0%,100%{transform:none}26%{transform:rotate(-30deg) translateY(1px)}38%{transform:rotate(26deg) scale(1.05,.96)}46%{transform:rotate(17deg)}58%{transform:rotate(-4deg)}76%{transform:rotate(1.6deg)}}
+#s3 .a-spark{animation-name:ec3k;transform-origin:56px 44px}
+@keyframes ec3k{0%,36%{transform:scale(.2);opacity:0}44%{transform:scale(1.2);opacity:1}62%{transform:scale(1.9) rotate(20deg);opacity:0}100%{transform:scale(1.9);opacity:0}}
+#s3 .a-star{animation-name:ec3s;transform-origin:10px 11px}
+@keyframes ec3s{0%,100%{transform:scale(1)}30%{transform:scale(.3)}56%{transform:scale(1.7) rotate(80deg)}85%{transform:scale(1)}}</style><g stroke-linejoin="round" stroke-linecap="round"><g class="a-body"><!-- molten hammer -->
   <g transform="translate(30 37) rotate(34) scale(.82) translate(-32 -34)">
    <!-- handle -->
    <path d="M27 22 H37 V55 Q37 58 32 58 Q27 58 27 55Z" fill="#b9733a" stroke="#1d0f09" stroke-width="3.2"/>
@@ -130,46 +168,66 @@
    <!-- rune on head -->
    <path d="M17 11.2 l2 0 -1 3z" fill="none" stroke="#ffb040" stroke-width="1"/>
   </g>
-  <path d="M10 7 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
+  </g>
+  <g class="a-spark" opacity="0"><path d="M58 38 l2.2 5 5 2.2 -5 2.2 -2.2 5 -2.2 -5 -5 -2.2 5 -2.2z" fill="#ffe27a" stroke="#1d0f09" stroke-width="1.4"/><path d="M52 36 l-4 -3 M60 33 l1 -5 M64 40 l5 -1" stroke="#ff9a2a" stroke-width="2" stroke-linecap="round"/></g>
+  <path class="a-star" d="M10 7 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
  </g></symbol>
- <symbol id="s4" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round" fill="none"><g transform="translate(32 34) scale(.94) translate(-32 -33)">
-  <!-- glow behind the held ember -->
+ <symbol id="s4" viewBox="0 0 64 64"><style>#s4 [class^="a-"]{animation-duration:calc(1.05s*var(--spd,1));animation-timing-function:cubic-bezier(.3,.7,.3,1);animation-delay:var(--delay,0ms);animation-fill-mode:both;animation-play-state:var(--win,paused);transform-box:view-box}
+#s4 .a-armA{animation-name:ec4a;transform-origin:32px 36.4px}
+#s4 .a-armB{animation-name:ec4b;transform-origin:32px 36.4px}
+@keyframes ec4a{0%,100%{transform:none}22%{transform:rotate(11deg)}36%{transform:rotate(-5deg)}46%{transform:rotate(3deg)}60%{transform:rotate(-1.2deg)}80%{transform:rotate(.4deg)}}
+@keyframes ec4b{0%,100%{transform:none}22%{transform:rotate(-11deg)}36%{transform:rotate(5deg)}46%{transform:rotate(-3deg)}60%{transform:rotate(1.2deg)}80%{transform:rotate(-.4deg)}}
+#s4 .a-ember{animation-name:ec4e;transform-origin:32px 8px}
+@keyframes ec4e{0%,100%{transform:none}22%{transform:scale(.92) translateY(2px)}36%{transform:scale(1.2,.84)}50%{transform:scale(.94,1.12) translateY(-2px)}70%{transform:scale(1.04)}}
+#s4 .a-star{animation-name:ec4s;transform-origin:51px 15px}
+@keyframes ec4s{0%,100%{transform:scale(1)}30%{transform:scale(.3)}55%{transform:scale(1.8) rotate(80deg)}85%{transform:scale(1)}}</style><g stroke-linejoin="round" stroke-linecap="round" fill="none"><g transform="translate(32 34) scale(.94) translate(-32 -33)"><!-- rune-etched tongs -->
   <circle cx="32" cy="9" r="8" fill="#ff7a14" opacity=".35" stroke="none"/>
-  <!-- arm A: bottom-left handle to right jaw -->
-  <path d="M13 58 L31 37 Q39 28 37 15 L33 7" stroke="#1d0f09" stroke-width="11.5"/>
-  <path d="M13 58 L31 37 Q39 28 37 15 L33 7" stroke="#38425a" stroke-width="7.5"/>
-  <path d="M13.8 57 L31.4 36.4 Q38.6 27.6 36.2 15" stroke="#6b7897" stroke-width="5"/>
-  <path d="M13 56 L29 38 Q35 31 34.6 24" stroke="#a9b6d0" stroke-width="1.6"/>
-  <!-- arm B: bottom-right handle to left jaw (on top) -->
-  <path d="M51 58 L33 37 Q25 28 27 15 L31 7" stroke="#1d0f09" stroke-width="11.5"/>
-  <path d="M51 58 L33 37 Q25 28 27 15 L31 7" stroke="#38425a" stroke-width="7.5"/>
-  <path d="M50.2 57 L32.6 36.4 Q25.4 27.6 27.8 15" stroke="#7d8aa9" stroke-width="5"/>
-  <path d="M49 55 L35 39 Q28 31 28.6 24" stroke="#b8c4dc" stroke-width="1.6"/>
-  <!-- leather grips -->
-  <path d="M13 58 L19.5 50.4" stroke="#1d0f09" stroke-width="12.5"/><path d="M13 58 L19.5 50.4" stroke="#8a4f26" stroke-width="8.6"/>
-  <path d="M51 58 L44.5 50.4" stroke="#1d0f09" stroke-width="12.5"/><path d="M51 58 L44.5 50.4" stroke="#8a4f26" stroke-width="8.6"/>
-  <path d="M11.5 55.5 L15.5 58.5 M15.5 52.5 L19.5 55.5 M19 48.8 L23.2 51.6 M52.5 55.5 L48.5 58.5 M48.5 52.5 L44.5 55.5 M45 48.8 L40.8 51.6" stroke="#4d2a14" stroke-width="1.8"/>
-  <path d="M14 53.4 L19 47.5 M50 53.4 L45 47.5" stroke="#d29a62" stroke-width="1.3"/>
-  <!-- pommel balls -->
-  <circle cx="11.5" cy="59.5" r="4.4" fill="#566079" stroke="#1d0f09" stroke-width="2.6"/><circle cx="10.2" cy="58.2" r="1.4" fill="#c4d0e6" stroke="none"/>
-  <circle cx="52.5" cy="59.5" r="4.4" fill="#566079" stroke="#1d0f09" stroke-width="2.6"/><circle cx="51.2" cy="58.2" r="1.4" fill="#c4d0e6" stroke="none"/>
-  <!-- glowing runes etched on the arms -->
-  <g transform="rotate(-50 24.5 45.5)"><path d="M24.5 41.5 v8 M24.5 43 l3 -1.8 M24.5 46.4 l3 -1.8" stroke="#1d0f09" stroke-width="3.4"/><path d="M24.5 41.5 v8 M24.5 43 l3 -1.8 M24.5 46.4 l3 -1.8" stroke="#ffd23a" stroke-width="1.5"/></g>
-  <g transform="rotate(50 39.5 45.5)"><path d="M39.5 41.5 v8 M39.5 43 l-3 -1.8 M39.5 46.4 l-3 -1.8" stroke="#1d0f09" stroke-width="3.4"/><path d="M39.5 41.5 v8 M39.5 43 l-3 -1.8 M39.5 46.4 l-3 -1.8" stroke="#ffd23a" stroke-width="1.5"/></g>
+  <!-- arm A -->
+  <g class="a-armA">
+   <path d="M13 58 L31 37 Q39 28 37 15 L33 7" stroke="#1d0f09" stroke-width="11.5"/>
+   <path d="M13 58 L31 37 Q39 28 37 15 L33 7" stroke="#38425a" stroke-width="7.5"/>
+   <path d="M13.8 57 L31.4 36.4 Q38.6 27.6 36.2 15" stroke="#6b7897" stroke-width="5"/>
+   <path d="M13 56 L29 38 Q35 31 34.6 24" stroke="#a9b6d0" stroke-width="1.6"/>
+   <path d="M13 58 L19.5 50.4" stroke="#1d0f09" stroke-width="12.5"/><path d="M13 58 L19.5 50.4" stroke="#8a4f26" stroke-width="8.6"/>
+   <path d="M11.5 55.5 L15.5 58.5 M15.5 52.5 L19.5 55.5" stroke="#4d2a14" stroke-width="1.8"/><path d="M14 53.4 L18.5 48.2" stroke="#d29a62" stroke-width="1.3"/>
+   <circle cx="11.5" cy="59.5" r="4.4" fill="#566079" stroke="#1d0f09" stroke-width="2.6"/><circle cx="10.2" cy="58.2" r="1.4" fill="#c4d0e6" stroke="none"/>
+   <g transform="rotate(-50 24.5 45.5)"><path d="M24.5 41.5 v8 M24.5 43 l3 -1.8 M24.5 46.4 l3 -1.8" stroke="#1d0f09" stroke-width="3.4"/><path d="M24.5 41.5 v8 M24.5 43 l3 -1.8 M24.5 46.4 l3 -1.8" stroke="#ffd23a" stroke-width="1.5"/></g>
+  </g>
+  <!-- arm B -->
+  <g class="a-armB">
+   <path d="M51 58 L33 37 Q25 28 27 15 L31 7" stroke="#1d0f09" stroke-width="11.5"/>
+   <path d="M51 58 L33 37 Q25 28 27 15 L31 7" stroke="#38425a" stroke-width="7.5"/>
+   <path d="M50.2 57 L32.6 36.4 Q25.4 27.6 27.8 15" stroke="#7d8aa9" stroke-width="5"/>
+   <path d="M49 55 L35 39 Q28 31 28.6 24" stroke="#b8c4dc" stroke-width="1.6"/>
+   <path d="M51 58 L44.5 50.4" stroke="#1d0f09" stroke-width="12.5"/><path d="M51 58 L44.5 50.4" stroke="#8a4f26" stroke-width="8.6"/>
+   <path d="M52.5 55.5 L48.5 58.5 M48.5 52.5 L44.5 55.5" stroke="#4d2a14" stroke-width="1.8"/><path d="M50 53.4 L45.5 48.2" stroke="#d29a62" stroke-width="1.3"/>
+   <circle cx="52.5" cy="59.5" r="4.4" fill="#566079" stroke="#1d0f09" stroke-width="2.6"/><circle cx="51.2" cy="58.2" r="1.4" fill="#c4d0e6" stroke="none"/>
+   <g transform="rotate(50 39.5 45.5)"><path d="M39.5 41.5 v8 M39.5 43 l-3 -1.8 M39.5 46.4 l-3 -1.8" stroke="#1d0f09" stroke-width="3.4"/><path d="M39.5 41.5 v8 M39.5 43 l-3 -1.8 M39.5 46.4 l-3 -1.8" stroke="#ffd23a" stroke-width="1.5"/></g>
+  </g>
   <g transform="rotate(14 36 24)"><path d="M36 20 v8 M33.4 22.4 l2.6 2 2.6 -2" stroke="#ffd23a" stroke-width="1.3" opacity=".95"/></g>
   <!-- pivot rivet -->
   <circle cx="32" cy="35.5" r="5.6" fill="#e5a727" stroke="#1d0f09" stroke-width="3"/>
   <path d="M29 33 a4 4 0 0 1 4 -1.6" stroke="#fff3b0" stroke-width="1.5"/>
   <circle cx="32.6" cy="36.4" r="1.3" fill="#8a5a10" stroke="none"/>
   <!-- held ember nugget -->
+  <g class="a-ember">
   <path d="M32 1 L38.5 7 L35.5 13 L28.5 13 L25.5 7Z" fill="#ff6a14" stroke="#1d0f09" stroke-width="2.8"/>
   <path d="M32 1 L25.5 7 L28.5 13 L32 8Z" fill="#ffd23a"/>
   <path d="M32 8 L38.5 7 L35.5 13Z" fill="#d8350a"/>
   <path d="M29.5 5 l2 -1.5" stroke="#fff" stroke-width="1.1"/>
-  <path d="M50 14 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1"/>
+  </g>
+  <path class="a-star" d="M50 14 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1"/>
   </g>
  </g></symbol>
- <symbol id="s5" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><!-- dragonbone blade -->
+ <symbol id="s5" viewBox="0 0 64 64"><style>#s5 [class^="a-"]{animation-duration:calc(1.05s*var(--spd,1));animation-timing-function:cubic-bezier(.3,.7,.3,1);animation-delay:var(--delay,0ms);animation-fill-mode:both;animation-play-state:var(--win,paused);transform-box:view-box}
+#s5 .a-body{animation-name:ec5b;transform-origin:32px 54px}
+@keyframes ec5b{0%,100%{transform:none}24%{transform:rotate(-17deg) translate(-2px,3px)}38%{transform:rotate(21deg) translate(2px,-3px) scale(1,1.05)}50%{transform:rotate(26deg) translate(1px,-1px)}66%{transform:rotate(-4deg)}82%{transform:rotate(1.8deg)}}
+#s5 .a-slash{animation-name:ec5l;transform-origin:32px 20px}
+@keyframes ec5l{0%,32%{transform:scale(.7) rotate(-20deg);opacity:0}42%{transform:scale(1.05) rotate(0);opacity:.95}62%,100%{transform:scale(1.15) rotate(14deg);opacity:0}}
+#s5 .a-rune{animation-name:ec5r}
+@keyframes ec5r{0%,30%{opacity:0}42%{opacity:1}70%,100%{opacity:0}}
+#s5 .a-star{animation-name:ec5s;transform-origin:49px 11px}
+@keyframes ec5s{0%,100%{transform:scale(1)}30%{transform:scale(.3)}56%{transform:scale(1.8) rotate(80deg)}85%{transform:scale(1)}}</style><g stroke-linejoin="round" stroke-linecap="round"><g class="a-body"><!-- dragonbone blade -->
   <g transform="translate(0 1.5) scale(1 .88) translate(0 -1.5)"><!-- blade -->
   <path d="M32 1.5 L26 11 L28 13 L23.5 22 L25.5 24 L22 34 L24 36 L22.5 45 H41.5 L40 36 L42 30 L38.5 22 L40 14Z" fill="#f1e2bd" stroke="#1d0f09" stroke-width="3.2"/>
   <path d="M32 1.5 L26 11 L28 13 L23.5 22 L25.5 24 L22 34 L24 36 L22.5 45 H31 L31.5 20Z" fill="#fff3d2"/>
@@ -201,9 +259,20 @@
   <path d="M25.5 59.2 Q25.5 56.5 32 56.5 Q38.5 56.5 38.5 59.2 Q38.5 62.8 32 62.8 Q25.5 62.8 25.5 59.2Z" fill="#ffc83a" stroke="#1d0f09" stroke-width="2.6"/>
   <path d="M28 58 Q30 57 33 57.2" stroke="#fff0a0" stroke-width="1.2" fill="none"/>
   <circle cx="32" cy="59.8" r="2" fill="#e0281c" stroke="#1d0f09" stroke-width="1.2"/>
-  <path d="M49 6 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
+  <g class="a-rune" opacity="0"><path d="M31.4 13 V40" transform="translate(0 1.5) scale(1 .88) translate(0 -1.5)" stroke="#fff2a0" stroke-width="2.4" fill="none"/></g>
+  </g>
+  <path class="a-slash" opacity="0" d="M4 26 Q26 -6 60 18 Q32 4 4 26Z" fill="#fff" stroke="none"/>
+  <path class="a-star" d="M49 6 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
  </g></symbol>
- <symbol id="s6" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><g transform="translate(32 34) scale(.9) translate(-32 -32)">
+ <symbol id="s6" viewBox="0 0 64 64"><style>#s6 [class^="a-"]{animation-duration:calc(1.05s*var(--spd,1));animation-timing-function:cubic-bezier(.3,.7,.3,1);animation-delay:var(--delay,0ms);animation-fill-mode:both;animation-play-state:var(--win,paused);transform-box:view-box}
+#s6 .a-body{animation-name:ec6b;transform-origin:32px 58px}
+@keyframes ec6b{0%,100%{transform:none}18%{transform:translateY(2px) scale(1.05,.93)}36%{transform:translateY(-6px) scale(.96,1.07) rotate(-7deg)}52%{transform:translateY(-2px) rotate(5.5deg)}66%{transform:rotate(-3deg)}82%{transform:rotate(1.2deg)}}
+#s6 .a-orbs{animation-name:ec6o;animation-delay:calc(var(--delay,0ms) + 90ms)}
+@keyframes ec6o{0%,100%{transform:none}36%{transform:translateY(-3px)}60%{transform:translateY(1.2px)}}
+#s6 .a-g1,#s6 .a-g2,#s6 .a-g3{animation-name:ec6g;transform-box:fill-box;transform-origin:50% 50%}
+#s6 .a-g2{animation-delay:calc(var(--delay,0ms) + 140ms)}
+#s6 .a-g3{animation-delay:calc(var(--delay,0ms) + 280ms)}
+@keyframes ec6g{0%,100%{transform:scale(0) rotate(0);opacity:0}30%{opacity:1}50%{transform:scale(1.5) rotate(70deg);opacity:1}75%{transform:scale(.2) rotate(110deg);opacity:0}}</style><g stroke-linejoin="round" stroke-linecap="round"><g class="a-body"><g transform="translate(32 34) scale(.9) translate(-32 -32)">
   <!-- velvet cap behind the points -->
   <path d="M16 40 Q20 24 32 22 Q44 24 48 40Z" fill="#9c1c3a" stroke="#1d0f09" stroke-width="2.6"/>
   <path d="M22 38 Q24 28 31 25" fill="none" stroke="#d8506a" stroke-width="1.6"/>
@@ -233,18 +302,34 @@
   <ellipse cx="18" cy="53.6" rx="4" ry="3.2" fill="#ffab26" stroke="#1d0f09" stroke-width="2"/><path d="M15.6 52.6 q1.6 -1.4 3.2 -.6" stroke="#fff3c0" stroke-width="1.1" fill="none"/>
   <ellipse cx="46" cy="53.6" rx="4" ry="3.2" fill="#2fbf8a" stroke="#1d0f09" stroke-width="2"/><path d="M43.6 52.6 q1.6 -1.4 3.2 -.6" stroke="#d6ffee" stroke-width="1.1" fill="none"/>
   <circle cx="10.4" cy="53.6" r="1.4" fill="#8a5a10"/><circle cx="53.6" cy="53.6" r="1.4" fill="#8a5a10"/>
-  <!-- ember orbs on the tips -->
+  <g class="a-orbs"><!-- ember orbs on the tips -->
   <circle cx="5" cy="15.5" r="4.4" fill="#ff7a14" stroke="#1d0f09" stroke-width="2.6"/><circle cx="3.8" cy="14.2" r="1.4" fill="#ffe0a0"/>
   <circle cx="59" cy="15.5" r="4.4" fill="#ff7a14" stroke="#1d0f09" stroke-width="2.6"/><circle cx="57.8" cy="14.2" r="1.4" fill="#ffe0a0"/>
   <circle cx="32" cy="5.5" r="4.8" fill="#ff5a14" stroke="#1d0f09" stroke-width="2.6"/><circle cx="30.6" cy="4" r="1.6" fill="#ffe0a0"/>
   <circle cx="19" cy="18.6" r="3.2" fill="#ff9a2a" stroke="#1d0f09" stroke-width="2.2"/><circle cx="45" cy="18.6" r="3.2" fill="#ff9a2a" stroke="#1d0f09" stroke-width="2.2"/>
+  </g>
   <path d="M52 3 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2z" fill="#fff" stroke="#1d0f09" stroke-width="1"/>
   </g>
+  <path class="a-g1" d="M32 47 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z" fill="#fff" stroke="#1d0f09" stroke-width="1" opacity="0"/>
+  <path class="a-g2" d="M19 49 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1" opacity="0"/>
+  <path class="a-g3" d="M45 49 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1" opacity="0"/>
+  </g>
  </g></symbol>
- <symbol id="s7" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><g transform="translate(32 36) scale(.9) translate(-32 -31)">
-  <!-- flame crest breaking the ring -->
+ <symbol id="s7" viewBox="0 0 64 64"><style>#s7 [class^="a-"]{animation-duration:calc(1.05s*var(--spd,1));animation-timing-function:cubic-bezier(.3,.7,.3,1);animation-delay:var(--delay,0ms);animation-fill-mode:both;animation-play-state:var(--win,paused);transform-box:view-box}
+#s7 .a-body{animation-name:ec7b;transform-origin:32px 38px}
+@keyframes ec7b{0%,100%{transform:none}20%{transform:scale(.92,.9)}40%{transform:scale(1.1,1.13)}56%{transform:scale(1.02)}74%{transform:scale(.99)}}
+#s7 .a-flame{animation-name:ec7f;transform-origin:32px 45px;animation-delay:calc(var(--delay,0ms) + 60ms)}
+@keyframes ec7f{0%,100%{transform:none}22%{transform:scale(.9,.84)}40%{transform:scale(1.14,1.3) skewX(-7deg)}54%{transform:scale(.96,1.12) skewX(6deg)}70%{transform:scale(1.03,1.04) skewX(-3deg)}85%{transform:skewX(1deg)}}
+#s7 .a-crest{animation-name:ec7c;transform-origin:32px 14px;animation-delay:calc(var(--delay,0ms) + 110ms)}
+@keyframes ec7c{0%,100%{transform:none}40%{transform:scale(.94,1.35)}58%{transform:scale(1.06,.9)}78%{transform:scale(.98,1.08)}}
+#s7 .a-ring{animation-name:ec7r;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes ec7r{0%,100%{transform:rotate(0)}38%{transform:rotate(48deg)}70%{transform:rotate(-8deg)}}
+#s7 .a-star{animation-name:ec7s;transform-origin:55px 9px}
+@keyframes ec7s{0%,100%{transform:scale(1)}30%{transform:scale(.3)}56%{transform:scale(1.8) rotate(80deg)}85%{transform:scale(1)}}</style><g stroke-linejoin="round" stroke-linecap="round"><g class="a-body"><g transform="translate(32 36) scale(.9) translate(-32 -31)">
+  <g class="a-crest"><!-- flame crest breaking the ring -->
   <path d="M16 16 Q10 6 19 -1 Q19 8 26 11Z M48 16 Q54 6 45 -1 Q45 8 38 11Z M24 12 Q25 0 32 -6 Q39 0 40 12Z" fill="#ff6a14" stroke="#1d0f09" stroke-width="2.4"/>
   <path d="M28.5 10 Q29.5 3 32 -1 Q34.5 3 35.5 10Z" fill="#ffd23a"/>
+  </g>
   <!-- iron ring -->
   <circle cx="32" cy="31" r="26.5" fill="#5a5266" stroke="#1d0f09" stroke-width="3.6"/>
   <path d="M9 24 A24 24 0 0 1 28 7.5" fill="none" stroke="#a79db8" stroke-width="2.6"/>
@@ -255,9 +340,9 @@
   </g>
   <!-- rune disc -->
   <circle cx="32" cy="31" r="19.5" fill="#2a1210" stroke="#1d0f09" stroke-width="2.6"/>
-  <circle cx="32" cy="31" r="16.4" fill="none" stroke="#ff8a1a" stroke-width="2.2" stroke-dasharray="3.2 3"/>
+  <circle class="a-ring" cx="32" cy="31" r="16.4" fill="none" stroke="#ff8a1a" stroke-width="2.2" stroke-dasharray="3.2 3"/>
   <circle cx="32" cy="31" r="14" fill="#ff7a14" opacity=".35"/>
-  <!-- core flame -->
+  <g class="a-flame"><!-- core flame -->
   <path d="M32 11 C34 20 44 22 42.4 33 C41.4 40.4 37.6 45 32 45 C26.4 45 22.6 40.4 21.6 33 C20 24 29 20 32 11Z" fill="#ff5a14" stroke="#1d0f09" stroke-width="3"/>
   <path d="M32 11 C29 20 20 24 21.6 33 C22 36 23 39 25 41.6 C23.5 33 28 22 32 11Z" fill="#ff8a2a"/>
   <path d="M32 22 C34.6 28 38.4 30 37.6 35.6 C37 40 35 42.4 32 42.4 C29 42.4 27 40 26.4 35.6 C25.6 30 29.6 28 32 22Z" fill="#ffb02e"/>
@@ -265,15 +350,24 @@
   <!-- angry eyes -->
   <path d="M26.6 31.6 L30.6 33.6 M37.4 31.6 L33.4 33.6" stroke="#1d0f09" stroke-width="2.4" fill="none"/>
   <circle cx="29.6" cy="34.6" r=".9" fill="#1d0f09"/><circle cx="34.4" cy="34.6" r=".9" fill="#1d0f09"/>
+  </g>
   <!-- ribbon -->
   <path d="M3 47 H61 L57.6 53.4 L61 60 H3 L6.4 53.4Z" fill="#ffc83a" stroke="#1d0f09" stroke-width="3.2"/>
   <path d="M6 49 H58 V51 H6Z" fill="#fff0a0"/>
   <path d="M6.6 57.6 H57.4 L58.6 59 H5.4Z" fill="#d89a14"/>
   <text x="32" y="58" text-anchor="middle" font-size="11.5" fill="#1d0f09" stroke="#1d0f09" stroke-width=".4" font-family="Luckiest Guy,Impact,Arial Black" letter-spacing=".6">WILD</text>
-  <path d="M55 6 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2z" fill="#fff" stroke="#1d0f09" stroke-width="1"/>
+  <path class="a-star" d="M55 6 l1.2 3 3 1.2 -3 1.2 -1.2 3 -1.2 -3 -3 -1.2 3 -1.2z" fill="#fff" stroke="#1d0f09" stroke-width="1"/>
   </g>
- </g></symbol>
- <symbol id="s8" viewBox="0 0 64 64"><g stroke-linejoin="round" stroke-linecap="round"><!-- forgefire gem (scatter) -->
+  </g>
+ </g></symbol> <symbol id="s8" viewBox="0 0 64 64"><style>#s8 [class^="a-"]{animation-duration:calc(1.05s*var(--spd,1));animation-timing-function:cubic-bezier(.3,.7,.3,1);animation-delay:var(--delay,0ms);animation-fill-mode:both;animation-play-state:var(--win,paused);transform-box:view-box}
+#s8 .a-body{animation-name:ec8b;transform-origin:32px 42px}
+@keyframes ec8b{0%,100%{transform:none}22%{transform:scale(.94,.95) rotate(-4deg)}42%{transform:scale(1.1) rotate(5deg)}60%{transform:scale(1.02) rotate(-3deg)}80%{transform:rotate(1deg)}}
+#s8 .a-fire{animation-name:ec8f;transform-origin:32px 36px;animation-delay:calc(var(--delay,0ms) + 60ms)}
+@keyframes ec8f{0%,100%{transform:none}25%{transform:scale(.8,.7)}45%{transform:scale(1.3,1.45)}62%{transform:scale(.92,1.1)}80%{transform:scale(1.05,1.02)}}
+#s8 .a-sweep{animation-name:ec8w}
+@keyframes ec8w{0%,34%{transform:translateX(-10px);opacity:0}44%{opacity:.95}68%{transform:translateX(46px);opacity:.9}78%,100%{transform:translateX(54px);opacity:0}}
+#s8 .a-star{animation-name:ec8s;transform-origin:54px 11px}
+@keyframes ec8s{0%,100%{transform:scale(1) rotate(0)}30%{transform:scale(.2)}55%{transform:scale(2) rotate(100deg)}85%{transform:scale(1.1) rotate(160deg)}}</style><g stroke-linejoin="round" stroke-linecap="round"><g class="a-body"><!-- forgefire gem (scatter) -->
   <!-- glow -->
   <!-- iron claws behind pavilion -->
   <path d="M4.6 16 L4.6 25 Q8 36 20 46" fill="none" stroke="#1d0f09" stroke-width="7"/><path d="M4.6 16 L4.6 25 Q8 36 20 46" fill="none" stroke="#8c829c" stroke-width="3.4"/>
@@ -293,12 +387,15 @@
   <path d="M25 19 H39 L32 47Z" fill="#f0406e"/>
   <path d="M39 19 H49 L32 47Z" fill="#b81c48"/>
   <path d="M49 19 H58 L32 47Z" fill="#8e1038"/>
-  <!-- fire inclusion -->
+  <g class="a-fire"><!-- fire inclusion -->
   <path d="M32 21 C33 26 37 27 36.4 31.4 C36 34.6 34.4 36 32 36 C29.6 36 28 34.6 27.6 31.4 C27 27.6 30.6 26 32 21Z" fill="#ff9a2a" stroke="#8e1038" stroke-width="1.2"/>
   <path d="M32 27 C32.8 29.6 34.4 30 34.1 32.4 C33.9 34 33 34.6 32 34.6 C31 34.6 30.1 34 29.9 32.4 C29.6 30.4 31.4 29.6 32 27Z" fill="#fff0a0"/>
+  </g>
   <!-- facet edges -->
   <path d="M19 5 L25 13 H39 L45 5 M25 13 L15 19 M39 13 L49 19 M25 13 V19 M39 13 V19 M6 19 H58 M15 19 L32 47 M25 19 L32 47 M39 19 L32 47 M49 19 L32 47" fill="none" stroke="#1d0f09" stroke-width="1.5"/>
   <path d="M6 19 L19 5 H45 L58 19 L32 47Z" fill="none" stroke="#1d0f09" stroke-width="3.6"/>
+  <clipPath id="ec8c"><path d="M6 19 L19 5 H45 L58 19 L32 47Z"/></clipPath>
+  <g clip-path="url(#ec8c)"><g class="a-sweep" opacity="0"><path d="M16 0 L24 0 L14 52 L6 52Z" fill="#fff"/><path d="M27 0 L30 0 L20 52 L17 52Z" fill="#fff"/></g></g>
   <!-- highlights and rim -->
   <path d="M22 8 H31" stroke="#fff" stroke-width="2.4" fill="none"/>
   <path d="M10 18 L14 13" stroke="#fff" stroke-width="1.6" fill="none"/>
@@ -313,5 +410,6 @@
   <rect x="22.4" y="51.2" width="19.2" height="9.6" rx="3" fill="#ffc83a" stroke="#1d0f09" stroke-width="2.4"/>
   <path d="M24.4 53 H39" stroke="#fff0a0" stroke-width="1.2"/>
   <text x="32" y="59.6" text-anchor="middle" font-size="8.6" fill="#1d0f09" font-family="Luckiest Guy,Impact,Arial Black">FS</text>
-  <path d="M54 5 l1.4 3.6 3.6 1.4 -3.6 1.4 -1.4 3.6 -1.4 -3.6 -3.6 -1.4 3.6 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
+  </g>
+  <path class="a-star" d="M54 5 l1.4 3.6 3.6 1.4 -3.6 1.4 -1.4 3.6 -1.4 -3.6 -3.6 -1.4 3.6 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
  </g></symbol>

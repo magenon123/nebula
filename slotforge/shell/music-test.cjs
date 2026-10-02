@@ -11,15 +11,15 @@ const ANALYSE = `async ({ theme, secs, inten }) => {
   const oc = new OfflineAudioContext(2, Math.ceil(sr * secs), sr), m = SlotMusic.make(oc, oc.destination, defs, { offline: true, volume: 1 });
   m.intensity(inten); m.start(theme); m.renderTo(secs); const buf = await oc.startRendering();
   const L = buf.getChannelData(0), R = buf.getChannelData(1), N = L.length, x = new Float32Array(N); for (let i = 0; i < N; i++) x[i] = (L[i] + R[i]) / 2;
-  let pk = 0, ss = 0; for (let i = 0; i < N; i++) { const a = Math.max(Math.abs(L[i]), Math.abs(R[i])); if (a > pk) pk = a; ss += x[i] * x[i]; }
+  let pk = 0, ss = 0, pkAt = 0; for (let i = 0; i < N; i++) { const a = Math.max(Math.abs(L[i]), Math.abs(R[i])); if (a > pk) { pk = a; pkAt = i; } ss += x[i] * x[i]; }
   const rms = (a, b) => { let s = 0; for (let i = a; i < b; i++) s += x[i] * x[i]; return Math.sqrt(s / Math.max(1, b - a)); };
-  const w = Math.floor(sr * .1), Ls = Math.floor(loop * sr), out = { theme, inten, loopSec: +loop.toFixed(2), peak: pk, peakDb: 20 * Math.log10(pk), rms: Math.sqrt(ss / N), rmsDb: 20 * Math.log10(Math.sqrt(ss / N)) };
+  const w = Math.floor(sr * .1), Ls = Math.floor(loop * sr), out = { theme, inten, peakAtSec: +(pkAt / sr).toFixed(3), loopSec: +loop.toFixed(2), peak: pk, peakDb: 20 * Math.log10(pk), rms: Math.sqrt(ss / N), rmsDb: 20 * Math.log10(Math.sqrt(ss / N)) };
   out.rmsFirst100 = rms(Math.floor(sr * .3), Math.floor(sr * .3) + w); out.rmsLast100 = rms(Ls - w, Ls); out.rmsAfterWrap100 = rms(Ls, Ls + w);
   /* largest sample-to-sample jump within +-30 ms of the wrap vs the largest elsewhere (a click would be much larger) */
   const jump = (a, b) => { let j = 0; for (let i = a + 1; i < b; i++) j = Math.max(j, Math.abs(x[i] - x[i - 1])); return j; };
   out.jumpAtWrap = jump(Ls - Math.floor(sr * .03), Ls + Math.floor(sr * .03)); out.jumpTypical = jump(Math.floor(sr * 5), Math.floor(sr * 5) + Math.floor(sr * .06)); out.jumpMax = jump(Math.floor(sr * 3), N);
   /* FFT */
-  const NF = 16384, hann = new Float32Array(NF); for (let i = 0; i < NF; i++) hann[i] = .5 - .5 * Math.cos(2 * Math.PI * i / (NF - 1));
+  const NF = 32768, hann = new Float32Array(NF); for (let i = 0; i < NF; i++) hann[i] = .5 - .5 * Math.cos(2 * Math.PI * i / (NF - 1));
   const fft = (re, im) => { const n = re.length; for (let i = 1, j = 0; i < n; i++) { let bit = n >> 1; for (; j & bit; bit >>= 1) j ^= bit; j ^= bit; if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; } }
     for (let len = 2; len <= n; len <<= 1) { const ang = -2 * Math.PI / len, wr = Math.cos(ang), wi = Math.sin(ang); for (let i = 0; i < n; i += len) { let cr = 1, ci = 0; for (let k = 0; k < len / 2; k++) { const ur = re[i + k], ui = im[i + k], vr = re[i + k + len / 2] * cr - im[i + k + len / 2] * ci, vi = re[i + k + len / 2] * ci + im[i + k + len / 2] * cr; re[i + k] = ur + vr; im[i + k] = ui + vi; re[i + k + len / 2] = ur - vr; im[i + k + len / 2] = ui - vi; const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t; } } } };
   const P = new Float64Array(NF / 2); let nw = 0;
@@ -40,7 +40,7 @@ const ANALYSE = `async ({ theme, secs, inten }) => {
   const page = await (await browser.newContext({ viewport: { width: 1600, height: 900 } })).newPage();
   const errs = []; page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/Failed to load|ERR_/.test(m.text())) errs.push(m.text()); });
   await page.goto('file://' + file); await page.waitForFunction('SlotShell.hooks', null, { timeout: 60000 });
-  for (const theme of ['base', 'bonus']) for (const inten of [1, 0]) {
+  for (const theme of ['base', 'bonus']) for (const inten of (process.argv.includes('--int0') ? [1, 0] : [1])) {
     const t0 = Date.now(), res = await page.evaluate('(' + ANALYSE + ')(' + JSON.stringify({ theme, secs, inten }) + ')').catch(e => ({ error: String(e) }));
     delete res.wav; console.log(`\n=== ${path.basename(file)} ${theme} intensity ${inten}  (${((Date.now() - t0) / 1000).toFixed(0)}s)`); console.log(JSON.stringify(res, null, 1));
   }
