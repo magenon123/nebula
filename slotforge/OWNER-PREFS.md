@@ -32,3 +32,8 @@ Agents: read this before every design or build decision. The lead keeps it updat
 ## Owner notes after reviewing Grumble & Brine (2026-10-02)
 - **Backgrounds: not "more realistic", more DETAILED.** The photo-real painted backdrop tried on EmberClaw did not look good. Keep the hand-inked cartoon look and add richness instead: more layers, more props and story details, more depth, more variety of shape and colour, small things to discover; still no floating bubbles/dots, no halftone. Applies to every slot, EmberClaw included.
 - **The Bonus Buy sign on the left shows NO price.** One price on it makes players think there is only one bonus option. It is just the sign ("BONUS BUY"); all options and prices live on the Bonus Buy screen.
+
+## Owner notes, round 2 (2026-10-02)
+- The **doodle style is accepted** ("completely fine"). Do not move away from it.
+- **Side characters (Brann the dwarf, Captain Barnacle the crab) need MORE DETAIL and to look better**: richer costume/props/texture, more expressive faces and poses, better proportions and line quality, within the doodle style.
+- **Symbols must be drawn ONE BY ONE** (each symbol on its own: sketch, render large and at game size, critique, refine, then move on), not as a batch. The batch-made symbols "don't look the best".
