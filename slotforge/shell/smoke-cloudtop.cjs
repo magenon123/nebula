@@ -185,8 +185,9 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   await clk('#bFill', { force: true }).catch(() => {}); await clk('#menuBtn').catch(() => {}); await sleep(200);
   await clk('#buyOpen'); await sleep(200); await clk('#buy1'); await sleep(250); await clk('#cYes');
   check('cap: intro appears', await waitFor('#introM', 120000)); await sleep(900); await clk('#introM', { position: { x: 80, y: 80 } });
-  check('cap: outro appears', await waitFor('#outroM', 120000)); await sleep(2500); await clk('#outroM', { position: { x: 60, y: 60 } });
-  check('cap: gold MAX WIN screen shows', await waitCond(() => document.getElementById('big').classList.contains('maxwin') && document.getElementById('big').classList.contains('show'), 30000)); await sleep(1800); await shot('18-max-win');
+  check('cap: outro appears', await waitFor('#outroM', 120000));
+  let sawMax = false; for (let i = 0; i < 200 && !sawMax; i++) { if (await vis('#outroM')) { await sleep(700); await clk('#outroM', { position: { x: 60, y: 60 } }).catch(() => {}); } sawMax = await page.evaluate(() => document.getElementById('big').classList.contains('maxwin') && document.getElementById('big').classList.contains('show')); await sleep(100); }
+  check('cap: gold MAX WIN screen shows', sawMax); await sleep(1800); await shot('18-max-win');
   check('cap round settles', await settle()); await page.evaluate(NORMAL);
 
   // autoplay + stop square
