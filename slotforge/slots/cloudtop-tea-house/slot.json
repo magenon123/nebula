@@ -2,7 +2,7 @@
  "id": "cloudtop-tea-house",
  "title": "Koji's Cloudtop Tea House",
  "logoText": "CLOUDTOP TEA HOUSE",
- "infoTitle": "CLOUDTOP TEA HOUSE \u00b7 TIN RUSH",
+ "infoTitle": "CLOUDTOP TEA HOUSE · BONUSES",
  "api": "/api/slot/cloudtop-tea-house/spin",
  "engineSource": "slotforge/engines/cloudtop-tea-house.js",
  "storage": "ct",
@@ -99,7 +99,7 @@
  ],
  "autoBigLv": 3,
  "text": {
-  "idle": "SHALL WE POUR? PLACE YOUR BET",
+  "idle": "SHALL WE POUR? PLACE A BET",
   "spin": "POURING...",
   "win": "A FINE CUP! {amt}",
   "lose": "THE CUPS ARE EMPTY",
@@ -117,6 +117,26 @@
    "text": "Skip the tea break. The Tins drop right away and the Tin Rush starts with 3 pours. Fill the drawers, launch the kites.",
    "confirmTitle": "BUY TIN RUSH?",
    "confirmText": "TIN RUSH: six or more Tea Tins land and the hold-and-win round starts with 3 pours."
+  },
+  {
+   "key": "fs",
+   "mult": 21,
+   "sym": 16,
+   "vol": 3,
+   "name": "Free Spins",
+   "text": "Three festival drums drop at once and Koji starts 10 free spins. Every drawer that helps a win steeps darker and pays more next time.",
+   "confirmTitle": "BUY FREE SPINS?",
+   "confirmText": "FREE SPINS: three FS drums land, then 10 free spins with Steeping Drawers (more spins from more drums)."
+  },
+  {
+   "key": "super",
+   "mult": 75,
+   "sym": 16,
+   "vol": 5,
+   "name": "Super Free Spins",
+   "text": "Four drums, a golden dusk and four drawers already steeped. 12 free spins with the strongest drawer boosts. Wild swings.",
+   "confirmTitle": "BUY SUPER FREE SPINS?",
+   "confirmText": "SUPER FREE SPINS: four FS drums land, 12 spins, four drawers start pre-steeped, gold drawers pay the most. Very volatile."
   }
  ],
  "intro": {

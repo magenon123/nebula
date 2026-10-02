@@ -3,10 +3,12 @@
  * Round payload: plans/cloudtop-tea-house/01-round-format.md. Art geometry: slots/cloudtop-tea-house/ART-NOTES.md. */
 SlotShell.boot(SLOT_CFG, S => {
 const { $, sfx, wait, T, say, shake, flash, embers, coins, char, pop, fmt, sleep } = S;
-const ROWS = 4, COLS = 5, WILD = 8, BUNDLE = 9, TIN = 10, COLL = 11, GRAND = 15;
+const ROWS = 4, COLS = 5, WILD = 8, BUNDLE = 9, TIN = 10, COLL = 11, GRAND = 15, FSS = 16;
 const KIND_SYM = { value: 10, collector: 11, mini: 12, minor: 13, major: 14 };
 const FX = S.fx, GRID = $('grid'), CW = 128, CH = 128, MAXW = S.cfg.maxWin, INFO = S.cfg.engineData.info;
 let lastGrid = null, inBonus = false, bonusOpened = false, rushLeft = 3, resets = 0, tinsNow = 0;
+let bType = null, bonusR = null, fsBoost = [0], fsMax = 3, fsLv = null;   // bType: 'tin' | 'fs' | 'super' (set by showTrigger, so the music/splash getters can follow it)
+const FSI = INFO.fsBonus;
 const board = new Map();   // bonus board: cell index -> {kind, value}
 const cells = [];
 const at = (r, c) => cells[r * COLS + c];
@@ -59,7 +61,41 @@ function musicDefs() {
     outro(K) { const { V, dest, t } = K; [3, 2, 0, -2].forEach((d, i) => V.koto(dest, t + i * .22, K.note(d, 1), { g: .07, d: 1.5 })); V.metal(dest, t + .7, K.mtof(74), 2.2, .08); },
     grand(K) { const { V, dest, t } = K; V.metal(dest, t, K.mtof(50), 3, .16, [1, 2.4, 4.1, 6.7]); for (let i = 0; i < 12; i++) V.taiko(dest, t + .4 + i * (.3 - i * .014), .5 + i * .05, { g: .3 }); for (let i = 0; i < 14; i++) V.koto(dest, t + .5 + i * .06, K.note(i, 1), { g: .06, d: 1.2 }); V.shaku(dest, t + 1, 2.2, K.note(4, 2), { g: .06 }); }
   };
-  return { base: zen, bonus: rush, stingers };
+  /* FREE SPINS "steeping" (112 bpm) and SUPER "golden dusk" (142 bpm): same Hirajoshi, layers come in with the drawer levels (game intensity) */
+  const AR2 = [[0, 2, 3, 4], [2, 3, 4, 2], [0, 3, 4, 3], [4, 3, 2, 0]];
+  const TKs = { f0: 146.8, f1: 73.4 };
+  const steep = {
+    tempo: 112, barBeats: 4, spb: 8, swing: .12, bars: 16, key: 62, scale: [0, 2, 3, 7, 8], seed: 71, gain: .8, phrase: 4,
+    layers: { drone: { gain: 1, wet: .25 }, koto: { gain: 1, wet: .28 }, tok: { gain: 1, wet: .1 }, taiko: { int: .08, gain: 1, wet: .22 }, shaku: { int: .3, gain: 1, wet: .4 }, hi: { int: .5, gain: 1, wet: .3 }, fill: { int: .75, gain: 1, wet: .2 } },
+    bar(M) {
+      const k = M.i & 3, a = AR2[(M.i >> 2) & 3], wk = clamp(M.walk, -1, 1), I = M.int;
+      M.pad('drone', M.t0, M.bd, k % 2 ? [38, 45] : [38, 50, 45], { wave: 'sawtooth', cut: 240 + I * 160, q: .4, a: .8, r: 1, g: .05, det: 5 });
+      for (let s = 0; s < 8; s++) M.koto('koto', M.st(s), M.note(a[s % 4] + (s >= 4 ? wk : 0), s % 4 === 0 ? 0 : 1), { g: s % 4 === 0 ? .065 : .04, d: .5 });
+      M.tok('tok', M.st(2), .5, { f: 1050 }); M.tok('tok', M.st(6), .4, { f: 1300 });
+      M.taiko('taiko', M.st(0), .7 + I * .3, { g: .3 + I * .15, ...TKs }); if (I > .4) M.taiko('taiko', M.st(4), .55, { g: .3, ...TKs });
+      if (k === 0 || k === 2) M.shaku('shaku', M.st(0), 2.2, M.note(SH[(M.i >> 1) & 3][k >> 1] + 1, 1), { g: .04, a: .2 });
+      if (I > .5) [0, 2, 4, 6].forEach(s => M.koto('hi', M.st(s) + .01, M.note(a[s >> 1] + 2, 2), { g: .032, d: .6 }));
+      if (k === 3) [4, 5, 6, 7].forEach((s, j) => M.taiko('fill', M.st(s), .45 + j * .12, { f0: 146.8 * (1 + j * .1), f1: 73.4, d: .3 }));
+    }
+  };
+  const sup = {
+    tempo: 142, barBeats: 4, spb: 16, swing: 0, bars: 16, key: 59, scale: [0, 2, 3, 7, 8], seed: 97, gain: .8, phrase: 4,
+    layers: { drone: { gain: 1, wet: .2 }, taiko: { gain: 1, wet: .22 }, arp: { gain: 1, wet: .25 }, tok: { gain: 1, wet: .1 }, bell: { int: .2, gain: 1, wet: .4 }, shaku: { int: .35, gain: 1, wet: .4 }, hi: { int: .55, gain: 1, wet: .3 }, fill: { int: .8, gain: 1, wet: .2 } },
+    bar(M) {
+      const k = M.i & 3, ph = (M.i >> 2) & 3, a = ARP[ph], wk = clamp(M.walk, -1, 1), I = M.int;
+      M.pad('drone', M.t0, M.bd, [35, 42, 47, 54], { wave: 'sawtooth', cut: 300 + I * 260, q: .5, a: .4, r: .6, g: .06, det: 7 });
+      const T2 = { f0: 138.6, f1: 69.3 }; [0, 6, 8, 14].forEach((s, j) => M.taiko('taiko', M.st(s), j % 2 ? .6 : 1, { g: .46, ...T2 })); if (I > .3) [3, 11].forEach(s => M.taiko('taiko', M.st(s), .35, T2));
+      for (let s = 0; s < 16; s++) { const deg = a[s % 4] + (s >= 8 ? 1 : 0); M.koto('arp', M.st(s), M.note(deg + wk * (s > 7 ? 1 : 0), s % 8 < 4 ? 0 : 1), { g: s % 4 === 0 ? .065 : .042, d: .38 }); }
+      [2, 6, 10, 14].forEach(s => M.tok('tok', M.st(s), .55, { f: s % 8 === 2 ? 1150 : 1400 }));
+      if (k % 2 === 0) M.metal('bell', M.st(0), M.mtof(M.note(a[0] + 5, 2)), 1.8, .06);
+      if (k % 2 === 0) M.shaku('shaku', M.st(0), 1.8, M.note(SH[ph][k >> 1] + 2, 1), { g: .042, a: .1 });
+      if (I > .55) [0, 4, 8, 12].forEach(s => M.koto('hi', M.st(s) + .008, M.note(a[s >> 2] + 3, 2), { g: .035, d: .5 }));
+      if (k === 3) [10, 11, 12, 13, 14, 15].forEach((s, j) => M.taiko('fill', M.st(s), .5 + j * .1, { f0: 138.6 * (1 + j * .08), f1: 69.3, d: .26 }));
+    }
+  };
+  stingers.steep = K => { const { V, dest, t } = K; [0, 2, 4].forEach((d, i) => V.koto(dest, t + i * .09, K.note(d + 2, 1), { g: .07, d: .9 })); V.tok(dest, t + .3, .6); };
+  stingers.retrig = K => { const { V, dest, t } = K; V.taiko(dest, t, 1, { g: .4 }); [0, 2, 3, 4, 5, 7].forEach((d, i) => V.koto(dest, t + .1 + i * .06, K.note(d, 1), { g: .06, d: 1 })); V.shaku(dest, t + .4, 1.4, K.note(4, 1), { g: .05 }); };
+  return { base: zen, get bonus() { return bType === 'super' ? sup : bType === 'fs' ? steep : rush; }, stingers };
 }
 
 /* ---------- the board: 5 reels x 4 rows ---------- */
@@ -77,11 +113,11 @@ function dropCells(list, base = 0) {
 }
 /* reel by reel; once two Tea Tins have landed the remaining reels hang a beat with a heartbeat before each lands (near-miss slow drop) */
 function dropReels(grid) {
-  let base = 0, end = 0, tease = false, seen = 0, said = false; const times = {};
+  let base = 0, end = 0, tease = false, seen = 0, seenF = 0, said = false; const times = {};
   for (let c = 0; c < COLS; c++) {
-    if (seen >= 2) { tease = true; base += 560; const b0 = base; after(b0 - 500 + c * 92, () => { sfx.beat(); if (!said) { said = true; say('ONE MORE...', true); } shake(.3); }); }
+    if (seen >= 2 || seenF >= 2) { tease = true; base += 560; const b0 = base; after(b0 - 500 + c * 92, () => { sfx.beat(); if (!said) { said = true; say('ONE MORE...', true); } shake(.3); }); }
     const r = dropCells(Array.from({ length: ROWS }, (_, i) => [i, c]), base); end = Math.max(end, r.end); Object.assign(times, r.times);
-    for (let i = 0; i < ROWS; i++) if (grid[i][c] === TIN) seen++;
+    for (let i = 0; i < ROWS; i++) { if (grid[i][c] === TIN) seen++; else if (grid[i][c] === FSS) seenF++; }
   }
   return { end, tease, times };
 }
@@ -155,6 +191,10 @@ async function evalWins(st, ctx, run) {
     const t0 = i * gap, R = thread(w.cells, t0, i), lastC = w.cells.length - 1;
     w.cells.forEach(([r, c], j) => { const dl = R.arrive[j] + 24 + r * 20, key = r * COLS + c; if (!cellT.has(key) || dl < cellT.get(key).dl) cellT.set(key, { dl, r, c }); });
     after(R.arrive[0], () => sfx.link(0)); after(R.arrive[lastC], () => sfx.link(Math.min(4, w.cells.length)));
+    if (w.boost > 0) {   // Steeping Drawers: each steeped drawer flashes its tag as the string reaches it, the sum becomes a chip x(1+boost) at the end of the string
+      w.cells.forEach(([r, c], j) => after(R.arrive[j] + 30, () => { const tg = at(r, c).querySelector('.tg'); if (tg) { tg.classList.remove('fl'); void tg.offsetWidth; tg.classList.add('fl'); } }));
+      xChip(w, R.arrive[lastC] + 120, i);
+    }
     if (n <= 8) after(R.arrive[lastC] + 90, () => { const [x, y] = scr(...w.cells[Math.min(2, lastC)]); pop(x, y - 30, '+' + fmt(w.payout * ctx.stake)); });
     endAll = Math.max(endAll, R.arrive[lastC]);
   });
@@ -169,11 +209,13 @@ async function baseSpin(sp, run, ctx) {
   char('spin', 950 * T()); paint(sp.initialGrid); sfx.drop();
   const dt = dropReels(sp.initialGrid), tins = tinCells(sp.initialGrid); tinsNow = tins.length;
   tins.slice().sort((a, b) => dt.times[a[0] * COLS + a[1]] - dt.times[b[0] * COLS + b[1]]).forEach(([r, c], i) => { const t = dt.times[r * COLS + c]; after(t, () => { sfx.tin(i); ring(at(r, c)); }); });
+  fsCellsOf(sp.initialGrid).sort((a, b) => dt.times[a[0] * COLS + a[1]] - dt.times[b[0] * COLS + b[1]]).forEach(([r, c], i) => { const t = dt.times[r * COLS + c]; after(t, () => { sfx.drum(i); ring(at(r, c)); }); });
   if (dt.tease) after(Math.max(300, dt.end - 1500), () => { const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('tease'); });
   await wait(dt.end + 260);
   if (dt.tease) {
-    const ch = $('char'), hit = tins.length >= 6; ch.classList.add(hit ? 'exhale' : 'slump'); setTimeout(() => ch.classList.remove('tease', 'exhale', 'slump'), 750 * T());
-    if (!hit && tins.length >= 4) say('ALMOST... JUST ONE MORE TIN', true);
+    const nF = fsCellsOf(sp.initialGrid).length, ch = $('char'), hit = tins.length >= 6 || nF >= 3; ch.classList.add(hit ? 'exhale' : 'slump'); setTimeout(() => ch.classList.remove('tease', 'exhale', 'slump'), 750 * T());
+    if (!hit && tins.length >= 4) { say('ALMOST... JUST ONE MORE TIN', true); await wait(650); }
+    else if (!hit && nF === 2) { say('ALMOST... JUST ONE MORE DRUM', true); await wait(650); }
   }
   const st = sp.step;
   if (st) {
@@ -183,6 +225,14 @@ async function baseSpin(sp, run, ctx) {
   return run;
 }
 async function showTrigger(R) {
+  bonusR = R; bType = R.bonusType || 'tin'; setupSplash(bType, R);
+  if (bType !== 'tin') {   // FS drums: the three (four) drums beat one after another
+    const dl = R.fsScatter.cells.slice().sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+    restCells(); GRID.classList.add('focus'); clearLinks();
+    dl.forEach(([r, c], i) => { FX.act(at(r, c), i * 140, c); at(r, c).classList.add('scat'); after(i * 140, () => { sfx.drum(i); ring(at(r, c), 500); gold(r, c, 8, .8); }); });
+    say(bType === 'super' ? `${dl.length} DRUMS! SUPER FREE SPINS` : `${dl.length} DRUMS! FREE SPINS`, true); char('special', 1100 * T());
+    await wait(dl.length * 140 + 1000); return;
+  }
   const list = R.tins ? R.tins.cells.slice() : tinCells(lastGrid); list.sort((a, b) => a[1] - b[1] || a[0] - b[0]);
   restCells(); GRID.classList.add('focus'); clearLinks();
   list.forEach(([r, c], i) => { FX.act(at(r, c), i * 120, c); at(r, c).classList.add('scat'); after(i * 120, () => { sfx.tin(i); ring(at(r, c), 500); }); });
@@ -293,7 +343,105 @@ async function bonusStep(sp, run0, ctx) {
   else if (!sp.kite.length && sp.newTins.length && !lock) say(cnt(rushLeft), true);
   return run;
 }
-async function playSpin(sp, run, ctx) { return sp.kind === 'lock' || sp.kind === 'respin' ? bonusStep(sp, run, ctx) : baseSpin(sp, run, ctx); }
+async function playSpin(sp, run, ctx) { if (sp.landed) return fsSpin(sp, run, ctx); return sp.kind === 'lock' || sp.kind === 'respin' ? bonusStep(sp, run, ctx) : baseSpin(sp, run, ctx); }
+
+/* ---------- FREE SPINS / SUPER FREE SPINS: Steeping Drawers ---------- */
+const fsCellsOf = grid => { const o = []; grid.forEach((row, r) => row.forEach((x, c) => { if (x === FSS) o.push([r, c]); })); return o; };
+const toLocal = (x, y) => { const b = fxl().getBoundingClientRect(), k = b.width / 640; return [(x - b.left) / k, (y - b.top) / k]; };
+const toStage = (x, y) => { const b = $('stage').getBoundingClientRect(), k = b.width / 1600; return [(x - b.left) / k, (y - b.top) / k]; };
+const splashSvg = sup => `<svg class="kojiSplash${sup ? ' super' : ''}" viewBox="30 -50 420 390"><use href="#kojiSplash${sup ? 'Super' : ''}"/></svg>`;
+/* per-bonus splash copy, portraits and the pre-steeped map (the shell builds the splash once; we re-dress it before every bonus) */
+function setupSplash(type, R) {
+  const sup = type === 'super', tin = type === 'tin', I = S.cfg.intro, O = S.cfg.outro, B = R.bonus || {}, F = FSI[type] || {};
+  ['introM', 'outroM'].forEach(id => $(id).classList.toggle('sup', sup));
+  $('introLbl').textContent = tin ? I.unit : 'SPINS';
+  $('introRibbon').textContent = tin ? I.ribbon : sup ? 'SUPER FREE SPINS' : 'FREE SPINS';
+  const chips = tin ? I.chips : sup ? [`${B.preSteep ? B.preSteep.length : FSI.super.preSteep} DRAWERS ALREADY STEEPED`, 'FIVE LEVELS, GOLD AT THE TOP', `UP TO x${F.maxLineMult} ON ONE LINE`] : ['WINNING DRAWERS STEEP DARKER', 'STEEPED DRAWERS PAY x(1 + BOOST)', `UP TO x${F.maxLineMult} ON ONE LINE`];
+  $('introChips').innerHTML = chips.map(c => `<span>${c}</span>`).join('');
+  const q = (id, t) => { const e = $(id).querySelector('.quote'); if (e) e.textContent = t; };
+  q('introM', tin ? I.quote : sup ? '"Tonight the whole mountain gets the good leaves!"' : '"Every cup steeps a little stronger. Shall we?"');
+  document.querySelector('#introM .tapHint').textContent = tin ? I.tap : sup ? 'TAP ANYWHERE TO START THE SUPER STEEP' : 'TAP ANYWHERE TO START STEEPING';
+  $('outroRibbon').textContent = tin ? O.ribbon : sup ? 'A GOLDEN INFUSION' : 'A FINE STEEPING';
+  document.querySelector('#outroM .mtop').textContent = tin ? O.label : 'YOUR STEEPING';
+  ['introArt', 'outroArt'].forEach(id => { const e = $(id); if (e) e.innerHTML = splashSvg(sup); });
+  const old = document.querySelector('#introM .preMap'); if (old) old.remove();
+  if (sup) {
+    const pre = new Set((B.preSteep || []).map(p => p.r * COLS + p.c));
+    $('introChips').insertAdjacentHTML('afterend', `<div class="preMap"><small>KOJI POURS ON FOUR DRAWERS</small><div>${Array.from({ length: ROWS * COLS }, (_, i) => `<i class="${pre.has(i) ? 'g' : ''}" style="--d:${300 + [...pre].indexOf(i) * 260}ms"></i>`).join('')}</div></div>`);
+  }
+}
+function setupOutro() { /* outro dressing was done in setupSplash; nothing else to do here */ }
+function setLv(d, lv) {
+  if (lv) d.dataset.lv = lv; else delete d.dataset.lv;
+  let tg = d.querySelector('.tg');
+  if (lv > 0) { if (!tg) { tg = document.createElement('span'); tg.className = 'tg'; d.append(tg); } tg.textContent = '+' + (fsBoost[lv] || 0); } else if (tg) tg.remove();
+}
+function applyLevels(levels) { cells.forEach((d, i) => setLv(d, levels ? levels[(i / COLS) | 0][i % COLS] : 0)); }
+function xChip(w, delay, i) {
+  after(delay, () => {
+    const [x, y] = ctrG(...w.cells[w.cells.length - 1]), e = document.createElement('div'); e.className = 'ctX' + (w.boost >= 8 ? ' big' : ''); e.textContent = 'x' + (1 + w.boost);
+    e.style.left = Math.min(CW * 4.45, Math.max(CW * .55, x)) + 'px'; e.style.top = (y - 56 - (i % 3) * 16) + 'px'; fxl().append(e); sfx.xchip(w.boost);
+    e.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.2) rotate(-14deg)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.45) rotate(4deg)', offset: .25 }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: .42 }, { opacity: 1, transform: 'translate(-50%,-50%)', offset: .9 }, { opacity: 0, transform: 'translate(-50%,-80%)' }], { duration: 1900 * T(), easing: 'ease-out' }).finished.then(() => e.remove(), () => e.remove());
+  });
+}
+const LADLE = `<svg viewBox="0 0 120 90" width="120" height="90" style="overflow:visible"><path d="M112 6 L52 42" stroke="#1c2340" stroke-width="14" stroke-linecap="round"/><path d="M112 6 L52 42" stroke="#b07a4a" stroke-width="7" stroke-linecap="round"/><path d="M12 40 Q12 78 40 78 Q68 78 68 40Z" fill="#d4ae52" stroke="#1c2340" stroke-width="5.5" stroke-linejoin="round"/><ellipse cx="40" cy="40" rx="28" ry="8" fill="#8a4a14" stroke="#1c2340" stroke-width="4.5"/><path d="M22 52 Q26 66 36 68" fill="none" stroke="#fff3c4" stroke-width="3.4" stroke-linecap="round"/></svg>`;
+const KITE_COL = [['#f2d23a', '#d9432e'], ['#f59db8', '#7a3ca6'], ['#79a85a', '#f2d23a'], ['#6aa6d8', '#fbf1dc'], ['#ffd23a', '#fff0a0']];
+const SKY = [[70, 120], [1250, 110], [190, 50], [1440, 230], [290, 170], [1190, 30], [40, 250], [1520, 120], [330, 60], [1340, 30], [120, 190], [1470, 40]];
+let skyN = 0;
+function skyKite(r, c, gold) {   // a paper kite pops out of the top-level drawer, flies up and joins the kites in the sky (stays for the rest of the bonus)
+  const sky = $('ctSky'), [sx, sy] = scr(r, c), [x0, y0] = toStage(sx, sy), sp = SKY[skyN++ % SKY.length], col = gold ? KITE_COL[4] : KITE_COL[(skyN + 1) % 4];
+  const k = document.createElement('div'); k.className = 'ctSkyK'; k.innerHTML = KITE_SVG.replace('#f2d23a', col[0]).replace('<path d="M60 4 L108 62 L60 62Z M12 62 L60 122 L60 62Z" fill="#d9432e"/>', `<path d="M60 4 L108 62 L60 62Z M12 62 L60 122 L60 62Z" fill="${col[1]}"/>`);
+  k.style.left = x0 + 'px'; k.style.top = y0 + 'px'; sky.append(k);
+  const mx = (x0 + sp[0]) / 2 + (sp[0] < 800 ? -60 : 60);
+  k.animate([{ transform: 'translate(-60px,-70px) scale(.05) rotate(0)', opacity: 0 }, { transform: 'translate(-60px,-120px) scale(.4) rotate(-12deg)', opacity: 1, offset: .15 }, { transform: `translate(${mx - x0 - 60}px,${(y0 + sp[1]) / 2 - y0 - 130}px) scale(.5) rotate(14deg)`, offset: .55 }, { transform: `translate(${sp[0] - x0 - 60}px,${sp[1] - y0 - 70}px) scale(.38) rotate(0)`, opacity: 1 }], { duration: 1700 * T(), easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards' });
+  after(1700, () => { k.classList.add('rest'); k.style.transform = `translate(${sp[0] - x0 - 60}px,${sp[1] - y0 - 70}px) scale(.38)`; k.getAnimations().forEach(a => a.cancel()); });
+}
+function steepCell(u, gold) {
+  const d = at(u.r, u.c), [x, y] = ctrG(u.r, u.c), lad = document.createElement('div'); lad.className = 'ctLadle'; lad.innerHTML = LADLE; lad.style.left = (x + 18) + 'px'; lad.style.top = (y - 92) + 'px'; fxl().append(lad);
+  lad.animate([{ opacity: 0, transform: 'translate(70px,-60px) rotate(20deg) scale(.8)' }, { opacity: 1, transform: 'translate(10px,0) rotate(0) scale(1)', offset: .25 }, { opacity: 1, transform: 'translate(-6px,6px) rotate(-30deg) scale(1.02)', offset: .5 }, { opacity: 1, transform: 'translate(-6px,6px) rotate(-34deg)', offset: .78 }, { opacity: 0, transform: 'translate(60px,-50px) rotate(10deg)' }], { duration: 1000 * T(), easing: 'ease-in-out' }).finished.then(() => lad.remove(), () => lad.remove());
+  const st = document.createElement('div'); st.className = 'ctStream'; st.style.left = (x - 14) + 'px'; st.style.top = (y - 36) + 'px'; fxl().append(st);
+  st.animate([{ transform: 'scaleY(0)', opacity: 1 }, { transform: 'scaleY(1)', opacity: 1, offset: .35 }, { transform: 'scaleY(1)', opacity: 1, offset: .7 }, { transform: 'scaleY(1) translateY(30px)', opacity: 0 }], { duration: 760 * T(), delay: 260 * T(), fill: 'both', easing: 'ease-in' }).finished.then(() => st.remove(), () => st.remove());
+  after(300, () => sfx.steep(u.to));
+  after(560, () => {
+    setLv(d, u.to); const tg = d.querySelector('.tg'); if (tg) tg.animate([{ transform: 'scale(.2) rotate(-30deg)' }, { transform: 'scale(1.5) rotate(10deg)', offset: .4 }, { transform: 'scale(1) rotate(0)' }], { duration: 520 * T(), easing: 'cubic-bezier(.3,1.6,.5,1)' });
+    const w = document.createElement('div'); w.className = 'ctWash' + (gold ? ' g' : ''); d.append(w); w.animate([{ opacity: .95, transform: 'scale(.2)' }, { opacity: .8, transform: 'scale(1.05)', offset: .45 }, { opacity: 0, transform: 'scale(1.1)' }], { duration: 900 * T(), easing: 'ease-out' }).finished.then(() => w.remove(), () => w.remove());
+    d.animate([{ transform: 'none' }, { transform: 'scale(1.08,.94)', offset: .3 }, { transform: 'scale(.97,1.04)', offset: .62 }, { transform: 'none' }], { duration: 520 * T(), easing: 'ease-out' });
+    const [sx, sy] = scr(u.r, u.c); S.shards(sx, sy, 7, ['#fff6e2', '#f0d8a8', '#c98b4a', gold ? '#ffd23a' : '#e9c995'], { power: .45, edge: 'rgba(28,35,64,.5)' });
+    if (u.popKite) { sfx.kitePop(); S.music.stinger('steep'); skyKite(u.r, u.c, gold); S.shards(sx, sy, 12, ['#f2d23a', '#d9432e', '#fbf1dc'], { power: .8, edge: 'rgba(28,35,64,.6)' }); }
+  });
+}
+async function pourUps(sp) {
+  const ups = sp.levelUps; if (!ups.length) return; const gold = bType === 'super';
+  say(ups.some(u => u.popKite) ? 'A DRAWER IS FULLY STEEPED! THE KITE FLIES' : 'KOJI POURS... THE DRAWERS STEEP DARKER', true); char('special', 900 * T()); sfx.pour();
+  ups.forEach((u, i) => after(i * 190, () => steepCell(u, gold && u.to >= fsMax - 1)));
+  await wait(ups.length * 190 + 1250);
+}
+const sumLv = lv => lv.reduce((a, r) => a + r.reduce((x, y) => x + y, 0), 0);
+async function fsSpin(sp, run0, ctx) {
+  const stake = ctx.stake, sup = bType === 'super', dec = sp.spinsLeft - (sp.retrigger || 0); let run = run0;
+  setFs(dec, true); char('spin', 950 * T()); say(sup ? 'SUPER STEEP...' : 'STEEPING...');
+  paint(sp.landed); applyLevels(sp.levels); sfx.drop();
+  const dt = dropReels(sp.landed); fsCellsOf(sp.landed).sort((a, b) => dt.times[a[0] * COLS + a[1]] - dt.times[b[0] * COLS + b[1]]).forEach(([r, c], i) => { const t = dt.times[r * COLS + c]; after(t, () => { sfx.drum(i); ring(at(r, c)); }); });
+  if (dt.tease) after(Math.max(300, dt.end - 1500), () => { const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('tease'); });
+  await wait(dt.end + 260);
+  if (dt.tease) { const ch = $('char'); ch.classList.add(sp.fsCount >= 3 ? 'exhale' : 'slump'); setTimeout(() => ch.classList.remove('tease', 'exhale', 'slump'), 750 * T()); }
+  if (sp.bundle) await flipBundles(sp.bundle, sp.grid);
+  if (sp.wins.length) run = await evalWins({ wins: sp.wins, payout: sp.totalPayout }, ctx, Math.min(run, MAXW * stake));
+  else await wait(260);
+  if (run > MAXW * stake) run = MAXW * stake;
+  await pourUps(sp);
+  const lv = sumLv(sp.levels) + sp.levelUps.length; S.music.intensity(Math.min(1, lv / (ROWS * COLS * fsMax) * 2.4 + (sp.spinIndex % 3) * .02));
+  if (sp.retrigger) {
+    const cellsF = sp.fsCells; S.music.stinger('retrig'); sfx.retrig(); char('special', 1400 * T()); shake(1.6); flash(1.6);
+    cellsF.forEach(([r, c], i) => { FX.act(at(r, c), i * 90, c); at(r, c).classList.add('scat'); ring(at(r, c), 600); gold(r, c, 8, .8); });
+    banner(`+${sp.retrigger} SPINS!`, 'THE DRUMS BEAT AGAIN', 1900, true); say(`MORE DRUMS! +${sp.retrigger} SPINS`, true);
+    await wait(700);
+    const fb = $('fsBox').getBoundingClientRect(), to = toLocal(fb.left + fb.width / 2, fb.top + fb.height / 2), from = ctrG(...cellsF[0]);
+    await fly(from, to, '+' + sp.retrigger, 0); setFs(sp.spinsLeft, true); sfx.reset(); await wait(500); restCells();
+  }
+  if (sp.spinsLeft === 0) { say('THE LAST CUP IS POURED', true); await wait(420); }
+  return run;
+}
 
 /* ---------- Game Info paytable (engine info() embedded by the build, never retyped) ---------- */
 function buildPaytable() {
@@ -302,8 +450,16 @@ function buildPaytable() {
   $('ptab').innerHTML = '<tr><th>SYMBOL</th><th>3</th><th>4</th><th>5</th></tr>' +
     INFO.paytable.slice().reverse().map(p => row(p.id, p.name, f(p.pays[3]) + f(p.pays[4]) + f(p.pays[5]))).join('') +
     row(WILD, 'Smiling Kite (Wild)', '<td colspan="3">Stands in on reels 2-4</td>') + row(BUNDLE, 'Furoshiki Bundle', '<td colspan="3">All bundles flip to one symbol</td>') +
+    row(FSS, 'FS Drum (Bonus)', `<td colspan="3">${FSI.triggers.fs} FS: FREE SPINS, ${FSI.triggers.super}+ FS: SUPER</td>`) +
     row(TIN, 'Tea Tin (Bonus)', `<td colspan="3">${INFO.triggerTins}+ anywhere: TIN RUSH</td>`) +
     row(12, 'Mini Tin', `<td colspan="3">${J.mini}x</td>`) + row(13, 'Minor Tin', `<td colspan="3">${J.minor}x</td>`) + row(14, 'Major Tin', `<td colspan="3">${J.major}x</td>`) + row(GRAND, 'Grand Dragon Kite', `<td colspan="3">+${INFO.grandBonus}x, full board</td>`);
+  /* Steeping Drawers: numbers come from engine info().fsBonus, never retyped */
+  const rt = o => Object.keys(o).map(k => `${k} FS: +${o[k]}`).join(', ');
+  const val = { 'fs.startSpins': FSI.fs.startSpins, 'super.startSpins': FSI.super.startSpins, 'super.startSpins5': FSI.super.startSpins5, 'super.preSteep': FSI.super.preSteep, 'super.preLevel': FSI.super.preLevel,
+    'fs.retrigger': rt(FSI.fs.retrigger), 'super.retrigger': rt(FSI.super.retrigger), 'fs.maxSpins': FSI.fs.maxSpins, 'super.maxSpins': FSI.super.maxSpins };
+  document.querySelectorAll('#infoM [data-i]').forEach(e => { e.textContent = val[e.dataset.i]; });
+  const tab = (t, k) => `<table class="pt boost"><tr><th colspan="${FSI[k].boost.length + 1}">${t}</th></tr><tr><td>Drawer level</td>${FSI[k].boost.map((b, i) => `<td>${i}${i === FSI[k].maxLevel ? (k === 'super' ? ' (gold)' : ' (kite)') : ''}</td>`).join('')}</tr><tr><td>Boost added to the line</td>${FSI[k].boost.map(b => `<td>+${b}</td>`).join('')}</tr></table>`;
+  $('boostTabs').innerHTML = '<b>DRAWER BOOST TABLES</b><span>A line pays its normal win x (1 + the sum of the boosts of its drawers).</span>' + tab('FREE SPINS', 'fs') + tab('SUPER FREE SPINS', 'super');
 }
 
 /* ---------- sound: koto, shakuhachi, wood block, taiko and brass bells (all synthesised) ---------- */
@@ -356,6 +512,16 @@ return {
       big: lv => { const t = T0(); for (let i = 0; i < lv + 1; i++) bell(N(2 + i * 2) / 2, t + i * .26, .9, 1.6);
         for (let i = 0; i < 4 + lv * 3; i++) taiko(t + .1 + i * Math.max(.07, .22 - i * .01), .5 + i * .04, 120); shaku(N(7), t + .2, 1.5, .1);
         [0, 2, 4, 6, 8, 10].slice(0, 3 + lv).forEach((n, i) => koto(N(n), t + .3 + i * .1, .07, 1.2)); },
+      /* FS drum scatter lands: a taiko hit that climbs a step per drum, a skin slap and a small gong */
+      drum: k => { const t = T0(); taiko(t, .95, 88 + k * 12); noise(t, .04, .12, 'bandpass', 2200, 900, 1.2, .001); bell(N(3 + k * 2) / 2, t + .03, .5, 1.1); },
+      /* steeping pour: a ladle glug (bubbly sine blips) + a warm koto note that goes higher with each darker level */
+      steep: lv => { const t = T0(); noise(t, .5, .1, 'bandpass', 600, 1700, 2, .05); for (let i = 0; i < 7; i++) osc('sine', 260 + Math.random() * 120 + i * 40, t + .04 + i * .06, .06, .05, .004, 520 + i * 60);
+        koto(N(2 + (lv || 1) * 2), t + .3, .08, 1); noise(t + .34, .35, .05, 'bandpass', 3800, 2500, 3, .1); },
+      /* a drawer reaches its top level: paper flutter, a rising whoosh, a bright bell, the kite catches the wind */
+      kitePop: () => { const t = T0(); for (let i = 0; i < 6; i++) noise(t + i * .03, .05, .07, 'bandpass', 3000 + i * 500, 0, 1.4, .003); noise(t + .1, .8, .18, 'bandpass', 300, 3600, 1.4, .3); shaku(N(8), t + .05, .9, .09); bell(N(9), t + .35, .9, 1.4); koto(N(11), t + .4, .09, 1); },
+      /* x(1+boost) chip pops at the end of the string */
+      xchip: b => { const t = T0(); metal(N(4 + Math.min(8, b)) , t, .6, .12, [1, 2.76]); tok(t, 1500, .08); },
+      retrig: () => { const t = T0(); for (let i = 0; i < 6; i++) taiko(t + i * .09, .45 + i * .08, 100 + i * 10); [0, 2, 4, 5, 7, 9, 11].forEach((n, i) => koto(N(n + 2), t + .3 + i * .06, .08, 1.1)); bell(N(5), t + .35, 1, 2); },
       tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .1, .001); tok(t, 1200 + k * 600, .06); },
       feverOn: () => { const t = T0(); koto(N(4), t, .08, .6); }
     };
@@ -373,18 +539,27 @@ return {
   init() {
     for (let i = 0; i < ROWS * COLS; i++) { const d = document.createElement('div'); d.className = 'cell'; $('grid').append(d); cells.push(d); }
     $('fxl').insertAdjacentHTML('beforeend', '<div id="ctBanner"><b></b><small></small></div>');
+    $('scene').insertAdjacentHTML('afterend', '<div id="ctSky"></div>');
     buildPaytable();
   },
   paintIdle() { paint([[1, 0, 3, 6, 2], [4, 7, 0, 5, 1], [2, 6, 8, 0, 3], [5, 1, 4, 7, 0]]); dropAll(); },
-  roundStart() { document.querySelectorAll('#gates .gate').forEach(g => g.classList.remove('on', 'launch')); board.clear(); },
-  clearBoard: async () => { if (inBonus) { if (!bonusOpened) { bonusOpened = true; await bonusOpen(); } else await wait(40); return; } await dropOut(); },
+  splashArt: () => splashSvg(false),
+  roundStart() { document.querySelectorAll('#gates .gate').forEach(g => g.classList.remove('on', 'launch')); board.clear(); bType = null; $('ctSky').replaceChildren(); skyN = 0; },
+  clearBoard: async () => { if (inBonus && bType === 'tin') { if (!bonusOpened) { bonusOpened = true; await bonusOpen(); } else await wait(40); return; } await dropOut(); },
   restoreBoard() { if (lastGrid) paint(lastGrid); },
   baseSpin: R => ({ initialGrid: R.initialGrid, step: R.cascadeSteps[0] || null, tins: R.tins, bought: R.bought }),
   playSpin,
   showTrigger,
   bonusMode(on) {
-    inBonus = on; bonusOpened = false; $('scene').classList.toggle('dusk', on);
-    if (on) { char('bonus', 1400 * T()); S.music.intensity(.12); setFs(3); } else { S.music.intensity(0); }
+    inBonus = on; bonusOpened = false; $('scene').classList.toggle('dusk', on); $('scene').classList.toggle('sup', on && bType === 'super'); $('ctSky').classList.toggle('sup', on && bType === 'super'); $('grid').classList.toggle('steepG', on && bType !== 'tin'); $('grid').classList.toggle('supG', on && bType === 'super');
+    if (on) {
+      char('bonus', 1400 * T()); document.querySelector('#fsBox small').textContent = bType === 'tin' ? S.cfg.fsLabel : 'SPINS LEFT';
+      if (bType === 'tin') { S.music.intensity(.12); setFs(3); }
+      else { const B = bonusR.bonus; fsBoost = B.boost; fsMax = B.maxLevel; fsLv = null; setFs(B.startSpins); S.music.intensity(bType === 'super' ? .3 : .08); cells.forEach(d => { d.classList.remove('scat'); }); }
+    } else {
+      S.music.intensity(0); applyLevels(null); setupOutro();
+      const sk = $('ctSky'); if (sk.children.length) sk.animate([{ opacity: 1 }, { opacity: 1, offset: .6 }, { opacity: 0 }], { duration: 3200 * T(), fill: 'forwards' }).finished.then(() => { sk.replaceChildren(); sk.getAnimations().forEach(a => a.cancel()); }, () => {});
+    }
   }
 };
 });

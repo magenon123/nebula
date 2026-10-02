@@ -367,3 +367,62 @@
 .splashArt svg.kojiSplash.super{width:340px;height:316px;margin-bottom:-96px;filter:drop-shadow(0 8px 0 rgba(0,0,0,.4)) drop-shadow(0 0 26px rgba(255,200,70,.85))}
 .splashArt:not(:empty)~.gems{display:none}
 /* ART-GEN splash end */
+
+/* ---------- ROUND 7 (kai): Free Spins / Super Free Spins, 3-card buy screen, message line ---------- */
+/* the embedded display font is wider: keep the status line on ONE line, centred on the same spot */
+#msg{left:460px;width:680px;font-size:23px;white-space:nowrap}
+.bbc h3{white-space:nowrap;font-size:24px;letter-spacing:.5px}
+i[data-i]{font-style:normal;font-weight:900;color:var(--accent)}
+table.pt.boost{margin:8px auto 4px;width:auto;min-width:60%}
+table.pt.boost th{text-align:center}
+/* Steeping Drawers: five tea-stain skins. The id doubled on purpose: it must beat the per-symbol plate colours above */
+#grid#grid .cell[data-lv="1"]{--tr:#b58b4e;--tg:rgba(150,100,40,.3);--p1:#f0d9a6;--p2:#d9b36f}
+#grid#grid .cell[data-lv="2"]{--tr:#8a5a2a;--tg:rgba(120,70,20,.45);--p1:#dcab6c;--p2:#b27a3a}
+#grid#grid .cell[data-lv="3"]{--tr:#d9432e;--tg:rgba(90,40,10,.5);--p1:#c78a52;--p2:#8e5428}
+#grid#grid .cell[data-lv="4"]{--tr:#ffd23a;--tg:rgba(255,200,60,.8);--p1:#fff2a6;--p2:#ecb52a}
+#grid#grid .cell[data-lv="4"]::before{box-shadow:inset 0 0 0 2px #fff6c8,inset 0 0 22px rgba(255,210,70,.85),0 0 0 2.5px #1c2340,0 0 16px rgba(255,200,60,.85),0 4px 0 rgba(28,35,64,.4)}
+#grid#grid .cell[data-lv="3"]::after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1l9 10-9 11-9-11z' fill='%23f2d23a' stroke='%231c2340' stroke-width='2.4' stroke-linejoin='round'/%3E%3Cpath d='M12 1v21M3 11h18' stroke='%231c2340' stroke-width='1.6'/%3E%3C/svg%3E") 9px 9px/20px 20px no-repeat,
+ linear-gradient(#d4ae52,#d4ae52) 0 0/14px 4px no-repeat,linear-gradient(#d4ae52,#d4ae52) 100% 0/14px 4px no-repeat,linear-gradient(#d4ae52,#d4ae52) 0 100%/14px 4px no-repeat,linear-gradient(#d4ae52,#d4ae52) 100% 100%/14px 4px no-repeat}
+/* the paper tag hanging off the drawer pull: boost of this drawer */
+.cell .tg{position:absolute;right:6px;top:3px;z-index:4;min-width:30px;padding:0 6px;text-align:center;font-family:var(--toon);font-size:17px;line-height:1.25;color:var(--ink);background:var(--paper);border:3px solid var(--ink);border-radius:5px 5px 8px 8px;transform:rotate(7deg);box-shadow:0 2px 0 rgba(28,35,64,.35)}
+.cell .tg::before{content:"";position:absolute;left:50%;top:-8px;width:3px;height:7px;margin-left:-1.5px;background:var(--ink)}
+.cell[data-lv="3"] .tg{background:#ffe9b0}.cell[data-lv="4"] .tg{background:#fff2a6;border-color:#8a5a06}
+.cell .tg.fl{animation:ctTag .7s cubic-bezier(.3,1.6,.5,1)}
+@keyframes ctTag{0%{transform:rotate(7deg) scale(1)}30%{transform:rotate(-8deg) scale(1.7);background:#ffd23a}100%{transform:rotate(7deg) scale(1)}}
+.ctX{position:absolute;z-index:14;pointer-events:none;padding:0 14px;font-family:var(--toon);font-size:40px;line-height:1.2;color:#fff1a8;background:#d9432e;border:5px solid var(--ink);border-radius:99px;box-shadow:0 5px 0 rgba(28,35,64,.45),inset 0 0 0 2px rgba(255,255,255,.3);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;white-space:nowrap}
+.ctX.big{font-size:52px;background:linear-gradient(#ffd23a,#e8920a);color:#fff}
+.ctLadle{position:absolute;z-index:15;width:120px;height:90px;pointer-events:none;transform-origin:100% 10%;filter:drop-shadow(0 4px 0 rgba(28,35,64,.35))}
+.ctStream{position:absolute;z-index:14;width:28px;height:62px;border-radius:12px 12px 14px 14px;background:linear-gradient(#c98b4a,#8a4a14);border:3px solid var(--ink);transform-origin:50% 0;pointer-events:none}
+.ctWash{position:absolute;inset:5px;border-radius:10px;z-index:2;pointer-events:none;background:radial-gradient(circle,rgba(150,84,30,.75),rgba(150,84,30,0) 72%)}
+.ctWash.g{background:radial-gradient(circle,rgba(255,214,70,.9),rgba(255,214,70,0) 72%)}
+/* paper kites popped out of top-level drawers join the sky (between the scene and the frame) */
+#ctSky{position:absolute;left:0;top:0;width:1600px;height:900px;pointer-events:none}
+#ctSky.sup::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,150,40,.1),rgba(255,196,80,.3) 55%,rgba(130,40,110,.32))}
+.ctSkyK{position:absolute;width:120px;height:250px;transform-origin:60px 70px;filter:drop-shadow(0 4px 0 rgba(28,35,64,.25))}
+.ctSkyK.rest svg{animation:ctSway 3.6s ease-in-out infinite alternate;transform-origin:60px 40px}
+@keyframes ctSway{from{transform:rotate(-6deg) translateY(0)}to{transform:rotate(7deg) translateY(-8px)}}
+/* SUPER splash: gold */
+#introM.sup,#outroM.sup{background:radial-gradient(circle,rgba(120,56,18,.985),rgba(28,8,18,.995))}
+#introM.sup .rays,#outroM.sup .rays{background:repeating-conic-gradient(rgba(255,214,90,.3) 0 7deg,transparent 7deg 20deg)}
+#introM.sup .medal{background:radial-gradient(circle at 50% 30%,#fff2a0,#f0b020 58%,#8a5a06)}
+#introM.sup .medal .mnum{color:#fff}
+#introM.sup .ribbon{color:#a8420a}
+#introM .medal{margin-top:0}
+.preMap{margin-top:12px;text-align:center}
+.preMap small{display:block;font-family:var(--toon);font-size:17px;letter-spacing:2px;color:var(--gold);text-shadow:2px 2px 0 var(--ink);margin-bottom:6px}
+.preMap div{display:inline-grid;grid-template-columns:repeat(5,30px);gap:4px}
+.preMap i{display:block;height:20px;border-radius:5px;background:#d8b98a;border:3px solid var(--ink)}
+.preMap i.g{animation:ctPre .8s var(--d,0ms) cubic-bezier(.3,1.6,.5,1) both}
+@keyframes ctPre{0%{background:#d8b98a;transform:scale(1)}45%{background:#c98b4a;transform:scale(1.6)}100%{background:#ffd23a;box-shadow:0 0 12px #ffd23a;transform:scale(1.08)}}
+/* splash layout (kai): Koji peeks over the medal (intro) / over the ribbon (outro) instead of covering the number */
+.splashArt svg.kojiSplash{z-index:1}
+#introM .splashArt svg.kojiSplash{margin-bottom:-38px}
+#outroM .splashArt svg.kojiSplash{margin-bottom:-20px}
+#outroM .ribbon{margin:0 0 2px!important;position:relative;z-index:3}
+#outroM .quote{margin:12px 0 14px}
+#outroM .medal.wide .mtop{margin-bottom:12px}
+#outroM.sup .medal{background:radial-gradient(circle at 50% 30%,#fff2a0,#f0b020 58%,#8a5a06)}
+#grid#grid .cell[data-lv="1"]{--tr:#a87a3c;--tg:rgba(150,100,40,.35);--p1:#ecc98a;--p2:#cf9d55}
+symbol#kojiSplashSuper,symbol#kojiSplash{overflow:visible}
+#introM.sup .sp{transform:scale(.8);transform-origin:50% 46%}
+#introM .splashArt{z-index:1}

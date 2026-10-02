@@ -79,21 +79,30 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   await page.goto('file://' + file);
   await page.evaluate(() => { window.__seen = { fly: 0, kite: 0, dragon: 0, gate: 0 }; new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { const c = n.className || ''; if (/ctFly/.test(c)) __seen.fly++; if (/ctK\b/.test(c)) __seen.kite++; if (/ctDragon/.test(c)) __seen.dragon++; }))).observe(document.body, { childList: true, subtree: true });
     new MutationObserver(() => { if (document.querySelector('#gates .gate.on')) __seen.gate++; }).observe(document.getElementById('gates'), { attributes: true, subtree: true }); });
+  /* OWNER BUG GUARD: in no frame of any bonus may the counter show "n / m" (shell text) or the shell's bonus message appear */
+  await page.evaluate(() => { window.__fsAll = []; window.__msgAll = [];
+    new MutationObserver(() => window.__fsAll.push(document.getElementById('fs').textContent)).observe(document.getElementById('fs'), { childList: true, characterData: true, subtree: true });
+    new MutationObserver(() => window.__msgAll.push(document.getElementById('msg').textContent)).observe(document.getElementById('msg'), { childList: true, characterData: true, subtree: true });
+    const poll = () => { const f = document.getElementById('fs').textContent; if (/\/\s*\d+/.test(f)) window.__fsAll.push('RAF:' + f); requestAnimationFrame(poll); }; poll(); });
   await sleep(2500);
+  const fpsIdle = await page.evaluate(() => new Promise(res => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 3000) requestAnimationFrame(f); else res(n / 3); }; requestAnimationFrame(f); }));
+  console.log('  idle fps (software rendering): ' + fpsIdle.toFixed(1));
   let s = await state(); await shot('01-idle');
   check('idle: play-money balance $1,000.00', s.bal === '$1,000.00', s.bal);
   check('idle: 5x4 board = 20 cells, 4 Kite Launch gates', (await page.$$eval('#grid .cell', c => c.length)) === 20 && (await page.$$eval('#gates .gate', c => c.length)) === 4);
   check('idle: status line, sign has no price', /SHALL WE POUR/.test(s.msg) && (await page.$('#buyPrice')) === null, s.msg);
+  check('idle: status line fits ONE line (no wrap with the embedded font)', await page.$eval('#msg', e => { const r = document.createRange(); r.selectNodeContents(e); const b = r.getBoundingClientRect(); return b.height < 34 && b.width < e.getBoundingClientRect().width; }));
   check('idle: no dusk, no Fever badge', !(await page.$eval('#scene', e => e.classList.contains('dusk'))) && !s.fever);
   await clk('#menuBtn'); await sleep(200); check('menu opens', await vis('#menu'));
   await clk('#bSnd'); check('sound toggles OFF', (await txt('#bSnd i')) === 'OFF'); await clk('#bSnd'); check('sound toggles ON', (await txt('#bSnd i')) === 'ON');
   if (!await vis('#menu')) await clk('#menuBtn');
   await clk('#bTurbo'); check('turbo ON shows badge', await page.evaluate(() => !document.getElementById('turboBadge').hidden)); await clk('#bTurbo');   // leave turbo OFF (real timing for the screenshots)
   if (!await vis('#menu')) await clk('#menuBtn'); await sleep(150); await clk('#bInfo'); await sleep(250); check('info opens', await vis('#infoM')); await shot('02-info');
-  const nPt = await page.$$eval('#infoM .pt tr', r => r.length);
-  check('info paytable: header + 8 pay symbols + wild, bundle, tin, 3 jackpot tins, grand = 16 rows', nPt === 16, String(nPt));
-  check('info text: max win 5,000x, buy 60x placeholder resolved, no [[ ]] left', /5,000x/.test(await txt('#infoM')) && /Tin Rush for 60x|TIN RUSH for 60x|for 60x/.test(await txt('#infoM')) && !/\[\[/.test(await txt('#infoM')));
-  check('info paytable is the engine data (Golden Koi 5 of a kind = 44x)', /44x/.test(await txt('#infoM .pt')));
+  const nPt = await page.$$eval('#ptab tr', r => r.length);
+  check('info paytable: header + 8 pay symbols + wild, bundle, FS drum, tin, 3 jackpot tins, grand = 17 rows', nPt === 17, String(nPt));
+  { const it = await txt('#infoM'); check('info: Free Spins, Super, Steeping Drawers, boost tables from info()', /FREE SPINS/.test(it) && /SUPER FREE SPINS/.test(it) && /STEEPING DRAWERS/.test(it) && (await page.$$eval('#infoM table.boost', t => t.length)) === 2 && /\+8/.test(it) && /for 21x/.test(it) && /75x/.test(it) && !/undefined|NaN/.test(it), it.slice(0, 80)); }
+  check('info text: max win 5,000x, buy 60x placeholder resolved, no [[ ]] left', /5,000x/.test(await txt('#infoM')) && /for 60x/.test(await txt('#infoM')) && !/\[\[/.test(await txt('#infoM')));
+  check('info paytable is the engine data (Golden Koi 5 of a kind = 36.74x)', /36\.74x/.test(await txt('#ptab')));
   await clk('#infoM [data-close]'); check('info closes', !(await vis('#infoM')));
   await clk('#betV'); await sleep(250); const opts = await page.$$eval('#betGrid .opt', o => o.map(x => x.textContent));
   check('bet picker $0.10 .. $10,000, 42 options', opts[0] === '$0.10' && opts[opts.length - 1] === '$10,000' && opts.length === 42, opts.length + ''); await clk('#betGrid .opt:text-is("$1")');
@@ -126,7 +135,8 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
 
   // buy screen: ONE card, no Fever
   await clk('#buyOpen'); await sleep(300); check('buy screen opens', await vis('#buyM')); await shot('06-buy-screen');
-  check('buy screen: ONE card (Tin Rush) at $60.00, no Fever card', (await page.$$eval('.bbRow .bbc', c => c.length)) === 1 && (await txt('#p1')) === '$60.00' && (await page.$('#ante')) === null);
+  check('buy screen: THREE cards (Tin Rush $60, Free Spins $21, Super $75), no Fever card', (await page.$$eval('.bbRow .bbc', c => c.length)) === 3 && (await txt('#p1')) === '$60.00' && (await txt('#p2')) === '$21.00' && (await txt('#p3')) === '$75.00' && (await page.$('#ante')) === null);
+  check('buy screen: cards are the same height and the names fit on one line', await page.$$eval('.bbRow .bbc', c => { const h = c.map(x => Math.round(x.getBoundingClientRect().height)); return Math.max(...h) - Math.min(...h) < 30; }) && await page.$$eval('.bbc h3', h => h.every(x => x.getBoundingClientRect().height < 36)));
   await clk('#buy1'); await sleep(250); check('BUY opens confirm', await vis('#confirm') && !(await vis('#buyM'))); await shot('07-confirm');
   check('confirm copy and cost', /BUY TIN RUSH/.test(await txt('#cTitle')) && (await txt('#cCost')) === '$60.00');
   const before = await state(); await clk('#cNo'); await sleep(200); s = await state(); check('CANCEL spends nothing', !(await vis('#confirm')) && s.bal === before.bal);
@@ -189,6 +199,97 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   let sawMax = false; for (let i = 0; i < 200 && !sawMax; i++) { if (await vis('#outroM')) { await sleep(700); await clk('#outroM', { position: { x: 60, y: 60 } }).catch(() => {}); } sawMax = await page.evaluate(() => document.getElementById('big').classList.contains('maxwin') && document.getElementById('big').classList.contains('show')); await sleep(100); }
   check('cap: gold MAX WIN screen shows', sawMax); await sleep(1800); await shot('18-max-win');
   check('cap round settles', await settle()); await page.evaluate(NORMAL);
+
+  // ===== Round 7: FREE SPINS, SUPER FREE SPINS (4 and 5 FS), retrigger, FS tease, Tin priority =====
+  await page.evaluate(() => { window.__r7 = { ladle: 0, x: 0, sky: 0, banner: 0, fly: 0 };
+    new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { const c = (typeof n.className === 'string' ? n.className : '') || ''; if (/ctLadle/.test(c)) __r7.ladle++; if (/\bctX\b/.test(c)) __r7.x++; if (/ctSkyK/.test(c)) __r7.sky++; if (/ctFly/.test(c)) __r7.fly++; }))).observe(document.getElementById('stage'), { childList: true, subtree: true });
+    new MutationObserver(() => { const b = document.querySelector('#ctBanner b'); if (b && /SPINS!/.test(b.textContent)) __r7.banner++; }).observe(document.getElementById('ctBanner'), { childList: true, subtree: true }); });
+  const runFs = async pre => {
+    const sh = {}; const t0 = Date.now(); const out = { lvMax: 0, sky: 0 };
+    while (Date.now() - t0 < 400000) {
+      const st = await page.evaluate(() => ({ outro: !document.getElementById('outroM').hidden, ladle: !!document.querySelector('.ctLadle'), lv: document.querySelectorAll('#grid .cell[data-lv]').length, lv3: document.querySelectorAll('#grid .cell[data-lv="3"],#grid .cell[data-lv="4"]').length,
+        msg: document.getElementById('msg').textContent, sky: document.querySelectorAll('#ctSky .ctSkyK').length, ban: +getComputedStyle(document.getElementById('ctBanner')).opacity > .8 && /SPINS!/.test(document.querySelector('#ctBanner b').textContent), fsBox: !document.getElementById('fsBox').hidden }));
+      if (st.outro) break; out.lvMax = Math.max(out.lvMax, st.lv); out.sky = Math.max(out.sky, st.sky);
+      if (st.fsBox && !sh.cnt) { sh.cnt = 1; await sleep(300); await page.screenshot({ path: path.join(outDir, pre + '-counter.png'), clip: { x: 0, y: 0, width: 420, height: 160 } }); }
+      if (st.ladle && !sh.pour) { sh.pour = 1; await sleep(480); await shot(pre + '-levelup-pour'); }
+      else if (st.ban && !sh.ret) { sh.ret = 1; await sleep(250); await shot(pre + '-retrigger'); }
+      else if (st.sky && !sh.sky) { sh.sky = 1; await sleep(2300); await shot(pre + '-kite-in-sky'); }
+      else if (st.lv >= 6 && /FINE CUP/.test(st.msg) && !sh.mid) { sh.mid = 1; await sleep(500); await shot(pre + '-steeped-mid'); }
+      await sleep(50); }
+    return out; };
+  const buyCard = async n => { await clk('#buyOpen'); await sleep(250); await clk('#buy' + n); await sleep(250); await clk('#cYes'); };
+  const finishFs = async (pre, who) => { check(who + ': outro appears', await waitFor('#outroM', 120000)); await sleep(2800); await shot(pre + '-outro'); const v = await txt('#outroV'); check(who + ': outro total is a dollar amount', /^\$[\d,]+\.\d\d$/.test(v), v); await clk('#outroM', { position: { x: 60, y: 60 } }); check(who + ': round settles', await settle()); };
+  const fsVals = async i0 => (await page.evaluate(() => window.__fsAll)).slice(i0).filter(x => /^\d+$/.test(x)).map(Number).filter((v, i, a) => i === 0 || v !== a[i - 1]);   // ordered, consecutive duplicates removed
+
+  // FREE SPINS (bought, 21x): drums -> intro -> 10 spins, steep pours, retrigger, outro
+  await page.evaluate(FORCE(`x => x.bought === 'fs' && x.bonus.spins.length >= 11 && x.bonus.spins.some(d => d.levelUps.length >= 2) && x.bonus.spins.some(d => d.retrigger) && x.bonus.spins.some(d => d.wins.some(w => w.boost > 0)) && x.totalPayout > 8 && x.totalPayout < 150`, 61));
+  const fsI0 = await page.evaluate(() => window.__fsAll.length); await page.evaluate(() => { __r7.ladle = __r7.x = __r7.sky = __r7.banner = __r7.fly = 0; }); await watchMsgs();
+  await buyCard(2);
+  check('FS buy: trigger spin shows exactly 3 FS drums', await waitCond(() => document.querySelectorAll('#grid .cell.scat').length === 3, 30000)); await sleep(500); await shot('R7-fs-trigger');
+  check('FS buy: intro appears', await waitFor('#introM', 60000)); await sleep(1700); await shot('R7-fs-intro');
+  check('FS intro: 10 SPINS, FREE SPINS ribbon, Koji portrait, no pre-steep map', (await txt('#introN')) === '10' && (await txt('#introRibbon')) === 'FREE SPINS' && !!(await page.$('#introArt svg.kojiSplash')) && !(await page.$('.preMap')), (await txt('#introN')) + ' / ' + (await txt('#introRibbon')));
+  await clk('#introM', { position: { x: 80, y: 80 } });
+  await sleep(150); check('FS: counter label is SPINS LEFT in the same counter spot', /SPINS LEFT/.test(await txt('#fsBox small')) && (await page.$eval('#fsBox', e => !e.hidden)), await txt('#fsBox small'));
+  const fo = await runFs('R7-fs');
+  const o7 = await page.evaluate(() => window.__r7), fv = await fsVals(fsI0);
+  check('FS: drawers got steeped (level skins on the board)', fo.lvMax >= 4, String(fo.lvMax));
+  check('FS: pour (ladle) animation ran and x(1+boost) chips showed', o7.ladle >= 2 && o7.x >= 1, JSON.stringify(o7));
+  check('FS: retrigger banner "+N SPINS" and the +N flew into the counter', o7.banner >= 1 && o7.fly >= 1, JSON.stringify(o7));
+  check('FS: counter counts down to 0 and goes UP on the retrigger (own counter)', fv[0] === 10 && fv.includes(0) && fv.some((v, i) => i > 0 && v > fv[i - 1]), fv.join(','));
+  check('FS: messages are the bonus own (steeping / pours), shell text absent', await sawMsg(/STEEPING/) && await sawMsg(/KOJI POURS/) && await sawMsg(/MORE DRUMS/) && !(await sawMsg(/TIN RUSH: POUR/)));
+  await finishFs('R7-fs', 'FS'); s = await state();
+  check('FS: after the bonus dusk is off, counter hidden, drawer skins cleared', !(await page.$eval('#scene', e => e.classList.contains('dusk'))) && !s.fsBox && (await page.$$eval('#grid .cell[data-lv]', c => c.length)) === 0);
+  await page.evaluate(NORMAL);
+
+  // SUPER (bought, 75x): 4 drums, 12 spins, pre-steeped drawers in the intro and on the board, gold look, a top-level kite pops into the sky
+  await page.evaluate(FORCE(`x => x.bought === 'super' && x.fsScatter.count === 4 && x.bonus.startSpins === 12 && x.bonus.preSteep.length === 4 && x.bonus.spins.some(d => d.levelUps.some(u => u.popKite)) && x.bonus.spins.some(d => d.retrigger) && x.totalPayout > 30 && x.totalPayout < 500`, 62));
+  await page.evaluate(() => { __r7.ladle = __r7.x = __r7.sky = __r7.banner = __r7.fly = 0; }); await watchMsgs();
+  await buyCard(3);
+  check('SUPER buy: trigger spin shows 4 FS drums', await waitCond(() => document.querySelectorAll('#grid .cell.scat').length === 4, 30000));
+  check('SUPER buy: intro appears', await waitFor('#introM', 60000)); await sleep(2300); await shot('R7-super-intro-presteeped');
+  check('SUPER intro: 12 SPINS, SUPER ribbon, gold class, 4 pre-steeped drawers shown, super portrait', (await txt('#introN')) === '12' && /SUPER FREE SPINS/.test(await txt('#introRibbon')) && await page.$eval('#introM', e => e.classList.contains('sup')) && (await page.$$eval('.preMap i.g', i => i.length)) === 4 && !!(await page.$('#introArt svg.kojiSplash.super')));
+  await clk('#introM', { position: { x: 80, y: 80 } }); await sleep(900);
+  check('SUPER: gold look on (scene sup) and Koji in bonus mode', await page.$eval('#ctSky', e => e.classList.contains('sup')) && await page.$eval('#char', e => e.classList.contains('bonusmode')));
+  const fpsBonus = await page.evaluate(() => new Promise(res => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 3000) requestAnimationFrame(f); else res(n / 3); }; requestAnimationFrame(f); }));
+  console.log('  bonus (dusk, super) fps while playing, software rendering: ' + fpsBonus.toFixed(1));
+  const so = await runFs('R7-super'); const o8 = await page.evaluate(() => window.__r7);
+  check('SUPER: pre-steeped drawers were on the board from the first spin (levels)', so.lvMax >= 4, String(so.lvMax));
+  check('SUPER: a top-level drawer popped a kite into the sky', o8.sky >= 1 && so.sky >= 1, JSON.stringify(o8));
+  check('SUPER: retrigger banner shown', o8.banner >= 1, JSON.stringify(o8));
+  await finishFs('R7-super', 'SUPER'); await page.evaluate(NORMAL);
+
+  // 5 FS: SUPER with 16 spins
+  await page.evaluate(FORCE(`x => x.bought === 'super' && x.fsScatter.count === 5 && x.bonus.startSpins === 16 && x.totalPayout < 300`, 63)); await watchMsgs();
+  await buyCard(3);
+  check('5 FS buy: trigger spin shows 5 drums', await waitCond(() => document.querySelectorAll('#grid .cell.scat').length === 5, 30000));
+  check('5 FS: intro says 16 SPINS (SUPER)', await waitFor('#introM', 60000) && (await sleep(800), (await txt('#introN')) === '16') && /SUPER/.test(await txt('#introRibbon'))); await shot('R7-5fs-intro');
+  await clk('#introM', { position: { x: 80, y: 80 } }); await runFs('R7-5fs'); await finishFs('R7-5fs', '5 FS'); await page.evaluate(NORMAL);
+
+  // natural FS (3 drums on the base spin with a line win) and natural SUPER from the base spin
+  await page.evaluate(FORCE(`x => !x.bought && x.bonusType === 'fs' && x.fsScatter.count === 3 && x.cascadeSteps[0].wins.length >= 1 && x.totalPayout < 100`, 64)); await watchMsgs(); await clk('#spin');
+  check('natural FS: lines shown, then the drums, then the intro', await waitFor('#introM', 120000) && await sawMsg(/DRUMS! FREE SPINS/)); await sleep(900); await clk('#introM', { position: { x: 80, y: 80 } });
+  await runFs('R7-nat-fs'); await finishFs('R7-nat-fs', 'natural FS'); await page.evaluate(NORMAL);
+  await page.evaluate(FORCE(`x => !x.bought && x.bonusType === 'super' && x.totalPayout < 400`, 65)); await watchMsgs(); await clk('#spin');
+  check('natural SUPER: intro appears', await waitFor('#introM', 120000)); await sleep(900); check('natural SUPER: intro is the super splash', await page.$eval('#introM', e => e.classList.contains('sup'))); await clk('#introM', { position: { x: 80, y: 80 } });
+  await runFs('R7-nat-super'); await finishFs('R7-nat-super', 'natural SUPER'); await page.evaluate(NORMAL);
+
+  // FS tease: 2 drums in the first reels -> slow last reels, "ONE MORE...", Koji holds his breath; ends without a bonus
+  await page.evaluate(FORCE(`x => !x.bonusTriggered && x.fsScatter.count === 2 && x.tins.count < 4 && x.fsScatter.cells.every(c => c[1] <= 2)`, 66));
+  await watchMsgs(); await page.evaluate(() => { window.__tease2 = false; setInterval(() => { if (document.getElementById('char').classList.contains('tease')) window.__tease2 = true; }, 30); }); await clk('#spin');
+  check('FS tease: "ONE MORE..." with the slow drop after 2 drums', await waitCond(() => document.getElementById('msg').textContent.includes('ONE MORE'), 20000)); await sleep(500); await shot('R7-fs-tease');
+  check('FS tease: Koji holds his breath', await waitCond(() => window.__tease2, 8000)); check('FS tease settles', await settle()); check('FS tease: near-miss copy', await sawMsg(/ONE MORE DRUM/)); await page.evaluate(NORMAL);
+
+  // Tin Rush priority: 6+ tins and 3+ FS in the same spin -> Tin Rush only (engine rewrites the FS cells), Tin Rush keeps its own POURS LEFT label
+  await page.evaluate(FORCE(`x => !x.bought && x.bonusType === 'tin' && x.fsScatter.suppressed >= 3 && x.totalPayout < 400`, 67)); await watchMsgs(); await clk('#spin');
+  check('Tin priority: Tin Rush intro (no FS bonus)', await waitFor('#introM', 120000)); await sleep(900);
+  check('Tin priority: TIN RUSH ribbon, 3 POURS, no drums on the board, normal splash', /TIN RUSH/.test(await txt('#introRibbon')) && (await txt('#introN')) === '3' && (await page.$$eval('#grid .cell use[href="#s16"]', u => u.length)) === 0 && !(await page.$eval('#introM', e => e.classList.contains('sup'))));
+  await clk('#introM', { position: { x: 80, y: 80 } }); await sleep(900); check('Tin Rush counter label is POURS LEFT again', /POURS LEFT/.test(await txt('#fsBox small')), await txt('#fsBox small'));
+  await runBonus('prio', 'R7-prio'); check('Tin priority: outro', await waitFor('#outroM', 120000)); await sleep(2800); await shot('R7-tin-outro'); await clk('#outroM', { position: { x: 60, y: 60 } }); check('Tin priority round settles', await settle()); await page.evaluate(NORMAL);
+
+  // THE OWNER'S BUG: across Tin Rush, Free Spins, Super (all bonuses above) the counter never showed "n / m" and the shell's bonus line never appeared
+  { const all = await page.evaluate(() => window.__fsAll), msgs = await page.evaluate(() => window.__msgAll);
+    check('NO FLASH: #fs never matched /\/\s*\d+/ in ' + all.length + ' mutations over Tin Rush + FS + SUPER', all.length > 20 && !all.some(x => /\/\s*\d+/.test(x)), all.filter(x => /\/\s*\d+/.test(x)).slice(0, 5).join('|'));
+    check('NO FLASH: #msg never showed the shell bonus text ("TIN RUSH: POUR n", "n / m") in ' + msgs.length + ' updates', msgs.length > 50 && !msgs.some(x => /TIN RUSH: POUR|\d+\s*\/\s*\d+/.test(x))); }
 
   // autoplay + stop square
   await clk('#bAuto'); await sleep(250); check('autoplay dialog opens', await vis('#autoM')); await clk('#autoOpts .opt >> nth=0'); await clk('#autoGo');
