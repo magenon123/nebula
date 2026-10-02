@@ -135,7 +135,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
 
   // buy screen: ONE card, no Fever
   await clk('#buyOpen'); await sleep(300); check('buy screen opens', await vis('#buyM')); await shot('06-buy-screen');
-  check('buy screen: THREE cards (Tin Rush $60, Free Spins $21, Super $75), no Fever card', (await page.$$eval('.bbRow .bbc', c => c.length)) === 3 && (await txt('#p1')) === '$60.00' && (await txt('#p2')) === '$21.00' && (await txt('#p3')) === '$75.00' && (await page.$('#ante')) === null);
+  check('buy screen: FS Luck card + THREE buy cards (Tin Rush $60, Free Spins $21, Super $75)', (await page.$$eval('.bbRow .bbc', c => c.length)) === 4 && (await txt('#p1')) === '$60.00' && (await txt('#p2')) === '$21.00' && (await txt('#p3')) === '$75.00' && (await page.$('#ante')) !== null);
   check('buy screen: cards are the same height and the names fit on one line', await page.$$eval('.bbRow .bbc', c => { const h = c.map(x => Math.round(x.getBoundingClientRect().height)); return Math.max(...h) - Math.min(...h) < 30; }) && await page.$$eval('.bbc h3', h => h.every(x => x.getBoundingClientRect().height < 36)));
   await clk('#buy1'); await sleep(250); check('BUY opens confirm', await vis('#confirm') && !(await vis('#buyM'))); await shot('07-confirm');
   check('confirm copy and cost', /BUY TIN RUSH/.test(await txt('#cTitle')) && (await txt('#cCost')) === '$60.00');
