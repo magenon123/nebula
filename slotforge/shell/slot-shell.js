@@ -274,12 +274,14 @@ function tapWait(id, autoMs, minMs = 450) { return new Promise(res => { const m 
 const tierOf = x => cfg.tiers.find(t => x >= t.min) || null;
 async function bigWin(x, amt) {
   const t = tierOf(x); if (!t) return null;
-  const lv = t.lv, bigMark = {};
-  $('bigT').textContent = t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = t.tag || '';
+  const lv = t.lv, bigMark = {}, isMax = x >= cfg.maxWin - 1e-9;   // the cap itself gets its own gold presentation
+  $('big').classList.toggle('maxwin', isMax);
+  $('bigT').textContent = isMax ? 'MAX WIN' : t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = isMax ? 'THE MAXIMUM. YOU HIT THE CEILING!' : t.tag || '';
   $('big').classList.add('show'); char('big', 3300); shake(lv + .6); flash(lv); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
+  if (isMax) { coins(160); embers(260, innerWidth / 2, innerHeight / 2, true); setTimeout(() => { if ($('big').classList.contains('show')) { coins(120); flash(3); } }, 2200 * T()); }
   sfx.big(lv); music.duck([0, .5, .38, .28, .2][lv] || .3, 1.2 + lv * .8, 1.6); music.stinger('win');
-  await Promise.race([countUp($('bigA'), amt, (1400 + lv * 700) * T() + 300, 0, k => { sfx.tick(k); if (lv >= 2 && !(bigMark.a) && k > .35) { bigMark.a = 1; shake(lv * .45); } if (lv >= 3 && !bigMark.b && k > .7) { bigMark.b = 1; shake(lv * .6); flash(lv - 1); embers(40 * lv, innerWidth / 2, innerHeight / 2, true); } }), sleep(20000)]);
-  await sleep(auto.left > 0 ? 700 : 1500 + lv * 300);
+  await Promise.race([countUp($('bigA'), amt, (isMax ? 5200 : 1400 + lv * 700) * T() + 300, 0, k => { sfx.tick(k); if (lv >= 2 && !(bigMark.a) && k > .35) { bigMark.a = 1; shake(lv * .45); } if (lv >= 3 && !bigMark.b && k > .7) { bigMark.b = 1; shake(lv * .6); flash(lv - 1); embers(40 * lv, innerWidth / 2, innerHeight / 2, true); } }), sleep(20000)]);
+  await sleep(auto.left > 0 ? 700 : isMax ? 3500 : 1500 + lv * 300);
   $('big').classList.remove('show'); return t.name;
 }
 $('big').onclick = () => { skipBig = true; };
@@ -443,7 +445,7 @@ addQuote('introM', cfg.intro.quote); addQuote('outroM', cfg.outro.quote);
 if (cfg.intro.tap) document.querySelector('#introM .tapHint').textContent = cfg.intro.tap;
 if (cfg.outro.tap) document.querySelector('#outroM .tapHint').textContent = cfg.outro.tap;
 if (cfg.outro.label) document.querySelector('#outroM .mtop').textContent = cfg.outro.label;
-if (cfg.tiers.some(t => t.tag)) $('bigX').insertAdjacentHTML('afterend', '<div id="bigTag"></div>');
+if (true) $('bigX').insertAdjacentHTML('afterend', '<div id="bigTag"></div>');
 if (hooks.splashArt) for (const k of ['intro', 'outro']) $(k + 'M').querySelector('.sp').insertAdjacentHTML('afterbegin', `<div class="splashArt" id="${k}Art">${hooks.splashArt(k)}</div>`);
 
 hooks.init(S);
