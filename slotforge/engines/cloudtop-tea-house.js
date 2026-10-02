@@ -42,7 +42,7 @@ export const CFG = {
   // base game
   coinP: 0.09,
   anteCost: 2,                                // FS LUCK (bet-up): every spin costs 2x and the FS drums land far more often
-  anteFsP: 0.0379,                             // FS scatter per cell in FS LUCK mode (tuned with tools/sim.js so the mode returns ~96.1%)
+  anteFsP: 0.03805,                             // FS scatter per cell in FS LUCK mode (tuned with tools/sim.js so the mode returns ~96.1%)
   fsP: 0.018,                                 // FS scatter, per cell, all reels; rolled AFTER the tin test with the SAME draw (tin odds never move)
   triggerTins: 6,
   symW: [10, 10, 10, 10, 10, 10, 10, 10],     // pay symbols 0..7
