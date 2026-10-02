@@ -2,6 +2,12 @@
 
 **Rule from the owner:** the owner is the judge (no judge agent). ONE slot at a time (Grumble & Brine now). All agents run on **Sonnet 5.5**. Keep usage lean: do the job, don't re-read what you don't need, no long chatter. Work may be interrupted by the owner's usage limit at any time: **save work to files often, and write your progress in the chat** so a fresh agent can continue exactly where you stopped.
 
+**AUTONOMY (owner, latest):** the owner has shown the direction (UI, look, sound, math 96.0-96.5% every mode, MAX LUCK, tease, FS tag, gold MAX WIN screen, all in OWNER-PREFS.md). The team now works ON ITS OWN on the next slots. The owner stays the judge: nothing is delivered or started next without his APPROVE/REVISE at the checkpoints. VARIETY RULE (OWNER-PREFS Round 5): every new slot needs a different main mechanic, bonus and set of extras from ALL existing slots; MAX LUCK only about 1 slot in 5.
+
+## Slots
+- #1 EmberClaw: approved. #2 Grumble & Brine: approved. Do not touch except bug fixes.
+- #3: PHASE 0 (concept). maya + leo pitch and converge on ONE concept, write `plans/<slug>/00-concept.md` (+ comparison table against existing slots), then STOP for the owner (checkpoint 1).
+
 ## Done
 - EmberClaw (slot #1): finished, math retuned to ~96.2% in all modes, files rebuilt. Do not touch except bug fixes.
 - Shared shell (`shell/`), slot module format (`slots/emberclaw/`), engine registry + generic server route (`engines/`, `server.js` marked section), math tools + tests (`tools/`), build script (`/home/user/nebula/build-standalone.py <slug>`).
