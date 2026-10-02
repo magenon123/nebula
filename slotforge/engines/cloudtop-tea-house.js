@@ -46,10 +46,10 @@ export const CFG = {
   wildW: 1, bundleW: 3,                       // wild only reels 2-4
   flipW: [16, 15, 14, 11, 10, 9, 6, 4],       // what a bundle can flip into (pay symbols only)
   pay: [[0.35, 1.0, 3], [0.35, 1.2, 3.5], [0.45, 1.4, 4.5], [0.7, 2.5, 8], [0.9, 3, 10.5], [1.1, 4, 16], [1.3, 5.3, 22], [2.2, 9, 44]],
-  payScale: 1.005,
+  payScale: 1,
   // Tin Rush
   startRespins: 3,
-  q: 0.073,
+  q: 0.0732,
   maxRespins: 60,
   valueW: [[1, 45], [2, 25], [3, 12], [5, 8], [8, 4], [15, 2], [40, 0.6]],
   collectorP: 0.012, collectorBase: 2,
@@ -145,7 +145,7 @@ function playRush(rng, startCells, capLeft) {
 }
 
 /* bonus-only helper for tools: bonus value with a conditioned start (same as a bought round, uncapped by the base) */
-export function bonusOnly(rng) { return playRush(rng, startTins(rng), CFG.maxWin).total; }
+export function bonusOnly(rng) { return Math.min(CFG.maxWin, playRush(rng, startTins(rng), CFG.maxWin).total); }
 
 function startTins(rng) {   // natural tin-count distribution conditioned on >= triggerTins, positions uniform
   let n;
