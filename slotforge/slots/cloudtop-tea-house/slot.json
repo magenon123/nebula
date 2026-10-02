@@ -2,7 +2,7 @@
  "id": "cloudtop-tea-house",
  "title": "Koji's Cloudtop Tea House",
  "logoText": "CLOUDTOP TEA HOUSE",
- "infoTitle": "CLOUDTOP TEA HOUSE · TIN RUSH",
+ "infoTitle": "CLOUDTOP TEA HOUSE \u00b7 TIN RUSH",
  "api": "/api/slot/cloudtop-tea-house/spin",
  "engineSource": "slotforge/engines/cloudtop-tea-house.js",
  "storage": "ct",
@@ -143,5 +143,6 @@
    "wet": 0.3,
    "lp": 0.5
   }
- }
+ },
+ "ownCounter": true
 }

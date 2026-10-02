@@ -61,3 +61,9 @@ Existing slots (EmberClaw, Grumble & Brine) stay as they are.
 
 ## Round 6: slot #3 concept approved (Koji's Cloudtop Tea House)
 Owner approved the concept with the notes in STATUS.md. The lead calls itself "Tally".
+
+## Round 7: Tea House revision notes (owner)
+1. Fix ALL the listed weak spots (Grand dragon kite face looks like a pig, hat reads like a hard hat, stiff win arms, small symbols, heavy scene perf, no Koji splash portrait, fonts).
+2. Need MORE TYPES OF BONUSES. KEEP Tin Rush exactly as it is (owner: "it's fine").
+3. Bonus scatters carry ONLY the text "FS". 3 FS = normal free-spins bonus, 4 FS = SUPER bonus. (Tea Tins stay the Tin Rush trigger, 6+.)
+4. BUG: in the bonus, every spin the shell counter flashes "n / 14" for a split second before the slot's "POURS LEFT" counter. Fixed by cfg.ownCounter (shell no longer writes the counter or the message when a slot owns its counter). Verify it is gone.

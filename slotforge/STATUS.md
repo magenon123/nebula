@@ -9,6 +9,10 @@
 - #3 Koji's Cloudtop Tea House (`cloudtop-tea-house`): concept APPROVED by the owner (plans/cloudtop-tea-house/00-concept.md). Owner notes: one buy + mystery bundles only (no bet-up, no MAX LUCK); risk-it ladder parked; keep the Kite Launch as the star moment (own sound + animation); do NOT make the tail wilder until the real sim shows it; hold-and-win must not feel generic; bonus + big-win screens must carry the energy (the tea house is calm). Max win 5,000x. Every mode 96.0-96.5%.
   Pipeline: (1) rin engine + round format doc + sim/tests, in parallel with (2) leo art fragments in slots/cloudtop-tea-house/ (all 11 symbols with own win motions inside the <symbol>, scene, logo, frame, character, side, info; follow slots/grumble-and-brine/ as the format and quality bar), then (3) kai slot.json/slot.js/slot.css (music + sfx from leo's spec), build-standalone, smoke test, then (4) lead verifies and delivers to the owner. The shell must work with NO ante/fever card (cfg.anteCost 0) and a single buy card; kai fixes the shell if it assumes otherwise, without changing EmberClaw / Grumble & Brine behaviour.
 
+## Slot #3 REVISION ROUND (owner notes in OWNER-PREFS Round 7)
+Step A (parallel): maya = design addendum plans/cloudtop-tea-house/02-new-bonuses.md (FS free-spins bonus on 3 FS + SUPER on 4 FS, different from Tin Rush / EmberClaw / Grumble; buys; math plan). leo = fix weak spots + new FS scatter symbol (text FS only) + Koji splash portrait + scene perf.
+Step B: rin engine (new bonuses, buys, every mode 96.0-96.5%, tests), then kai client (new bonus visuals/sfx/music, counter bug check, smoke), then lead verifies and delivers.
+
 ## Done
 - EmberClaw (slot #1): finished, math retuned to ~96.2% in all modes, files rebuilt. Do not touch except bug fixes.
 - Shared shell (`shell/`), slot module format (`slots/emberclaw/`), engine registry + generic server route (`engines/`, `server.js` marked section), math tools + tests (`tools/`), build script (`/home/user/nebula/build-standalone.py <slug>`).
