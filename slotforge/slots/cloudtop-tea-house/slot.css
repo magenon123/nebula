@@ -251,3 +251,33 @@
 .mbox .x,.bbX{background:var(--btn);color:#fff;border-color:var(--ink)}
 /* Bonus Buy sign: hanging tea-house board; tint the plaque cedar */
 #buyOpen .plq{background:radial-gradient(circle at 14px 14px,var(--rivet) 4px,transparent 5px),radial-gradient(circle at calc(100% - 14px) 14px,var(--rivet) 4px,transparent 5px),linear-gradient(180deg,#8a5532,#5a3520);box-shadow:inset 0 0 0 3px var(--rim),0 8px 0 rgba(28,35,64,.4)}
+
+/* ---------- kai: Tin Rush effects (banner, Kite Launch band + kite, collector flights, Grand dragon) ---------- */
+#ctBanner{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);opacity:0;text-align:center;pointer-events:none;z-index:12;white-space:nowrap}
+#ctBanner b{display:block;font-family:var(--toon);font-weight:400;font-size:58px;line-height:1;letter-spacing:2px;color:var(--paper);-webkit-text-stroke:11px var(--ink);paint-order:stroke fill;text-shadow:0 6px 0 rgba(28,35,64,.45)}
+#ctBanner small{display:block;margin-top:4px;font-family:var(--toon);font-size:26px;letter-spacing:3px;color:var(--gold);-webkit-text-stroke:7px var(--ink);paint-order:stroke fill}
+#ctBanner.big b{font-size:70px;color:#ffe27a}
+.ctBand{position:absolute;left:-6px;width:652px;height:128px;border-radius:10px;pointer-events:none;z-index:2;background:linear-gradient(90deg,rgba(255,200,80,0),rgba(255,206,90,.55) 12%,rgba(255,236,160,.75) 50%,rgba(255,206,90,.55) 88%,rgba(255,200,80,0));box-shadow:0 0 40px 10px rgba(255,190,70,.55);transform-origin:0 50%}
+.ctK{position:absolute;left:0;top:0;width:120px;height:250px;pointer-events:none;z-index:13;transform-origin:60px 62px;filter:drop-shadow(0 6px 0 rgba(28,35,64,.3))}
+.ctFly{position:absolute;z-index:12;pointer-events:none;font-family:var(--toon);font-size:24px;line-height:1.2;color:var(--ink);background:var(--paper);border:3.5px solid var(--ink);border-radius:99px;padding:0 9px;box-shadow:0 3px 0 rgba(28,35,64,.35)}
+.ctDragon{position:absolute;left:0;top:0;width:330px;height:330px;pointer-events:none;z-index:11;filter:drop-shadow(0 10px 0 rgba(28,35,64,.3)) drop-shadow(0 0 24px rgba(255,200,80,.8))}
+/* a closed drawer that has just been rattled by a pour keeps its plate flat */
+#grid .cell.closed.land svg.g{display:none}
+/* single buy card sits centred (no fever card) */
+.bbRow .bbc:only-child{transform:rotate(-.6deg)}
+
+/* ---------- kai: shell reskin, dusk lacquer (splashes, big win) ---------- */
+.modal.splash{background:radial-gradient(circle,rgba(86,44,92,.985),rgba(20,10,34,.995))}
+.rays{background:repeating-conic-gradient(rgba(255,196,140,.2) 0 7deg,transparent 7deg 20deg)}
+.medal{background:radial-gradient(circle at 50% 30%,#ff9d7a,#d9432e 58%,#7a1c14);box-shadow:inset 0 0 0 7px var(--rim),inset 0 0 0 12px var(--ink),0 14px 0 rgba(0,0,0,.45)}
+.medal .mtop{color:var(--paper)}
+.medal .mlbl{color:var(--gold)}
+.ribbon{background:linear-gradient(#fff6e2,#ecd5ac);color:var(--accent);text-shadow:2px 3px 0 rgba(28,35,64,.3);box-shadow:inset 0 0 0 3px rgba(217,67,46,.35),0 9px 0 rgba(0,0,0,.45)}
+.ribbon::before,.ribbon::after{background:#2f3a6e}
+.gems svg{filter:drop-shadow(0 7px 0 rgba(0,0,0,.5)) drop-shadow(0 0 18px rgba(255,185,56,.75))}
+.chips span{background:var(--panel2);border-color:var(--rim);color:var(--paper)}
+.quote{color:var(--paper);margin-top:46px}
+#big{background:radial-gradient(circle,rgba(86,44,92,.86),rgba(14,8,26,.95))}
+.ctK svg{transform:scale(1.4);transform-origin:60px 62px}
+/* pours counter: a little tea cup instead of "FS" */
+#fsBox::before{content:"\2615";font-size:24px;color:var(--ink)}

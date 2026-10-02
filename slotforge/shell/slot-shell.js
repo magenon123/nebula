@@ -367,12 +367,12 @@ $('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); ref
 const mult = () => luck ? LUCK_COST : ante ? ANTE_COST : 1;
 function refreshUi() {
   const s = BETS[bi], risk = s * mult(); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
-  $('barR').classList.toggle('hot', ante || luck); $('betLbl').textContent = ante || luck ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !(ante || luck); $('feverBadge').textContent = luck ? cfg.luck.badge : cfg.fever.badge;
+  $('barR').classList.toggle('hot', ante || luck); $('betLbl').textContent = ante || luck ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !(ante || luck); $('feverBadge').textContent = luck ? cfg.luck.badge : cfg.fever ? cfg.fever.badge : '';
   if (LUCK_COST) { $('luck').textContent = luck ? 'DEACTIVATE' : 'ACTIVATE'; $('luck').classList.toggle('or', !luck); $('luck').classList.toggle('off', luck); }
   const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
   $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
   BUYS.forEach((b, i) => fitTxt($('p' + (i + 1)), fmt(s * b.mult), 34, '23px'));
-  $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante);
+  if (cfg.fever) { $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante); }
   $('bAuto').classList.toggle('on', auto.left > 0);
   $('spinCnt').hidden = !(auto.left > 0); $('spinCnt').textContent = auto.left; $('spin').querySelector('svg').style.visibility = auto.left > 0 ? 'hidden' : '';
   $('bTurbo').classList.toggle('on', turbo); $('bTurbo').querySelector('i').textContent = turbo ? 'ON' : 'OFF'; $('turboBadge').hidden = !turbo;
@@ -424,16 +424,16 @@ const sym = id => `<svg viewBox="0 0 64 64"><use href="#s${id}"/></svg>`;
 document.title = cfg.title + (LOCAL ? ' (offline demo)' : '');
 $('authName').textContent = cfg.logoText;
 $('buyOpen').querySelector('svg').innerHTML = `<use href="#s${cfg.scatterSym}"/>`;
-$('feverBadge').textContent = cfg.fever.badge;
+$('feverBadge').textContent = cfg.fever ? cfg.fever.badge : '';
 const bigTier = cfg.tiers.find(t => t.lv === cfg.autoBigLv); $('swBigTxt').textContent = `Stop on a big win (${bigTier.min}x+)`;
 $('bbRow').innerHTML =
-  `<div class="bbc"><div class="med">${sym(cfg.fever.sym)}</div><h3>${cfg.fever.name}</h3><p>${cfg.fever.text}</p><div class="vol" data-n="${cfg.fever.vol}"><span>VOLATILITY</span></div><div class="price" id="pa">${ANTE_COST}x BET</div><button class="go or" id="ante">ACTIVATE</button></div>` +
+  (cfg.fever ? `<div class="bbc"><div class="med">${sym(cfg.fever.sym)}</div><h3>${cfg.fever.name}</h3><p>${cfg.fever.text}</p><div class="vol" data-n="${cfg.fever.vol}"><span>VOLATILITY</span></div><div class="price" id="pa">${ANTE_COST}x BET</div><button class="go or" id="ante">ACTIVATE</button></div>` : '') +
   (LUCK_COST ? `<div class="bbc"><div class="med">${sym(cfg.luck.sym)}</div><h3>${cfg.luck.name}</h3><p>${cfg.luck.text}</p><div class="vol" data-n="${cfg.luck.vol}"><span>VOLATILITY</span></div><div class="price" id="pl">${LUCK_COST}x BET</div><button class="go or" id="luck">ACTIVATE</button></div>` : '') +
   BUYS.map((b, i) => `<div class="bbc"><div class="med">${sym(b.sym)}</div><h3>${b.name}</h3><p>${b.text}</p><div class="vol" data-n="${b.vol}"><span>VOLATILITY</span></div><div class="price" id="p${i + 1}">$${b.mult}.00</div><button class="go gd" id="buy${i + 1}">BUY</button></div>`).join('');
 document.querySelectorAll('.vol').forEach(v => { for (let i = 1; i <= 5; i++) v.insertAdjacentHTML('beforeend', `<i class="${i <= +v.dataset.n ? 'on' : ''}"></i>`); });
 BUYS.forEach((b, i) => { $('buy' + (i + 1)).onclick = () => { closeM('buyM'); askBuy(b.key); }; });
 if (LUCK_COST) $('luck').onclick = () => { sfx.ui(); luck = !luck; if (luck) ante = false; refreshUi(); closeM('buyM'); if (luck) { say(cfg.luck.onMsg, true); sfx.feverOn(); } else say(cfg.luck.offMsg); };
-$('ante').onclick = () => { sfx.ui(); ante = !ante; if (ante) luck = false; refreshUi(); closeM('buyM'); if (ante) { say(cfg.fever.onMsg, true); sfx.feverOn(); } else say(cfg.fever.offMsg); };
+if (cfg.fever) $('ante').onclick = () => { sfx.ui(); ante = !ante; if (ante) luck = false; refreshUi(); closeM('buyM'); if (ante) { say(cfg.fever.onMsg, true); sfx.feverOn(); } else say(cfg.fever.offMsg); };
 $('introGems').innerHTML = [1, 2, 3].map(() => `<div class="g">${sym(cfg.scatterSym)}</div>`).join('');
 $('introLbl').textContent = cfg.intro.unit; $('introRibbon').textContent = cfg.intro.ribbon;
 $('introChips').innerHTML = cfg.intro.chips.map(c => `<span>${c}</span>`).join('');

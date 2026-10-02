@@ -39,7 +39,7 @@ def bundle_engine(path):
 def check_against_engine(cfg, path):
     """slot.json is the client's copy of a few engine numbers; fail the build if they drift."""
     js = ("import(process.argv[1]).then(m=>{const C=m.CFG;console.log(JSON.stringify({bets:C.bets,maxWin:C.maxWin,anteCost:C.anteCost||0,luckCost:C.luckCost||0,"
-          "buy:Object.fromEntries(Object.entries(C.buy||{}).map(([k,v])=>[k,v.cost])),paytable:m.PAYTABLE||null,payScale:C.payScale||1,scatterPay:m.SCATTER_PAY||C.scatterPay||null}))})")
+          "buy:Object.fromEntries(Object.entries(C.buy||{}).map(([k,v])=>[k,v.cost])),paytable:m.PAYTABLE||null,payScale:C.payScale||1,scatterPay:m.SCATTER_PAY||C.scatterPay||null,info:(!m.PAYTABLE&&m.info)?m.info():null}))})")
     r = subprocess.run(['node', '-e', js, 'file://' + os.path.join(ROOT, path)], capture_output=True, text=True)
     if r.returncode:
         sys.exit('cannot load engine for the CFG check:\n' + r.stderr)
@@ -53,7 +53,9 @@ def check_against_engine(cfg, path):
     if mine != e['buy']: bad.append(f'buys {mine} != engine CFG.buy costs {e["buy"]}')
     if bad:
         sys.exit('slot.json / engine mismatch:\n  ' + '\n  '.join(bad))
-    return {'paytable': e['paytable'], 'payScale': e['payScale'], 'scatterPay': e.get('scatterPay')}
+    out = {'paytable': e['paytable'], 'payScale': e['payScale'], 'scatterPay': e.get('scatterPay')}
+    if e.get('info'): out['info'] = e['info']
+    return out
 
 
 def assemble(slug, standalone):

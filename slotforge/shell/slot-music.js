@@ -105,6 +105,28 @@ function make(ctx, out, defs, opt = {}) {
       const k = Object.assign({ g: .08 }, o), end = t + dur + .3, lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 1; lp.frequency.setValueAtTime(300, t); lp.frequency.linearRampToValueAtTime(900, t + dur * .5); lp.frequency.linearRampToValueAtTime(380, t + dur);
       lp.connect(sus(dest, t, dur, .06, k.g, .2)); [-6, 6].forEach(d => { const os = ctx.createOscillator(); os.type = 'sawtooth'; os.detune.value = d; os.frequency.setValueAtTime(mtof(m0), t); os.frequency.setValueAtTime(mtof(m0), t + dur * .25); os.frequency.exponentialRampToValueAtTime(mtof(m1), t + dur * .9); os.connect(lp); os.start(t); os.stop(end); });
     },
+    /* koto: plucked triangle + soft saw through a quick lowpass, a small pitch dip at the pluck and a noise click (karplus-ish) */
+    koto(dest, t, m, o = {}) {
+      const k = Object.assign({ g: .09, d: 1.1 }, o), f = mtof(m), end = t + k.d + .1, lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = .8;
+      lp.frequency.setValueAtTime(4200, t); lp.frequency.exponentialRampToValueAtTime(700, t + k.d * .5); lp.connect(dec(dest, t, k.g, k.d, .002));
+      sw('triangle', f * 1.03, f, t, .05, end).connect(lp);
+      const b = osc('sawtooth', f, t, end), bg = ctx.createGain(); bg.gain.value = .2; b.connect(bg); bg.connect(lp);
+      const c = osc('sine', f * 2.01, t, end), cg = ctx.createGain(); cg.gain.value = .22; c.connect(cg); cg.connect(lp);
+      nz(dest, t, .02, k.g * .35, 'bandpass', 3200, 0, 2, .001);
+    },
+    /* shakuhachi: sine with slow vibrato that grows in, a quiet 2nd harmonic and band-passed breath noise */
+    shaku(dest, t, dur, m, o = {}) {
+      const k = Object.assign({ g: .05, a: .14, r: .3, vib: 5.1, breath: .3 }, o), f = mtof(m), end = t + Math.max(k.a, dur) + k.r + .05, mix = sus(dest, t, dur, k.a, k.g, k.r);
+      const o1 = ctx.createOscillator(); o1.type = 'sine'; o1.frequency.value = f; const vg = ctx.createGain(); vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(f * .011, t + Math.min(.7, dur * .7));
+      const vl = ctx.createOscillator(); vl.frequency.value = k.vib; vl.connect(vg); vg.connect(o1.frequency); vl.start(t); vl.stop(end); o1.connect(mix); o1.start(t); o1.stop(end);
+      const o2 = osc('sine', f * 2, t, end), g2 = ctx.createGain(); g2.gain.value = .16; o2.connect(g2); g2.connect(mix);
+      const s = ctx.createBufferSource(); s.buffer = nbuf; s.loop = true; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = Math.min(5200, f * 2.6); bp.Q.value = 1.4;
+      const bg = ctx.createGain(); bg.gain.value = k.breath * .3; s.connect(bp); bp.connect(bg); bg.connect(mix); s.start(t, rr()); s.stop(end);
+    },
+    /* wood block: a short high "tok" */
+    tok(dest, t, v = 1, o = {}) {
+      const f = o.f || 1050; sw('sine', f * 1.25, f, t, .015, t + .14).connect(dec(dest, t, .1 * v, .07, .001)); sw('square', f * 2.1, f * 1.5, t, .012, t + .1).connect(dec(dest, t, .02 * v, .03, .001));
+    },
     riser(dest, t, dur, o = {}) { const k = Object.assign({ g: .06, f1: 300, f2: 3800 }, o), s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), e = ctx.createGain(); s.buffer = nbuf; s.loop = true; f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(k.f1, t); f.frequency.exponentialRampToValueAtTime(k.f2, t + dur);
       e.gain.setValueAtTime(0, t); e.gain.linearRampToValueAtTime(k.g, t + dur * .95); e.gain.linearRampToValueAtTime(0, t + dur); s.connect(f); f.connect(e); e.connect(dest); s.start(t, rr()); s.stop(t + dur + .05); },
     horn(dest, t, dur, notes, o = {}) { V.pad(dest, t, dur, notes, Object.assign({ cut: 380, cut2: 1100, q: 1, a: dur * .4, r: dur * .5, g: .07, det: 7 }, o)); }

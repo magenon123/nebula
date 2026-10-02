@@ -1747,6 +1747,28 @@ function make(ctx, out, defs, opt = {}) {
       const k = Object.assign({ g: .08 }, o), end = t + dur + .3, lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 1; lp.frequency.setValueAtTime(300, t); lp.frequency.linearRampToValueAtTime(900, t + dur * .5); lp.frequency.linearRampToValueAtTime(380, t + dur);
       lp.connect(sus(dest, t, dur, .06, k.g, .2)); [-6, 6].forEach(d => { const os = ctx.createOscillator(); os.type = 'sawtooth'; os.detune.value = d; os.frequency.setValueAtTime(mtof(m0), t); os.frequency.setValueAtTime(mtof(m0), t + dur * .25); os.frequency.exponentialRampToValueAtTime(mtof(m1), t + dur * .9); os.connect(lp); os.start(t); os.stop(end); });
     },
+    /* koto: plucked triangle + soft saw through a quick lowpass, a small pitch dip at the pluck and a noise click (karplus-ish) */
+    koto(dest, t, m, o = {}) {
+      const k = Object.assign({ g: .09, d: 1.1 }, o), f = mtof(m), end = t + k.d + .1, lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = .8;
+      lp.frequency.setValueAtTime(4200, t); lp.frequency.exponentialRampToValueAtTime(700, t + k.d * .5); lp.connect(dec(dest, t, k.g, k.d, .002));
+      sw('triangle', f * 1.03, f, t, .05, end).connect(lp);
+      const b = osc('sawtooth', f, t, end), bg = ctx.createGain(); bg.gain.value = .2; b.connect(bg); bg.connect(lp);
+      const c = osc('sine', f * 2.01, t, end), cg = ctx.createGain(); cg.gain.value = .22; c.connect(cg); cg.connect(lp);
+      nz(dest, t, .02, k.g * .35, 'bandpass', 3200, 0, 2, .001);
+    },
+    /* shakuhachi: sine with slow vibrato that grows in, a quiet 2nd harmonic and band-passed breath noise */
+    shaku(dest, t, dur, m, o = {}) {
+      const k = Object.assign({ g: .05, a: .14, r: .3, vib: 5.1, breath: .3 }, o), f = mtof(m), end = t + Math.max(k.a, dur) + k.r + .05, mix = sus(dest, t, dur, k.a, k.g, k.r);
+      const o1 = ctx.createOscillator(); o1.type = 'sine'; o1.frequency.value = f; const vg = ctx.createGain(); vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(f * .011, t + Math.min(.7, dur * .7));
+      const vl = ctx.createOscillator(); vl.frequency.value = k.vib; vl.connect(vg); vg.connect(o1.frequency); vl.start(t); vl.stop(end); o1.connect(mix); o1.start(t); o1.stop(end);
+      const o2 = osc('sine', f * 2, t, end), g2 = ctx.createGain(); g2.gain.value = .16; o2.connect(g2); g2.connect(mix);
+      const s = ctx.createBufferSource(); s.buffer = nbuf; s.loop = true; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = Math.min(5200, f * 2.6); bp.Q.value = 1.4;
+      const bg = ctx.createGain(); bg.gain.value = k.breath * .3; s.connect(bp); bp.connect(bg); bg.connect(mix); s.start(t, rr()); s.stop(end);
+    },
+    /* wood block: a short high "tok" */
+    tok(dest, t, v = 1, o = {}) {
+      const f = o.f || 1050; sw('sine', f * 1.25, f, t, .015, t + .14).connect(dec(dest, t, .1 * v, .07, .001)); sw('square', f * 2.1, f * 1.5, t, .012, t + .1).connect(dec(dest, t, .02 * v, .03, .001));
+    },
     riser(dest, t, dur, o = {}) { const k = Object.assign({ g: .06, f1: 300, f2: 3800 }, o), s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), e = ctx.createGain(); s.buffer = nbuf; s.loop = true; f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(k.f1, t); f.frequency.exponentialRampToValueAtTime(k.f2, t + dur);
       e.gain.setValueAtTime(0, t); e.gain.linearRampToValueAtTime(k.g, t + dur * .95); e.gain.linearRampToValueAtTime(0, t + dur); s.connect(f); f.connect(e); e.connect(dest); s.start(t, rr()); s.stop(t + dur + .05); },
     horn(dest, t, dur, notes, o = {}) { V.pad(dest, t, dur, notes, Object.assign({ cut: 380, cut2: 1100, q: 1, a: dur * .4, r: dur * .5, g: .07, det: 7 }, o)); }
@@ -2179,12 +2201,12 @@ $('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); ref
 const mult = () => luck ? LUCK_COST : ante ? ANTE_COST : 1;
 function refreshUi() {
   const s = BETS[bi], risk = s * mult(); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
-  $('barR').classList.toggle('hot', ante || luck); $('betLbl').textContent = ante || luck ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !(ante || luck); $('feverBadge').textContent = luck ? cfg.luck.badge : cfg.fever.badge;
+  $('barR').classList.toggle('hot', ante || luck); $('betLbl').textContent = ante || luck ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !(ante || luck); $('feverBadge').textContent = luck ? cfg.luck.badge : cfg.fever ? cfg.fever.badge : '';
   if (LUCK_COST) { $('luck').textContent = luck ? 'DEACTIVATE' : 'ACTIVATE'; $('luck').classList.toggle('or', !luck); $('luck').classList.toggle('off', luck); }
   const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
   $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
   BUYS.forEach((b, i) => fitTxt($('p' + (i + 1)), fmt(s * b.mult), 34, '23px'));
-  $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante);
+  if (cfg.fever) { $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante); }
   $('bAuto').classList.toggle('on', auto.left > 0);
   $('spinCnt').hidden = !(auto.left > 0); $('spinCnt').textContent = auto.left; $('spin').querySelector('svg').style.visibility = auto.left > 0 ? 'hidden' : '';
   $('bTurbo').classList.toggle('on', turbo); $('bTurbo').querySelector('i').textContent = turbo ? 'ON' : 'OFF'; $('turboBadge').hidden = !turbo;
@@ -2236,16 +2258,16 @@ const sym = id => `<svg viewBox="0 0 64 64"><use href="#s${id}"/></svg>`;
 document.title = cfg.title + (LOCAL ? ' (offline demo)' : '');
 $('authName').textContent = cfg.logoText;
 $('buyOpen').querySelector('svg').innerHTML = `<use href="#s${cfg.scatterSym}"/>`;
-$('feverBadge').textContent = cfg.fever.badge;
+$('feverBadge').textContent = cfg.fever ? cfg.fever.badge : '';
 const bigTier = cfg.tiers.find(t => t.lv === cfg.autoBigLv); $('swBigTxt').textContent = `Stop on a big win (${bigTier.min}x+)`;
 $('bbRow').innerHTML =
-  `<div class="bbc"><div class="med">${sym(cfg.fever.sym)}</div><h3>${cfg.fever.name}</h3><p>${cfg.fever.text}</p><div class="vol" data-n="${cfg.fever.vol}"><span>VOLATILITY</span></div><div class="price" id="pa">${ANTE_COST}x BET</div><button class="go or" id="ante">ACTIVATE</button></div>` +
+  (cfg.fever ? `<div class="bbc"><div class="med">${sym(cfg.fever.sym)}</div><h3>${cfg.fever.name}</h3><p>${cfg.fever.text}</p><div class="vol" data-n="${cfg.fever.vol}"><span>VOLATILITY</span></div><div class="price" id="pa">${ANTE_COST}x BET</div><button class="go or" id="ante">ACTIVATE</button></div>` : '') +
   (LUCK_COST ? `<div class="bbc"><div class="med">${sym(cfg.luck.sym)}</div><h3>${cfg.luck.name}</h3><p>${cfg.luck.text}</p><div class="vol" data-n="${cfg.luck.vol}"><span>VOLATILITY</span></div><div class="price" id="pl">${LUCK_COST}x BET</div><button class="go or" id="luck">ACTIVATE</button></div>` : '') +
   BUYS.map((b, i) => `<div class="bbc"><div class="med">${sym(b.sym)}</div><h3>${b.name}</h3><p>${b.text}</p><div class="vol" data-n="${b.vol}"><span>VOLATILITY</span></div><div class="price" id="p${i + 1}">$${b.mult}.00</div><button class="go gd" id="buy${i + 1}">BUY</button></div>`).join('');
 document.querySelectorAll('.vol').forEach(v => { for (let i = 1; i <= 5; i++) v.insertAdjacentHTML('beforeend', `<i class="${i <= +v.dataset.n ? 'on' : ''}"></i>`); });
 BUYS.forEach((b, i) => { $('buy' + (i + 1)).onclick = () => { closeM('buyM'); askBuy(b.key); }; });
 if (LUCK_COST) $('luck').onclick = () => { sfx.ui(); luck = !luck; if (luck) ante = false; refreshUi(); closeM('buyM'); if (luck) { say(cfg.luck.onMsg, true); sfx.feverOn(); } else say(cfg.luck.offMsg); };
-$('ante').onclick = () => { sfx.ui(); ante = !ante; if (ante) luck = false; refreshUi(); closeM('buyM'); if (ante) { say(cfg.fever.onMsg, true); sfx.feverOn(); } else say(cfg.fever.offMsg); };
+if (cfg.fever) $('ante').onclick = () => { sfx.ui(); ante = !ante; if (ante) luck = false; refreshUi(); closeM('buyM'); if (ante) { say(cfg.fever.onMsg, true); sfx.feverOn(); } else say(cfg.fever.offMsg); };
 $('introGems').innerHTML = [1, 2, 3].map(() => `<div class="g">${sym(cfg.scatterSym)}</div>`).join('');
 $('introLbl').textContent = cfg.intro.unit; $('introRibbon').textContent = cfg.intro.ribbon;
 $('introChips').innerHTML = cfg.intro.chips.map(c => `<span>${c}</span>`).join('');

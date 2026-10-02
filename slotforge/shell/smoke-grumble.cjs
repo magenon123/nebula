@@ -105,7 +105,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
 
   // Deep Pressure
   await clk('#buyOpen'); await sleep(300); check('buy screen opens', await vis('#buyM')); await shot('06-buy-screen');
-  check('buy screen: 3 cards, prices $100.00 / $500.00', (await page.$$eval('.bbRow .bbc', c => c.length)) === 3 && (await txt('#p1')) === '$100.00' && (await txt('#p2')) === '$500.00');
+  check('buy screen: 4 cards (Deep Pressure, MAX LUCK, 2 tickets), prices $100.00 / $500.00', (await page.$$eval('.bbRow .bbc', c => c.length)) === 4 && (await txt('#p1')) === '$100.00' && (await txt('#p2')) === '$500.00');
   check('buy cards carry the Grumble & Brine copy', /Deep Pressure/i.test(await txt('.bbRow')) && /Dive Ticket/i.test(await txt('.bbRow')) && /Abyss Pass/i.test(await txt('.bbRow')));
   await clk('#ante'); await sleep(250); s = await state(); await shot('07-deep-pressure-on');
   check('Deep Pressure: modal closes', !(await vis('#buyM')));

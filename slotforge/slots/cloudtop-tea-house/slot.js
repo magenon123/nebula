@@ -1,0 +1,390 @@
+/* Koji's Cloudtop Tea House. The only slot-specific client logic; the shell (shell/slot-shell.js) calls these hooks.
+ * Pure renderer: the engine/server returns the whole round (grid, bundle flip, wins with cells, Tin Rush steps); nothing here computes an outcome.
+ * Round payload: plans/cloudtop-tea-house/01-round-format.md. Art geometry: slots/cloudtop-tea-house/ART-NOTES.md. */
+SlotShell.boot(SLOT_CFG, S => {
+const { $, sfx, wait, T, say, shake, flash, embers, coins, char, pop, fmt, sleep } = S;
+const ROWS = 4, COLS = 5, WILD = 8, BUNDLE = 9, TIN = 10, COLL = 11, GRAND = 15;
+const KIND_SYM = { value: 10, collector: 11, mini: 12, minor: 13, major: 14 };
+const FX = S.fx, GRID = $('grid'), CW = 128, CH = 128, MAXW = S.cfg.maxWin, INFO = S.cfg.engineData.info;
+let lastGrid = null, inBonus = false, bonusOpened = false, rushLeft = 3, resets = 0, tinsNow = 0;
+const board = new Map();   // bonus board: cell index -> {kind, value}
+const cells = [];
+const at = (r, c) => cells[r * COLS + c];
+const after = (ms, fn) => setTimeout(fn, ms * T());
+const ctrG = (r, c) => [(c + .5) * CW, (r + .5) * CH];
+const scr = (r, c) => { const b = at(r, c).getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; };
+const ALL = [].concat(...Array.from({ length: ROWS }, (_, r) => Array.from({ length: COLS }, (_, c) => [r, c])));
+const cnt = n => `${n} ${n === 1 ? 'POUR' : 'POURS'} LEFT`;
+
+/* ---------- MUSIC: "morning on the cliff" (base, 92 bpm) and "kite weather" (Tin Rush, 128 bpm); D Hirajoshi (D E F A Bb) ---------- */
+function musicDefs() {
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  const KP = [[0, 2, 3, 2], [1, 3, 2, 0], [2, 3, 4, 3], [2, 1, 0, -2], [0, 2, 3, 5], [4, 3, 2, 1], [3, 2, 1, 0], [0, -2, 0, -1]];
+  const SH = [[4, 3, 2], [3, 2, 0], [5, 4, 3], [2, 1, 0]];   // shakuhachi phrase heads (scale degrees, octave +1)
+  const zen = {
+    tempo: 92, barBeats: 4, spb: 8, swing: .22, bars: 16, key: 62, scale: [0, 2, 3, 7, 8], seed: 31, gain: .85, phrase: 8,
+    layers: { drone: { gain: 1, wet: .3 }, koto: { gain: 1, wet: .3 }, tok: { enter: 1, gain: 1, wet: .1 }, snap: { enter: 2, gain: 1, wet: .08 }, shaku: { enter: 4, gain: 1, wet: .45 }, taiko: { gain: 1, wet: .25 }, hi: { int: .35, gain: 1, wet: .35 } },
+    bar(M) {
+      const k = M.i & 7, ph = M.i >> 3, wk = clamp(M.walk, -1, 1), p = KP[k];
+      if (k % 2 === 0) M.pad('drone', M.t0, M.bd * 2, k % 4 === 2 ? [38, 50, 45] : [38, 50], { wave: 'sawtooth', cut: 230, q: .4, a: 1.4, r: 1.6, g: .05, det: 6 });
+      [0, 3, 4, 6].forEach((s, j) => { if (j === 2 && M.rnd() < .25) return; M.koto('koto', M.st(s), M.note(p[j] + (ph && j === 3 ? wk : 0), 0), { g: .07, d: 1.3 }); });
+      if (k % 2 === 0) M.koto('koto', M.st(0), M.note(p[0], -1), { g: .08, d: 1.6 });
+      M.tok('tok', M.st(3), .5, { f: 1000 }); M.tok('tok', M.st(7), .35, { f: 1250 }); if (k % 4 === 3) M.tok('tok', M.st(5), .25, { f: 900 });
+      M.shaker('snap', M.st(2), .5); M.shaker('snap', M.st(6), .4); if (k % 2) M.shaker('snap', M.st(5), .2);
+      if (k % 4 === 0) { const h = SH[(M.i >> 2) & 3]; M.shaku('shaku', M.st(0), 2.6 * 60 / 92 + 1.4 * 60 / 92 * 0, M.note(h[0] + wk, 1), { g: .045 }); M.shaku('shaku', M.st(6), 1.6, M.note(h[1], 1), { g: .035, a: .3 }); }
+      if (k % 4 === 1) M.shaku('shaku', M.st(0), 2.2, M.note(SH[(M.i >> 2) & 3][2], 1), { g: .035, a: .2 });
+      if (k === 0 && M.pass === 0) M.taiko('taiko', M.st(0), .35, { g: .3, f0: 146.8, f1: 73.4 });
+      if (M.int > .35) [0, 2, 4, 6].forEach(s => M.koto('hi', M.st(s) + .01, M.note(p[(s >> 1)] + 2, 1), { g: .035, d: .9 }));
+    }
+  };
+  const ARP = [[0, 2, 3, 4], [2, 3, 4, 3], [0, 3, 2, 4], [4, 3, 2, 0]];
+  const rush = {
+    tempo: 128, barBeats: 4, spb: 16, swing: 0, bars: 16, key: 62, scale: [0, 2, 3, 7, 8], seed: 53, gain: .8, phrase: 4,
+    layers: { drone: { gain: 1, wet: .2 }, taiko: { gain: 1, wet: .22 }, arp: { gain: 1, wet: .25 }, tok: { gain: 1, wet: .1 }, shaku: { int: .4, gain: 1, wet: .4 }, hi: { int: .6, gain: 1, wet: .3 }, fill: { int: .78, gain: 1, wet: .2 } },
+    bar(M) {
+      const k = M.i & 3, ph = (M.i >> 2) & 3, a = ARP[ph], wk = clamp(M.walk, -1, 1);
+      M.pad('drone', M.t0, M.bd, [38, 45, 50], { wave: 'sawtooth', cut: 280, q: .4, a: .5, r: .6, g: .05, det: 5 });
+      const TK = { f0: 146.8, f1: 73.4 }; M.taiko('taiko', M.st(0), 1, { g: .42, ...TK }); M.taiko('taiko', M.st(8), .85, { g: .42, ...TK }); M.taiko('taiko', M.st(6), .22, TK); M.taiko('taiko', M.st(14), .25, TK); if (M.rnd() < .5) M.taiko('taiko', M.st(11), .15, TK);
+      for (let s = 0; s < 16; s++) { const deg = a[s % 4] + (s >= 8 ? 1 : 0) + (k === 3 && s >= 12 ? 1 : 0); M.koto('arp', M.st(s), M.note(deg + wk * (s > 7 ? 1 : 0), s % 8 < 4 ? 0 : 1), { g: s % 4 === 0 ? .06 : .04, d: .42 }); }
+      [2, 6, 10, 14].forEach(s => M.tok('tok', M.st(s), .5, { f: s % 8 === 2 ? 1100 : 1350 }));
+      if (k % 2 === 0) M.shaku('shaku', M.st(0), 1.7, M.note(SH[ph][k >> 1] + 1, 1), { g: .04, a: .12 });
+      if (M.int > .6) [0, 4, 8, 12].forEach(s => M.koto('hi', M.st(s) + .008, M.note(a[(s >> 2)] + 2, 2), { g: .035, d: .5 }));
+      if (k === 3) [12, 13, 14, 15].forEach((s, j) => M.taiko('fill', M.st(s), .55 + j * .12, { f0: 146.8 * (1 + j * .1), f1: 73.4, d: .3 }));
+      if (rushLeft <= 1) M.riser('riser', M.t0, M.bd, { g: .05, f1: 250, f2: 4200 });
+    }
+  };
+  const stingers = {
+    win(K) { const { V, dest, t } = K; [0, 2, 3].forEach((d, i) => V.koto(dest, t + i * .11, K.note(d, 1), { g: .08, d: 1 })); V.tok(dest, t + .36, .6); },
+    bonus(K) { const { V, dest, t } = K; V.taiko(dest, t, 1, { g: .4 }); [0, 1, 2, 3, 4, 5, 6, 7].forEach((d, i) => V.koto(dest, t + .15 + i * .07, K.note(d, 1), { g: .06, d: 1.1 })); V.shaku(dest, t + .5, 1.8, K.note(4, 1), { g: .06 }); },
+    outro(K) { const { V, dest, t } = K; [3, 2, 0, -2].forEach((d, i) => V.koto(dest, t + i * .22, K.note(d, 1), { g: .07, d: 1.5 })); V.metal(dest, t + .7, K.mtof(74), 2.2, .08); },
+    grand(K) { const { V, dest, t } = K; V.metal(dest, t, K.mtof(50), 3, .16, [1, 2.4, 4.1, 6.7]); for (let i = 0; i < 12; i++) V.taiko(dest, t + .4 + i * (.3 - i * .014), .5 + i * .05, { g: .3 }); for (let i = 0; i < 14; i++) V.koto(dest, t + .5 + i * .06, K.note(i, 1), { g: .06, d: 1.2 }); V.shaku(dest, t + 1, 2.2, K.note(4, 2), { g: .06 }); }
+  };
+  return { base: zen, bonus: rush, stingers };
+}
+
+/* ---------- the board: 5 reels x 4 rows ---------- */
+function setCell(d, sym, chip, cls = '') {
+  FX.reset(d); d.className = 'cell' + (sym === WILD ? ' wild' : '') + cls;
+  d.innerHTML = sym == null ? '' : `<svg class="g"><use href="#s${sym}"/></svg>` + (chip != null ? `<span class="m">x${chip}</span>` : '');
+}
+function paint(grid) { lastGrid = grid; grid.forEach((row, r) => row.forEach((s, c) => setCell(at(r, c), s, null))); GRID.classList.remove('focus'); clearLinks(); }
+const dropOpt = (r, c, base = 0) => ({ delay: base + c * 92 + (ROWS - 1 - r) * 34 + Math.random() * 14, dist: (r + 1) * CH + 60, tilt: (Math.random() - .5) * 5, dur: 560 });
+function dropCells(list, base = 0) {
+  let end = 0; const col = {}, times = {};
+  list.forEach(([r, c]) => { const o = dropOpt(r, c, base); FX.drop(at(r, c), o); const t = o.delay + o.dur * .58; times[r * COLS + c] = t; end = Math.max(end, t); col[c] = Math.min(col[c] == null ? 1e9 : col[c], t); });
+  Object.keys(col).forEach(c => after(col[c], () => sfx.land(+c)));
+  return { end, times };
+}
+/* reel by reel; once two Tea Tins have landed the remaining reels hang a beat with a heartbeat before each lands (near-miss slow drop) */
+function dropReels(grid) {
+  let base = 0, end = 0, tease = false, seen = 0, said = false; const times = {};
+  for (let c = 0; c < COLS; c++) {
+    if (seen >= 2) { tease = true; base += 560; const b0 = base; after(b0 - 500 + c * 92, () => { sfx.beat(); if (!said) { said = true; say('ONE MORE...', true); } shake(.3); }); }
+    const r = dropCells(Array.from({ length: ROWS }, (_, i) => [i, c]), base); end = Math.max(end, r.end); Object.assign(times, r.times);
+    for (let i = 0; i < ROWS; i++) if (grid[i][c] === TIN) seen++;
+  }
+  return { end, tease, times };
+}
+async function dropOut() {
+  clearLinks(); GRID.classList.remove('focus'); let end = 0;
+  ALL.forEach(([r, c]) => { const o = { delay: c * 48 + (ROWS - 1 - r) * 26, dist: (ROWS - r) * CH + 90, rot: (c % 2 ? 1 : -1) * (2 + c % 3), dur: 420 }; FX.out(at(r, c), o); end = Math.max(end, o.delay + o.dur); });
+  await wait(end * .86);
+}
+const dropAll = () => dropCells(ALL);
+
+/* ---------- the paper string: a cream paper cord with a vermilion stitch, threaded drawer by drawer, a red bead (mizuhiki knot) at each ---------- */
+const lnkB = () => FX.layer('lnkB', 7), lnkT = () => FX.layer('lnkT', 10);
+function clearLinks() { ['lnkB', 'lnkT'].forEach(id => { const l = document.getElementById(id); if (l) l.replaceChildren(); }); }
+function fadeLinks(ms) { ['lnkB', 'lnkT'].forEach(id => { const l = document.getElementById(id); if (!l) return; [...l.children].forEach(g => { if (g.tagName !== 'defs') g.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(4px)' }], { duration: ms * T(), fill: 'forwards', easing: 'ease-in' }); }); }); setTimeout(clearLinks, (ms + 40) * T()); }
+function restCells() { cells.forEach(d => FX.rest(d)); }
+let ropeUid = 0;
+const bead = (parent, x, y, at0) => {
+  const g = FX.el('g', { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})` }, parent), k = FX.el('g', {}, g);
+  FX.el('circle', { r: 9, fill: '#d9432e', stroke: '#1c2340', 'stroke-width': 3.2 }, k); FX.el('circle', { cx: -3, cy: -3, r: 2.6, fill: '#ffb4a0' }, k);
+  FX.el('path', { d: 'M-3 8 L-6 17 M3 8 L5 16', stroke: '#1c2340', 'stroke-width': 3.2, 'stroke-linecap': 'round', fill: 'none' }, k); FX.el('path', { d: 'M-3 8 L-6 17 M3 8 L5 16', stroke: '#d9432e', 'stroke-width': 1.4, 'stroke-linecap': 'round', fill: 'none' }, k);
+  k.animate([{ transform: 'scale(.2,1.8)', opacity: 0 }, { transform: 'scale(1.4,.7)', opacity: 1, offset: .35 }, { transform: 'scale(.9,1.14)', offset: .66 }, { transform: 'scale(1)', opacity: 1 }], { duration: 320 * T(), delay: at0 * T(), easing: 'cubic-bezier(.3,0,.3,1)', fill: 'both' });
+};
+/* list = [[r,c],...] left to right; t0 = ms (unscaled) from now. Returns {arrive:[ms per cell], end} */
+function thread(list, t0, wi) {
+  const off = wi ? (wi % 2 ? 1 : -1) * 5 : 0, P = list.map(([r, c]) => { const [x, y] = ctrG(r, c); return [x + (Math.random() - .5) * 6, y + 14 + off + (Math.random() - .5) * 6]; });
+  const f = P[0], l = P[P.length - 1], pts = [[f[0] - 70, f[1] + 24], ...P, [l[0] + 70, l[1] + 28]];
+  const taut = FX.curve(pts, 0), slack = FX.curve(pts, 26), cum = [0]; for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  const tot = cum[cum.length - 1], draw = 150 + 110 * Math.max(1, list.length - 1), k = T(), B = lnkB(), T2 = lnkT(), id = 'rm' + (++ropeUid);
+  const mask = FX.el('mask', { id, maskUnits: 'userSpaceOnUse', x: -300, y: -300, width: 1400, height: 1000 }, FX.el('defs', {}, B)), mp = FX.el('path', { d: taut, fill: 'none', stroke: '#fff', 'stroke-width': 80, 'stroke-linecap': 'round' }, mask);
+  const Ln = mp.getTotalLength(); mp.style.strokeDasharray = Ln; mp.animate([{ strokeDashoffset: Ln }, { strokeDashoffset: 0 }], { duration: draw * k, delay: t0 * k, easing: 'linear', fill: 'both' });
+  const g = FX.el('g', { mask: `url(#${id})` }, B), mk = (w, col, extra = {}) => FX.el('path', Object.assign({ d: slack, fill: 'none', stroke: col, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, extra), g);
+  const strands = [mk(14, '#1c2340'), mk(9, '#fbf1dc'), mk(2.6, '#d9432e', { 'stroke-dasharray': '9 9', 'stroke-linecap': 'butt' }), mk(2, '#fff', { 'stroke-dasharray': '16 22', transform: 'translate(0 -2.6)' })];
+  const tw = t0 + draw;   // pulled taut at the end, with a little overshoot, then the string hums
+  strands.forEach(p => p.animate([{ d: `path("${slack}")` }, { d: `path("${taut}")` }], { duration: 280 * k, delay: tw * k, easing: 'cubic-bezier(.2,1.7,.4,1)', fill: 'forwards' }));
+  g.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-3px)', offset: .2 }, { transform: 'translateY(2.4px)', offset: .45 }, { transform: 'translateY(-1px)', offset: .7 }, { transform: 'none' }], { duration: 420 * k, delay: (tw + 120) * k, easing: 'ease-out' });
+  const arrive = [];
+  P.forEach((p, i) => { const at0 = t0 + cum[i + 1] / tot * draw; arrive.push(at0); bead(T2, p[0], p[1], at0); });
+  return { arrive, end: tw + 280 };
+}
+
+/* ---------- little helpers for effects ---------- */
+const fxl = () => $('fxl');
+function banner(title, sub, ms = 1500, big) {
+  const b = $('ctBanner'); b.querySelector('b').textContent = title; b.querySelector('small').textContent = sub || ''; b.classList.toggle('big', !!big);
+  b.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.3) rotate(-6deg)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.14) rotate(2deg)', offset: .16 }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1) rotate(0)', offset: .26 }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.02)', offset: .84 }, { opacity: 0, transform: 'translate(-50%,-62%) scale(.96)' }], { duration: ms * T(), easing: 'ease-out' });
+}
+function chipEl(d) { return d.querySelector('.m'); }
+function setChip(d, v, up) { let m = chipEl(d); if (!m) { d.insertAdjacentHTML('beforeend', `<span class="m${up ? ' up' : ''}">x${v}</span>`); m = chipEl(d); } else { m.textContent = 'x' + v; if (up) { m.classList.remove('up'); void m.offsetWidth; m.classList.add('up'); } } return m; }
+function ring(d, ms = 650) { d.classList.remove('pulse'); void d.offsetWidth; d.classList.add('pulse'); setTimeout(() => d.classList.remove('pulse'), ms * T()); }
+function gold(r, c, n = 10, power = 1) { const [x, y] = scr(r, c); S.shards(x, y, n, ['#f2d23a', '#e9b43c', '#fff1b8', '#d9432e'], { power, edge: 'rgba(28,35,64,.6)' }); }
+function flipSym(d, sym) {
+  const g = d.querySelector('svg.g'); if (!g) return;
+  g.style.transformOrigin = '50% 60%'; g.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(.05) scaleY(1.1)', offset: .5 }, { transform: 'scaleX(1)' }], { duration: 300 * T(), easing: 'ease-in-out' });
+  setTimeout(() => { const u = g.querySelector('use'); if (u) u.setAttribute('href', '#s' + sym); }, 150 * T());
+}
+function setFs(n, bump) { const e = $('fs'); e.textContent = n; if (bump) e.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.8) rotate(-6deg)', offset: .3 }, { transform: 'scale(.92)', offset: .65 }, { transform: 'scale(1)' }], { duration: 620 * T(), easing: 'ease-out' }); }
+
+/* ---------- base spin ---------- */
+const tinCells = grid => { const o = []; grid.forEach((row, r) => row.forEach((s, c) => { if (s === TIN) o.push([r, c]); })); return o; };
+async function flipBundles(b, grid) {
+  say('THE BUNDLES UNTIE!', true); char('special', 900 * T()); sfx.untie(b.flipTo);
+  b.cells.forEach(([r, c], i) => { FX.act(at(r, c), i * 80, c); after(i * 80 + 660, () => { const u = at(r, c).querySelector('svg.g use'); if (u) u.setAttribute('href', '#s' + b.flipTo); }); });
+  const endMs = b.cells.length * 80 + 660 + 520;
+  after(endMs - 100, () => { b.cells.forEach(([r, c]) => { ring(at(r, c)); gold(r, c, 6, .6); }); flash(1.2); });
+  await wait(endMs + 360); b.cells.forEach(([r, c]) => FX.rest(at(r, c)));
+  lastGrid = grid; grid.forEach((row, r) => row.forEach((s, c) => { if (s !== TIN) { const u = at(r, c).querySelector('svg.g use'); if (u && u.getAttribute('href') !== '#s' + s) u.setAttribute('href', '#s' + s); } }));
+}
+async function evalWins(st, ctx, run) {
+  GRID.classList.add('focus'); const cellT = new Map(); let endAll = 0; const n = st.wins.length, gap = n > 8 ? 55 : n > 4 ? 85 : 120;
+  st.wins.forEach((w, i) => {
+    const t0 = i * gap, R = thread(w.cells, t0, i), lastC = w.cells.length - 1;
+    w.cells.forEach(([r, c], j) => { const dl = R.arrive[j] + 24 + r * 20, key = r * COLS + c; if (!cellT.has(key) || dl < cellT.get(key).dl) cellT.set(key, { dl, r, c }); });
+    after(R.arrive[0], () => sfx.link(0)); after(R.arrive[lastC], () => sfx.link(Math.min(4, w.cells.length)));
+    if (n <= 8) after(R.arrive[lastC] + 90, () => { const [x, y] = scr(...w.cells[Math.min(2, lastC)]); pop(x, y - 30, '+' + fmt(w.payout * ctx.stake)); });
+    endAll = Math.max(endAll, R.arrive[lastC]);
+  });
+  cellT.forEach(o => FX.act(at(o.r, o.c), o.dl, o.c));
+  sfx.win(Math.min(7, n + (st.payout > 5 ? 2 : 0)));
+  char('win', 1500 * T()); const before = run; run += st.payout * ctx.stake; after(endAll, () => ctx.onWin(before, run));
+  if (n > 8) after(endAll + 100, () => { const [x, y] = scr(1, 2); pop(x, y, '+' + fmt(st.payout * ctx.stake)); });
+  say(`A FINE CUP! +${fmt(st.payout * ctx.stake)}`, true);
+  await wait(endAll + 800); fadeLinks(240); GRID.classList.remove('focus'); restCells(); return run;
+}
+async function baseSpin(sp, run, ctx) {
+  char('spin', 950 * T()); paint(sp.initialGrid); sfx.drop();
+  const dt = dropReels(sp.initialGrid), tins = tinCells(sp.initialGrid); tinsNow = tins.length;
+  tins.slice().sort((a, b) => dt.times[a[0] * COLS + a[1]] - dt.times[b[0] * COLS + b[1]]).forEach(([r, c], i) => { const t = dt.times[r * COLS + c]; after(t, () => { sfx.tin(i); ring(at(r, c)); }); });
+  if (dt.tease) after(Math.max(300, dt.end - 1500), () => { const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('tease'); });
+  await wait(dt.end + 260);
+  if (dt.tease) {
+    const ch = $('char'), hit = tins.length >= 6; ch.classList.add(hit ? 'exhale' : 'slump'); setTimeout(() => ch.classList.remove('tease', 'exhale', 'slump'), 750 * T());
+    if (!hit && tins.length >= 4) say('ALMOST... JUST ONE MORE TIN', true);
+  }
+  const st = sp.step;
+  if (st) {
+    if (st.bundle) await flipBundles(st.bundle, st.grid);
+    if (st.wins.length) run = await evalWins(st, ctx, run);
+  }
+  return run;
+}
+async function showTrigger(R) {
+  const list = R.tins ? R.tins.cells.slice() : tinCells(lastGrid); list.sort((a, b) => a[1] - b[1] || a[0] - b[0]);
+  restCells(); GRID.classList.add('focus'); clearLinks();
+  list.forEach(([r, c], i) => { FX.act(at(r, c), i * 120, c); at(r, c).classList.add('scat'); after(i * 120, () => { sfx.tin(i); ring(at(r, c), 500); }); });
+  say(`${list.length} TEA TINS! TIN RUSH`, true); char('special', 1100 * T());
+  await wait(list.length * 120 + 900);
+}
+
+/* ---------- Tin Rush (hold and win) ---------- */
+async function bonusOpen() {
+  /* the empty drawers slide shut around the tins that stay */
+  const stay = new Set(); ALL.forEach(([r, c]) => { if (lastGrid[r][c] === TIN) stay.add(r * COLS + c); });
+  sfx.drawers(); GRID.classList.remove('focus'); restCells(); clearLinks();
+  ALL.forEach(([r, c], i) => { const d = at(r, c), k = r * COLS + c;
+    if (stay.has(k)) { d.classList.add('locked'); d.classList.remove('scat'); return; }
+    FX.out(d, { delay: c * 24 + r * 12, dist: 120, up: 4, dur: 260, rot: (c % 2 ? 1 : -1) * 2 });
+    after(c * 24 + r * 12 + 280, () => { setCell(d, null, null, ' closed'); d.animate([{ opacity: 0, transform: 'scale(.86)' }, { opacity: 1, transform: 'none' }], { duration: 240 * T(), easing: 'ease-out' }); });
+  });
+  await wait(760);
+}
+async function fly(from, to, text, delay) {
+  const e = document.createElement('div'); e.className = 'ctFly'; e.textContent = text; e.style.left = from[0] + 'px'; e.style.top = from[1] + 'px'; fxl().append(e);
+  const a = e.animate([{ transform: 'translate(-50%,-50%) scale(1.2)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.3)', opacity: 1, offset: .15 }, { transform: `translate(calc(-50% + ${to[0] - from[0]}px),calc(-50% + ${to[1] - from[1]}px)) scale(.5)`, opacity: .9 }], { duration: 380 * T(), delay: delay * T(), easing: 'cubic-bezier(.5,0,.8,.5)', fill: 'both' });
+  await a.finished.catch(() => {}); e.remove();
+}
+async function collectorSuck(nt, d) {
+  const srcs = [...board.entries()], kc = ctrG(nt.r, nt.c); let acc = 2; sfx.kettle(); say('THE KETTLE COLLECTS!', true);
+  const m = setChip(d, 2, true), g = d.querySelector('svg.g'), gap = srcs.length > 10 ? 40 : 70;
+  const jobs = srcs.map(([k, v], i) => { const r = Math.floor(k / COLS), c = k % COLS; const p = ctrG(r, c);
+    return fly([p[0], p[1] + 30], [kc[0], kc[1] + 30], 'x' + v.value, i * gap).then(() => { acc += v.value; m.textContent = 'x' + acc; sfx.collect(i); g.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12,.9)', offset: .4 }, { transform: 'scale(.97,1.05)', offset: .7 }, { transform: 'none' }], { duration: 200 * T() }); }); });
+  await Promise.all(jobs); m.textContent = 'x' + nt.value; m.classList.remove('up'); void m.offsetWidth; m.classList.add('up'); flash(1); gold(nt.r, nt.c, 12, 1);
+  d.animate([{ transform: 'none' }, { transform: 'scale(1.1)', offset: .3 }, { transform: 'none' }], { duration: 400 * T() }); await wait(260);
+}
+async function placeTin(nt, k, lock, ctx) {
+  const d = at(nt.r, nt.c), sym = KIND_SYM[nt.kind];
+  if (lock) { d.classList.add('locked'); if (sym !== TIN) flipSym(d, sym); }
+  else { setCell(d, sym, null, ' locked land'); }
+  sfx.tin(k); ring(d); if (nt.kind !== 'value') gold(nt.r, nt.c, 8, .7);
+  if (nt.kind === 'collector') { await wait(lock ? 220 : 260); await collectorSuck(nt, d); }
+  else { if (nt.kind === 'mini' || nt.kind === 'minor' || nt.kind === 'major') { sfx.jackpot(nt.kind); say(nt.kind.toUpperCase() + ' TIN! x' + nt.value, true); char('special', 900 * T()); if (nt.kind === 'major') { shake(3); flash(2.5); embers(120, ...scr(nt.r, nt.c), true); } else flash(1); }
+    await wait(lock ? 160 : 120); setChip(d, nt.value, true); await wait(lock ? 150 : 200); }
+  board.set(nt.r * COLS + nt.c, { kind: nt.kind, value: nt.value });
+}
+const KITE_SVG = `<svg viewBox="0 0 120 250" width="120" height="250" style="overflow:visible"><path d="M60 122 Q38 150 66 176 Q92 200 56 238" fill="none" stroke="#1c2340" stroke-width="10" stroke-linecap="round"/><path d="M60 122 Q38 150 66 176 Q92 200 56 238" fill="none" stroke="#fbf1dc" stroke-width="5" stroke-linecap="round" stroke-dasharray="9 7"/>
+<path d="M58 150 l-13 -9 v18z M58 150 l13 -9 v18z M72 190 l-12 -8 v16z M72 190 l12 -8 v16z" fill="#d9432e" stroke="#1c2340" stroke-width="3" stroke-linejoin="round"/>
+<path d="M60 4 L108 62 L60 122 L12 62Z" fill="#f2d23a" stroke="#1c2340" stroke-width="5.5" stroke-linejoin="round"/><path d="M60 4 L108 62 L60 62Z M12 62 L60 122 L60 62Z" fill="#d9432e"/><path d="M60 4 V122 M12 62 H108" stroke="#1c2340" stroke-width="3.4"/><path d="M60 4 L108 62 L60 122 L12 62Z" fill="none" stroke="#1c2340" stroke-width="5.5" stroke-linejoin="round"/><circle cx="60" cy="62" r="9" fill="#fbf1dc" stroke="#1c2340" stroke-width="3.4"/></svg>`;
+async function kiteLaunch(k, bump, ctx) {
+  const row = k.row, gate = $('gates').children[row], rowCells = [0, 1, 2, 3, 4].map(c => at(row, c)), band = document.createElement('div');
+  band.className = 'ctBand'; band.style.top = row * CH + 'px'; fxl().append(band);
+  GRID.classList.add('focus'); gate.classList.remove('launch'); gate.classList.add('on'); sfx.gate(); S.music.duck(.25, 1.9, 1.4);
+  band.animate([{ opacity: 0, transform: 'scaleX(.3)' }, { opacity: 1, transform: 'scaleX(1)', offset: .25 }, { opacity: 1, offset: .8 }, { opacity: 0 }], { duration: 2100 * T(), easing: 'ease-out' });
+  rowCells.forEach((d, c) => { d.classList.add('hit'); d.style.zIndex = 'auto'; });
+  say('KITE LAUNCH! ROW x2', true); banner('KITE LAUNCH!', 'THIS ROW DOUBLES', 1900, true); char('special', 900 * T());
+  await wait(520);
+  gate.classList.add('launch'); sfx.kite(); shake(2.6); flash(2.2); embers(70, ...scr(row, 0), true);
+  const kt = document.createElement('div'); kt.className = 'ctK'; kt.innerHTML = KITE_SVG; fxl().append(kt);
+  const y0 = (row + .5) * CH - 62, travel = 4 * CW + 220;
+  kt.animate([
+    { transform: `translate(-110px,${y0 + 30}px) rotate(62deg)`, opacity: 0, offset: 0 },
+    { transform: `translate(-40px,${y0 - 6}px) rotate(70deg)`, opacity: 1, offset: .08 },
+    { transform: `translate(${travel * .5}px,${y0 - 36}px) rotate(78deg)`, opacity: 1, offset: .5 },
+    { transform: `translate(${travel}px,${y0 - 70}px) rotate(82deg)`, opacity: 1, offset: .8 },
+    { transform: `translate(${travel + 160}px,${y0 - 330}px) rotate(95deg)`, opacity: 0, offset: 1 }], { duration: 1500 * T(), easing: 'cubic-bezier(.35,0,.5,1)', fill: 'both' });
+  const stake = ctx.stake;
+  for (let c = 0; c < COLS; c++) {
+    const t = 260 + c * 175, d = rowCells[c], b = k.before[c], a = k.after[c];
+    FX.act(d, t - 60, c);
+    after(t, () => { sfx.clink(c); const m = chipEl(d); if (m) { FX.tween(380 * T(), e => { m.textContent = 'x' + Math.round(b + (a - b) * e); });
+      m.animate([{ transform: 'translateX(-50%) scale(1)' }, { transform: 'translateX(-50%) scale(1.7) rotate(-5deg)', offset: .3 }, { transform: 'translateX(-50%) scale(.95)', offset: .7 }, { transform: 'translateX(-50%)' }], { duration: 560 * T(), easing: 'ease-out' }); }
+      gold(row, c, 12, 1.1); const e = board.get(row * COLS + c); if (e) e.value = a;
+      const [x, y] = scr(row, c); pop(x, y - 36, 'x2'); });
+  }
+  after(260 + 4 * 175 + 200, () => { bump(k.gain * stake); const [x, y] = scr(row, 2); pop(x, y + 16, '+' + fmt(k.gain * stake)); });
+  await wait(260 + 4 * 175 + 900);
+  rowCells.forEach(d => FX.rest(d)); GRID.classList.remove('focus'); band.remove(); kt.remove(); await wait(260);
+  say('THE KITE FLIES!', true);
+}
+async function grandKite(g, bump, ctx) {
+  GRID.classList.add('focus'); ALL.forEach(([r, c]) => FX.act(at(r, c), (r + c) * 55, c));
+  const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('maxwin');
+  say('GRAND DRAGON KITE!', true); sfx.grand(); S.music.duck(.15, 3.5, 1.6); S.music.stinger('grand'); banner('GRAND DRAGON KITE', '+' + g.bonus + 'x BONUS', 3000, true);
+  const dr = document.createElement('div'); dr.className = 'ctDragon'; dr.innerHTML = `<svg viewBox="0 0 128 128" width="330" height="330" style="overflow:visible"><use href="#s${GRAND}"/></svg>`; fxl().append(dr);
+  dr.animate([{ transform: 'translate(155px,640px) scale(.5) rotate(-8deg)', opacity: 0 }, { transform: 'translate(155px,330px) scale(1) rotate(3deg)', opacity: 1, offset: .35 }, { transform: 'translate(155px,120px) scale(1.05) rotate(-3deg)', opacity: 1, offset: .75 }, { transform: 'translate(155px,-120px) scale(1.2) rotate(5deg)', opacity: 0 }], { duration: 3000 * T(), easing: 'ease-in-out', fill: 'both' });
+  shake(4); flash(3); coins(120); embers(220, innerWidth / 2, innerHeight / 2, true);
+  after(900, () => { shake(3); flash(2.5); coins(80); const [x, y] = scr(1, 2); pop(x, y, '+' + fmt(g.bonus * ctx.stake)); bump(g.bonus * ctx.stake); });
+  await wait(3200); dr.remove(); GRID.classList.remove('focus'); restCells(); setTimeout(() => ch.classList.remove('maxwin'), 800 * T());
+}
+async function bonusStep(sp, run0, ctx) {
+  const stake = ctx.stake, cap = MAXW * stake, lock = sp.kind === 'lock'; let run = run0;
+  const bump = d => setRun(run + d), setRun = v => { v = Math.min(cap, v); if (v !== run) { ctx.onWin(run, v); run = v; } };
+  if (lock) { rushLeft = 3; resets = 0; board.clear(); setFs(3); say('THE TINS SHOW THEIR PRIZES', true); await wait(250); }
+  else {
+    setFs(rushLeft); say(cnt(rushLeft), true); char('spin', 950 * T()); sfx.pour();
+    cells.forEach((d, i) => { if (d.classList.contains('closed')) d.animate([{ transform: 'none' }, { transform: `translateY(${i % 2 ? 3 : -3}px) rotate(${i % 2 ? .6 : -.6}deg)`, offset: .25 }, { transform: `translateY(${i % 2 ? -2 : 2}px)`, offset: .55 }, { transform: 'none' }], { duration: 440 * T(), delay: (i % 5) * 28 * T() }); });
+    await wait(480);
+  }
+  let k = 0;
+  for (const nt of sp.newTins) { await placeTin(nt, k++, lock, ctx); bump(nt.value * stake); }
+  tinsNow = board.size; S.music.intensity(Math.min(1, board.size / 17 + resets * .06));
+  if (!sp.newTins.length) { sfx.empty(); say('NO NEW TIN. ' + cnt(sp.spinsLeft), true); await wait(380); }
+  /* counter first, so a Kite Launch plays on the right number */
+  if (!lock && sp.reset) { resets++; rushLeft = 3; setFs(3, true); sfx.reset(); say('A NEW TIN! POURS RESET TO 3', true); await wait(520); }
+  else if (!lock) { rushLeft = sp.spinsLeft; setFs(rushLeft, true); }
+  else { rushLeft = sp.spinsLeft; }
+  for (const kl of sp.kite) { await kiteLaunch(kl, bump, ctx); S.music.intensity(Math.min(1, board.size / 17 + resets * .06 + .2)); }
+  if (sp.grand) await grandKite(sp.grand, bump, ctx);
+  setRun(run0 + sp.totalPayout * stake);
+  if (sp.spinsLeft === 0 && !sp.grand) { say('THE LAST POUR... ' + board.size + ' TINS IN THE DRAWERS', true); await wait(500); }
+  else if (!sp.kite.length && sp.newTins.length && !lock) say(cnt(rushLeft), true);
+  return run;
+}
+async function playSpin(sp, run, ctx) { return sp.kind === 'lock' || sp.kind === 'respin' ? bonusStep(sp, run, ctx) : baseSpin(sp, run, ctx); }
+
+/* ---------- Game Info paytable (engine info() embedded by the build, never retyped) ---------- */
+function buildPaytable() {
+  const f = v => v == null || v === 0 ? '<td class="no">-</td>' : `<td>${+(+v).toFixed(2)}x</td>`, row = (id, name, tds) => `<tr><td><div class="nm"><svg viewBox="0 0 128 128"><use href="#s${id}"/></svg>${name}</div></td>${tds}</tr>`;
+  const J = INFO.jackpots;
+  $('ptab').innerHTML = '<tr><th>SYMBOL</th><th>3</th><th>4</th><th>5</th></tr>' +
+    INFO.paytable.slice().reverse().map(p => row(p.id, p.name, f(p.pays[3]) + f(p.pays[4]) + f(p.pays[5]))).join('') +
+    row(WILD, 'Smiling Kite (Wild)', '<td colspan="3">Stands in on reels 2-4</td>') + row(BUNDLE, 'Furoshiki Bundle', '<td colspan="3">All bundles flip to one symbol</td>') +
+    row(TIN, 'Tea Tin (Bonus)', `<td colspan="3">${INFO.triggerTins}+ anywhere: TIN RUSH</td>`) +
+    row(12, 'Mini Tin', `<td colspan="3">${J.mini}x</td>`) + row(13, 'Minor Tin', `<td colspan="3">${J.minor}x</td>`) + row(14, 'Major Tin', `<td colspan="3">${J.major}x</td>`) + row(GRAND, 'Grand Dragon Kite', `<td colspan="3">+${INFO.grandBonus}x, full board</td>`);
+}
+
+/* ---------- sound: koto, shakuhachi, wood block, taiko and brass bells (all synthesised) ---------- */
+return {
+  music: musicDefs,
+  sfx(kit) {
+    const { ctx, bus, env, osc, noise, metal, st, T0 } = kit;
+    const HIR = [0, 2, 3, 7, 8, 12, 14, 15, 19, 20, 24, 26, 27, 31, 32, 36], D5 = 587.33;
+    const koto = (f, t, v = .09, d = .9) => { const lp = ctx.createBiquadFilter(), o = ctx.createOscillator(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(4200, t); lp.frequency.exponentialRampToValueAtTime(800, t + d * .5); o.type = 'triangle'; o.frequency.setValueAtTime(f * 1.03, t); o.frequency.exponentialRampToValueAtTime(f, t + .05);
+      o.connect(lp).connect(env(t, .002, v, d)).connect(bus); o.start(t); o.stop(t + d + .1); noise(t, .02, v * .4, 'bandpass', 3200, 0, 2, .001); };
+    const tok = (t, f = 1000, v = .12) => { osc('sine', f * 1.25, t, .08, v, .001, f); osc('square', f * 2, t, .03, v * .15, .001); };
+    const taiko = (t, v = 1, f0 = 120) => { osc('sine', f0, t, .55, .42 * v, .003, f0 * .42); osc('sine', f0 * 1.5, t, .25, .14 * v, .003, f0 * .6); noise(t, .12, .18 * v, 'bandpass', 260, 130, 1.1, .002); noise(t, .03, .07 * v, 'bandpass', 1800, 0, 1, .001); };
+    const shaku = (f, t, d, v = .08) => { const o = ctx.createOscillator(), l = ctx.createOscillator(), lg = ctx.createGain(); o.type = 'sine'; o.frequency.value = f; l.frequency.value = 5.2; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(f * .012, t + d * .6); l.connect(lg).connect(o.frequency);
+      o.connect(env(t, d * .25, v, d * .75)).connect(bus); o.start(t); l.start(t); o.stop(t + d + .1); l.stop(t + d + .1); noise(t, d, v * .5, 'bandpass', f * 2.6, 0, 1.4, d * .25); };
+    const bell = (f, t, p = 1, d = 1.4) => { metal(f, t, d, .13 * p, [1, 2.4, 4.1, 6.7]); noise(t, .04, .08 * p, 'bandpass', 2400, 1200, 1.4); };
+    const N = k => D5 * st(HIR[Math.min(k, HIR.length - 1)]);
+    const R = {
+      ui: () => { const t = T0(); tok(t, 900, .1); koto(N(5), t + .02, .05, .3); },
+      tap: () => { const t = T0(); tok(t, 1100, .12); },
+      hit: () => { const t = T0(); noise(t, .07, .15, 'highpass', 3000, 6000, .7); tok(t, 1300, .1); },
+      spin: () => { const t = T0(); noise(t, .22, .13, 'bandpass', 300, 1500, .8, .05); tok(t, 700, .13); osc('sine', 160, t, .18, .12, .02, 90); },
+      drop: () => { const t = T0(); noise(t, .45, .09, 'bandpass', 1900, 350, .7, .04); },
+      land: c => { const t = T0(); osc('sine', 150, t, .12, .22, .002, 68); noise(t, .06, .14, 'lowpass', 600, 0); if (c === 4) tok(t, 800, .06); },
+      win: n => { const t = T0(), b = Math.min(n, 6); [0, 1, 2].forEach((d, i) => koto(N(b + d * 2), t + i * .1, .09, 1)); tok(t + .34, 1250, .1); },
+      link: c => { const t = T0(); koto(N(1 + c * 2) / 2, t, .07, .5); noise(t, .05, .08, 'bandpass', 1100, 600, 1.2, .002); },
+      /* SIGNATURE 1: tin lock. A wooden clack and a small bell whose pitch climbs one pentatonic step per tin: a full board plays a rising scale */
+      tin: k => { const t = T0(); osc('sine', 190, t, .1, .26, .002, 80); noise(t, .05, .17, 'bandpass', 1500, 700, 1.3, .001); osc('square', 700, t, .03, .05, .001); const f = N(k + 3); metal(f, t + .03, .7, .12, [1, 2.76]); osc('sine', f * 2, t + .03, .3, .04, .002); },
+      lock: k => R.tin(k),
+      /* SIGNATURE 3: the bundle unties. Cloth rustle, a soft pop, then a koto glissando that lands on the new symbol's note */
+      untie: sym => { const t = T0(); for (let i = 0; i < 7; i++) noise(t + i * .035 + Math.random() * .02, .06, .05 + Math.random() * .04, 'bandpass', 2500 + Math.random() * 3000, 0, 1.3, .004);
+        osc('sine', 300, t + .3, .1, .16, .003, 900); noise(t + .3, .05, .1, 'bandpass', 1800, 900, 1);
+        const land = Math.min(sym, 7) + 2; for (let i = 0; i < 5; i++) koto(N(Math.max(0, land - 4 + i)), t + .36 + i * .055, .06 + i * .008, i === 4 ? 1.3 : .5); },
+      beat: () => { const t = T0(); taiko(t, .5, 90); taiko(t + .2, .35, 90); noise(t, .5, .05, 'bandpass', 400, 2400, 1.2, .2); },
+      drawers: () => { const t = T0(); for (let i = 0; i < 5; i++) { osc('sine', 120 + i * 10, t + i * .05, .1, .15, .002, 70); noise(t + i * .05, .08, .1, 'lowpass', 700, 200); } },
+      pour: () => { const t = T0(); noise(t, .45, .12, 'bandpass', 700, 2200, 2.2, .06); for (let i = 0; i < 6; i++) osc('sine', 500 + Math.random() * 400, t + .05 + i * .07, .07, .035, .004, 1100); tok(t, 800, .08); },
+      empty: () => { const t = T0(); osc('triangle', 260, t, .35, .1, .01, 150); noise(t, .3, .05, 'lowpass', 500, 150, .8, .03); },
+      reset: () => { const t = T0(); [0, 4, 7, 10].forEach((n, i) => koto(N(n), t + i * .07, .07, .8)); osc('sine', 140, t, .3, .2, .01, 60); },
+      kettle: () => { const t = T0(); noise(t, .9, .09, 'bandpass', 3500, 5200, 4, .15); osc('sine', 1200, t, .8, .045, .15, 1700); osc('sine', 1210, t, .8, .04, .15, 1710); },
+      collect: i => { const t = T0(); osc('sine', 700 + (i % 8) * 90, t, .09, .07, .003, 1400); },
+      jackpot: kind => { const t = T0(), b = kind === 'major' ? 9 : kind === 'minor' ? 6 : 4; bell(N(b) / 2, t, 1.1, 2); koto(N(b), t + .05, .1, 1.2); koto(N(b + 2), t + .14, .1, 1.2); if (kind === 'major') { taiko(t, 1); shaku(N(b + 3), t + .1, 1.4, .08); } },
+      gate: () => { const t = T0(); tok(t, 700, .16); bell(N(2), t + .04, .8, 1.2); osc('sine', 100, t, .25, .2, .004, 60); },
+      clink: c => { const t = T0(), f = N(5 + c) * 1.5; metal(f, t, .35, .1, [1, 2.76]); noise(t, .02, .08, 'highpass', 6000, 0); },
+      /* SIGNATURE 2: KITE LAUNCH. A windy sweep rising with a shakuhachi note, a string twang, a taiko hit as the kite leaves; the row's tins clink after */
+      kite: () => { const t = T0(); noise(t, 1.2, .24, 'bandpass', 250, 3800, 1.5, .5); noise(t + .1, 1, .1, 'highpass', 2000, 6000, .8, .5);
+        shaku(N(7), t + .02, 1.1, .11); osc('triangle', 330, t + .5, .5, .13, .002, 300); koto(N(3), t + .5, .12, .8); osc('sawtooth', 110, t + .5, .2, .03, .002, 140);
+        taiko(t + .58, 1.3, 105); noise(t + .58, .5, .12, 'lowpass', 700, 150); [0, 1, 2, 3, 4].forEach(i => osc('sine', 1500 + i * 180, t + .8 + i * .175, .08, .03, .002)); },
+      grand: () => { const t = T0(); bell(147, t, 1.5, 3.2); for (let i = 0; i < 10; i++) taiko(t + .35 + i * (.28 - i * .012), .6 + i * .05, 110); for (let i = 0; i < 14; i++) koto(N(i % 11) * (i > 10 ? 2 : 1), t + .5 + i * .06, .07, 1.4); shaku(N(7), t + 1, 2.2, .1); noise(t + 1.8, 1.4, .12, 'bandpass', 500, 4000, 1, .6); },
+      bonus: () => { const t = T0(); bell(220, t, 1.2, 2.4); taiko(t + .1, 1.2, 100); taiko(t + .5, 1, 100); for (let i = 0; i < 8; i++) koto(N(i), t + .7 + i * .08, .08, 1.2); shaku(N(7), t + 1.2, 1.8, .08); },
+      outro: () => { const t = T0(); [7, 5, 3, 0].forEach((n, i) => koto(N(n), t + i * .2, .08, 1.4)); bell(N(0) / 2, t + .7, 1, 2.4); noise(t + .9, .8, .05, 'bandpass', 800, 300, 1, .3); },
+      big: lv => { const t = T0(); for (let i = 0; i < lv + 1; i++) bell(N(2 + i * 2) / 2, t + i * .26, .9, 1.6);
+        for (let i = 0; i < 4 + lv * 3; i++) taiko(t + .1 + i * Math.max(.07, .22 - i * .01), .5 + i * .04, 120); shaku(N(7), t + .2, 1.5, .1);
+        [0, 2, 4, 6, 8, 10].slice(0, 3 + lv).forEach((n, i) => koto(N(n), t + .3 + i * .1, .07, 1.2)); },
+      tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .1, .001); tok(t, 1200 + k * 600, .06); },
+      feverOn: () => { const t = T0(); koto(N(4), t, .08, .6); }
+    };
+    return R;
+  },
+  /* a faint high wind over the cliff and, now and then, a far wind chime (furin) */
+  ambience(kit) {
+    const { ctx, osc, metal } = kit; const bed = kit.bed({ lowpass: 420, gain: .3, level: .02, loopSec: 4, crack: { gain: [.002, .004], f: [3000, 1500], q: 2, every: [2500, 5000], len: [.05, .1] } });
+    let tm = 0, run = false;
+    const chime = () => { if (!run) return; if (!S.isTurbo()) { const t = ctx.currentTime + .02, f = [1568, 1760, 2093, 2349][Math.floor(Math.random() * 4)]; for (let i = 0; i < 1 + Math.floor(Math.random() * 3); i++) metal(f * (i ? 1.19 : 1), t + i * .3, 1.6, .018, [1, 2.4]); }
+      tm = setTimeout(chime, 9000 + Math.random() * 14000); };
+    return { start() { run = true; bed.start(); clearTimeout(tm); tm = setTimeout(chime, 4000); }, stop() { run = false; clearTimeout(tm); bed.stop(); } };
+  },
+  particleColor: (p, a) => p.w ? 'rgba(0,0,0,0)' : p.c ? `rgba(255,${190 + (p.l % 50)},70,${a})` : `rgba(255,${200 + (p.l % 40)},${215 + (p.l % 30)},${a})`,
+  init() {
+    for (let i = 0; i < ROWS * COLS; i++) { const d = document.createElement('div'); d.className = 'cell'; $('grid').append(d); cells.push(d); }
+    $('fxl').insertAdjacentHTML('beforeend', '<div id="ctBanner"><b></b><small></small></div>');
+    buildPaytable();
+  },
+  paintIdle() { paint([[1, 0, 3, 6, 2], [4, 7, 0, 5, 1], [2, 6, 8, 0, 3], [5, 1, 4, 7, 0]]); dropAll(); },
+  roundStart() { document.querySelectorAll('#gates .gate').forEach(g => g.classList.remove('on', 'launch')); board.clear(); },
+  clearBoard: async () => { if (inBonus) { if (!bonusOpened) { bonusOpened = true; await bonusOpen(); } else await wait(40); return; } await dropOut(); },
+  restoreBoard() { if (lastGrid) paint(lastGrid); },
+  baseSpin: R => ({ initialGrid: R.initialGrid, step: R.cascadeSteps[0] || null, tins: R.tins, bought: R.bought }),
+  playSpin,
+  showTrigger,
+  bonusMode(on) {
+    inBonus = on; bonusOpened = false; $('scene').classList.toggle('dusk', on);
+    if (on) { char('bonus', 1400 * T()); S.music.intensity(.12); setFs(3); } else { S.music.intensity(0); }
+  }
+};
+});
