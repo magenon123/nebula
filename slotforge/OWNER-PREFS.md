@@ -58,3 +58,6 @@ We will make tens if not hundreds of slots. They must NOT share the same gamble 
 Different per slot: main mechanic, bonus, and the set of extras. Extras are picked from a growing menu (bet-up chance mode, single bonus buy, MAX LUCK style 5% jackpot toggle, risk-it ladder, mystery/sticky symbols, shrinking grid, progressive meter...), 1-2 per slot. MAX LUCK is rare (about 1 slot in 5).
 Before building a slot: compare its main mechanic and its extras list against all existing slots; reject duplicates. Also vary volatility, hit rate, max win and grid type.
 Existing slots (EmberClaw, Grumble & Brine) stay as they are.
+
+## Round 6: slot #3 concept approved (Koji's Cloudtop Tea House)
+Owner approved the concept with the notes in STATUS.md. The lead calls itself "Tally".

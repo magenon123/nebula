@@ -6,7 +6,8 @@
 
 ## Slots
 - #1 EmberClaw: approved. #2 Grumble & Brine: approved. Do not touch except bug fixes.
-- #3: PHASE 0 (concept). maya + leo pitch and converge on ONE concept, write `plans/<slug>/00-concept.md` (+ comparison table against existing slots), then STOP for the owner (checkpoint 1).
+- #3 Koji's Cloudtop Tea House (`cloudtop-tea-house`): concept APPROVED by the owner (plans/cloudtop-tea-house/00-concept.md). Owner notes: one buy + mystery bundles only (no bet-up, no MAX LUCK); risk-it ladder parked; keep the Kite Launch as the star moment (own sound + animation); do NOT make the tail wilder until the real sim shows it; hold-and-win must not feel generic; bonus + big-win screens must carry the energy (the tea house is calm). Max win 5,000x. Every mode 96.0-96.5%.
+  Pipeline: (1) rin engine + round format doc + sim/tests, in parallel with (2) leo art fragments in slots/cloudtop-tea-house/ (all 11 symbols with own win motions inside the <symbol>, scene, logo, frame, character, side, info; follow slots/grumble-and-brine/ as the format and quality bar), then (3) kai slot.json/slot.js/slot.css (music + sfx from leo's spec), build-standalone, smoke test, then (4) lead verifies and delivers to the owner. The shell must work with NO ante/fever card (cfg.anteCost 0) and a single buy card; kai fixes the shell if it assumes otherwise, without changing EmberClaw / Grumble & Brine behaviour.
 
 ## Done
 - EmberClaw (slot #1): finished, math retuned to ~96.2% in all modes, files rebuilt. Do not touch except bug fixes.
