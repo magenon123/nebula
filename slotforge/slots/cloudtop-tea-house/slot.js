@@ -539,7 +539,7 @@ return {
   init() {
     for (let i = 0; i < ROWS * COLS; i++) { const d = document.createElement('div'); d.className = 'cell'; $('grid').append(d); cells.push(d); }
     $('fxl').insertAdjacentHTML('beforeend', '<div id="ctBanner"><b></b><small></small></div>');
-    $('scene').insertAdjacentHTML('afterend', '<div id="ctSky"></div>');
+    { const sky = document.createElement('div'); sky.id = 'ctSky'; let top = $('scene'); while (top.parentElement && top.parentElement.id !== 'stage') top = top.parentElement; top.after(sky); }   // between the scene and the frame/Koji
     buildPaytable();
   },
   paintIdle() { paint([[1, 0, 3, 6, 2], [4, 7, 0, 5, 1], [2, 6, 8, 0, 3], [5, 1, 4, 7, 0]]); dropAll(); },
