@@ -22,7 +22,7 @@ const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, BUYS = cfg.buys || [], P =
 let hooks = {};
 let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, busy = false, balance = 0, STAGE_S = 1;
 let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false), musicOn = store.get(P + '_mus', true), sndVol = store.get(P + '_sndv', .85), musVol = store.get(P + '_musv', .7);
-const MUS_GAIN = .5;   // slider 100% = this much of the music bus; calibrated so the soundtrack sits well below the effects
+const MUS_GAIN = .9;   // slider 100% = this much of the music bus; calibrated so the soundtrack sits well below the effects
 let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
 const T = () => turbo ? .45 : 1;
 const wait = ms => sleep(ms * T());

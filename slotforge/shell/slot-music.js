@@ -71,7 +71,6 @@ function make(ctx, out, defs, opt = {}) {
       lp.connect(dec(dest, t, k.g, k.d, .003));
       const a = osc(k.kind === 'banjo' ? 'sawtooth' : 'triangle', f, t, end); a.connect(lp);
       if (k.kind === 'uke') { const b = osc('sine', f * 2, t, end), bg = ctx.createGain(); bg.gain.value = .3; b.connect(bg); bg.connect(lp); }
-      if (k.kind === 'banjo') nz(dest, t, .02, k.g * .5, 'highpass', 3500, 0, .7, .001);
     },
     strum(dest, t, notes, o = {}) { notes.forEach((m, i) => V.pluck(dest, t + i * (o.sp || .012), m, o)); },
     /* upright bass pluck */

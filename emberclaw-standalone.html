@@ -1591,8 +1591,10 @@ const VOW = { a: [800, 1150, 2900], o: [450, 800, 2830], u: [325, 700, 2700], e:
 function make(ctx, out, defs, opt = {}) {
   const sr = ctx.sampleRate, LOOK = opt.look || .7, TH = {}, nr = mb32(12345);
   const master = ctx.createGain(); master.gain.value = opt.volume == null ? .7 : opt.volume; master.connect(out);
-  const duckG = ctx.createGain(); duckG.connect(master);
-  const stingG = ctx.createGain(); stingG.connect(master);
+  /* safety: soft clipper (tanh, linear below ~0.3) so no stray transient can ever clip the output */
+  const clip = ctx.createWaveShaper(), cv = new Float32Array(2049); for (let i = 0; i < cv.length; i++) { const x = (i / 1024 - 1) * 2; cv[i] = Math.tanh(x) / 1; } clip.curve = cv; clip.connect(master);
+  const duckG = ctx.createGain(); duckG.connect(clip);
+  const stingG = ctx.createGain(); stingG.connect(clip);
   const nbuf = ctx.createBuffer(1, sr * 2, sr), nd = nbuf.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = nr() * 2 - 1;
   /* shared dark hall + a soft feedback delay for sonar pings */
   const rv = ctx.createConvolver(), rvLen = Math.floor(sr * 2.6), ib = ctx.createBuffer(2, rvLen, sr), rr = mb32(777);
@@ -1642,7 +1644,6 @@ function make(ctx, out, defs, opt = {}) {
       lp.connect(dec(dest, t, k.g, k.d, .003));
       const a = osc(k.kind === 'banjo' ? 'sawtooth' : 'triangle', f, t, end); a.connect(lp);
       if (k.kind === 'uke') { const b = osc('sine', f * 2, t, end), bg = ctx.createGain(); bg.gain.value = .3; b.connect(bg); bg.connect(lp); }
-      if (k.kind === 'banjo') nz(dest, t, .02, k.g * .5, 'highpass', 3500, 0, .7, .001);
     },
     strum(dest, t, notes, o = {}) { notes.forEach((m, i) => V.pluck(dest, t + i * (o.sp || .012), m, o)); },
     /* upright bass pluck */
@@ -1723,7 +1724,7 @@ function make(ctx, out, defs, opt = {}) {
     theme(name, xf = 2, fresh) {
       if (!defs[name]) return; if (cur && cur.name === name && cur.active) return; const now = ctx.currentTime;
       if (cur) { cur.active = false; cur.gain.gain.cancelScheduledValues(now); cur.gain.gain.setTargetAtTime(0, now, xf / 3.5); const old = cur; setTimeout(() => { if (!old.active) Object.keys(old.L).forEach(k => old.L[k].gain.value = 0); }, (xf + 4) * 1000); }
-      const th = TH[name] = mk(name, defs[name]); th.next = now + .08; th.bar = opt.startBar || 0; th.pass = opt.startPass || 0; th.active = true; th.gain.gain.setValueAtTime(0, now); th.gain.gain.setTargetAtTime(defs[name].gain == null ? 1 : defs[name].gain, now, Math.max(.05, xf / 3.5)); cur = th;
+      const th = TH[name] = mk(name, defs[name]); th.next = now + .08 + (opt.t0 || 0); th.bar = opt.startBar || 0; th.pass = opt.startPass || 0; th.active = true; th.gain.gain.setValueAtTime(0, now); th.gain.gain.setTargetAtTime(defs[name].gain == null ? 1 : defs[name].gain, now, Math.max(.05, xf / 3.5)); cur = th;
       if (!started) { started = true; if (!opt.offline) timer = setInterval(tick, 80); } tick();
     },
     intensity(x) { intensityT = Math.max(0, Math.min(1, x)); },
@@ -1764,7 +1765,7 @@ const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, BUYS = cfg.buys || [], P =
 let hooks = {};
 let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, busy = false, balance = 0, STAGE_S = 1;
 let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false), musicOn = store.get(P + '_mus', true), sndVol = store.get(P + '_sndv', .85), musVol = store.get(P + '_musv', .7);
-const MUS_GAIN = .5;   // slider 100% = this much of the music bus; calibrated so the soundtrack sits well below the effects
+const MUS_GAIN = .9;   // slider 100% = this much of the music bus; calibrated so the soundtrack sits well below the effects
 let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
 const T = () => turbo ? .45 : 1;
 const wait = ms => sleep(ms * T());
@@ -2221,7 +2222,7 @@ const EM_B = [[[0, 6, 4], [8, 4, 6], [12, 4, 5]], [[0, 12, 4], [12, 4, 1]]];
 const EM_END = [[[0, 6, 4], [8, 4, 5], [12, 4, 4]], [[0, 12, 1], [12, 4, 0]]];
 function musicDefs() {
   const forgeBase = {
-    tempo: 80, barBeats: 4, spb: 16, swing: .08, bars: 16, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 17, gain: .5, phrase: 4,
+    tempo: 80, barBeats: 4, spb: 16, swing: .08, bars: 16, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 17, gain: .24, phrase: 4,
     layers: { pad: { gain: 1 }, sub: { gain: 1 }, taiko: { enter: 2, gain: 1 }, crack: { enter: 4, gain: 1, wet: .1 }, anvil: { enter: 4, int: .15, gain: 1 },
       lead: { enter: 8, gain: 1, wet: .3 }, choirhi: { int: .5, enter: 12, gain: 1, wet: .35 }, roll: { int: .8, gain: 1 } },
     bar(M) {
@@ -2241,7 +2242,7 @@ function musicDefs() {
     }
   };
   const forgeBonus = {
-    tempo: 112, barBeats: 4, spb: 16, swing: 0, bars: 24, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 29, gain: .62, phrase: 4,
+    tempo: 112, barBeats: 4, spb: 16, swing: 0, bars: 24, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 29, gain: .3, phrase: 4,
     layers: { choir: { gain: 1, wet: .4 }, pad: { gain: 1 }, bass: { gain: 1 }, kick: { enter: 1, gain: 1 }, anvil: { enter: 2, gain: 1 }, hat: { enter: 3, gain: 1, wet: .08 },
       lead: { enter: 4, gain: 1, wet: .28 }, lead2: { int: .45, enter: 8, gain: 1, wet: .3 }, riser: { gain: 1 }, roll: { int: .7, gain: 1 } },
     bar(M) {
@@ -2365,7 +2366,7 @@ const tube = $('tube');
 for (let i = 1; i <= 9; i++) { const e = document.createElement('i'); e.dataset.n = i; tube.append(e); }
 let heatNow = 0;
 function setHeat(h) {
-  const prev = heatNow; if (h > prev) sfx.heat(Math.min(h, 9)); heatNow = h; const lit = Math.min(h, 9), was = Math.min(prev, 9), k = T();
+  const prev = heatNow; if (h > prev) sfx.heat(Math.min(h, 9)); heatNow = h; try { S.music.intensity(Math.min(h, 9) / 9); } catch {} const lit = Math.min(h, 9), was = Math.min(prev, 9), k = T();
   /* segments ignite one after the other, each with a hand-keyed flare (swell, over-bright, settle) */
   [...tube.children].forEach(e => { const n = +e.dataset.n, on = n <= lit;
     if (on && n > was) { const dl = (n - was - 1) * 85; after(dl, () => e.classList.add('on'));

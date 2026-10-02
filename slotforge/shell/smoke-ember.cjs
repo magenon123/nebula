@@ -91,8 +91,8 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   // bought bonus
   await page.evaluate(FORCE(`x => x.bought === 'standard' && x.bonus.spins.length >= 6 && x.totalPayout > 30`, 5));
   await clk('#buyOpen'); await sleep(250); check('buy screen opens', await vis('#buyM')); await clk('#buy1'); await sleep(250); check('BUY opens confirm', await vis('#confirm')); await clk('#cYes');
-  const sawTrig = await waitCond(() => document.querySelectorAll('#grid .cell.scat').length >= 3, 30000); await sleep(600); await shot('05-trigger-gems');
-  check('bought bonus: trigger spin shows the gems with links', sawTrig && (await page.$$eval('#lnkT path', p => p.length)) >= 2);
+  const sawTrig = await waitCond(() => document.querySelectorAll('#grid .cell.scat').length >= 3 && document.querySelectorAll('#lnkT path').length >= 2, 30000); await sleep(500); await shot('05-trigger-gems');
+  check('bought bonus: trigger spin shows the gems with welded links', sawTrig);
   const sawIntro = await waitFor('#introM'); check('intro splash appears', sawIntro);
   if (sawIntro) { await sleep(1000); await shot('06-intro'); await clk('#introM', { position: { x: 80, y: 80 } }); }
   await sleep(1800); s = await state(); check('bonus: counter visible', s.fsBox && /^\d+ \/ \d+/.test(s.fs), s.fs); await shot('07-bonus');

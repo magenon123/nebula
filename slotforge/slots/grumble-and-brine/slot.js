@@ -20,7 +20,7 @@ const SH_B = [[[0, 3, 7], [3, 1, 6], [4, 1, 4], [5, 1, 6]], [[0, 3, 5], [3, 3, 3
 function musicDefs() {
   const PH_A = [dm, dm, gM, gM, dm, cM, am, dm], PH_B = [dm, gM, cM, gM, dm, am, cM, am];
   const shanty = {
-    tempo: 100, barBeats: 2, spb: 6, swing: 0, bars: 32, key: 62, scale: [0, 2, 3, 5, 7, 9, 10], seed: 41, gain: 1, phrase: 8,
+    tempo: 100, barBeats: 2, spb: 6, swing: 0, bars: 32, key: 62, scale: [0, 2, 3, 5, 7, 9, 10], seed: 41, gain: .8, phrase: 8,
     layers: { bass: { gain: 1, wet: .12 }, stomp: { enter: 2, gain: 1, wet: .05 }, strum: { enter: 2, gain: 1, wet: .15 }, reed: { enter: 4, gain: 1, wet: .22 }, reedpad: { enter: 8, int: .3, gain: 1, wet: .3 },
       banjo: { int: .35, enter: 8, gain: 1, wet: .15 }, perc: { enter: 6, gain: 1, wet: .08 }, hi: { int: .65, gain: 1, wet: .25 }, fx: { gain: 1, wet: .5 } },
     bar(M) {
@@ -44,7 +44,7 @@ function musicDefs() {
   };
   const PHD = [[dm, dm, cM, cM, am, am, gM, gM], [dm, dm, gM, gM, cM, cM, am, am], [dm, cM, am, gM, dm, am, gM, dm]];
   const dive = {
-    tempo: 72, barBeats: 2, spb: 6, swing: 0, bars: 24, key: 62, scale: [0, 2, 3, 5, 7, 9, 10], seed: 77, gain: 1, phrase: 4,
+    tempo: 72, barBeats: 2, spb: 6, swing: 0, bars: 24, key: 62, scale: [0, 2, 3, 5, 7, 9, 10], seed: 77, gain: .22, phrase: 4,
     layers: { pad: { gain: 1, wet: .4 }, drone: { gain: 1, wet: .1 }, heart: { gain: 1, wet: .1 }, whale: { gain: 1, wet: .7 }, reed: { int: .3, gain: 1, wet: .5 }, ping: { int: .6, gain: 1, wet: .3 },
       uke: { int: .6, gain: 1, wet: .3 }, hi: { int: .95, gain: 1, wet: .5 }, perc: { int: .95, gain: 1, wet: .1 } },
     bar(M) {
@@ -171,7 +171,7 @@ function setStrip(jellies, chain) {
 
 /* ---------- Tide Gauge (Deep Dive only) ---------- */
 function setTide(n, anim) {
-  const t = $('tide'), up = n > tideNow, tv = $('tideV'); tideNow = n;
+  const t = $('tide'), up = n > tideNow, tv = $('tideV'); tideNow = n; try { S.music.intensity(Math.max(0, Math.min(3, n)) / 3); } catch {}
   t.classList.remove('lv0', 'lv1', 'lv2', 'lv3'); t.classList.add('lv' + n); tv.textContent = '+' + n;
   if (anim && up) { t.classList.remove('pulse', 'shake'); void t.offsetWidth; t.classList.add('pulse', 'shake'); sfx.tide(n); setTimeout(() => t.classList.remove('pulse', 'shake'), 950 * T()); shake(.4 + n * .35);
     tv.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.7,1.4)', offset: .25 }, { transform: 'scale(.92)', offset: .55 }, { transform: 'scale(1)' }], { duration: 620 * T(), easing: 'ease-out' }); if (n >= 3) flash(2.5); }

@@ -23,7 +23,7 @@ const EM_B = [[[0, 6, 4], [8, 4, 6], [12, 4, 5]], [[0, 12, 4], [12, 4, 1]]];
 const EM_END = [[[0, 6, 4], [8, 4, 5], [12, 4, 4]], [[0, 12, 1], [12, 4, 0]]];
 function musicDefs() {
   const forgeBase = {
-    tempo: 80, barBeats: 4, spb: 16, swing: .08, bars: 16, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 17, gain: .5, phrase: 4,
+    tempo: 80, barBeats: 4, spb: 16, swing: .08, bars: 16, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 17, gain: .24, phrase: 4,
     layers: { pad: { gain: 1 }, sub: { gain: 1 }, taiko: { enter: 2, gain: 1 }, crack: { enter: 4, gain: 1, wet: .1 }, anvil: { enter: 4, int: .15, gain: 1 },
       lead: { enter: 8, gain: 1, wet: .3 }, choirhi: { int: .5, enter: 12, gain: 1, wet: .35 }, roll: { int: .8, gain: 1 } },
     bar(M) {
@@ -43,7 +43,7 @@ function musicDefs() {
     }
   };
   const forgeBonus = {
-    tempo: 112, barBeats: 4, spb: 16, swing: 0, bars: 24, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 29, gain: .62, phrase: 4,
+    tempo: 112, barBeats: 4, spb: 16, swing: 0, bars: 24, key: 62, scale: [0, 1, 3, 5, 7, 8, 10], seed: 29, gain: .3, phrase: 4,
     layers: { choir: { gain: 1, wet: .4 }, pad: { gain: 1 }, bass: { gain: 1 }, kick: { enter: 1, gain: 1 }, anvil: { enter: 2, gain: 1 }, hat: { enter: 3, gain: 1, wet: .08 },
       lead: { enter: 4, gain: 1, wet: .28 }, lead2: { int: .45, enter: 8, gain: 1, wet: .3 }, riser: { gain: 1 }, roll: { int: .7, gain: 1 } },
     bar(M) {
@@ -167,7 +167,7 @@ const tube = $('tube');
 for (let i = 1; i <= 9; i++) { const e = document.createElement('i'); e.dataset.n = i; tube.append(e); }
 let heatNow = 0;
 function setHeat(h) {
-  const prev = heatNow; if (h > prev) sfx.heat(Math.min(h, 9)); heatNow = h; const lit = Math.min(h, 9), was = Math.min(prev, 9), k = T();
+  const prev = heatNow; if (h > prev) sfx.heat(Math.min(h, 9)); heatNow = h; try { S.music.intensity(Math.min(h, 9) / 9); } catch {} const lit = Math.min(h, 9), was = Math.min(prev, 9), k = T();
   /* segments ignite one after the other, each with a hand-keyed flare (swell, over-bright, settle) */
   [...tube.children].forEach(e => { const n = +e.dataset.n, on = n <= lit;
     if (on && n > was) { const dl = (n - was - 1) * 85; after(dl, () => e.classList.add('on'));
