@@ -70,27 +70,88 @@ function musicDefs() {
 }
 
 /* ---------- the board: 5 reels x 3 rows ---------- */
+const FX = S.fx, GRID = $('grid'), CWD = 136, CHT = 136;
 const cells = [];
 const at = (r, c) => cells[r * COLS + c];
+const after = (ms, fn) => setTimeout(fn, ms * T());
 const ctr = list => { let x = 0, y = 0; list.forEach(([r, c]) => { const b = at(r, c).getBoundingClientRect(); x += b.left + b.width / 2; y += b.top + b.height / 2; }); return [x / list.length, y / list.length]; };
+const ctrG = (r, c) => [(c + .5) * CWD, (r + .5) * CHT];
 function paint(grid, jellies = []) {
   lastGrid = grid; lastJ = jellies;
   const jm = {}; jellies.forEach(j => jm[j.r * COLS + j.c] = j.v);
   grid.forEach((row, r) => row.forEach((s, c) => {
-    const d = at(r, c); d.className = 'cell' + (s === JELLY ? ' wild' : s === BUOY ? ' scatter' : ''); d.style.removeProperty('--dl');
+    const d = at(r, c); FX.reset(d); d.className = 'cell' + (s === JELLY ? ' wild' : s === BUOY ? ' scatter' : '');
     d.innerHTML = `<svg class="g"><use href="#s${s}"/></svg>` + (s === JELLY && jm[r * COLS + c] != null ? `<span class="m">x${jm[r * COLS + c]}</span>` : '');
   }));
-  $('grid').classList.remove('focus');
+  GRID.classList.remove('focus'); clearLinks();
 }
-/* bottom row lands first, every row above follows (a hair of left-to-right stagger); fast = the short respin drop of a Drift */
-const dropCell = (d, r, c, fast) => { d.style.setProperty('--dl', (fast ? (2 - r) * 34 : (2 - r) * 95 + c * 22) * T() + 'ms'); d.classList.add(fast ? 'rdrop' : 'drop'); };
-function dropAll() { for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) dropCell(at(r, c), r, c); }
+/* ---------- drops and exits (see shell FX): reel by reel, anticipation, squash and stretch, overshoot, settle ---------- */
+const dropOpt = (r, c, base = 0, fast = false) => fast
+  ? { delay: base + c * 26 + (2 - r) * 30 + Math.random() * 14, dist: (r + 1) * CHT * .8 + 50, tilt: (Math.random() - .5) * 4, dur: 400 }
+  : { delay: base + c * 92 + (2 - r) * 40 + Math.random() * 16, dist: (r + 1) * CHT + 60, tilt: (Math.random() - .5) * 5, dur: 560 };
+/* drop the listed [r,c]; one landing sound per reel at its touchdown; returns ms (unscaled) to the last touchdown */
+function dropCells(list, base = 0, fast = false) {
+  let end = 0; const col = {};
+  list.forEach(([r, c]) => { const o = dropOpt(r, c, base, fast); FX.drop(at(r, c), o); const t = o.delay + o.dur * .58; end = Math.max(end, t); col[c] = Math.min(col[c] == null ? 1e9 : col[c], t); });
+  Object.keys(col).forEach(c => after(col[c], () => sfx.land(+c === COLS - 1 ? 2 : 1)));
+  return end;
+}
+const ALL = [].concat(...Array.from({ length: ROWS }, (_, r) => Array.from({ length: COLS }, (_, c) => [r, c])));
+const dropAll = () => dropCells(ALL);
 async function dropOut() {
-  setStrip([], 0);
-  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { const d = at(r, c); d.classList.remove('drop', 'rdrop', 'hit'); d.style.setProperty('--dl', (2 - r) * 55 * T() + 'ms'); d.classList.add('out'); }
-  await wait(2 * 55 + 430);
+  setStrip([], 0); clearLinks(); GRID.classList.remove('focus'); let end = 0;
+  ALL.forEach(([r, c]) => { const o = { delay: c * 52 + (2 - r) * 30, dist: (3 - r) * CHT + 90, rot: (c % 2 ? 1 : -1) * (2 + c % 3), dur: 420 }; FX.out(at(r, c), o); end = Math.max(end, o.delay + o.dur); });
+  await wait(end * .86);
 }
-const landSounds = (cellsList, fast) => { sfx.drop(); [0, 1, 2].forEach(r => setTimeout(() => sfx.land(r), (((2 - r) * 95) + 330) * T())); };
+
+/* ---------- links: a taut braided rope pulled reel to reel through the winners, knotted at each, spurs to extra winners in a reel ---------- */
+const lnkB = () => FX.layer('lnkB', 7), lnkT = () => FX.layer('lnkT', 10);
+function clearLinks() { ['lnkB', 'lnkT'].forEach(id => { const l = document.getElementById(id); if (l) l.replaceChildren(); }); }
+function fadeLinks(ms) { ['lnkB', 'lnkT'].forEach(id => { const l = document.getElementById(id); if (!l) return; [...l.children].forEach(g => { if (g.tagName !== 'defs') g.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(4px)' }], { duration: ms * T(), fill: 'forwards', easing: 'ease-in' }); }); }); setTimeout(clearLinks, (ms + 40) * T()); }
+function restCells() { cells.forEach(d => FX.rest(d)); }
+let ropeUid = 0;
+const knot = (parent, x, y, ang, at0) => {
+  const g = FX.el('g', { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${ang.toFixed(1)})` }, parent), k = FX.el('g', {}, g);
+  FX.el('rect', { x: -6.5, y: -11.5, width: 13, height: 23, rx: 4.5, fill: '#b8864a', stroke: '#1b1008', 'stroke-width': 3 }, k);
+  FX.el('path', { d: 'M-6 -7.5 L6 -3 M-6 -1 L6 3.5 M-6 5.5 L6 9.5', stroke: '#5a3a18', 'stroke-width': 2, 'stroke-linecap': 'round', fill: 'none' }, k);
+  FX.el('path', { d: 'M-2 -11 L-5 -18 M3 -11 L6 -17 M-3 11 L-6 18 M2 11 L5 17', stroke: '#1b1008', 'stroke-width': 3.2, 'stroke-linecap': 'round', fill: 'none' }, k);
+  FX.el('path', { d: 'M-2 -11 L-5 -18 M3 -11 L6 -17 M-3 11 L-6 18 M2 11 L5 17', stroke: '#d9b377', 'stroke-width': 1.4, 'stroke-linecap': 'round', fill: 'none' }, k);
+  k.animate([{ transform: 'scale(.2,1.8)', opacity: 0 }, { transform: 'scale(1.4,.7)', opacity: 1, offset: .35 }, { transform: 'scale(.9,1.14)', offset: .66 }, { transform: 'scale(1)', opacity: 1 }], { duration: 320 * T(), delay: at0 * T(), easing: 'cubic-bezier(.3,0,.3,1)', fill: 'both' });
+  return g;
+};
+/* list = [[r,c],...] winners; t0 = ms (unscaled) from now; wi = index of this win (rope offset). Returns {arrive:{col: ms}, end: ms} */
+function rope(list, t0, wi) {
+  const byCol = {}; list.forEach(([r, c]) => (byCol[c] = byCol[c] || []).push(r));
+  const cols = Object.keys(byCol).map(Number).sort((a, b) => a - b); let prev = 1;
+  const anchors = cols.map(c => { const rows = byCol[c], r = rows.reduce((b, x) => Math.abs(x - prev) < Math.abs(b - prev) ? x : b, rows[0]); prev = r; return { c, r, rows }; });
+  const off = wi ? (wi % 2 ? 1 : -1) * 6 : 0, P = anchors.map(a => { const [x, y] = ctrG(a.r, a.c); return [x + (Math.random() - .5) * 6, y + 16 + off + (Math.random() - .5) * 6]; });
+  const f = P[0], l = P[P.length - 1], pts = [[f[0] - 74, f[1] + 24], ...P, [l[0] + 74, l[1] + 30]];
+  const taut = FX.curve(pts, 0), slack = FX.curve(pts, 30), cum = [0]; for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  const tot = cum[cum.length - 1], draw = 130 + 120 * Math.max(1, anchors.length - 1), k = T(), B = lnkB(), T2 = lnkT(), id = 'rm' + (++ropeUid);
+  const mask = FX.el('mask', { id, maskUnits: 'userSpaceOnUse', x: -300, y: -300, width: 1400, height: 1000 }, FX.el('defs', {}, B)), mp = FX.el('path', { d: taut, fill: 'none', stroke: '#fff', 'stroke-width': 80, 'stroke-linecap': 'round' }, mask);
+  const Ln = mp.getTotalLength(); mp.style.strokeDasharray = Ln; mp.animate([{ strokeDashoffset: Ln }, { strokeDashoffset: 0 }], { duration: draw * k, delay: t0 * k, easing: 'linear', fill: 'both' });
+  const g = FX.el('g', { mask: `url(#${id})` }, B), mk = (w, col, extra = {}) => FX.el('path', Object.assign({ d: slack, fill: 'none', stroke: col, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, extra), g);
+  const strands = [mk(15.5, '#1b1008'), mk(10, '#c9a066'), mk(10, '#7a5226', { 'stroke-dasharray': '3.2 7.6', 'stroke-linecap': 'butt' }), mk(2.4, '#f3dca8', { 'stroke-dasharray': '17 19', transform: 'translate(0 -2.7)' })];
+  const tw = t0 + draw;   // pulled taut: the slack goes out of the rope with a little overshoot, then the line hums
+  strands.forEach(p => p.animate([{ d: `path("${slack}")` }, { d: `path("${taut}")` }], { duration: 300 * k, delay: tw * k, easing: 'cubic-bezier(.2,1.7,.4,1)', fill: 'forwards' }));
+  g.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-3px)', offset: .2 }, { transform: 'translateY(2.4px)', offset: .45 }, { transform: 'translateY(-1px)', offset: .7 }, { transform: 'none' }], { duration: 420 * k, delay: (tw + 120) * k, easing: 'ease-out' });
+  const arrive = {};
+  anchors.forEach((a, i) => { const ci = i + 1, at0 = t0 + cum[ci] / tot * draw, p = P[i], q0 = pts[ci - 1], q1 = pts[ci + 1], ang = Math.atan2(q1[1] - q0[1], q1[0] - q0[0]) * 180 / Math.PI;
+    arrive[a.c] = at0; knot(T2, p[0], p[1], ang, at0);
+    a.rows.forEach(r => { if (r === a.r) return; const e = ctrG(r, a.c), sy = e[1] + 14, d = FX.curve([[p[0], p[1]], [p[0] + (Math.random() - .5) * 10, (p[1] + sy) / 2], [e[0], sy]], 0), sp = FX.el('g', {}, B);
+      FX.el('path', { d, fill: 'none', stroke: '#1b1008', 'stroke-width': 12.5, 'stroke-linecap': 'round' }, sp); const sb = FX.el('path', { d, fill: 'none', stroke: '#c9a066', 'stroke-width': 7.5, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': 1 }, sp);
+      sp.firstChild.setAttribute('pathLength', 1); sp.firstChild.setAttribute('stroke-dasharray', 1);
+      [sp.firstChild, sb].forEach(p2 => p2.animate([{ strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: .97, opacity: 1, offset: .05 }, { strokeDashoffset: 0, opacity: 1 }], { duration: 160 * k, delay: (at0 + 70) * k, easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'both' }));
+      knot(T2, e[0], sy, 90, at0 + 200); arrive[a.c + ':' + r] = at0 + 200; }); });
+  return { arrive, end: tw + 300 };
+}
+const SHARD = [['#7a5232', '#4a2f1c', '#b08a5a'], ['#aeb6bd', '#6e7880', '#d8dde0'], ['#7fd1a0', '#3e8a63', '#e8f6ee'], ['#f2c14a', '#b8871e', '#fff1b8'], ['#d9a441', '#8a5a1e', '#8fe0e6'], ['#6c7882', '#3a444c', '#a9b6bf'],
+  ['#b88a52', '#6e4a22', '#f2c14a'], ['#a5502a', '#5a3a2a', '#c9ced4'], ['#f1e4d4', '#c79aa0', '#fff6ea'], ['#7ff4e8', '#3fb7c9', '#d6fffa'], ['#e8503a', '#f2c14a', '#ffffff']];
+/* put the winners into their win pose, each when the rope reaches its reel. Returns {end}: when the last pose is over (ms) */
+function presentList(list, R, extra = 0) {
+  let last = 0; list.forEach(([r, c], i) => { const dl = (R.arrive[c + ':' + r] != null ? R.arrive[c + ':' + r] : R.arrive[c]) + 24 + r * 26 + extra; FX.act(at(r, c), dl, c); last = Math.max(last, dl); });
+  return last;
+}
 
 /* ---------- Current Strip + Drift chain ---------- */
 const lanes = [...document.querySelectorAll('#strip .lane')];
@@ -110,96 +171,121 @@ function setStrip(jellies, chain) {
 
 /* ---------- Tide Gauge (Deep Dive only) ---------- */
 function setTide(n, anim) {
-  const t = $('tide'), up = n > tideNow; tideNow = n;
-  t.classList.remove('lv0', 'lv1', 'lv2', 'lv3'); t.classList.add('lv' + n); $('tideV').textContent = '+' + n;
-  if (anim && up) { t.classList.remove('pulse', 'shake'); void t.offsetWidth; t.classList.add('pulse', 'shake'); sfx.tide(n); setTimeout(() => t.classList.remove('pulse', 'shake'), 950); if (n >= 3) flash(); }
+  const t = $('tide'), up = n > tideNow, tv = $('tideV'); tideNow = n;
+  t.classList.remove('lv0', 'lv1', 'lv2', 'lv3'); t.classList.add('lv' + n); tv.textContent = '+' + n;
+  if (anim && up) { t.classList.remove('pulse', 'shake'); void t.offsetWidth; t.classList.add('pulse', 'shake'); sfx.tide(n); setTimeout(() => t.classList.remove('pulse', 'shake'), 950 * T()); shake(.4 + n * .35);
+    tv.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.7,1.4)', offset: .25 }, { transform: 'scale(.92)', offset: .55 }, { transform: 'scale(1)' }], { duration: 620 * T(), easing: 'ease-out' }); if (n >= 3) flash(2.5); }
 }
 
 /* ---------- effects ---------- */
-function trail(m) {
-  const t = document.createElement('div'); t.className = 'trail'; t.textContent = '‹‹‹';
-  t.style.left = m.to * 136 + 'px'; t.style.top = m.r * 136 + 'px'; $('fxl').append(t); setTimeout(() => t.remove(), 700);
-}
 function popWin(w, stake) { const [x, y] = ctr(w.cells); pop(x, y, '+' + fmt(w.payout * stake)); }
 const buoyCells = grid => { const o = []; grid.forEach((row, r) => row.forEach((s, c) => { if (s === BUOY) o.push([r, c]); })); return o; };
 const maxV = js => js.reduce((a, j) => Math.max(a, j.v), 1);
 
-/* one board evaluation: highlight every winning way, pop the pays, update WIN */
+/* one board evaluation: a rope is pulled through every winning way, reel by reel; each winner acts when the rope reaches it; pays pop; WIN updates */
 async function evalStep(st, n, ctx, run) {
-  let first = false;
   if (st.wins.length) {
-    $('grid').classList.add('focus');
-    st.wins.forEach((w, i) => { w.cells.forEach(([r, c]) => at(r, c).classList.add('hit')); setTimeout(() => { popWin(w, ctx.stake); sfx.hit(); }, i * 90 * T()); });
+    GRID.classList.add('focus'); let endAll = 0;
+    const cellT = new Map();
+    st.wins.forEach((w, i) => {
+      const t0 = i * 110, R = rope(w.cells, t0, i), lastC = Math.max(...w.cells.map(x => x[1]));
+      w.cells.forEach(([r, c]) => { const dl = (R.arrive[c + ':' + r] != null ? R.arrive[c + ':' + r] : R.arrive[c]) + 24 + r * 26, key = r * COLS + c; if (!cellT.has(key) || dl < cellT.get(key).dl) cellT.set(key, { dl, r, c }); });
+      Object.keys(R.arrive).filter(k => !String(k).includes(':')).forEach(c => after(R.arrive[c], () => sfx.link(+c)));
+      after(R.arrive[lastC] + 90, () => popWin(w, ctx.stake)); endAll = Math.max(endAll, R.arrive[lastC]);
+    });
+    cellT.forEach(o => FX.act(at(o.r, o.c), o.dl, o.c));
     sfx.win(Math.min(7, n + st.wins.length - 1));
-    if (n === 0 || st.kind === 'open') { char('win', 1500 * T()); first = true; }
-    const before = run; run += st.payout * ctx.stake; ctx.onWin(before, run);
+    if (n === 0 || st.kind === 'open') char('win', 1500 * T());
+    const before = run; run += st.payout * ctx.stake; after(endAll, () => ctx.onWin(before, run));
     say(st.kind === 'drift' ? `DRIFT! x${maxV(st.jellies)}  +${fmt(st.payout * ctx.stake)}` : `SALVAGED +${fmt(st.payout * ctx.stake)}`, true);
-    await wait(st.kind === 'open' ? 760 : 300);
+    await wait(endAll + 760);
   } else if (st.kind === 'open') await wait(120);
   return run;
 }
 
-/* Drift: the old herd stays, everything else sinks, then the new board drops in while each Jelly slides one reel left (+1) */
-async function driftStep(st, prev) {
-  setStrip(st.jellies, st.chain);
-  say(`DRIFT! x${maxV(st.jellies)}`, true); char('special', 900 * T()); sfx.special(maxV(st.jellies));
-  const keep = new Set(prev.jellies.filter(j => j.c > 0).map(j => j.r * COLS + j.c));
-  prev.exits.forEach(e => { const d = at(e.r, 0); d.classList.remove('hit'); });
-  cells.forEach((d, i) => { if (!keep.has(i)) d.classList.add('rsout'); });
-  if (prev.exits.length) say('THE JELLY LEAVES THE BOARD', true);
-  st.moves.forEach(trail);
-  await wait(140);
-  paint(st.grid, st.jellies);
-  const jm = new Set(st.jellies.map(j => j.r * COLS + j.c));
-  cells.forEach((d, i) => { if (!jm.has(i)) dropCell(d, Math.floor(i / COLS), i % COLS, true); });
-  st.moves.forEach(m => { const d = at(m.r, m.to); d.classList.add('drifting', 'pulse'); });
-  sfx.drop(); setTimeout(() => sfx.land(2), 300 * T());
-  await wait(300);
+/* a Jelly that leaves the board floats up and away, wobbling */
+function jellyLeave(r) {
+  const d = at(r, 0), g = d.querySelector('svg.g'), x = d.getBoundingClientRect(); if (!g) return; const k = T();
+  g.animate([{ transform: 'none', opacity: 1, offset: 0, easing: 'cubic-bezier(.3,0,.5,1)' }, { transform: 'translateY(4px) scale(1.08,.9)', opacity: 1, offset: .18, easing: 'cubic-bezier(.3,.6,.4,1)' }, { transform: 'translateY(-34px) rotate(-6deg) scale(.92,1.1)', opacity: 1, offset: .55, easing: 'ease-in' }, { transform: 'translateY(-110px) rotate(5deg) scale(.7,.8)', opacity: 0, offset: 1 }], { duration: 560 * k, fill: 'forwards' });
+  FX.shards(x.left + x.width / 2, x.top + x.height / 2, 7, SHARD[9], { power: .6 });
+}
+/* a Jelly glides one reel left: wind-up, stretch through the middle, overshoot, settle; ghosts trail behind it */
+function glide(m) {
+  const d = at(m.r, m.to), k = T(), w = CWD, e = FX.ease; d.style.zIndex = 3; d.style.transformOrigin = '50% 70%';
+  d.animate([
+    { transform: `translateX(${w}px) scale(1,1)`, offset: 0, easing: 'cubic-bezier(.3,0,.4,1)' },
+    { transform: `translateX(${w + 9}px) scale(.9,1.1)`, offset: .16, easing: 'cubic-bezier(.5,0,.5,1)' },
+    { transform: `translateX(${w * .45}px) scale(1.18,.86)`, offset: .52, easing: 'cubic-bezier(.4,0,.5,1)' },
+    { transform: 'translateX(-11px) scale(.95,1.07)', offset: .8, easing: e.out },
+    { transform: 'translateX(3px) scale(1.03,.97)', offset: .92, easing: e.out },
+    { transform: 'none', offset: 1 }], { duration: 470 * k, fill: 'both' });
+  const L = lnkB(); for (let j = 0; j < 3; j++) {
+    const [cx, cy] = ctrG(m.r, m.to + 1), gh = FX.el('g', {}, L); FX.el('use', { href: `#s${JELLY}`, x: cx - CWD * .45, y: cy - CHT * .45, width: CWD * .9, height: CHT * .9, opacity: .5 - j * .14 }, gh);
+    gh.animate([{ transform: 'translateX(0) scale(1)', opacity: 0 }, { transform: `translateX(${-CWD * .35}px) scale(${.92 - j * .06},${1.04})`, opacity: 1, offset: .3 }, { transform: `translateX(${-CWD}px) scale(${.8 - j * .08})`, opacity: 0 }], { duration: (430 + j * 40) * k, delay: (60 + j * 55) * k, easing: 'cubic-bezier(.4,0,.5,1)', fill: 'both' });
+  }
 }
 
-/* buoys on the board: staggered sonar pings as they land; returns after the landing */
-function pingBuoys(list, base) { list.forEach((_, i) => setTimeout(() => sfx.scatter(i), (base + i * 170) * T())); }
+/* Drift: the old herd stays, everything else leaves (winners burst, the rest sinks), then the new board drops in while each Jelly glides one reel left (+1) */
+async function driftStep(st, prev) {
+  fadeLinks(200); setStrip(st.jellies, st.chain);
+  say(`DRIFT! x${maxV(st.jellies)}`, true); char('special', 900 * T()); sfx.special(maxV(st.jellies));
+  const keep = new Set(prev.jellies.filter(j => j.c > 0).map(j => j.r * COLS + j.c)), win = new Set(); prev.wins.forEach(w => w.cells.forEach(([r, c]) => win.add(r * COLS + c)));
+  if (prev.exits.length) say('THE JELLY LEAVES THE BOARD', true);
+  GRID.classList.remove('focus');
+  cells.forEach((d, i) => {
+    const r = Math.floor(i / COLS), c = i % COLS; if (keep.has(i)) { FX.rest(d); return; } if (c === 0 && prev.exits.some(e => e.r === r)) return;
+    if (win.has(i)) FX.burst(d, SHARD[lastGrid[r][c]] || SHARD[0], { n: 7, power: .85, rot: (c % 2 ? 1 : -1) * 5, dur: 240 });
+    else FX.out(d, { delay: c * 18, dist: 150, up: 5, dur: 260, rot: (c % 2 ? 1 : -1) * 3 });
+  });
+  await wait(250);
+  paint(st.grid, st.jellies);
+  const jm = new Set(st.jellies.map(j => j.r * COLS + j.c)), list = ALL.filter(([r, c]) => !jm.has(r * COLS + c));
+  const end = dropCells(list, 0, true); sfx.drop(); st.moves.forEach(glide);
+  await wait(Math.max(end, 380) + 60);
+}
+
+/* buoys on the board: sonar pings as each lands (reel c touches down at ~ c*92 + 380 ms) */
+function pingBuoys(list) { list.forEach(([, c], i) => after(c * 92 + 400, () => sfx.scatter(i))); }
 
 async function playSpin(sp, run, ctx) {
   const stake = ctx.stake, steps = sp.steps || [], open = steps[0], jel = open ? open.jellies : [];
   char('spin', 950 * T());
   if (sp.tideBefore != null) setTide(sp.tideBefore, true);
-  paint(sp.initialGrid, jel); setStrip(jel, 0); dropAll(); landSounds();
+  paint(sp.initialGrid, jel); setStrip(jel, 0); sfx.drop(); const e0 = dropAll();
   const buoys = buoyCells(sp.initialGrid);
-  if (buoys.length) pingBuoys(buoys, 450);
-  if (jel.length) setTimeout(() => sfx.jelly(), 520 * T());
-  await wait(820);
+  if (buoys.length) pingBuoys(buoys);
+  if (jel.length) after(520, () => sfx.jelly());
+  await wait(e0 + 200);
   if (buoys.length && sp.tideBefore != null && buoys.length >= 2) { char('special', 900 * T()); }
-  if (sp.retrigger) { say(`+${sp.retrigger} DIVES!`, true); buoys.forEach(([r, c]) => at(r, c).classList.add('hit', 'scat')); sfx.retrigger(); await wait(700); }
+  if (sp.retrigger) { say(`+${sp.retrigger} DIVES!`, true); const R = rope(buoys, 0, 0); presentList(buoys, R); buoys.forEach(([r, c]) => at(r, c).classList.add('scat')); sfx.retrigger(); await wait(R.end + 600); fadeLinks(200); restCells(); }
   else if (sp.scatter && sp.scatter.count === 2 && !sp.bought) { say('ONE MORE BUOY...', true); char('wince', 1100 * T()); await wait(500); }
   let n = 0;
   for (let i = 0; i < steps.length; i++) {
-    const st = steps[i];
+    const st = steps[i], last = i === steps.length - 1;
     if (i > 0) await driftStep(st, steps[i - 1]);
     run = await evalStep(st, n, ctx, run);
     if (st.wins.length) n++;
-    if (st.exits && st.exits.length) { st.exits.forEach(e => { const d = at(e.r, 0); d.classList.remove('drifting', 'pulse', 'hit'); d.classList.add('rsout'); }); setStrip(st.jellies.filter(j => j.c > 0), st.chain); sfx.leave(); await wait(i === steps.length - 1 ? 260 : 0); }
-    $('grid').classList.remove('focus'); cells.forEach(d => d.classList.remove('hit'));
+    if (st.exits && st.exits.length) { st.exits.forEach(e => jellyLeave(e.r)); setStrip(st.jellies.filter(j => j.c > 0), st.chain); sfx.leave(); await wait(last ? 300 : 120); }
+    if (last) { GRID.classList.remove('focus'); if (st.wins.length) { fadeLinks(240); restCells(); } }
   }
   if (sp.tideAfter != null) { setTide(sp.tideAfter, true); if (sp.tideAfter > (sp.tideBefore || 0)) await wait(350); }
   if (sp.scatter && sp.scatter.payout > 0) {
-    const bc = sp.scatter.cells; bc.forEach(([r, c]) => at(r, c).classList.add('hit')); $('grid').classList.add('focus');
-    const [x, y] = ctr(bc); pop(x, y, '+' + fmt(sp.scatter.payout * stake));
-    const before = run; run += sp.scatter.payout * stake; ctx.onWin(before, run); sfx.win(4); await wait(450);
-    $('grid').classList.remove('focus');
+    const bc = sp.scatter.cells; GRID.classList.add('focus'); const R = rope(bc, 0, 0); presentList(bc, R); bc.forEach(([r, c]) => at(r, c).classList.add('scat'));
+    after(R.end - 100, () => { const [x, y] = ctr(bc); pop(x, y, '+' + fmt(sp.scatter.payout * stake)); const before = run; run += sp.scatter.payout * stake; ctx.onWin(before, run); sfx.win(4); });
+    await wait(R.end + 700); fadeLinks(240); GRID.classList.remove('focus'); restCells();
   }
   if (!steps.length && !buoys.length) await wait(100);
   return run;
 }
 
-/* the Sonar Buoys that triggered the Deep Dive ping on the board before the splash */
-async function showTrigger(R) {
-  const list = (R.scatter && R.scatter.cells) || buoyCells(lastGrid), g = list.map(([r, c]) => at(r, c));
-  cells.forEach(d => d.classList.remove('hit'));
-  $('grid').classList.add('focus'); g.forEach(d => d.classList.add('hit', 'scat'));
-  say(g.length >= 3 ? 'PING! PING! PING!' : 'SONAR PING! DEEP DIVE', true); char('special', 1100 * T());
-  g.forEach((d, i) => setTimeout(() => sfx.scatter(i), i * 260 * T()));
-  await wait(260 * g.length + 800);
+/* the Sonar Buoys that triggered the Deep Dive ping on the board before the splash: a rope is pulled through them */
+async function showTrigger(R0) {
+  const list = (R0.scatter && R0.scatter.cells) || buoyCells(lastGrid);
+  cells.forEach(d => FX.rest(d)); GRID.classList.add('focus'); clearLinks();
+  const R = rope(list, 0, 0); presentList(list, R); list.forEach(([r, c]) => at(r, c).classList.add('scat'));
+  say(list.length >= 3 ? 'PING! PING! PING!' : 'SONAR PING! DEEP DIVE', true); char('special', 1100 * T());
+  list.slice().sort((a, b) => a[1] - b[1]).forEach(([, c], i) => after(R.arrive[c], () => sfx.scatter(i)));
+  await wait(R.end + 900);
   say('SONAR PING! DEEP DIVE', true); await wait(500);
 }
 
@@ -256,6 +342,8 @@ return {
         if (lv >= 3) { const o = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = env(t + .2, .2, .14, 1.4); o.type = 'sawtooth'; o.frequency.setValueAtTime(45, t + .2); o.frequency.exponentialRampToValueAtTime(32, t + 1.7); f.type = 'lowpass'; f.frequency.value = 300; o.connect(f).connect(g).connect(bus); o.start(t + .2); o.stop(t + 1.9); noise(t + .2, 1.5, .28, 'lowpass', 900, 120); }
         [0, 4, 7, 12, 16, 19, 24].slice(0, 3 + lv).forEach((n, i) => metal(440 * st(n), t + .3 + i * .1, 1.2, .08)); flurry(t, 20, 1.5); osc('sine', 110, t, 1.4, .5, .01, 24); },
       tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .12, .001); noise(t, .02, .08, 'highpass', 6000, 0); },
+      /* the rope reaches a reel: a taut twang and a knot thunk, rising along the reels */
+      link: c => { const t = T0(), f = 220 * st(SC[Math.min(c * 2, 7)]); osc('triangle', f, t, .22, .09, .004, f * .97); osc('sine', 120, t, .08, .12, .002, 80); noise(t, .05, .09, 'bandpass', 900, 500, 1.2, .002); blup(t + .03, 500 + c * 90, 900, .04, .05); },
       feverOn: () => { const t = T0(); noise(t, .5, .12, 'highpass', 3000, 800, .8); osc('sine', 90, t, .5, .14, .02, 140); metal(260, t + .1, .8, .1); }
     };
     return R;

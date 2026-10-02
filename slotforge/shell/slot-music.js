@@ -18,8 +18,10 @@ const VOW = { a: [800, 1150, 2900], o: [450, 800, 2830], u: [325, 700, 2700], e:
 function make(ctx, out, defs, opt = {}) {
   const sr = ctx.sampleRate, LOOK = opt.look || .7, TH = {}, nr = mb32(12345);
   const master = ctx.createGain(); master.gain.value = opt.volume == null ? .7 : opt.volume; master.connect(out);
-  const duckG = ctx.createGain(); duckG.connect(master);
-  const stingG = ctx.createGain(); stingG.connect(master);
+  /* safety: soft clipper (tanh, linear below ~0.3) so no stray transient can ever clip the output */
+  const clip = ctx.createWaveShaper(), cv = new Float32Array(2049); for (let i = 0; i < cv.length; i++) { const x = (i / 1024 - 1) * 2; cv[i] = Math.tanh(x) / 1; } clip.curve = cv; clip.connect(master);
+  const duckG = ctx.createGain(); duckG.connect(clip);
+  const stingG = ctx.createGain(); stingG.connect(clip);
   const nbuf = ctx.createBuffer(1, sr * 2, sr), nd = nbuf.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = nr() * 2 - 1;
   /* shared dark hall + a soft feedback delay for sonar pings */
   const rv = ctx.createConvolver(), rvLen = Math.floor(sr * 2.6), ib = ctx.createBuffer(2, rvLen, sr), rr = mb32(777);
@@ -150,7 +152,7 @@ function make(ctx, out, defs, opt = {}) {
     theme(name, xf = 2, fresh) {
       if (!defs[name]) return; if (cur && cur.name === name && cur.active) return; const now = ctx.currentTime;
       if (cur) { cur.active = false; cur.gain.gain.cancelScheduledValues(now); cur.gain.gain.setTargetAtTime(0, now, xf / 3.5); const old = cur; setTimeout(() => { if (!old.active) Object.keys(old.L).forEach(k => old.L[k].gain.value = 0); }, (xf + 4) * 1000); }
-      const th = TH[name] = mk(name, defs[name]); th.next = now + .08; th.bar = opt.startBar || 0; th.pass = opt.startPass || 0; th.active = true; th.gain.gain.setValueAtTime(0, now); th.gain.gain.setTargetAtTime(defs[name].gain == null ? 1 : defs[name].gain, now, Math.max(.05, xf / 3.5)); cur = th;
+      const th = TH[name] = mk(name, defs[name]); th.next = now + .08 + (opt.t0 || 0); th.bar = opt.startBar || 0; th.pass = opt.startPass || 0; th.active = true; th.gain.gain.setValueAtTime(0, now); th.gain.gain.setTargetAtTime(defs[name].gain == null ? 1 : defs[name].gain, now, Math.max(.05, xf / 3.5)); cur = th;
       if (!started) { started = true; if (!opt.offline) timer = setInterval(tick, 80); } tick();
     },
     intensity(x) { intensityT = Math.max(0, Math.min(1, x)); },

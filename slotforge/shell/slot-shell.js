@@ -187,6 +187,8 @@ const FX = {
     const u = n.querySelector('use'), id = u ? (u.getAttribute('href') || '').slice(1) : ''; if (!FX.hasParts(id)) FX.hop(n, delay, wi);
     return n;
   },
+  /* back to rest after a win pose (the winners stay on the board) */
+  rest(cell) { if (!cell.classList.contains('hit')) return; cell.classList.remove('hit', 'scat'); ['--win', '--delay', '--wi'].forEach(p => cell.style.removeProperty(p)); cell.style.zIndex = ''; const g = cell.querySelector('svg.g'); if (g) g.style.zIndex = ''; const m = cell.querySelector('.m'); if (m) m.style.zIndex = ''; },
   /* the symbol bursts: a quick swell, then it is gone in pieces. colors = chip colours; pieces fly from the cell centre (screen px) */
   burst(cell, colors, o = {}) {
     const g = cell.querySelector('svg.g'), k = T(), r = cell.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;

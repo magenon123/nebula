@@ -106,16 +106,17 @@ const lnkB = () => FX.layer('lnkB', 7), lnkT = () => FX.layer('lnkT', 10);
 function clearLinks() { ['lnkB', 'lnkT'].forEach(id => { const l = document.getElementById(id); if (l) l.replaceChildren(); }); }
 const ctrOf = (r, c) => [(c + .5) * CWD, (r + .5) * CH];
 function seam(a, b, delay, dur) {
-  const L = lnkB(), g = FX.el('g', {}, L), len = Math.hypot(b[0] - a[0], b[1] - a[1]), nx = -(b[1] - a[1]) / len, ny = (b[0] - a[0]) / len, n = 5, pts = [];
-  for (let i = 0; i <= n; i++) { const t = i / n, j = (i === 0 || i === n) ? 0 : (Math.random() - .5) * 11; pts.push([a[0] + (b[0] - a[0]) * t + nx * j, a[1] + (b[1] - a[1]) * t + ny * j]); }
+  /* the joint between two connected cells is welded: a jagged molten seam across the shared border, an iron link seated over it */
+  const T2 = lnkT(), g = FX.el('g', {}, T2), len = Math.hypot(b[0] - a[0], b[1] - a[1]), dx = (b[0] - a[0]) / len, dy = (b[1] - a[1]) / len, mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, half = CWD * .36, n = 6, pts = [];
+  for (let i = 0; i <= n; i++) { const t = i / n * 2 - 1, j = (i === 0 || i === n) ? 0 : (Math.random() - .5) * 8; pts.push([mx - dy * half * t + dx * j, my + dx * half * t + dy * j]); }
   const d = 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L'), mk = (w, col) => FX.el('path', { d, pathLength: 1, fill: 'none', stroke: col, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-dasharray': 1 }, g);
-  const crust = mk(14, '#24100a'), mid = mk(8.5, '#f0561a'), core = mk(3.4, '#ffe39a'), k = T();
+  const crust = mk(11, '#24100a'), mid = mk(6.5, '#f0561a'), core = mk(2.6, '#ffe39a'), k = T();
   [crust, mid, core].forEach((p, i) => p.animate([{ strokeDashoffset: 1, opacity: 0 }, { strokeDashoffset: .98, opacity: 1, offset: .04 }, { strokeDashoffset: 0, opacity: 1 }], { duration: dur * k, delay: (delay + i * 14) * k, easing: 'cubic-bezier(.25,.7,.35,1)', fill: 'both' }));
   core.animate([{ stroke: '#ffe39a' }, { stroke: '#f58a30' }], { duration: 900 * k, delay: (delay + dur + 120) * k, fill: 'forwards' });
   mid.animate([{ stroke: '#f0561a' }, { stroke: '#9c2e12' }], { duration: 900 * k, delay: (delay + dur + 120) * k, fill: 'forwards' });
   /* an iron link seated across the seam */
-  const T2 = lnkT(), mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI + (Math.random() - .5) * 14;
-  const lk = FX.el('g', { transform: `translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})` }, T2), inner = FX.el('g', {}, lk);
+  const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI + (Math.random() - .5) * 14;
+  const lk = FX.el('g', { transform: `translate(${mx.toFixed(1)} ${my.toFixed(1)}) rotate(${ang.toFixed(1)})` }, g), inner = FX.el('g', {}, lk);
   FX.el('rect', { x: -11, y: -6, width: 22, height: 12, rx: 6, fill: 'none', stroke: '#15100e', 'stroke-width': 7.5 }, inner); FX.el('rect', { x: -11, y: -6, width: 22, height: 12, rx: 6, fill: 'none', stroke: '#9aa3ad', 'stroke-width': 3.6 }, inner);
   FX.el('rect', { x: -9, y: -4.6, width: 18, height: 4, rx: 2, fill: 'none', stroke: '#e5eaee', 'stroke-width': 1.2, opacity: .8 }, inner);
   inner.animate([{ transform: 'scale(1.9,.5)', opacity: 0 }, { transform: 'scale(.82,1.2)', opacity: 1, offset: .45 }, { transform: 'scale(1.08,.94)', offset: .72 }, { transform: 'scale(1)', opacity: 1 }], { duration: 300 * k, delay: (delay + dur * .6) * k, easing: 'cubic-bezier(.3,0,.3,1)', fill: 'both' });
