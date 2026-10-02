@@ -111,11 +111,11 @@ function dropCells(list, base = 0) {
   Object.keys(col).forEach(c => after(col[c], () => sfx.land(+c)));
   return { end, times };
 }
-/* reel by reel; once two Tea Tins have landed the remaining reels hang a beat with a heartbeat before each lands (near-miss slow drop) */
+/* reel by reel; once five Tea Tins (one short of Tin Rush) or two FS drums have landed the remaining reels hang a beat with a heartbeat before each lands (near-miss slow drop) */
 function dropReels(grid) {
   let base = 0, end = 0, tease = false, seen = 0, seenF = 0, said = false; const times = {};
   for (let c = 0; c < COLS; c++) {
-    if (seen >= 2 || seenF >= 2) { tease = true; base += 560; const b0 = base; after(b0 - 500 + c * 92, () => { sfx.beat(); if (!said) { said = true; say('ONE MORE...', true); } shake(.3); }); }
+    if (seen >= 5 || seenF >= 2) { tease = true; base += 560; const b0 = base; after(b0 - 500 + c * 92, () => { sfx.beat(); if (!said) { said = true; say('ONE MORE...', true); } shake(.3); }); }
     const r = dropCells(Array.from({ length: ROWS }, (_, i) => [i, c]), base); end = Math.max(end, r.end); Object.assign(times, r.times);
     for (let i = 0; i < ROWS; i++) { if (grid[i][c] === TIN) seen++; else if (grid[i][c] === FSS) seenF++; }
   }

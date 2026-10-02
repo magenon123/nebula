@@ -426,3 +426,6 @@ table.pt.boost th{text-align:center}
 symbol#kojiSplashSuper,symbol#kojiSplash{overflow:visible}
 #introM.sup .sp{transform:scale(.8);transform-origin:50% 46%}
 #introM .splashArt{z-index:1}
+
+/* Tin value chip: top-left corner so it never covers the TIN tag at the bottom of the tin */
+.cell .m{left:6px;right:auto;top:6px;bottom:auto;transform:none;min-width:34px;padding:0 6px;font-size:17px;border-width:3px;line-height:1.25}
