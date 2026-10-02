@@ -10,9 +10,16 @@ import { getEngine, listEngines, listModes, modeOpts, modeCost } from '../engine
 
 export function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
+/* sfc32 seeded through splitmix32 (period ~2^128, seeds are independent streams). */
+export function sfc32(seed) {
+  let s = seed >>> 0; const sm = () => { s = s + 0x9E3779B9 | 0; let t = s ^ s >>> 16; t = Math.imul(t, 0x21f0aaad); t ^= t >>> 15; t = Math.imul(t, 0x735a2d97); return (t ^ t >>> 15) >>> 0; };
+  let a = sm(), b = sm(), c = sm(), d = sm();
+  return () => { a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0; let t = (a + b | 0) + d | 0; d = d + 1 | 0; a = b ^ b >>> 9; b = c + (c << 3) | 0; c = (c << 21 | c >>> 11); c = c + t | 0; return (t >>> 0) / 4294967296; };
+}
+
 /* Pure function: run `rounds` rounds of one mode with one seed. Used by workers, tests and the CLI. */
 export function runSeed(engine, mode, rounds, seed) {
-  const opts = modeOpts(engine, mode), costPer = modeCost(engine, mode), rng = mulberry(seed);
+  const opts = modeOpts(engine, mode), costPer = modeCost(engine, mode), rng = sfc32(seed);   // 128-bit state: mulberry has a 2^32 period, which long-round modes (bonus buys, >1G draws per seed) exhaust and overlap across seeds
   const bought = !!opts.buy;
   let ret = 0, sq = 0, baseRet = 0, hits = 0, trig = 0, bonusSum = 0, bonusN = 0, max = 0, capped = 0;
   for (let i = 0; i < rounds; i++) {

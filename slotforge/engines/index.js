@@ -1,8 +1,9 @@
 /* Engine registry. To add a slot: create engines/<id>.js (see ENGINE-API.md) and add one line below. */
 import * as emberclaw from './emberclaw.js';
 import * as grumbleAndBrine from './grumble-and-brine.js';
+import * as cloudtopTeaHouse from './cloudtop-tea-house.js';
 
-const ENGINES = { emberclaw, 'grumble-and-brine': grumbleAndBrine };
+const ENGINES = { emberclaw, 'grumble-and-brine': grumbleAndBrine, 'cloudtop-tea-house': cloudtopTeaHouse };
 
 const REQUIRED = ['CFG', 'playRound', 'cryptoRng'];
 for (const [id, e] of Object.entries(ENGINES)) {
