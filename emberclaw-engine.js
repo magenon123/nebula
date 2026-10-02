@@ -33,6 +33,11 @@ export const CFG = {
   bonusStartHeat: 1,                      // heat the Core starts at in a natural / Fever bonus (math tuning knob)
   anteCost: 3,                            // Forge Fever costs 3x the bet
   anteBonusWeights: [7.03, 7.03, 7.03, 14, 18, 22, 22], // Forge Fever bonuses use a richer table so the 3x price still returns ~96%
+  // MAX LUCK (optional per-spin mode): costs luckCost x bet; each spin has luckP to show 3 golden MAX coins and pay the cap.
+  // Return = (1-luckP)*normal + luckP*maxWin = 0.96*luckCost  =>  luckP = 0.96*(luckCost-1)/(maxWin-0.96)
+  luckCost: 496,
+  luckP: 0.050026,
+  luckTease: [[0, 80], [1, 12], [2, 8]],  // coins shown on a miss: cosmetic only (they sit on cells that never take part in a cluster)
 };
 
 export function cryptoRng() {
@@ -184,7 +189,35 @@ function triggerGrid(rng, n) {
   return g;
 }
 
-export function playRound(rng, { ante = false, buy = null } = {}) {
+const COIN = 9;
+function shuffled(rng, a) { a = a.slice(); for (let i = 0; i < a.length - 1; i++) { const j = i + Math.floor(rng() * (a.length - i)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function pickW(rng, tab) { const t = tab.reduce((a, x) => a + x[1], 0); let u = rng() * t; for (const [v, w] of tab) { if ((u -= w) < 0) return v; } return tab[tab.length - 1][0]; }
+
+/* MAX LUCK round. Hit: a fresh cluster-free board with 3 coins, pays the cap. Miss: an ordinary base round; 0-2 teaser coins go on cells that are never part of any cluster, event or refill. */
+function playLuck(rng) {
+  const hit = rng() < CFG.luckP;
+  if (hit) {
+    let g; for (let t = 0; t < 400; t++) { g = initialGrid(rng, 0, CFG.weights); if (!findClusters(g, newGrid(1)).length) break; }
+    const pool = shuffled(rng, [].concat(...g.map((row, r) => row.map((_, c) => [r, c])))), cells = pool.slice(0, 3).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    cells.forEach(([r, c]) => { g[r][c] = COIN; });
+    return { cost: CFG.luckCost, luck: { hit: true, cells }, initialGrid: g, openingEvents: [], openingGrid: clone(g), cascadeSteps: [], basePayout: CFG.maxWin, totalPayout: CFG.maxWin,
+      bonusTriggered: false, freeSpinsAwarded: 0, bonus: null, capped: true };
+  }
+  const r = playRound(rng, {}); r.cost = CFG.luckCost; r.luck = { hit: false, cells: [] };
+  const count = pickW(rng, CFG.luckTease);
+  if (count > 0 && !r.bonusTriggered) {
+    const used = new Set(), mark = (a, b) => used.add(a * COLS + b);
+    r.cascadeSteps.forEach(st => { st.clusters.forEach(k => k.cells.forEach(q => mark(q.r, q.c))); st.clearedCells.forEach(q => mark(q.r, q.c)); st.newCells.forEach(q => mark(q.r, q.c)); st.wilds.forEach(q => mark(q.r, q.c));
+      (st.reforgeEvents || []).forEach(e => { (e.cells || []).forEach(q => mark(q.r, q.c)); (e.doubled || []).forEach(q => mark(q.r, q.c)); }); });
+    const free = []; for (let a = 0; a < ROWS; a++) for (let b = 0; b < COLS; b++) if (!used.has(a * COLS + b) && r.initialGrid[a][b] !== SYM.SCATTER && r.initialGrid[a][b] !== SYM.WILD) free.push([a, b]);
+    const cells = shuffled(rng, free).slice(0, count).sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+    if (cells.length === count) { const grids = [r.initialGrid, r.openingGrid, ...r.cascadeSteps.map(st => st.grid)]; cells.forEach(([a, b]) => grids.forEach(G => { if (G) G[a][b] = COIN; })); r.luck.cells = cells; }
+  }
+  return r;
+}
+
+export function playRound(rng, { ante = false, buy = null, luck = false } = {}) {
+  if (luck) { if (ante || buy) throw new Error('luck cannot combine with ante or buy'); return playLuck(rng); }
   const bonusFrom = (startHeat, bw = CFG.bonusWeights) => {
     const spins = []; let heat = startHeat, left = CFG.freeSpins, n = 0, total = 0, awarded = CFG.freeSpins;
     while (left > 0 && n < CFG.maxBonusSpins && total < CFG.maxWin) {

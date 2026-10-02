@@ -349,6 +349,10 @@ button:disabled{cursor:not-allowed}
 #char.boom #cArmL{animation:pumpL .9s ease-in-out}
 #cBrows{transition:transform .15s}
 
+/* MAX LUCK coin */
+.cell.maxs{--plate-a:#6a4a12;--plate-b:#2a1a08;--rim:#ffd23a;--rim-w:3px;--glow:rgba(255,210,58,.6);--edge:rgba(255,230,120,.85)}
+.cell.maxs svg.g{filter:drop-shadow(0 0 12px rgba(255,210,58,.8));animation:wob 1.6s ease-in-out infinite alternate}
+
 </style></head><body>
 
 <!-- ============ shared defs (wobble filters, hatch patterns) + this slot's symbols ============ -->
@@ -778,6 +782,23 @@ button:disabled{cursor:not-allowed}
   </g>
   <path class="a-star" d="M54 5 l1.4 3.6 3.6 1.4 -3.6 1.4 -1.4 3.6 -1.4 -3.6 -3.6 -1.4 3.6 -1.4z" fill="#fff" stroke="#1d0f09" stroke-width="1.1"/>
  <g class="fs-tag"><rect x="12" y="41" width="40" height="19" rx="6" fill="#2a0f08"/><rect x="14" y="43" width="36" height="15" rx="4.5" fill="#e8503a" stroke="#fff3c4" stroke-width="1"/><text x="32" y="55.2" text-anchor="middle" font-family="'Lilita One','Luckiest Guy','Impact','Arial Black',sans-serif" font-size="14" letter-spacing="1" fill="#fff6d0" stroke="#2a0f08" stroke-width="2.4" paint-order="stroke" stroke-linejoin="round">FS</text></g></g></symbol>
+<symbol id="s9" viewBox="0 0 128 128"><style>.sy9 .a-coin{animation:sy9_coin calc(1.1s*var(--spd,1)) cubic-bezier(.3,.7,.3,1) calc(var(--delay,0ms) + 0ms) both;animation-play-state:var(--win,paused)}@keyframes sy9_coin{0%{transform:none}25%{transform:scale(.8,1.08) translateY(4px)}50%{transform:scale(1.14,.94) translateY(-10px) rotate(-4deg)}75%{transform:scale(.96,1.04) rotate(3deg)}100%{transform:none}}.sy9 .a-rays{animation:sy9_rays calc(1.1s*var(--spd,1)) linear calc(var(--delay,0ms) + 0ms) both;animation-play-state:var(--win,paused)}@keyframes sy9_rays{0%{transform:rotate(0) scale(1);opacity:.7}50%{transform:rotate(22deg) scale(1.15);opacity:1}100%{transform:rotate(45deg) scale(1);opacity:.7}}.sy9 .a-spk{animation:sy9_spk calc(1.1s*var(--spd,1)) ease-out calc(var(--delay,0ms) + 150ms) both;animation-play-state:var(--win,paused)}@keyframes sy9_spk{0%{opacity:0;transform:scale(.3)}40%{opacity:1;transform:scale(1.3) rotate(20deg)}100%{opacity:0;transform:scale(.6) rotate(50deg)}}</style><g class="sy9">
+  <ellipse cx="64" cy="121" rx="38" ry="5" fill="#000" opacity=".3"/>
+  <g class="a-rays" style="transform-box:fill-box;transform-origin:50% 50%"><g transform="translate(64 62)" fill="#ffe27a" stroke="#4a2a06" stroke-width="2.4" stroke-linejoin="round" opacity=".95"><path d="M-5 -46 L0 -60 L5 -46Z"/><path d="M-5 46 L0 60 L5 46Z"/><path d="M-46 -5 L-60 0 L-46 5Z"/><path d="M46 -5 L60 0 L46 5Z"/><path d="M-33 -33 L-45 -45 L-28 -38Z"/><path d="M33 33 L45 45 L28 38Z"/><path d="M33 -33 L45 -45 L38 -28Z"/><path d="M-33 33 L-45 45 L-38 28Z"/></g></g>
+  <g class="a-coin" style="transform-box:fill-box;transform-origin:50% 60%">
+   <circle cx="64" cy="62" r="45" fill="#3b2208" stroke="#1d1004" stroke-width="5"/>
+   <circle cx="64" cy="62" r="41" fill="#f2b92a" stroke="#6b4210" stroke-width="3"/>
+   <path d="M30 48 Q36 30 54 24 Q40 36 38 52Z" fill="#fff0a8" opacity=".85"/>
+   <path d="M30 88 Q50 104 80 100 Q96 94 100 80 Q92 98 70 100 Q46 100 30 88Z" fill="#b97a14" opacity=".8"/>
+   <circle cx="64" cy="62" r="33" fill="none" stroke="#7a4a10" stroke-width="2.6" stroke-dasharray="3.5 5" stroke-linecap="round"/>
+   <circle cx="64" cy="62" r="29.5" fill="#ffd23a" stroke="#6b4210" stroke-width="2.4"/>
+   <path d="M44 74 L70 40 M52 80 L78 46 M60 84 L84 54" stroke="#e1a21c" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>
+   <text x="64" y="73" text-anchor="middle" font-family="'Lilita One','Luckiest Guy','Impact','Arial Black',sans-serif" font-size="33" letter-spacing="1" stroke="#2a1604" stroke-width="7" stroke-linejoin="round" fill="#2a1604">MAX</text>
+   <text x="64" y="73" text-anchor="middle" font-family="'Lilita One','Luckiest Guy','Impact','Arial Black',sans-serif" font-size="33" letter-spacing="1" fill="#fff6d0" stroke="#c0671a" stroke-width="1.2" paint-order="stroke">MAX</text>
+   <path d="M38 36 l3 -7 l3 7 l-3 7z" fill="#fff" stroke="#2a1604" stroke-width="1.6" stroke-linejoin="round"/>
+  </g>
+  <g class="a-spk" style="transform-box:fill-box;transform-origin:50% 50%"><path d="M104 22 l4 -12 l4 12 l12 4 l-12 4 l-4 12 l-4 -12 l-12 -4z" fill="#fff6c0" stroke="#4a2a06" stroke-width="2.4" stroke-linejoin="round"/><path d="M18 100 l3 -8 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3z" fill="#fff6c0" stroke="#4a2a06" stroke-width="2" stroke-linejoin="round"/></g>
+ </g></symbol>
 
 </defs></svg>
 
@@ -1362,7 +1383,7 @@ button:disabled{cursor:not-allowed}
 <script>
 'use strict';
 /* ---- slot config (slots/emberclaw/slot.json) ---- */
-const SLOT_CFG = {"id": "emberclaw", "title": "EmberClaw: Molten Reforge", "logoText": "EMBERCLAW", "infoTitle": "EMBERCLAW · MOLTEN REFORGE", "api": "/api/emberclaw/spin", "engineSource": "emberclaw-engine.js", "storage": "ec", "walletKey": "emberclawWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 9500, "anteCost": 3, "scatterSym": 8, "char": {"el": "char", "states": ["swing", "win", "big", "boom"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "LEGENDARY", "lv": 4}, {"min": 25, "name": "FORGED", "lv": 3}, {"min": 10, "name": "MOLTEN", "lv": 2}, {"min": 5, "name": "SPARK", "lv": 1}], "autoBigLv": 3, "text": {"idle": "Strike the anvil.", "win": "YOU FORGED {amt}", "lose": "Cold iron. Strike again.", "freeSpin": "Free spin {n}", "freeSpinRetrigger": "  ·  +{r} SPINS!"}, "fever": {"name": "Forge Fever", "sym": 8, "vol": 3, "text": "Each spin costs 3x your bet, but the bonus game is 5 times more likely to trigger!", "badge": "FORGE FEVER ×3", "onMsg": "FORGE FEVER ON · 5x BONUS CHANCE", "offMsg": "Forge Fever off"}, "buys": [{"key": "standard", "mult": 100, "sym": 6, "vol": 4, "name": "The Reforging", "text": "10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.", "confirmTitle": "THE REFORGING", "confirmText": "Skip straight to 10 free spins. The Forge Core heat carries over between spins."}, {"key": "preheated", "mult": 500, "sym": 7, "vol": 5, "name": "Pre-Heated", "text": "The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.", "confirmTitle": "PRE-HEATED", "confirmText": "10 free spins with the Forge Core already at 6 heat: you start with a reforged Wild and the Core primed."}], "intro": {"unit": "FREE SPINS", "ribbon": "THE REFORGING", "chips": ["THE CORE KEEPS ITS HEAT", "EVERY 3RD SPIN: GUARANTEED DETONATION", "2+ GEMS: +4 SPINS"]}, "outro": {"ribbon": "BONUS COMPLETE"}, "audio": {"reverb": {"sec": 1.7, "pow": 2.8, "wet": 0.28}}, "engineData": {"paytable": [[0.1, 0.25, 0.5, 1.5], [0.15, 0.3, 0.6, 1.75], [0.2, 0.4, 0.8, 2], [0.4, 1, 2.5, 6], [0.6, 1.5, 3.5, 9], [1.5, 4, 10, 25], [3, 8, 20, 50]], "payScale": 1.049, "scatterPay": null}};
+const SLOT_CFG = {"id": "emberclaw", "title": "EmberClaw: Molten Reforge", "logoText": "EMBERCLAW", "infoTitle": "EMBERCLAW · MOLTEN REFORGE", "api": "/api/emberclaw/spin", "engineSource": "emberclaw-engine.js", "storage": "ec", "walletKey": "emberclawWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 9500, "anteCost": 3, "scatterSym": 8, "char": {"el": "char", "states": ["swing", "win", "big", "boom"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "LEGENDARY", "lv": 4}, {"min": 25, "name": "FORGED", "lv": 3}, {"min": 10, "name": "MOLTEN", "lv": 2}, {"min": 5, "name": "SPARK", "lv": 1}], "autoBigLv": 3, "text": {"idle": "Strike the anvil.", "win": "YOU FORGED {amt}", "lose": "Cold iron. Strike again.", "freeSpin": "Free spin {n}", "freeSpinRetrigger": "  ·  +{r} SPINS!"}, "fever": {"name": "Forge Fever", "sym": 8, "vol": 3, "text": "Each spin costs 3x your bet, but the bonus game is 5 times more likely to trigger!", "badge": "FORGE FEVER ×3", "onMsg": "FORGE FEVER ON · 5x BONUS CHANCE", "offMsg": "Forge Fever off"}, "buys": [{"key": "standard", "mult": 100, "sym": 6, "vol": 4, "name": "The Reforging", "text": "10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.", "confirmTitle": "THE REFORGING", "confirmText": "Skip straight to 10 free spins. The Forge Core heat carries over between spins."}, {"key": "preheated", "mult": 500, "sym": 7, "vol": 5, "name": "Pre-Heated", "text": "The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.", "confirmTitle": "PRE-HEATED", "confirmText": "10 free spins with the Forge Core already at 6 heat: you start with a reforged Wild and the Core primed."}], "intro": {"unit": "FREE SPINS", "ribbon": "THE REFORGING", "chips": ["THE CORE KEEPS ITS HEAT", "EVERY 3RD SPIN: GUARANTEED DETONATION", "2+ GEMS: +4 SPINS"]}, "outro": {"ribbon": "BONUS COMPLETE"}, "audio": {"reverb": {"sec": 1.7, "pow": 2.8, "wet": 0.28}}, "luckCost": 496, "luck": {"name": "MAX LUCK", "sym": 9, "vol": 5, "text": "Pay 496x per spin and keep it on. Every spin has a 5% chance of landing 3 golden MAX coins and winning 9,500x your bet. Leave it on for as many spins as you like.", "badge": "MAX LUCK ×496", "onMsg": "MAX LUCK ON. TOTAL BET x496", "offMsg": "MAX LUCK OFF"}, "engineData": {"paytable": [[0.1, 0.25, 0.5, 1.5], [0.15, 0.3, 0.6, 1.75], [0.2, 0.4, 0.8, 2], [0.4, 1, 2.5, 6], [0.6, 1.5, 3.5, 9], [1.5, 4, 10, 25], [3, 8, 20, 50]], "payScale": 1.049, "scatterPay": null}};
 /* ---- STANDALONE MODE: the server engine is embedded and runs locally with play money. ---- */
 const SLOT_ENGINE = (() => {
 /* EMBERCLAW: Molten Reforge — server-side game engine.
@@ -1399,6 +1420,11 @@ const CFG = {
   bonusStartHeat: 1,                      // heat the Core starts at in a natural / Fever bonus (math tuning knob)
   anteCost: 3,                            // Forge Fever costs 3x the bet
   anteBonusWeights: [7.03, 7.03, 7.03, 14, 18, 22, 22], // Forge Fever bonuses use a richer table so the 3x price still returns ~96%
+  // MAX LUCK (optional per-spin mode): costs luckCost x bet; each spin has luckP to show 3 golden MAX coins and pay the cap.
+  // Return = (1-luckP)*normal + luckP*maxWin = 0.96*luckCost  =>  luckP = 0.96*(luckCost-1)/(maxWin-0.96)
+  luckCost: 496,
+  luckP: 0.050026,
+  luckTease: [[0, 80], [1, 12], [2, 8]],  // coins shown on a miss: cosmetic only (they sit on cells that never take part in a cluster)
 };
 
 function cryptoRng() {
@@ -1550,7 +1576,35 @@ function triggerGrid(rng, n) {
   return g;
 }
 
-function playRound(rng, { ante = false, buy = null } = {}) {
+const COIN = 9;
+function shuffled(rng, a) { a = a.slice(); for (let i = 0; i < a.length - 1; i++) { const j = i + Math.floor(rng() * (a.length - i)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function pickW(rng, tab) { const t = tab.reduce((a, x) => a + x[1], 0); let u = rng() * t; for (const [v, w] of tab) { if ((u -= w) < 0) return v; } return tab[tab.length - 1][0]; }
+
+/* MAX LUCK round. Hit: a fresh cluster-free board with 3 coins, pays the cap. Miss: an ordinary base round; 0-2 teaser coins go on cells that are never part of any cluster, event or refill. */
+function playLuck(rng) {
+  const hit = rng() < CFG.luckP;
+  if (hit) {
+    let g; for (let t = 0; t < 400; t++) { g = initialGrid(rng, 0, CFG.weights); if (!findClusters(g, newGrid(1)).length) break; }
+    const pool = shuffled(rng, [].concat(...g.map((row, r) => row.map((_, c) => [r, c])))), cells = pool.slice(0, 3).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    cells.forEach(([r, c]) => { g[r][c] = COIN; });
+    return { cost: CFG.luckCost, luck: { hit: true, cells }, initialGrid: g, openingEvents: [], openingGrid: clone(g), cascadeSteps: [], basePayout: CFG.maxWin, totalPayout: CFG.maxWin,
+      bonusTriggered: false, freeSpinsAwarded: 0, bonus: null, capped: true };
+  }
+  const r = playRound(rng, {}); r.cost = CFG.luckCost; r.luck = { hit: false, cells: [] };
+  const count = pickW(rng, CFG.luckTease);
+  if (count > 0 && !r.bonusTriggered) {
+    const used = new Set(), mark = (a, b) => used.add(a * COLS + b);
+    r.cascadeSteps.forEach(st => { st.clusters.forEach(k => k.cells.forEach(q => mark(q.r, q.c))); st.clearedCells.forEach(q => mark(q.r, q.c)); st.newCells.forEach(q => mark(q.r, q.c)); st.wilds.forEach(q => mark(q.r, q.c));
+      (st.reforgeEvents || []).forEach(e => { (e.cells || []).forEach(q => mark(q.r, q.c)); (e.doubled || []).forEach(q => mark(q.r, q.c)); }); });
+    const free = []; for (let a = 0; a < ROWS; a++) for (let b = 0; b < COLS; b++) if (!used.has(a * COLS + b) && r.initialGrid[a][b] !== SYM.SCATTER && r.initialGrid[a][b] !== SYM.WILD) free.push([a, b]);
+    const cells = shuffled(rng, free).slice(0, count).sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+    if (cells.length === count) { const grids = [r.initialGrid, r.openingGrid, ...r.cascadeSteps.map(st => st.grid)]; cells.forEach(([a, b]) => grids.forEach(G => { if (G) G[a][b] = COIN; })); r.luck.cells = cells; }
+  }
+  return r;
+}
+
+function playRound(rng, { ante = false, buy = null, luck = false } = {}) {
+  if (luck) { if (ante || buy) throw new Error('luck cannot combine with ante or buy'); return playLuck(rng); }
   const bonusFrom = (startHeat, bw = CFG.bonusWeights) => {
     const spins = []; let heat = startHeat, left = CFG.freeSpins, n = 0, total = 0, awarded = CFG.freeSpins;
     while (left > 0 && n < CFG.maxBonusSpins && total < CFG.maxWin) {
@@ -2225,7 +2279,7 @@ return shellApi;
  * bonus.spins[] have the same shape plus spinIndex / retrigger. */
 SlotShell.boot(SLOT_CFG, S => {
 const { $, sfx, wait, T, say, shake, flash, embers, char, pop, fmt } = S;
-const TIER = ['low','low','low','mid','mid','high','high','wild','scatter'];
+const TIER = ['low','low','low','mid','mid','high','high','wild','scatter','high'], COIN = 9;
 const NAMES = ['Iron Shard','Copper Ingot','Silver Chain','Molten Hammer','Rune-Etched Tongs','Dragonbone Blade','Crown of Cinders'];
 /* paytable shown in Game Info: the engine's PAYTABLE x CFG.payScale, injected by the build (never typed by hand), so the screen shows what is actually paid */
 const ED = S.cfg.engineData, round2 = v => +v.toFixed(2);
@@ -2300,7 +2354,7 @@ function paint(grid, wilds = []) {
   lastGrid = grid; lastWilds = wilds;
   const wm = {}; wilds.forEach(w => wm[w.r * 6 + w.c] = w.mult);
   grid.forEach((row, r) => row.forEach((s, c) => {
-    const d = at(r, c); FX.reset(d); d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : '');
+    const d = at(r, c); FX.reset(d); d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : s === COIN ? ' maxs' : '');
     d.innerHTML = `<svg class="g"><use href="#s${s}"/></svg>` + (s === 7 && wm[r * 6 + c] > 1 ? `<span class="m">x${wm[r * 6 + c]}</span>` : '');
   }));
   GRID.classList.remove('focus'); clearLinks();
@@ -2316,6 +2370,16 @@ function dropCells(list, base = 0) {
 }
 const ALL = [].concat(...Array.from({ length: 5 }, (_, r) => Array.from({ length: 6 }, (_, c) => [r, c])));
 const dropAll = () => dropCells(ALL);
+/* Row-by-row drop with the near-miss slowdown: once two Gems (or two MAX coins) have landed, the remaining rows hang a beat with a heartbeat. */
+function dropTease(grid) {
+  let base = 0, end = 0, tease = false; const seen = {}; [8, COIN].forEach(k => seen[k] = 0);
+  for (let r = 4; r >= 0; r--) {
+    if ([8, COIN].some(k => seen[k] >= 2)) { tease = true; base += 600; after(base - 540, () => { sfx.maxBeat(2); say('ONE MORE...', true); shake(.3); }); }
+    end = Math.max(end, dropCells(Array.from({ length: 6 }, (_, c) => [r, c]), base));
+    [8, COIN].forEach(k => { seen[k] += grid[r].filter(v => v === k).length; });
+  }
+  return { end, tease };
+}
 async function dropOut() {
   clearLinks(); GRID.classList.remove('focus'); let end = 0;
   ALL.forEach(([r, c]) => { const o = { delay: (4 - r) * 40 + c * 9, dist: (5 - r) * CH + 90, rot: (c % 2 ? 1 : -1) * (2 + (c * 7 % 4)), dur: 440 }; FX.out(at(r, c), o); end = Math.max(end, o.delay + o.dur); });
@@ -2420,7 +2484,7 @@ async function playEvents(events) {
 /* repaint a single cell (a refill or a clean-up) from a grid */
 function paintCell(grid, wilds, r, c) {
   const wm = {}; wilds.forEach(w => wm[w.r * 6 + w.c] = w.mult); const s = grid[r][c], d = at(r, c); FX.reset(d);
-  d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : '');
+  d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : s === COIN ? ' maxs' : '');
   d.innerHTML = `<svg class="g"><use href="#s${s}"/></svg>` + (s === 7 && wm[r * 6 + c] > 1 ? `<span class="m">x${wm[r * 6 + c]}</span>` : '');
 }
 let lastLand = 0;
@@ -2431,7 +2495,19 @@ function fadeLinks(ms) { ['lnkB', 'lnkT'].forEach(id => { const l = document.get
 async function playSpin(sp, runningFrom, ctx) {
   const stake = ctx.stake, onWin = ctx.onWin;
   smithStrike();
-  paint(sp.initialGrid); sfx.drop(); const e0 = dropAll(); await wait(e0 + 170);
+  paint(sp.initialGrid); sfx.drop(); const e0 = dropTease(sp.initialGrid).end;
+  const coins = ALL.filter(([r, c]) => sp.initialGrid[r][c] === COIN);
+  coins.forEach(([r, c], i) => after(e0 - 120 + i * 40, () => { sfx.maxLand(i); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 12, SHARD[5], { power: 1 }); flash(1.2); }));
+  await wait(e0 + 170);
+  if (coins.length) {
+    if (coins.length >= 3) {
+      GRID.classList.add('focus'); coins.forEach(([r, c], i) => { FX.act(at(r, c), i * 200, i); at(r, c).classList.add('scat'); if (i) seam(ctrOf(coins[i - 1][0], coins[i - 1][1]), ctrOf(r, c), i * 200 - 100, 240); });
+      sfx.maxWin(); char('big', 3000 * T()); shake(true); flash(); embers(220); say('MAX WIN!!!', true);
+      const mp = (sp.maxPay || 0) * stake; after(700, () => { const b = at(coins[1][0], coins[1][1]).getBoundingClientRect(); pop(b.left + b.width / 2, b.top, '+' + fmt(mp)); onWin(0, mp); });
+      await wait(1900); fadeLinks(240); GRID.classList.remove('focus'); return mp;
+    }
+    sfx.maxMiss(); say(coins.length === 2 ? 'SO CLOSE... TWO MAX COINS' : 'ONE MAX COIN', true); await wait(coins.length === 2 ? 900 : 400);
+  }
   if (sp.openingGrid && sp.openingEvents && sp.openingEvents.length) { paint(sp.openingGrid, sp.openingWilds); await playEvents(sp.openingEvents); }
   setHeat(sp.startHeat || 0);
   let run = runningFrom, n = 0;
@@ -2498,6 +2574,10 @@ return {
       /* a link seats: a small hammer tink, climbing the scale with the ring of the cluster */
       link: d => { const t = T0(); metal(520 * st([0, 2, 3, 5, 7, 8, 10, 12][Math.min(d, 7)]), t, .45, .05, [1, 2.76, 5.4]); noise(t, .03, .05, 'highpass', 4500, 0); osc('sine', 150, t, .06, .08, .002, 90); }
     };
+    R.maxLand = k => { const t = T0(), f = 520 * st([0, 4, 7, 12][Math.min(k, 3)]); metal(f, t, 1.3, .14); metal(f * 2, t + .05, .5, .07); noise(t, .12, .14, 'highpass', 5000, 9000, .7); anvil(.7, 1.3, t); };
+    R.maxBeat = n => { const t = T0(); osc('sine', 62, t, .16, .34, .004, 42); osc('sine', 62, t + .2, .12, .24, .004, 42); if (n > 1) noise(t, .5, .05 * n, 'bandpass', 400, 2400, 1.2, .2); };
+    R.maxWin = () => { const t = T0(); [0, 4, 7, 12, 16, 19, 24, 28].forEach((n, i) => metal(262 * st(n), t + i * .09, 1.8, .11)); horn(t, 2.4, .07, 82.5); [0, .3, .6, .9].forEach((d, i) => anvil(1, 1 + i * .08, t + d)); osc('sine', 100, t, 1.8, .55, .01, 26); };
+    R.maxMiss = () => { const t = T0(); osc('triangle', 300, t, .5, .16, .01, 120); noise(t, .6, .08, 'lowpass', 600, 120, .8, .05); anvil(.5, .7, t); };
     R.feverOn = () => R.heat(6);
     return R;
   },
@@ -2511,7 +2591,7 @@ return {
   roundStart: () => setHeat(0),
   clearBoard: dropOut,
   restoreBoard() { if (lastGrid) paint(lastGrid, lastWilds); },
-  baseSpin: R => ({ initialGrid: R.initialGrid, openingGrid: R.openingGrid, openingEvents: R.openingEvents, openingWilds: [], cascadeSteps: R.cascadeSteps, startHeat: 0 }),
+  baseSpin: R => ({ initialGrid: R.initialGrid, openingGrid: R.openingGrid, openingEvents: R.openingEvents, openingWilds: [], cascadeSteps: R.cascadeSteps, startHeat: 0, maxPay: R.luck && R.luck.hit ? R.totalPayout : 0 }),
   playSpin,
   showTrigger: showScatters
 };

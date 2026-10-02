@@ -4,7 +4,7 @@
  * bonus.spins[] have the same shape plus spinIndex / retrigger. */
 SlotShell.boot(SLOT_CFG, S => {
 const { $, sfx, wait, T, say, shake, flash, embers, char, pop, fmt } = S;
-const TIER = ['low','low','low','mid','mid','high','high','wild','scatter'];
+const TIER = ['low','low','low','mid','mid','high','high','wild','scatter','high'], COIN = 9;
 const NAMES = ['Iron Shard','Copper Ingot','Silver Chain','Molten Hammer','Rune-Etched Tongs','Dragonbone Blade','Crown of Cinders'];
 /* paytable shown in Game Info: the engine's PAYTABLE x CFG.payScale, injected by the build (never typed by hand), so the screen shows what is actually paid */
 const ED = S.cfg.engineData, round2 = v => +v.toFixed(2);
@@ -79,7 +79,7 @@ function paint(grid, wilds = []) {
   lastGrid = grid; lastWilds = wilds;
   const wm = {}; wilds.forEach(w => wm[w.r * 6 + w.c] = w.mult);
   grid.forEach((row, r) => row.forEach((s, c) => {
-    const d = at(r, c); FX.reset(d); d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : '');
+    const d = at(r, c); FX.reset(d); d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : s === COIN ? ' maxs' : '');
     d.innerHTML = `<svg class="g"><use href="#s${s}"/></svg>` + (s === 7 && wm[r * 6 + c] > 1 ? `<span class="m">x${wm[r * 6 + c]}</span>` : '');
   }));
   GRID.classList.remove('focus'); clearLinks();
@@ -95,6 +95,16 @@ function dropCells(list, base = 0) {
 }
 const ALL = [].concat(...Array.from({ length: 5 }, (_, r) => Array.from({ length: 6 }, (_, c) => [r, c])));
 const dropAll = () => dropCells(ALL);
+/* Row-by-row drop with the near-miss slowdown: once two Gems (or two MAX coins) have landed, the remaining rows hang a beat with a heartbeat. */
+function dropTease(grid) {
+  let base = 0, end = 0, tease = false; const seen = {}; [8, COIN].forEach(k => seen[k] = 0);
+  for (let r = 4; r >= 0; r--) {
+    if ([8, COIN].some(k => seen[k] >= 2)) { tease = true; base += 600; after(base - 540, () => { sfx.maxBeat(2); say('ONE MORE...', true); shake(.3); }); }
+    end = Math.max(end, dropCells(Array.from({ length: 6 }, (_, c) => [r, c]), base));
+    [8, COIN].forEach(k => { seen[k] += grid[r].filter(v => v === k).length; });
+  }
+  return { end, tease };
+}
 async function dropOut() {
   clearLinks(); GRID.classList.remove('focus'); let end = 0;
   ALL.forEach(([r, c]) => { const o = { delay: (4 - r) * 40 + c * 9, dist: (5 - r) * CH + 90, rot: (c % 2 ? 1 : -1) * (2 + (c * 7 % 4)), dur: 440 }; FX.out(at(r, c), o); end = Math.max(end, o.delay + o.dur); });
@@ -199,7 +209,7 @@ async function playEvents(events) {
 /* repaint a single cell (a refill or a clean-up) from a grid */
 function paintCell(grid, wilds, r, c) {
   const wm = {}; wilds.forEach(w => wm[w.r * 6 + w.c] = w.mult); const s = grid[r][c], d = at(r, c); FX.reset(d);
-  d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : '');
+  d.className = 'cell t-' + TIER[s] + (s === 7 ? ' wild' : s === 8 ? ' scatter' : s === COIN ? ' maxs' : '');
   d.innerHTML = `<svg class="g"><use href="#s${s}"/></svg>` + (s === 7 && wm[r * 6 + c] > 1 ? `<span class="m">x${wm[r * 6 + c]}</span>` : '');
 }
 let lastLand = 0;
@@ -210,7 +220,19 @@ function fadeLinks(ms) { ['lnkB', 'lnkT'].forEach(id => { const l = document.get
 async function playSpin(sp, runningFrom, ctx) {
   const stake = ctx.stake, onWin = ctx.onWin;
   smithStrike();
-  paint(sp.initialGrid); sfx.drop(); const e0 = dropAll(); await wait(e0 + 170);
+  paint(sp.initialGrid); sfx.drop(); const e0 = dropTease(sp.initialGrid).end;
+  const coins = ALL.filter(([r, c]) => sp.initialGrid[r][c] === COIN);
+  coins.forEach(([r, c], i) => after(e0 - 120 + i * 40, () => { sfx.maxLand(i); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 12, SHARD[5], { power: 1 }); flash(1.2); }));
+  await wait(e0 + 170);
+  if (coins.length) {
+    if (coins.length >= 3) {
+      GRID.classList.add('focus'); coins.forEach(([r, c], i) => { FX.act(at(r, c), i * 200, i); at(r, c).classList.add('scat'); if (i) seam(ctrOf(coins[i - 1][0], coins[i - 1][1]), ctrOf(r, c), i * 200 - 100, 240); });
+      sfx.maxWin(); char('big', 3000 * T()); shake(true); flash(); embers(220); say('MAX WIN!!!', true);
+      const mp = (sp.maxPay || 0) * stake; after(700, () => { const b = at(coins[1][0], coins[1][1]).getBoundingClientRect(); pop(b.left + b.width / 2, b.top, '+' + fmt(mp)); onWin(0, mp); });
+      await wait(1900); fadeLinks(240); GRID.classList.remove('focus'); return mp;
+    }
+    sfx.maxMiss(); say(coins.length === 2 ? 'SO CLOSE... TWO MAX COINS' : 'ONE MAX COIN', true); await wait(coins.length === 2 ? 900 : 400);
+  }
   if (sp.openingGrid && sp.openingEvents && sp.openingEvents.length) { paint(sp.openingGrid, sp.openingWilds); await playEvents(sp.openingEvents); }
   setHeat(sp.startHeat || 0);
   let run = runningFrom, n = 0;
@@ -277,6 +299,10 @@ return {
       /* a link seats: a small hammer tink, climbing the scale with the ring of the cluster */
       link: d => { const t = T0(); metal(520 * st([0, 2, 3, 5, 7, 8, 10, 12][Math.min(d, 7)]), t, .45, .05, [1, 2.76, 5.4]); noise(t, .03, .05, 'highpass', 4500, 0); osc('sine', 150, t, .06, .08, .002, 90); }
     };
+    R.maxLand = k => { const t = T0(), f = 520 * st([0, 4, 7, 12][Math.min(k, 3)]); metal(f, t, 1.3, .14); metal(f * 2, t + .05, .5, .07); noise(t, .12, .14, 'highpass', 5000, 9000, .7); anvil(.7, 1.3, t); };
+    R.maxBeat = n => { const t = T0(); osc('sine', 62, t, .16, .34, .004, 42); osc('sine', 62, t + .2, .12, .24, .004, 42); if (n > 1) noise(t, .5, .05 * n, 'bandpass', 400, 2400, 1.2, .2); };
+    R.maxWin = () => { const t = T0(); [0, 4, 7, 12, 16, 19, 24, 28].forEach((n, i) => metal(262 * st(n), t + i * .09, 1.8, .11)); horn(t, 2.4, .07, 82.5); [0, .3, .6, .9].forEach((d, i) => anvil(1, 1 + i * .08, t + d)); osc('sine', 100, t, 1.8, .55, .01, 26); };
+    R.maxMiss = () => { const t = T0(); osc('triangle', 300, t, .5, .16, .01, 120); noise(t, .6, .08, 'lowpass', 600, 120, .8, .05); anvil(.5, .7, t); };
     R.feverOn = () => R.heat(6);
     return R;
   },
@@ -290,7 +316,7 @@ return {
   roundStart: () => setHeat(0),
   clearBoard: dropOut,
   restoreBoard() { if (lastGrid) paint(lastGrid, lastWilds); },
-  baseSpin: R => ({ initialGrid: R.initialGrid, openingGrid: R.openingGrid, openingEvents: R.openingEvents, openingWilds: [], cascadeSteps: R.cascadeSteps, startHeat: 0 }),
+  baseSpin: R => ({ initialGrid: R.initialGrid, openingGrid: R.openingGrid, openingEvents: R.openingEvents, openingWilds: [], cascadeSteps: R.cascadeSteps, startHeat: 0, maxPay: R.luck && R.luck.hit ? R.totalPayout : 0 }),
   playSpin,
   showTrigger: showScatters
 };

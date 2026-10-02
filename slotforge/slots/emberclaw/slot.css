@@ -124,3 +124,7 @@
 #char.boom #cBrows{transform:translateY(-5px)}
 #char.boom #cArmL{animation:pumpL .9s ease-in-out}
 #cBrows{transition:transform .15s}
+
+/* MAX LUCK coin */
+.cell.maxs{--plate-a:#6a4a12;--plate-b:#2a1a08;--rim:#ffd23a;--rim-w:3px;--glow:rgba(255,210,58,.6);--edge:rgba(255,230,120,.85)}
+.cell.maxs svg.g{filter:drop-shadow(0 0 12px rgba(255,210,58,.8));animation:wob 1.6s ease-in-out infinite alternate}

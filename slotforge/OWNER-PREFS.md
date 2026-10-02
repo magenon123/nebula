@@ -49,3 +49,6 @@ Agents: read this before every design or build decision. The lead keeps it updat
 
 ## Round 4: MAX or NOTHING buy
 Owner wants a max-win-or-nothing feature as an ACTIVATED per-spin mode (like Deep Pressure), not a buy: golden MAX coins, 3 = max win. Slow-mo near-miss drop when 2 scatters/coins have landed. Owner insisted on 5% per spin: MAX LUCK costs 392x per spin and stays on until switched off (96.08% RTP, 16M-round sim) in Grumble & Brine; EmberClaw port after approval. Standalone files have a menu button to add $100,000 play money.
+
+## Grumble & Brine APPROVED by owner (MAX LUCK, near-miss tease, FS tag, gold MAX WIN screen).
+EmberClaw now has MAX LUCK x496 (5%/spin, 9,500x), same presentation. Awaiting owner notes on EmberClaw.
