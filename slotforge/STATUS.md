@@ -22,6 +22,8 @@ State: slot #3 Tea House revision. DONE and committed: engine (rin) with Tin Rus
 
 ## Slot #4 DECISION (owner delegated): pitch C, Arctic Aurora Lodge (plans/slot4-pitches.md). Owner: smallest risk, team decides details, must be able to compete in the market (so: realistic look, strong hooks, polish). Steps: (1) rin engine per maya's section C, (2) leo art-direction test (one symbol + one background in the realistic style) BEFORE the full art, owner sees the test, (3) then full art, kai client, lead verify. Resume: read plans/slot4-pitches.md pitch C.
 
+## Slot #4 progress: look test APPROVED by the owner (slots/arctic-aurora-lodge/test/). Now: rin engine (running), leo FULL ART in that exact style (slots/arctic-aurora-lodge/, same fragment format as Tea House), then kai client, then lead verify + deliver. Notes from leo's test: mountains weakest (fix), lodge small, bake static background to a bitmap layer at load, symbols rasterised once and cached.
+
 ## Done
 - EmberClaw (slot #1): finished, math retuned to ~96.2% in all modes, files rebuilt. Do not touch except bug fixes.
 - Shared shell (`shell/`), slot module format (`slots/emberclaw/`), engine registry + generic server route (`engines/`, `server.js` marked section), math tools + tests (`tools/`), build script (`/home/user/nebula/build-standalone.py <slug>`).
