@@ -11,9 +11,8 @@ const B = path.join(__dirname, 'bake');
     await q2.close(); fs.writeFileSync(path.join(B, name + '.webp'), Buffer.from(url.split(',')[1], 'base64')); console.log(name, (fs.statSync(path.join(B, name + '.webp')).size / 1024) | 0, 'KB');
   }
   await conv('scene', 'scene-static.svg', 1600, 900, false, .86);
-  await conv('trees', 'trees-near.svg', 1600, 900, true, .62);
+  await conv('trees', 'trees-near.svg', 1600, 900, true, .86);
   await conv('frame', 'frame-bake.svg', 1400, 1192, true, .9);
-  await conv('ribbon', 'ribbon.svg', 1000, 280, true, .72);
-  for (const c of ['cur1', 'cur2', 'cur3']) await conv(c, c + '.svg', 1700, 440, true, .8);
+  for (const c of ['cur1', 'cur2']) await conv(c, c + '.svg', 1700, 440, true, .8);
   await b.close();
 })();

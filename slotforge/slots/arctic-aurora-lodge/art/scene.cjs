@@ -156,10 +156,7 @@ ${lodge}
 <ellipse cx="800" cy="${HZ + 20}" rx="900" ry="30" fill="#5fe0c8" opacity=".16" filter="url(#b12)"/>
 <rect width="${W}" height="${H}" fill="url(#vig)"/>`;
 const TG = `<defs><linearGradient id="treeG" gradientUnits="userSpaceOnUse" x1="0" y1="180" x2="0" y2="900"><stop offset="0" stop-color="#0c3438"/><stop offset=".35" stop-color="#05161b"/><stop offset="1" stop-color="#010608"/></linearGradient></defs>`;
-const SP = require('./spruce.cjs');
-const nearTrees = [[-30, 830, 700, 190, .55, 3], [200, 740, 520, 150, .62, 5], [70, 780, 640, 170, .45, 7], [320, 700, 360, 100, .7, 9], [420, 680, 230, 66, .75, 11]];
-const nearTreesR = [[1580, 620, 380, 90, .5, 13], [1110, 520, 190, 50, .78, 17], [1136, 530, 130, 36, .8, 19]];
-fs.writeFileSync(path.join(out, 'trees-near.svg'), `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${SP.defs}${nearTrees.map(([x, b, h, w, dk, sd]) => SP.spruce(x, b, h, w, { seed: sd, dark: dk })).join('')}${nearTreesR.map(([x, b, h, w, dk, sd]) => SP.spruce(x, b, h, w, { seed: sd, dark: dk, step: h < 250 ? 9 : 15 })).join('')}<defs><radialGradient id="vig2" cx=".5" cy=".5" r=".78"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#vig2)"/></svg>`);
+fs.writeFileSync(path.join(out, 'trees-near.svg'), `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${TG}${trees([[1110, 520, 190, 50], [1136, 530, 130, 36]], { fill: 'url(#treeG)' })}${trees(nearR.slice(0, 1), { fill: 'url(#treeG)' })}${trees(nearL, { fill: 'url(#treeG)' })}<rect width="${W}" height="${H}" fill="url(#vig2)"/><defs><radialGradient id="vig2" cx=".5" cy=".5" r=".78"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/></radialGradient></defs></svg>`);
 fs.writeFileSync(path.join(out, 'scene-static.svg'), `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${defs}${body}</svg>`);
 // ---------- aurora curtains (transparent layers for the animated overlay)
 function curtain(w, hgt, yc, amp, ph, len, hue, op, seed) {

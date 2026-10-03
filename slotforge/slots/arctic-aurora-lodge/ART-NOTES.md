@@ -1,5 +1,5 @@
 # Arctic Aurora Lodge: art notes for kai (leo)
-Files: `symbols.svg`, `scene.html`, `logo.html`, `frame.html`, `character.html`, `side.html`, `sweep.html` (extra fragment: insert after side), **`flare.html` (NEW fragment: insert after sweep, last in the stage)**, `info.html`, `slot.css` (ALL art CSS incl. embedded Cinzel 700/900 fonts; append your own after `/* KAI */`). Generators + bakes in `art/` (not needed by the build): `node art/build.cjs` (symbols+winvars), `node art/scene.cjs && node art/terrain.cjs && node art/bake.cjs && node art/scene-html.cjs && node art/frame.cjs && node art/frame-html.cjs`, `node art/char.cjs` (bakes the character bitmaps, ~10 s), `node art/fox-bake.cjs` then `node art/build.cjs` (fox + blocks), `node art/ribbon.cjs`, `node art/side.cjs`, `node art/logo.cjs`, `node art/sweep.cjs`, then `node art/css.cjs` (re-assembles slot.css from art/*.css parts; edit the parts). Order in the stage: scene, logo, frame, character, side, sweep.
+Files: `symbols.svg`, `scene.html`, `logo.html`, `frame.html`, `character.html`, `side.html`, `sweep.html` (extra fragment: insert after side), `info.html`, `slot.css` (ALL art CSS incl. embedded Cinzel 700/900 fonts; append your own after `/* KAI */`). Generators + bakes in `art/` (not needed by the build): `node art/build.cjs` (symbols+winvars), `node art/scene.cjs && node art/terrain.cjs && node art/bake.cjs && node art/scene-html.cjs && node art/frame.cjs && node art/frame-html.cjs`, `node art/char.cjs`, `node art/side.cjs`, `node art/logo.cjs`, `node art/sweep.cjs`, then `node art/css.cjs` (re-assembles slot.css from art/*.css parts; edit the parts). Order in the stage: scene, logo, frame, character, side, sweep.
 
 ## Stage geometry (1600x900)
 | piece | box | notes |
@@ -35,38 +35,28 @@ Cell classes (slot.css): `.cell`, `.hit`, `.focus` on `#grid`. Drop / out / land
 ## Aurora Sweep `#sweep`
 5x5 `.sc[data-r][data-c]`. `#sweep.on` fades the sheet in over the board. Per cell: `.melt` (thaw) + text in `.val` (e.g. `12x`), `.prism` (+ `.melt`) shows s12, `.empty`, `.x2..x5` crossing chip. Bands: append `<div class="band row r2 go">` / `col c1 go` / `dg1 go` (down-right) / `dg2 go` into `#sweepBands`, remove after 1.1 s; melt the cells under it when the band is mid-way (~0.45 s).
 
-## Aino and Tuuli `#char` (REDONE, realistic bake version, round 10)
-Same API as before: slot.json `char: {el:'char', states:['spin','win','big','special','tease','bonus','maxwin','exhale','slump'], bonusClass:'bonusmode'}`. Idle = no class (breathing, blink, tail wag, ear twitch, breath fog, lantern-glow flicker, braid sway). Element ids unchanged (`#cAino #cHead #cArmL #cForeL #cArmR #cForeR #cBraid #cMouth .m0/.m1/.m2 #cDog #cDHead #cDTail #cDEarL/R #cDJaw .jc/.jo #cFog #cBang #cCorona`). NEW: `#cLant` (lantern, hangs from the left hand; it counter-rotates when the arm lifts) and `#cFlame`.
+## Aino and Tuuli `#char`
+slot.json: `char: {el:'char', states:['spin','win','big','special','tease','bonus','maxwin','exhale','slump'], bonusClass:'bonusmode'}`. Idle = no class (breathing, blink, tail wag, ear twitch, breath fog, lantern flicker, braid sway).
 | class | meaning |
 |---|---|
-| `spin` | looks up (head tilts, pupils and brows lift), right arm lifts a little with the forearm lagging, dog lifts its head (.95 s) |
-| `win` | smile, right arm swings out to wave (forearm waggles with lag/overshoot), body sways, Tuuli yips (jaw open overlay, head bobs, tail whip) 1.5 s |
-| `big` | 3 hops with squash/stretch, both arms up and out (+-150 deg, forearms flap, lantern stays upright, braid swings), aurora corona + rays flare, dog hops, 3.2 s |
-| `special` | **arm now points up and OUT to the right (-140 deg) and never crosses the face**, "!" pops, O mouth, 0.9 s |
-| `tease` | hold: eyes wide, tiny O mouth, brows up, dog crouches, ears flat; add `exhale` (hit) or `slump` (miss) before removing |
-| `bonus` | 1.4 s intro: raises the lantern to her chest (arm + forearm, lantern keeps hanging), glow rises, corona, dog jumps. Then the shell keeps `bonusmode`: corona hums, head nods on 84 bpm, fast tail |
-| `maxwin` | hold: arms wide (+-125 deg), lantern raised, corona full + rays, both look up, dog howls |
-`--spd` on `#char` for turbo. **What changed in the art (honest summary):** Aino is now ~7.3 heads tall with natural shoulders/limbs, a painted face (iris/pupil/catchlights, lids, lashes, brows made of strokes, nose, lips with 3 baked mouth states, skin gradients, aurora rim + lantern warm bounce), a fur hood built from ~8,000 fine strands in layers, a wool parka with seams, stitching, hem trim, belt, knit mittens, fur-lined boots, a real braid and a hurricane lantern. Tuuli is a sitting husky with a mask, blue eyes, layered fur strands, ruff and bushy tail. All of it is **baked WebP bitmaps** (parts in `<defs>` of `#cBackS`, ids `cp*`, referenced with `<use>`), so there is no filter at runtime. Layers: `#cBackS #cAinoS .cLG #cDogS #cFogS #cFrontS`, idle repaints only the small layers. character.html is now **~650 KB** (was 90 KB). Rebuild: `node art/char.cjs && node art/css.cjs`.
-**Splash portraits:** `symbols.svg` holds `<symbol id="ainoSplash">` and `ainoSplashSuper` (corona + rotating rays), viewBox `40 6 420 360` (unchanged size, so kai's `.ainoSplash` CSS keeps working). They are now a **bust portrait** (Aino from the belt up, Tuuli's head) with a bottom fade mask; they `<use>` the baked images of `character.html`, so that fragment must be in the page.
-
-## Giant blocks, Silver Fox, trees, frame (round 10)
-- **s6 Silver Fox**: new fox (orange-silver coat, big upright triangular ears with black backs, slit pupils, narrow white muzzle, white-tipped bushy tail). 4 baked bitmaps inside the symbol (head, 2 ears, tail) + vector eyes/nose. Win motion keeps its names (head tilt, ears, blink, sniff, sparkle) and adds a tail wag. symbols.svg grew to ~690 KB. Rebuild: `node art/fox-bake.cjs && node art/build.cjs`.
-- **b2_N / b3_N blocks**: the symbol is now truly frozen: a refracted ghost copy (offset, enlarged, dim), a blue `mix-blend-mode:color` tint, caustic lines, rimmed bubbles, hoarfrost corners, glass planes. **Win motion** (same trigger as before: `.cell.hit` or `.winAnim`): the block pulses and wobbles, the tint melts away (the symbol "thaws" to full colour), the ghost snaps into register, glowing cracks run across the ice, four glints pop, the rim glows, then a shine sweeps. No other change for kai.
-- **Pines**: replaced by layered spruces (branch limbs, needles, snow lying on the boughs, aurora rim light), baked into `trees.webp` (250 KB).
-- **Frame**: carved timber panels (Nordic diamond chains on the posts and top beam, sun-wheel roundels on the bottom beam), hammered iron straps, forged brackets with scrolls and bosses, lumpy snow, varied icicles, hoarfrost in the window corners. Same geometry (board area unchanged).
-
-## FLARE sweep (new, `flare.html` + css in slot.css)
-`<div id="flare">` is a full-stage overlay (1600x900, `display:none` when idle, z-index 40). Insert **after `#sweep`**. To play: `flare.classList.add('go')` (optionally `rev` for right-to-left), remove `go` after ~2.4 s x `--spd` (set `--spd` on `#flare`; it defaults to 1). To replay, remove the class, force a reflow (`void flare.offsetWidth`), add it again. It is a wide aurora ribbon (two layers, parallax) crossing the whole stage in 2.2 s, a mint bloom flash at mid-way and a 34-star sparkle trail; pure transform/opacity, nothing runs when idle. Suggested use: when Aurora Sweep starts and for each band that melts the sheet, plus the MAX WIN moment.
-
-## BONUS scene look (`#scene.bonus`, kai already toggles it)
-In addition to the violet tint: a third aurora curtain (`.cu.c3`, screen-blended) fades in, the other two go additive, a 44-flake snowfall (`.snowB`, runs only in bonus) and a warm light bloom around the lodge windows plus a green lake glow (`.bGlow`) fade in over 1.6 s, window flicker gets faster. Nothing to wire beyond the class that already exists. `#scene` fragment is now ~1 MB (curtain 3 + snow + new trees).
+| `spin` | looks up, brows up, right arm rises a little, dog's head lifts (.95 s) |
+| `win` | smile, free hand waves, lantern lifts, Tuuli yips (jaw open, head bobs, tail whip) 1.5 s |
+| `big` | 3 hops, both arms up, aurora corona + rotating rays flare, dog hops, 3.2 s |
+| `special` | points at the sky, "!" pops, O mouth, 0.9 s |
+| `tease` | hold: eyes wide, tiny O mouth, ears flat, dog crouches; add `exhale` (hit) or `slump` (miss) before removing |
+| `bonus` | 1.4 s intro: raises and lights the lantern, glow rises, corona, dog jumps. Then shell keeps `bonusmode`: corona hums, head nods on 84 bpm, fast tail |
+| `maxwin` | hold: arms wide, corona full + rays, both look up, dog howls |
+`--spd` on `#char` for turbo. Characters are separate stacked `<svg>`s (`#cBackS #cAinoS .cLG #cDogS #cFogS #cFrontS`) so idle motion repaints only small layers.
+**Splash portraits:** `symbols.svg` also holds `<symbol id="ainoSplash">` and `ainoSplashSuper` (corona + rotating rays), viewBox `40 6 420 360`. `splashArt: kind => \`<svg class="ainoSplash" viewBox="40 6 420 360" width="320" height="274"><use href="#ainoSplash${SUPER ? 'Super' : ''}"/></svg>\``. They reference the gradients of `#cBackS` (so the character fragment must be in the page). Not tested inside the real shell splash (needs a CSS size like the Tea House `.kojiSplash` rule: add `.ainoSplash{width:320px;height:274px;display:block;margin:0 auto}` when you wire it).
 
 ## Perf / bake notes
 Idle (software renderer, 1600x900, rAF counter, 4 s windows): **34-39 fps** on this machine (shell grain overlay not included in my test page; the shell's full-screen grain can cost ~5 fps more). Measured cost: each aurora curtain layer ~7 fps, so there are TWO (`.cu.c1`, `.cu.c2`); remove one (`display:none`) if a device is slow. Window flicker + smoke + flakes ~8 fps together (`#scene .flakes{display:none}` first). Symbol animations are released only on `.hit`. Scene/frame are bitmaps: re-run the art scripts to change them (they need Chromium via Playwright). No SVG filters at runtime anywhere. Standalone page weight: symbols 424 KB, scene 614 KB, frame ~150 KB, fonts 35 KB.
 
 ## Honest weak spots
-- Aino and Tuuli are now painted semi-realistic characters, but they are still **stylised 3D-render quality, not photographs**: the face is small at game size (about 45 px tall), the skin is smooth airbrushed gradients, sleeves are simple tapered limbs with seams and folds (the elbow bend is slight), fabric is a mottled texture rather than a weave, the fur is strand clumps with a slightly "bristly" look. Tuuli reads as a fluffy husky, somewhat puppy-like.
-- Raised arms are rigid rotating bitmaps (no deformation at the elbow beyond the two-segment overlap).
-- Silver Fox reads as a fox now; fur is the same strand style. Blocks: the freeze effect is layered vector tricks (no real refraction). Win-state blend modes (`mix-blend-mode:color/screen`) only run while a block is winning.
-- Flare and the bonus look were checked in still frames and 3 time steps, not on a real device. fps (software renderer, 4 s windows, test page with scene+frame+char): old character 40-45, new 41-43 (no regression).
-- Not done: win-connection art (not needed), music/sfx spec.
+- Aino: reads as a stylised toy/3D-render doll, ~5/10; arms are tube-like (stiff), face is clean/cartoonish; fur is outline tufts + strokes (fine at distance). Silhouette is stable in all states, but the raised-arm paths sweep across the face in `special`.
+- Tuuli the husky is the best of the two (6-7/10); legs are simple.
+- Silver Fox reads close to a wolf; knife/kettle/compass/lantern/goggles/crystal/gem are strong (7-8/10).
+- Frame looks like a plain timber picture frame with iron gussets (6/10). Pines are flat silhouettes (5/10), mountains now natural (7/10).
+- Blocks: the symbol sits inside the ice with veil + veins but is not truly refracted. Block win animation is only a shine + the symbol's motion.
+- Splash portraits and the Sweep sheet were rendered/checked only partly (sheet CSS reviewed in code, not screenshotted in motion).
+- Not done: win-connection art (not needed), bonus-mode scene beyond the violet tint, music/sfx spec.

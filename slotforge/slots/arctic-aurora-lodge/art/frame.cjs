@@ -5,10 +5,8 @@ function grain(x, y, w, h, n, horiz) { let d = ''; for (let i = 0; i < n; i++) {
 const bolt = (x, y) => `<circle cx="${x}" cy="${y}" r="4.4" fill="url(#iron)" stroke="#05080c" stroke-width="1"/><circle cx="${x - 1.2}" cy="${y - 1.4}" r="1.4" fill="#cfe4f4" opacity=".8"/>`;
 let ic = ''; for (let x = 40; x < 640; x += 16 + R() * 26) { const l = 7 + R() * 14; ic += `<path d="M${f(x)} 27L${f(x + 5)} 27L${f(x + 2.5)} ${f(27 + l)}Z" fill="url(#gIce)" opacity=".9"/>`; }
 let snowTop = `M-8 6C-4 -8 14 -12 30 -9C50 -16 90 -12 110 -9C150 -17 190 -10 230 -12C270 -17 320 -9 360 -12C400 -17 450 -9 490 -12C540 -17 590 -9 630 -11C650 -14 668 -10 680 -8C690 -6 692 2 690 8C660 4 640 12 600 8C560 14 520 6 480 10C440 14 400 6 360 10C320 14 280 6 240 10C200 14 160 6 120 10C80 14 50 6 20 10C6 12 -4 12 -8 6Z`;
-const E = require('./frame-enrich.cjs');
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1192" viewBox="-10 -8 700 596">
 <defs>
- ${E.defs}
  ${logG('lgH', true)}${logG('lgV', false)}
  <linearGradient id="iron" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9fb0c4"/><stop offset=".5" stop-color="#3a4656"/><stop offset="1" stop-color="#10151c"/></linearGradient>
  <linearGradient id="gIce" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2fdff"/><stop offset="1" stop-color="#8fd0f0" stop-opacity=".3"/></linearGradient>
@@ -43,12 +41,12 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1192" 
 <ellipse cx="-8" cy="559" rx="7" ry="15" fill="url(#logEnd)" stroke="#120a05" stroke-width="1.4"/><ellipse cx="688" cy="559" rx="7" ry="15" fill="url(#logEnd)" stroke="#120a05" stroke-width="1.4"/>
 <path d="M10 548H670" stroke="#ffe8c0" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/>
 <path d="M-6 574C100 582 580 582 686 574" stroke="#000" stroke-opacity=".35" stroke-width="6" fill="none" filter="url(#b3)"/>
-<!-- carved panels, wood life, iron straps, forged brackets -->
-${E.carv}${E.wood}${E.iron}${E.brackets}
+<!-- iron corner gussets -->
+${[[0, 0, 1, 1], [680, 0, -1, 1], [0, 572, 1, -1], [680, 572, -1, -1]].map(([x, y, sx, sy]) => `<g transform="translate(${x} ${y}) scale(${sx} ${sy})"><path d="M6 6H62L50 18H18V50L6 62Z" fill="url(#iron)" stroke="#05080c" stroke-width="1.4" transform="translate(${sy < 0 ? 0 : 0} 0)"/><path d="M10 10H56" stroke="#e6f2ff" stroke-opacity=".6" stroke-width="1.4"/>${bolt(18, 18)}${bolt(44, 11)}${bolt(11, 44)}</g>`).join('')}
 <!-- snow on the top beam + frost -->
-<path d="${E.snow}" fill="url(#snow)"/><path d="M-9 6C-4 -6 6 -10 16 -8C40 -12 90 -8 108 -8" stroke="#fff" stroke-width="0" fill="none"/><path d="M-4 -6C30 -14 90 -11 120 -9C200 -15 300 -10 360 -12C440 -16 560 -10 640 -11C664 -12 680 -8 688 -4" fill="none" stroke="#7dffc4" stroke-opacity=".55" stroke-width="1.4" filter="url(#b1)"/>
+<path d="${snowTop}" fill="url(#snow)"/><path d="M-4 -6C30 -14 90 -11 120 -9C200 -15 300 -10 360 -12C440 -16 560 -10 640 -11C664 -12 680 -8 688 -4" fill="none" stroke="#7dffc4" stroke-opacity=".55" stroke-width="1.4" filter="url(#b1)"/>
 <path d="M-8 560C0 552 18 552 30 558C60 552 90 556 110 558" fill="#f0f8ff" opacity=".0"/>
-${E.ic}<g>${E.frost}</g><g fill="#e8c890" opacity=".55">${E.beads}</g>
+${ic}
 <!-- lanterns on the top corners -->
 ${[[26, -10], [654, -10]].map(([x, y]) => `<ellipse cx="${x}" cy="${y + 4}" rx="34" ry="30" fill="url(#lampG)" style="mix-blend-mode:screen"/><rect x="${x - 7}" y="${y - 10}" width="14" height="18" rx="3" fill="#1c1208" stroke="#05080c" stroke-width="1"/><rect x="${x - 4.6}" y="${y - 7}" width="9.2" height="12" fill="#ffd493"/><path d="M${x - 8} ${y - 10}L${x} ${y - 17}L${x + 8} ${y - 10}Z" fill="#2a1608" stroke="#05080c" stroke-width="1"/><path d="M${x - 3} ${y - 6}V${y + 3}" stroke="#fff" stroke-opacity=".8" stroke-width="1.4"/>`).join('')}
 </svg>`;

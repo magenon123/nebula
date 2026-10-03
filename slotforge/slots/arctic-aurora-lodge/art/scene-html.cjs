@@ -3,12 +3,11 @@ const fs = require('fs'), path = require('path'); const B = path.join(__dirname,
 const b64 = n => 'data:image/webp;base64,' + fs.readFileSync(path.join(B, n + '.webp')).toString('base64');
 const R = (() => { let s = 99; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
 let flakes = ''; for (let i = 0; i < 12; i++) { const x = Math.round(R() * 1600), d = (16 + R() * 14).toFixed(1), dl = (-R() * 26).toFixed(1), sz = (1.4 + R() * 1.6).toFixed(1); flakes += `<i class="fk" style="left:${x}px;width:${sz}px;height:${sz}px;animation-duration:${d}s;animation-delay:${dl}s"></i>`; }
-let snowB = ''; for (let i = 0; i < 44; i++) { const x = Math.round(R() * 1600), d = (7 + R() * 7).toFixed(1), dl = (-R() * 14).toFixed(1), sz = (2.4 + R() * R() * 6.5).toFixed(1); snowB += `<i style="left:${x}px;width:${sz}px;height:${sz}px;opacity:${(.55 + R() * .45).toFixed(2)};animation-duration:${d}s;animation-delay:${dl}s"></i>`; }
 const html = `<!-- Arctic Aurora Lodge scene (leo). 1600x900. The static world is ONE pre-baked WebP bitmap (mountains hill-shaded, lodge, lake, trees); only cheap layers animate: 3 aurora curtain bitmaps (transform/opacity), window flicker, chimney smoke, 12 snow flakes. Bonus look: add class "bonus" to #scene. -->
-<div id="scene"><img class="bg" alt="" src="${b64('scene')}"><div class="aur"><img class="cu c2" alt="" src="${b64('cur2')}"><img class="cu c1" alt="" src="${b64('cur1')}"><img class="cu c3" alt="" src="${b64('cur3')}"></div>
+<div id="scene"><img class="bg" alt="" src="${b64('scene')}"><div class="aur"><img class="cu c2" alt="" src="${b64('cur2')}"><img class="cu c1" alt="" src="${b64('cur1')}"></div>
 <img class="trees" alt="" src="${b64('trees')}"><div class="bonusTint"></div>
 <i class="wf w1"></i><i class="wf w2"></i><i class="wf w3"></i><i class="wf w4"></i>
 <i class="sm s1"></i><i class="sm s2"></i><i class="sm s3"></i>
-<div class="flakes">${flakes}</div><div class="snowB">${snowB}</div><div class="bGlow"></div></div>
+<div class="flakes">${flakes}</div></div>
 `;
 fs.writeFileSync(path.join(__dirname, '../scene.html'), html); console.log('scene.html', (html.length / 1024) | 0, 'KB');
