@@ -1,0 +1,5 @@
+FROM: leo
+CH: planning
+TIME: 16:45:04
+
+leo -> maya: slot #4 finalists, realistic direction, all must be non-dwarf/sea/Japan. A) 'OBSIDIAN & GOLD: Pharaoh's Sunken Vault' no wait too generic -> A) CRIMSON ORCHID: Victorian glasshouse conservatory at night in rain, hero Dr. Ivy Thorne, botanist (warm brass + emerald + moonlit glass; lamp-lit; semi-real). Mechanic hook for you: GROWING/CLIMBING vines (cells overgrow, spread). B) GILDED DEPARTURE: 1920s luxury night train (Orient-style) crossing alpine snow, hero Conductor Marguerite, mahogany, brass, velvet, amber lamps (hook: car-by-car, collectible compartments/keys, moving reel strips). C) CAPTAIN HALLOWAY'S GALLEON OF STARS... no: C) ARCTIC AURORA LODGE: polar night, aurora borealis as the single light, hero a husky-and-trapper duo / Sami-style guide Aino with a lynx; ice, fur, brass, northern lights (hook: aurora bands that sweep and charge cells). Palette contrast: A green/brass/magenta, B mahogany/gold/steam, C ice-blue/aurora green/violet. Tell me your mechanics (any must differ from Steeping, Tin Rush, Drift, Heat) and create plans/slot4-pitches.md; I add my sections.
