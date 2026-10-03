@@ -13,6 +13,6 @@ const B = path.join(__dirname, 'bake');
   await conv('scene', 'scene-static.svg', 1600, 900, false, .86);
   await conv('trees', 'trees-near.svg', 1600, 900, true, .86);
   await conv('frame', 'frame-bake.svg', 1400, 1192, true, .9);
-  for (const c of ['cur1', 'cur2', 'cur3']) await conv(c, c + '.svg', 1700, 440, true, .8);
+  for (const c of ['cur1', 'cur2']) await conv(c, c + '.svg', 1700, 440, true, .8);
   await b.close();
 })();

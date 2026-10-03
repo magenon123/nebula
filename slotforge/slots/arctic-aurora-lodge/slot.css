@@ -43,11 +43,9 @@
 #scene .cu{position:absolute;left:-50px;top:0;width:1700px;height:440px;will-change:transform,opacity;transform-origin:50% 100%}
 #scene .cu.c1{animation:aaD1 31s ease-in-out infinite alternate,aaO1 11s ease-in-out infinite alternate}
 #scene .cu.c2{animation:aaD2 41s ease-in-out infinite alternate,aaO2 15s ease-in-out infinite alternate;opacity:.9}
-#scene .cu.c3{animation:aaD3 53s ease-in-out infinite alternate,aaO3 19s ease-in-out infinite alternate;opacity:.8}
 @keyframes aaD1{from{transform:translateX(-38px) scaleY(.94)}to{transform:translateX(42px) scaleY(1.06)}}
 @keyframes aaD2{from{transform:translateX(40px) scaleY(1.05)}to{transform:translateX(-36px) scaleY(.93)}}
-@keyframes aaD3{from{transform:translateX(-24px) scaleY(.96)}to{transform:translateX(30px) scaleY(1.04)}}
-@keyframes aaO1{from{opacity:.62}to{opacity:1}}@keyframes aaO2{from{opacity:.55}to{opacity:.95}}@keyframes aaO3{from{opacity:.5}to{opacity:.9}}
+@keyframes aaO1{from{opacity:.62}to{opacity:1}}@keyframes aaO2{from{opacity:.55}to{opacity:.95}}
 /* bonus mode: the aurora flares, violet cast (cheap: one overlay opacity) */
 #scene .bonusTint{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 20%,rgba(138,92,255,.38),rgba(138,92,255,0) 70%),linear-gradient(180deg,rgba(60,255,170,.16),rgba(60,255,170,0) 55%);opacity:0;transition:opacity 1.6s}
 #scene.bonus .bonusTint{opacity:1}
@@ -87,8 +85,8 @@
 #aura.fs .litSym{opacity:1;transform:none}
 #aura.fs .litBox.pop{animation:auPop .7s cubic-bezier(.3,1.6,.5,1)}
 @keyframes auPop{0%{transform:scale(.6)}60%{transform:scale(1.14)}100%{transform:none}}
-#aura .gs{position:absolute;left:0;right:0;top:134px;display:flex;flex-direction:column;align-items:center;gap:6px}
-#aura .g{position:relative;display:block;width:44px;height:42px;border-radius:50%;
+#aura .gs{position:absolute;left:0;right:0;top:128px;display:flex;flex-direction:column;align-items:center;gap:5px}
+#aura .g{position:relative;display:block;width:42px;height:40px;border-radius:50%;
  background:radial-gradient(circle at 50% 38%,#0e2c5a,#050f26 70%);box-shadow:inset 0 2px 6px #000,0 1px 0 rgba(160,220,255,.35),0 0 0 2px #1b3f78;border:0}
 #aura .g b{position:absolute;left:0;right:0;top:12px;text-align:center;font:700 14px/1 var(--toon);color:#3f6aa6;transition:opacity .2s}
 #aura .g svg{position:absolute;left:-4px;top:-4px;width:52px;height:50px;overflow:visible;opacity:0;transform:scale(.3)}
@@ -101,10 +99,180 @@
 #aura .gsLbl{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:900 9.5px/1 var(--toon);letter-spacing:2px;color:#7fa8d8}
 
 /* ===== char.css ===== */
-/* ---------- Aino + Tuuli ---------- */
-#char{left:1120px;top:340px;width:480px;height:410px;pointer-events:none;overflow:visible}
-#char svg{width:480px;height:410px;overflow:visible;display:block}
-#char #cMouth .m1,#char #cMouth .m2,#char #cDJaw .jo,#char #cFog circle{opacity:0}
+/* ---------- Aino + Tuuli. Layers are separate <svg> elements so idle motion repaints only a small layer ---------- */
+#char{left:1120px;top:340px;width:480px;height:410px;pointer-events:none;overflow:visible;--spd:1}
+#char .cl{position:absolute;left:0;top:0;width:480px;height:410px;overflow:visible;display:block}
+#char .cLG{position:absolute;left:49px;top:299px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(255,216,144,.8),rgba(255,168,64,.28) 50%,rgba(255,154,48,0) 72%);mix-blend-mode:screen;transform-origin:50% 50%;animation:cLf 2.6s ease-in-out infinite}
+@keyframes cLf{0%,100%{opacity:.8;transform:scale(1)}30%{opacity:1;transform:scale(1.08)}60%{opacity:.7;transform:scale(.94)}}
+#char #cMouth .m1,#char #cMouth .m2,#char #cDJaw .jo,#char #cBackS #cCorona{opacity:0}
+#char #cFog circle{opacity:0}
+/* shared transform origins (SVG user space px) */
+#cAino,#cAll{transform-origin:165px 358px}
+#cHead{transform-origin:165px 150px}#cBraid{transform-origin:205px 138px}
+#cArmR{transform-origin:216px 182px}#cForeR{transform-origin:244px 236px}#cArmL{transform-origin:114px 182px}#cForeL{transform-origin:90px 236px}
+#cLids,#cBrows,#cMouth,.cPup,.cEyeL,.cEyeR{transform-origin:165px 103px}
+.cPup{transform-origin:center}
+#cDog{transform-origin:380px 352px}#cDHead{transform-origin:380px 236px}#cDEarL{transform-origin:358px 170px}#cDEarR{transform-origin:402px 170px}#cDTail{transform-origin:432px 318px}#cDJaw{transform-origin:380px 224px}#cDBody{transform-origin:380px 340px}
+#cRays{transform-origin:240px 170px}
+/* ---------- IDLE: breathing (whole layer, compositor), blink, tail wag, fog puffs ---------- */
+#cAinoS{animation:cBr 4s ease-in-out infinite;transform-origin:165px 358px;will-change:transform}
+@keyframes cBr{0%,100%{transform:scale(1,1)}50%{transform:scale(1.004,1.012)}}
+#cLids{animation:cBl 5.4s steps(1,end) infinite}
+@keyframes cBl{0%,94%{opacity:0}95%,97%{opacity:1}98%,100%{opacity:0}}
+#cDogS{animation:cBr 3.4s ease-in-out -1s infinite;transform-origin:380px 352px;will-change:transform}
+#cDTail{animation:cWag 2.8s ease-in-out infinite}
+@keyframes cWag{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(7deg)}}
+#cDEarL{animation:cEar 7s ease-in-out infinite}#cDEarR{animation:cEar 9s ease-in-out -3s infinite}
+@keyframes cEar{0%,90%,100%{transform:none}93%{transform:rotate(-8deg)}96%{transform:rotate(3deg)}}
+#cDLids{animation:cBl 6.6s steps(1,end) -2s infinite}
+#cFog .fg1{animation:cFg 4.4s ease-out infinite}#cFog .fg2{animation:cFg 4.4s ease-out -2.2s infinite}
+@keyframes cFg{0%{opacity:0;transform:translate(0,4px) scale(.5)}20%{opacity:.8}100%{opacity:0;transform:translate(-12px,-22px) scale(2.2)}}
+#cBraid{animation:cBd 5s ease-in-out infinite}@keyframes cBd{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.8deg)}}
+/* ---------- STATES (the shell toggles one class on #char; --spd scales time for turbo) ---------- */
+#char{--t:calc(1s*var(--spd,1))}
+/* spin: looks up at the sky, the dog's ears perk */
+#char.spin #cHead{animation:cSpH calc(.95s*var(--spd)) ease-out both}
+#char.spin .cPup{animation:cSpP calc(.95s*var(--spd)) ease-out both}
+#char.spin #cBrows{animation:cSpB calc(.95s*var(--spd)) ease-out both}
+#char.spin #cArmR{animation:cSpA calc(.95s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.spin #cDHead{animation:cSpD calc(.95s*var(--spd)) ease-out both}
+@keyframes cSpH{0%{transform:none}25%{transform:rotate(3deg) translateY(2px)}60%{transform:rotate(-7deg) translateY(-3px)}100%{transform:rotate(-5deg) translateY(-2px)}}
+@keyframes cSpP{0%{transform:none}30%{transform:none}70%,100%{transform:translateY(-4px)}}
+@keyframes cSpB{0%{transform:none}60%,100%{transform:translateY(-3px)}}
+@keyframes cSpA{0%{transform:none}30%{transform:rotate(6deg)}70%,100%{transform:rotate(-38deg)}}
+@keyframes cSpD{0%{transform:none}30%{transform:rotate(3deg)}70%,100%{transform:rotate(-9deg) translateY(-2px)}}
+/* win: smiles, waves the free hand, lantern lifts, Tuuli yips */
+#char.win #cMouth .m0{opacity:0}#char.win #cMouth .m1{opacity:1}
+#char.win #cArmR{animation:cWiA calc(1.5s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.win #cForeR{animation:cWiF calc(1.5s*var(--spd)) ease-in-out both}
+#char.win #cArmL{animation:cWiL calc(1.5s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.win #cHead{animation:cWiH calc(1.5s*var(--spd)) ease-in-out both}
+#char.win #cDJaw .jc{opacity:0}#char.win #cDJaw .jo{opacity:1}
+#char.win #cDHead{animation:cWiD calc(1.5s*var(--spd)) ease-in-out both}
+#char.win #cDTail{animation:cWag .35s ease-in-out infinite}
+#char.win .cLG{animation:cLf .6s ease-in-out infinite}
+@keyframes cWiA{0%{transform:none}18%{transform:rotate(8deg)}40%,80%{transform:rotate(-112deg)}100%{transform:none}}
+@keyframes cWiF{0%,40%{transform:none}52%{transform:rotate(26deg)}64%{transform:rotate(-24deg)}76%{transform:rotate(22deg)}88%,100%{transform:none}}
+@keyframes cWiL{0%{transform:none}25%{transform:rotate(-4deg)}45%,80%{transform:rotate(-16deg)}100%{transform:none}}
+@keyframes cWiH{0%{transform:none}20%{transform:rotate(-4deg) translateY(2px)}45%{transform:rotate(5deg) translateY(-2px)}70%{transform:rotate(-2deg)}100%{transform:none}}
+@keyframes cWiD{0%{transform:none}15%{transform:translateY(5px)}30%{transform:translateY(-6px) rotate(-3deg)}45%{transform:translateY(4px)}60%{transform:translateY(-5px) rotate(3deg)}80%{transform:none}100%{transform:none}}
+/* big: both arms up, hops, aurora corona flares */
+#char.big #cMouth .m0{opacity:0}#char.big #cMouth .m1{opacity:1}
+#char.big #cAll{animation:cBgH calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cArmR{animation:cBgR calc(3.2s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.big #cArmL{animation:cBgL calc(3.2s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.big #cForeR{animation:cBgFr calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cHead{animation:cBgHd calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cDog{animation:cBgD calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cDJaw .jc{opacity:0}#char.big #cDJaw .jo{opacity:1}
+#char.big #cDTail{animation:cWag .25s ease-in-out infinite}
+#char.big #cCorona{animation:cCor calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cRays{animation:cRot calc(6.4s*var(--spd)) linear both}
+@keyframes cBgH{0%{transform:none}8%{transform:scale(1.04,.94)}18%{transform:translateY(-22px) scale(.97,1.04)}30%{transform:scale(1.04,.95)}42%{transform:translateY(-20px) scale(.97,1.04)}54%{transform:scale(1.03,.96)}66%{transform:translateY(-14px)}78%{transform:scale(1.02,.98)}100%{transform:none}}
+@keyframes cBgR{0%{transform:none}12%{transform:rotate(10deg)}28%,80%{transform:rotate(-168deg)}100%{transform:none}}
+@keyframes cBgL{0%{transform:none}12%{transform:rotate(-8deg)}28%,80%{transform:rotate(150deg)}100%{transform:none}}
+@keyframes cBgFr{0%,28%{transform:none}40%{transform:rotate(-20deg)}54%{transform:rotate(18deg)}68%{transform:rotate(-14deg)}84%,100%{transform:none}}
+@keyframes cBgHd{0%{transform:none}30%{transform:rotate(-6deg)}60%{transform:rotate(5deg)}100%{transform:none}}
+@keyframes cBgD{0%{transform:none}10%{transform:scale(1.03,.95)}22%{transform:translateY(-26px)}34%{transform:scale(1.04,.95)}46%{transform:translateY(-22px)}60%{transform:scale(1.03,.96)}74%{transform:translateY(-12px)}100%{transform:none}}
+@keyframes cCor{0%{opacity:0}18%,76%{opacity:1}100%{opacity:0}}
+@keyframes cRot{from{transform:rotate(0)}to{transform:rotate(140deg)}}
+/* special: points at the sky, "!" pops */
+#char.special #cMouth .m0{opacity:0}#char.special #cMouth .m2{opacity:1}
+#char.special #cArmR{animation:cSpcA calc(.9s*var(--spd)) cubic-bezier(.3,.9,.4,1.2) both}
+#char.special #cHead{animation:cSpcH calc(.9s*var(--spd)) ease-out both}
+#char.special #cBrows{transform:translateY(-4px)}
+#char.special .cEyeL,#char.special .cEyeR{transform:scale(1.1)}
+#char.special #cBang{animation:cBangA calc(.9s*var(--spd)) ease-out both}
+#char.special #cDEarL,#char.special #cDEarR{animation:none;transform:translateY(-4px)}
+#char.special #cDHead{animation:cSpD calc(.9s*var(--spd)) ease-out both}
+@keyframes cSpcA{0%{transform:none}35%{transform:rotate(-186deg)}60%{transform:rotate(-170deg)}100%{transform:rotate(-176deg)}}
+@keyframes cSpcH{0%{transform:none}35%{transform:rotate(-8deg) translateY(-3px)}100%{transform:rotate(-6deg) translateY(-2px)}}
+@keyframes cBangA{0%{opacity:0;transform:translateY(10px) scale(.4)}30%{opacity:1;transform:translateY(-4px) scale(1.2)}55%{transform:scale(1)}100%{opacity:1}}
+/* tease: held breath. everything freezes, eyes wide, dog crouches with ears flat */
+#char.tease #cMouth .m0{opacity:0}#char.tease #cMouth .m2{opacity:1;transform:scale(.55);transform-origin:165px 137px}
+#char.tease #cAinoS,#char.tease #cDogS,#char.tease #cBraid,#char.tease #cLids,#char.tease #cDTail,#char.tease #cDEarL,#char.tease #cDEarR,#char.tease #cDLids{animation:none}
+#char.tease .cEyeL,#char.tease .cEyeR{transform:scale(1.14)}
+#char.tease #cBrows{transform:translateY(-4px)}
+#char.tease #cHead{animation:cTsH calc(.5s*var(--spd)) ease-out both}
+#char.tease #cAino{animation:cTsA calc(.5s*var(--spd)) ease-out both}
+#char.tease #cDEarL{transform:rotate(-24deg)}#char.tease #cDEarR{transform:rotate(24deg)}
+#char.tease #cDog{animation:cTsD calc(.5s*var(--spd)) ease-out both}
+#char.tease .cLG{animation:none;opacity:.5}
+@keyframes cTsH{to{transform:rotate(2deg) translateY(2px)}}@keyframes cTsA{to{transform:scale(1.01,.99) translateX(2px)}}@keyframes cTsD{to{transform:scale(1.02,.94)}}
+/* resolve tease: exhale (hit) / slump (miss), add before removing tease */
+#char.tease.exhale #cAino{animation:cExA calc(.6s*var(--spd)) ease-out both}
+#char.tease.exhale #cMouth .m2{opacity:0}#char.tease.exhale #cMouth .m1{opacity:1}
+#char.tease.exhale #cDEarL,#char.tease.exhale #cDEarR{transform:none}#char.tease.exhale #cDog{animation:none}
+@keyframes cExA{0%{transform:none}35%{transform:translateY(-6px) scale(.98,1.03)}100%{transform:none}}
+#char.tease.slump #cHead{animation:cSlH calc(.6s*var(--spd)) ease-out both}
+#char.tease.slump #cMouth .m2{opacity:0}#char.tease.slump #cMouth .m0{opacity:1}
+#char.tease.slump #cDEarL{transform:rotate(-34deg)}#char.tease.slump #cDEarR{transform:rotate(34deg)}
+@keyframes cSlH{0%{transform:none}100%{transform:rotate(5deg) translateY(4px)}}
+/* bonus intro: raises and lights the lantern */
+#char.bonus #cMouth .m0{opacity:0}#char.bonus #cMouth .m1{opacity:1}
+#char.bonus #cArmL{animation:cBnA calc(1.4s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.bonus #cForeL{animation:cBnF calc(1.4s*var(--spd)) ease-in-out both}
+#char.bonus .cLG{animation:cBnG calc(1.4s*var(--spd)) ease-out both}
+#char.bonus #cDJaw .jc{opacity:0}#char.bonus #cDJaw .jo{opacity:1}
+#char.bonus #cDog{animation:cBgD calc(1.4s*var(--spd)) ease-in-out both}
+#char.bonus #cCorona{animation:cCor calc(1.4s*var(--spd)) ease-in-out both}
+@keyframes cBnA{0%{transform:none}40%,80%{transform:rotate(168deg)}100%{transform:rotate(150deg)}}
+@keyframes cBnF{0%,40%{transform:none}60%{transform:rotate(12deg)}100%{transform:rotate(6deg)}}
+@keyframes cBnG{0%{opacity:.8;transform:scale(1)}50%,100%{opacity:1;transform:translateY(-120px) scale(2.2)}}
+/* bonus mode (whole bonus, set by the shell): corona hums, head nods on the beat (84 bpm), dog wags fast */
+#char.bonusmode #cCorona{opacity:.38}
+#char.bonusmode #cRays{animation:cRot 60s linear infinite}
+#char.bonusmode #cHead{animation:cNod .714s ease-in-out infinite}
+#char.bonusmode #cDTail{animation:cWag .357s ease-in-out infinite}
+#char.bonusmode #cMouth .m0{opacity:0}#char.bonusmode #cMouth .m1{opacity:1}
+#char.bonusmode .cLG{transform:scale(1.5);animation:cLf 1.2s ease-in-out infinite}
+@keyframes cNod{0%,100%{transform:none}50%{transform:translateY(2px) rotate(1.5deg)}}
+/* max win: arms wide, corona full, both lift their heads */
+#char.maxwin #cMouth .m0{opacity:0}#char.maxwin #cMouth .m1{opacity:1}
+#char.maxwin #cCorona{opacity:1}
+#char.maxwin #cRays{animation:cRot 18s linear infinite}
+#char.maxwin #cArmR{animation:cMxR .8s cubic-bezier(.3,.9,.4,1.2) both}
+#char.maxwin #cArmL{animation:cMxL .8s cubic-bezier(.3,.9,.4,1.2) both}
+#char.maxwin #cHead{animation:cMxH .8s ease-out both}
+#char.maxwin #cDHead{animation:cMxD .8s ease-out both}
+#char.maxwin #cDJaw .jc{opacity:0}#char.maxwin #cDJaw .jo{opacity:1}
+#char.maxwin #cDTail{animation:cWag .3s ease-in-out infinite}
+@keyframes cMxR{from{transform:none}to{transform:rotate(-100deg)}}@keyframes cMxL{from{transform:none}to{transform:rotate(100deg)}}
+@keyframes cMxH{from{transform:none}to{transform:rotate(-6deg) translateY(-3px)}}@keyframes cMxD{from{transform:none}to{transform:rotate(-14deg) translateY(-4px)}}
+
+/* ===== sweep.css ===== */
+/* ---------- Aurora Sweep: 5x5 ice sheet ---------- */
+#sweep{left:468px;top:194px;width:624px;height:500px;opacity:0;pointer-events:none;transition:opacity .5s;z-index:5}
+#sweep.on{opacity:1}
+#sweep .swFrame{position:absolute;left:62px;top:0;width:500px;height:500px;border-radius:16px;background:linear-gradient(160deg,#cfeaff,#6aa0e8 45%,#2a3f9a);box-shadow:0 0 30px rgba(120,255,200,.35),inset 0 0 0 3px rgba(255,255,255,.5)}
+#sweep .swGrid{position:absolute;left:68px;top:6px;width:488px;height:488px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);gap:4px;border-radius:12px;overflow:hidden;background:#06122c}
+#sweep .sc{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 60%,#16407a,#07173a);box-shadow:inset 0 0 10px #000}
+#sweep .ice{position:absolute;inset:0;background:linear-gradient(145deg,rgba(235,250,255,.95),rgba(150,205,245,.9) 45%,rgba(90,140,225,.92));box-shadow:inset 0 0 0 2px rgba(255,255,255,.7),inset -6px -6px 12px rgba(30,60,150,.5);transition:opacity .45s,transform .45s}
+#sweep .ice::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.55) 48%,transparent 56%),repeating-linear-gradient(60deg,rgba(255,255,255,.14) 0 1px,transparent 1px 11px)}
+#sweep .val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 30px/1 var(--toon);color:#eaffd8;text-shadow:0 0 12px #3fffa0,0 2px 0 #06301e;opacity:0}
+#sweep .xn{position:absolute;right:4px;top:3px;font:900 15px/1 var(--toon);color:#2a1604;background:linear-gradient(#fff0b0,#e0a838);border-radius:9px;padding:2px 6px;opacity:0;border:1px solid #6a4410}
+#sweep .pr{position:absolute;inset:4px;width:calc(100% - 8px);height:calc(100% - 8px);opacity:0}
+#sweep .sc.melt .ice{opacity:0;transform:scale(1.15)}
+#sweep .sc.melt .val,#sweep .sc.melt.prism .pr{opacity:1;animation:swPop .5s cubic-bezier(.3,1.7,.5,1)}
+#sweep .sc.prism .val{opacity:0!important}
+#sweep .sc.melt.empty{background:#0a1c40}
+#sweep .sc.x2 .xn,#sweep .sc.x3 .xn,#sweep .sc.x4 .xn,#sweep .sc.x5 .xn{opacity:1;animation:swPop .4s cubic-bezier(.3,1.7,.5,1)}
+#sweep .sc.x2 .xn::after{content:"x2"}#sweep .sc.x3 .xn::after{content:"x3"}#sweep .sc.x4 .xn::after{content:"x4"}#sweep .sc.x5 .xn::after{content:"x5"}
+@keyframes swPop{0%{transform:scale(.3)}100%{transform:none}}
+#sweepBands{position:absolute;left:68px;top:6px;width:488px;height:488px;overflow:hidden;border-radius:12px}
+#sweepBands .band{position:absolute;background:linear-gradient(90deg,rgba(77,255,176,0),rgba(77,255,176,.85) 35%,rgba(190,255,230,.95) 50%,rgba(138,92,255,.85) 65%,rgba(138,92,255,0));mix-blend-mode:screen;opacity:0;will-change:transform,opacity}
+#sweepBands .row{left:0;width:488px;height:96px;background:linear-gradient(180deg,rgba(77,255,176,0),rgba(150,255,210,.9) 50%,rgba(138,92,255,0))}
+#sweepBands .col{top:0;height:488px;width:96px}
+#sweepBands .r0{top:0}#sweepBands .r1{top:98px}#sweepBands .r2{top:196px}#sweepBands .r3{top:294px}#sweepBands .r4{top:392px}
+#sweepBands .c0{left:0}#sweepBands .c1{left:98px}#sweepBands .c2{left:196px}#sweepBands .c3{left:294px}#sweepBands .c4{left:392px}
+#sweepBands .dg1,#sweepBands .dg2{left:-150px;top:196px;width:790px;height:96px;background:linear-gradient(180deg,rgba(77,255,176,0),rgba(150,255,210,.9) 50%,rgba(138,92,255,0))}
+#sweepBands .dg1{transform:rotate(45deg)}#sweepBands .dg2{transform:rotate(-45deg)}
+#sweepBands .row.go{animation:swRow 1s ease-in-out both}#sweepBands .col.go{animation:swCol 1s ease-in-out both}
+#sweepBands .dg1.go{animation:swD1 1.1s ease-in-out both}#sweepBands .dg2.go{animation:swD2 1.1s ease-in-out both}
+@keyframes swRow{0%{opacity:0;transform:translateX(-100%)}15%,85%{opacity:1}100%{opacity:0;transform:translateX(100%)}}
+@keyframes swCol{0%{opacity:0;transform:translateY(-100%)}15%,85%{opacity:1}100%{opacity:0;transform:translateY(100%)}}
+@keyframes swD1{0%{opacity:0;transform:rotate(45deg) translateX(-100%)}15%,85%{opacity:1}100%{opacity:0;transform:rotate(45deg) translateX(100%)}}
+@keyframes swD2{0%{opacity:0;transform:rotate(-45deg) translateX(-100%)}15%,85%{opacity:1}100%{opacity:0;transform:rotate(-45deg) translateX(100%)}}
 
 /* ART-GEN winvars begin */
 .cell.hit,.winAnim{--k0_knife:sy0_knife;--k0_glint:sy0_glint;--k0_spk:sy0_spk;--k1_st0:sy1_st0;--k1_st1:sy1_st1;--k1_st2:sy1_st2;--k1_pot:sy1_pot;--k1_lid:sy1_lid;--k2_mL:sy2_mL;--k2_mR:sy2_mR;--k2_puff:sy2_puff;--k4_comp:sy4_comp;--k4_needle:sy4_needle;--k4_gl:sy4_gl;--k4_spk:sy4_spk;--k5_swing:sy5_swing;--k5_flame:sy5_flame;--k5_glow:sy5_glow;--k6_head:sy6_head;--k6_earL:sy6_earL;--k6_earR:sy6_earR;--k6_lid0:sy6_lid0;--k6_lid1:sy6_lid1;--k6_nose:sy6_nose;--k6_spk:sy6_spk;--k7_head:sy7_head;--k7_owl:sy7_owl;--k7_wingL:sy7_wingL;--k7_wingR:sy7_wingR;--k7_lid0:sy7_lid0;--k7_lid1:sy7_lid1;--k7_spk:sy7_spk;--k8_main:sy8_main;--k8_sL:sy8_sL;--k8_sR:sy8_sR;--k8_aura:sy8_aura;--k8_beam:sy8_beam;--k8_spk:sy8_spk;--k9_rays:sy9_rays;--k9_orb:sy9_orb;--k9_rib:sy9_rib;--k9_core:sy9_core;--k9_star:sy9_star;--k9_ban:sy9_ban;--k9_spk:sy9_spk;--k10_t1:sy10_t1;--k10_t2:sy10_t2;--k10_t3:sy10_t3;--k10_t4:sy10_t4;--k10_t5:sy10_t5;--k10_ball:sy10_ball;--k10_fs:sy10_fs;--k10_em0:sy10_em0;--k10_em1:sy10_em1;--k10_em2:sy10_em2;--k11_gem:sy11_gem;--k11_sheen:sy11_sheen;--k11_aura:sy11_aura;--k11_spk:sy11_spk;--k11_sp2:sy11_sp2;--k12_pri:sy12_pri;--k12_beam:sy12_beam;--k3_glL:sy3_glL;--k3_glR:sy3_glR;--k3_gog:sy3_gog;--k3_lensL:sy3_lensL;--k3_lensR:sy3_lensR;--k3_spk:sy3_spk;--k20_blk:b2x0_blk;--k20_shine:b2x0_shine;--k21_blk:b2x1_blk;--k21_shine:b2x1_shine;--k22_blk:b2x2_blk;--k22_shine:b2x2_shine;--k23_blk:b2x3_blk;--k23_shine:b2x3_shine;--k24_blk:b2x4_blk;--k24_shine:b2x4_shine;--k25_blk:b2x5_blk;--k25_shine:b2x5_shine;--k26_blk:b2x6_blk;--k26_shine:b2x6_shine;--k27_blk:b2x7_blk;--k27_shine:b2x7_shine;--k28_blk:b2x8_blk;--k28_shine:b2x8_shine;--k30_blk:b3x0_blk;--k30_shine:b3x0_shine;--k31_blk:b3x1_blk;--k31_shine:b3x1_shine;--k32_blk:b3x2_blk;--k32_shine:b3x2_shine;--k33_blk:b3x3_blk;--k33_shine:b3x3_shine;--k34_blk:b3x4_blk;--k34_shine:b3x4_shine;--k35_blk:b3x5_blk;--k35_shine:b3x5_shine;--k36_blk:b3x6_blk;--k36_shine:b3x6_shine;--k37_blk:b3x7_blk;--k37_shine:b3x7_shine;--k38_blk:b3x8_blk;--k38_shine:b3x8_shine}

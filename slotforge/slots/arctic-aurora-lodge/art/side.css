@@ -10,8 +10,8 @@
 #aura.fs .litSym{opacity:1;transform:none}
 #aura.fs .litBox.pop{animation:auPop .7s cubic-bezier(.3,1.6,.5,1)}
 @keyframes auPop{0%{transform:scale(.6)}60%{transform:scale(1.14)}100%{transform:none}}
-#aura .gs{position:absolute;left:0;right:0;top:134px;display:flex;flex-direction:column;align-items:center;gap:6px}
-#aura .g{position:relative;display:block;width:44px;height:42px;border-radius:50%;
+#aura .gs{position:absolute;left:0;right:0;top:128px;display:flex;flex-direction:column;align-items:center;gap:5px}
+#aura .g{position:relative;display:block;width:42px;height:40px;border-radius:50%;
  background:radial-gradient(circle at 50% 38%,#0e2c5a,#050f26 70%);box-shadow:inset 0 2px 6px #000,0 1px 0 rgba(160,220,255,.35),0 0 0 2px #1b3f78;border:0}
 #aura .g b{position:absolute;left:0;right:0;top:12px;text-align:center;font:700 14px/1 var(--toon);color:#3f6aa6;transition:opacity .2s}
 #aura .g svg{position:absolute;left:-4px;top:-4px;width:52px;height:50px;overflow:visible;opacity:0;transform:scale(.3)}

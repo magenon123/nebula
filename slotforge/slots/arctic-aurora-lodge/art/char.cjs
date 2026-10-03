@@ -13,7 +13,7 @@ const hair = S.lin(0, 60, 0, 140, [[0, '#6a4630'], [.5, '#3e2619'], [1, '#1e120b
 const red = S.lin(0, 0, 1, 1, [[0, '#ff6a5c'], [.5, '#d4202e'], [1, '#7a0c1a']]);
 const redV = (x1, y1, x2, y2) => S.lin(x1, y1, x2, y2, [[0, '#f0504a'], [.55, '#c8222e'], [1, '#6e0c1a']]);
 const gold = S.lin(0, 0, 1, 1, [[0, '#fff0b0'], [.5, '#e0b24e'], [1, '#8a5a18']]);
-const snowG = S.lin(0, 330, 0, 410, [[0, '#9fc4e0'], [.35, '#4a7aa8'], [1, '#12284a']]);
+const snowG = S.lin(0, 330, 0, 410, [[0, '#9fc4e0'], [.35, '#4a7aa8'], [.8, '#12284a', .6], [1, '#12284a', 0]]);
 const dogG = S.lin(0, 200, 0, 340, [[0, '#7a8aa0'], [.5, '#4a5668'], [1, '#262e3c']]);
 const dogW = S.lin(0, 200, 0, 340, [[0, '#ffffff'], [.6, '#e4ecf6'], [1, '#aab8cc']]);
 const glowW = S.rad(0, 0, 1, [[0, '#ffd890', .9], [.4, '#ffa840', .4], [1, '#ff9a30', 0]]);
@@ -74,7 +74,7 @@ const aino = `
   <g id="cForeL">${limb('M90 236Q86 266 94 294', 21, S.lin(80, 236, 110, 296, [[0, '#3f68bc'], [1, '#14307a']]), '#bcd4ff', [-5, 0], null)}
    <path d="M80 286Q94 296 108 288L108 296Q94 304 80 296Z" fill="${redV(0, 286, 0, 300)}" stroke="#3a0610" stroke-width="1"/>
    ${furCuff(94, 290, 17)}${mitten(94, 300, 4)}
-   <g id="cLant"><circle cx="94" cy="344" r="38" fill="${S.rad(94, 344, 38, [[0, '#ffd890', .8], [.5, '#ffa840', .28], [1, '#ff9a30', 0]])}" class="cLGlow" style="mix-blend-mode:screen"/><use href="#s5" x="58" y="296" width="72" height="72"/></g>
+   <g id="cLant"><use href="#s5" x="58" y="296" width="72" height="72"/></g>
   </g></g>
  <!-- arm R (viewer's right) -->
  <g id="cArmR">${limb('M216 182Q238 200 244 236', 25, S.lin(210, 180, 250, 240, [[0, '#3a64b8'], [1, '#0e2860']]), '#9fc0ff', [-5, 0], [7, 0])}
@@ -155,9 +155,12 @@ const svg = `<div id="char">
 <i class="cLG"></i>
 <svg class="cl" id="cDogS" ${VB}>${tuuli}</svg>
 <svg class="cl" id="cFogS" ${VB}><g id="cFog"><circle class="fg1" cx="358" cy="230" r="7" fill="${S.rad(358, 230, 8, [[0, '#fff', .7], [1, '#cfe8ff', 0]])}"/><circle class="fg2" cx="358" cy="230" r="8" fill="${S.rad(358, 230, 9, [[0, '#fff', .6], [1, '#cfe8ff', 0]])}"/></g></svg>
-<svg class="cl" id="cFrontS" ${VB}><g mask="url(#chFade)"><path d="M0 410V372Q60 352 150 366Q260 350 360 364Q440 352 480 368V410Z" fill="${S.lin(0, 352, 0, 410, [[0, '#7aa8cc'], [.4, '#2c5688'], [1, '#0c1c3c']])}"/><path d="M0 372Q60 352 150 366Q260 350 360 364Q440 352 480 368" fill="none" stroke="#9ffbd8" stroke-opacity=".5" stroke-width="2.4"/></g>
+<svg class="cl" id="cFrontS" ${VB}><g mask="url(#chFade)"><path d="M0 410V372Q60 352 150 366Q260 350 360 364Q440 352 480 368V410Z" fill="${S.lin(0, 352, 0, 410, [[0, '#7aa8cc'], [.4, '#2c5688'], [.75, '#0c1c3c', .7], [1, '#0c1c3c', 0]])}"/><path d="M0 372Q60 352 150 366Q260 350 360 364Q440 352 480 368" fill="none" stroke="#9ffbd8" stroke-opacity=".5" stroke-width="2.4"/></g>
  <g id="cBang" opacity="0"><path d="M240 14l-6 30h12z" fill="#ffe08a" stroke="#4a2c08" stroke-width="1.6"/><circle cx="240" cy="54" r="5.4" fill="#ffe08a" stroke="#4a2c08" stroke-width="1.6"/></g></svg>
 </div>
 `;
 fs.writeFileSync(path.join(__dirname, '../character.html'), `<!-- Aino the guide + Tuuli the husky. viewBox 480x410 at stage (1120,340). Ids: cCorona(cRays) cAll cAino(cBody cBraid cArmL(cForeL cLant cLGlow) cArmR(cForeR) cHead(cLids cBrows cMouth .m0 .m1 .m2, .cPup)) cDog(cDTail cDBody cDHead(cDEarL cDEarR cDEyes cDLids cDJaw .jc/.jo) cFog) cBang -->\n` + svg);
+const strip = x => x.replace(/ id="[^"]*"/g, '');
+const sp = (sup) => `<symbol id="ainoSplash${sup ? 'Super' : ''}" viewBox="40 6 420 360"><style>.asp .asb{animation:aspB 3s ease-in-out infinite;transform-origin:50% 100%}@keyframes aspB{50%{transform:scale(1.01,1.025)}}.asp .asr{transform-origin:240px 170px;animation:aspR 24s linear infinite}@keyframes aspR{to{transform:rotate(360deg)}}</style><g class="asp">${sup ? `<ellipse cx="240" cy="170" rx="260" ry="190" fill="${corona}"/><g class="asr" fill="${S.rad(240, 170, 260, [[0, '#fff', .7], [1, '#9dffe0', 0]])}">${Array.from({ length: 12 }, (_, i) => { const a = i * 30 * Math.PI / 180, px = Math.cos(a + 1.5708), py = Math.sin(a + 1.5708); return `<path d="M${f(240 + 270 * Math.cos(a))} ${f(170 + 270 * Math.sin(a))}L${f(240 + 8 * px)} ${f(170 + 8 * py)}L${f(240 - 8 * px)} ${f(170 - 8 * py)}Z"/>`; }).join('')}</g>` : ''}<g class="asb">${strip(aino)}${strip(tuuli)}</g></g></symbol>`;
+fs.writeFileSync(path.join(__dirname, 'splash-sym.txt'), sp(false) + '\n' + sp(true) + '\n');
 console.log('character.html', (svg.length / 1024) | 0, 'KB');

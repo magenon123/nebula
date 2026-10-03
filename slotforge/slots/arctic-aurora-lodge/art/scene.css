@@ -6,11 +6,9 @@
 #scene .cu{position:absolute;left:-50px;top:0;width:1700px;height:440px;will-change:transform,opacity;transform-origin:50% 100%}
 #scene .cu.c1{animation:aaD1 31s ease-in-out infinite alternate,aaO1 11s ease-in-out infinite alternate}
 #scene .cu.c2{animation:aaD2 41s ease-in-out infinite alternate,aaO2 15s ease-in-out infinite alternate;opacity:.9}
-#scene .cu.c3{animation:aaD3 53s ease-in-out infinite alternate,aaO3 19s ease-in-out infinite alternate;opacity:.8}
 @keyframes aaD1{from{transform:translateX(-38px) scaleY(.94)}to{transform:translateX(42px) scaleY(1.06)}}
 @keyframes aaD2{from{transform:translateX(40px) scaleY(1.05)}to{transform:translateX(-36px) scaleY(.93)}}
-@keyframes aaD3{from{transform:translateX(-24px) scaleY(.96)}to{transform:translateX(30px) scaleY(1.04)}}
-@keyframes aaO1{from{opacity:.62}to{opacity:1}}@keyframes aaO2{from{opacity:.55}to{opacity:.95}}@keyframes aaO3{from{opacity:.5}to{opacity:.9}}
+@keyframes aaO1{from{opacity:.62}to{opacity:1}}@keyframes aaO2{from{opacity:.55}to{opacity:.95}}
 /* bonus mode: the aurora flares, violet cast (cheap: one overlay opacity) */
 #scene .bonusTint{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 20%,rgba(138,92,255,.38),rgba(138,92,255,0) 70%),linear-gradient(180deg,rgba(60,255,170,.16),rgba(60,255,170,0) 55%);opacity:0;transition:opacity 1.6s}
 #scene.bonus .bonusTint{opacity:1}

@@ -170,7 +170,9 @@ function curtain(w, hgt, yc, amp, ph, len, hue, op, seed) {
  <filter id="gl" x="-10%" y="-20%" width="120%" height="140%"><feGaussianBlur stdDeviation="26"/></filter></defs>
  <g filter="url(#gl)" opacity=".55">${o}</g><g filter="url(#bl)">${o}</g></svg>`;
 }
-fs.writeFileSync(path.join(out, 'cur1.svg'), curtain(1700, 440, 250, 56, 0.4, 250, 0, .6, 11));
+const c1s = curtain(1700, 440, 250, 56, 0.4, 250, 0, .6, 11), c3s = curtain(1700, 440, 320, 34, 4.0, 140, 0, .4, 13);
+const inner = x => x.slice(x.indexOf('<g filter="url(#gl)"'), x.lastIndexOf('</svg>'));
+fs.writeFileSync(path.join(out, 'cur1.svg'), c1s.replace(inner(c1s), inner(c3s) + inner(c1s)));
 fs.writeFileSync(path.join(out, 'cur2.svg'), curtain(1700, 440, 175, 44, 2.1, 190, 1, .46, 12));
-fs.writeFileSync(path.join(out, 'cur3.svg'), curtain(1700, 440, 320, 34, 4.0, 140, 0, .4, 13));
+
 console.log('scene svg ok');
