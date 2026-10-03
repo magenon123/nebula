@@ -1,0 +1,14 @@
+/* ---------- layout: 1600x900 stage. BOARD = 6x5 cells of 104 px = 624x520 at (468,184) ---------- */
+#frameArt{left:430px;top:148px;width:700px;height:596px;display:block;pointer-events:none}
+#frame{left:468px;top:184px;width:624px;height:520px}
+#grid{position:relative;display:grid;grid-template-columns:repeat(6,104px);grid-template-rows:repeat(5,104px);width:624px;height:520px;overflow:hidden;background:rgba(0,0,0,0)}
+#frameFx{position:absolute;left:0;top:0;width:624px;height:520px;pointer-events:none;z-index:4;overflow:visible}
+#fxl{position:absolute;inset:0;z-index:6;pointer-events:none}
+#grid.focus .cell:not(.hit):not(.win){opacity:.55;filter:saturate(.7);transition:.25s}
+.cell{margin:2px;min-width:0;min-height:0}
+/* giant blocks: put class b2 / b3 on the cell and set grid-column / grid-row spans inline; the block art is the symbol b2_N / b3_N */
+.cell.b2{grid-column-end:span 2;grid-row-end:span 2}.cell.b3{grid-column-end:span 3;grid-row-end:span 3}
+.cell.b2,.cell.b3{background:none!important;border:0;box-shadow:none;border-radius:8px}
+.cell.b2::before,.cell.b3::before{display:none}
+.cell.b2 svg.g,.cell.b3 svg.g{left:0;top:0;width:100%;height:100%}
+.cell.hit{z-index:2}

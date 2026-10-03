@@ -1,0 +1,24 @@
+/* ---------- aurora meter: LIT medallion + 8 gem sockets ---------- */
+#aura{left:306px;top:190px;width:114px;height:510px;pointer-events:none}
+#aura .auBack{position:absolute;left:0;top:0;width:114px;height:510px;overflow:visible}
+#aura .litBox{position:absolute;left:19px;top:30px;width:76px;height:88px;border-radius:12px;border:2px solid transparent;
+ background:radial-gradient(circle at 50% 40%,rgba(120,255,200,.22),rgba(0,0,0,0) 70%) padding-box,linear-gradient(180deg,#143a74,#071a3c) padding-box,linear-gradient(160deg,#cfffee,#6aa8ff 55%,#a77bff) border-box;
+ box-shadow:inset 0 0 10px rgba(0,0,0,.7);opacity:.55;transition:opacity .4s,box-shadow .4s}
+#aura .litSym{position:absolute;left:4px;top:2px;width:68px;height:68px;opacity:0;transform:scale(.6);transition:opacity .4s,transform .4s;overflow:visible}
+#aura .litLbl{position:absolute;left:0;right:0;bottom:3px;text-align:center;font:900 11px/1 var(--toon);letter-spacing:3px;color:#9fd8ff}
+#aura.fs .litBox{opacity:1;box-shadow:inset 0 0 10px rgba(0,0,0,.7),0 0 16px rgba(120,255,200,.6)}
+#aura.fs .litSym{opacity:1;transform:none}
+#aura.fs .litBox.pop{animation:auPop .7s cubic-bezier(.3,1.6,.5,1)}
+@keyframes auPop{0%{transform:scale(.6)}60%{transform:scale(1.14)}100%{transform:none}}
+#aura .gs{position:absolute;left:0;right:0;top:134px;display:flex;flex-direction:column;align-items:center;gap:6px}
+#aura .g{position:relative;display:block;width:44px;height:42px;border-radius:50%;
+ background:radial-gradient(circle at 50% 38%,#0e2c5a,#050f26 70%);box-shadow:inset 0 2px 6px #000,0 1px 0 rgba(160,220,255,.35),0 0 0 2px #1b3f78;border:0}
+#aura .g b{position:absolute;left:0;right:0;top:12px;text-align:center;font:700 14px/1 var(--toon);color:#3f6aa6;transition:opacity .2s}
+#aura .g svg{position:absolute;left:-4px;top:-4px;width:52px;height:50px;overflow:visible;opacity:0;transform:scale(.3)}
+#aura .g.on b{opacity:0}
+#aura .g.on{box-shadow:inset 0 2px 6px #000,0 0 14px rgba(120,255,200,.75),0 0 0 2px #7dffc4}
+#aura .g.on svg{opacity:1;transform:none;animation:auGem .55s cubic-bezier(.3,1.7,.5,1)}
+@keyframes auGem{0%{transform:scale(.2) rotate(-40deg);opacity:0}100%{transform:none;opacity:1}}
+#aura .g4{box-shadow:inset 0 2px 6px #000,0 1px 0 rgba(160,220,255,.35),0 0 0 2px #e8c15f}
+#aura .g4.on{box-shadow:inset 0 2px 6px #000,0 0 18px rgba(255,220,120,.9),0 0 0 2px #ffe08a}
+#aura .gsLbl{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:900 9.5px/1 var(--toon);letter-spacing:2px;color:#7fa8d8}

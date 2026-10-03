@@ -1,0 +1,4 @@
+/* ---------- Aino + Tuuli ---------- */
+#char{left:1120px;top:340px;width:480px;height:410px;pointer-events:none;overflow:visible}
+#char svg{width:480px;height:410px;overflow:visible;display:block}
+#char #cMouth .m1,#char #cMouth .m2,#char #cDJaw .jo,#char #cFog circle{opacity:0}
