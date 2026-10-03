@@ -253,6 +253,7 @@ async function sweepStep(sp, run0, ctx) {
   const stake = ctx.stake, cap = MAXW * stake, B = bonusR.bonus, b = sp.band; let run = run0; const sh = sweepState || (sweepState = { sheet: B.sheet, melted: new Set() });
   setFs(sp.spinsLeft, true); char('spin', 950 * T());
   if (sp.spinIndex === 1) { say('THE ICE HOLDS ITS SECRETS', true); await wait(500); }
+  { const fl = $('flare'); if (fl) { fl.classList.remove('go', 'rev'); void fl.offsetWidth; if (b.type === 'anti' || (b.type === 'col' && b.index % 2)) fl.classList.add('rev'); fl.classList.add('go'); setTimeout(() => fl.classList.remove('go', 'rev'), 2500 * T()); } }
   say(`BAND ${sp.spinIndex} OF ${B.startSpins}`, true); sfx.band(); S.music.intensity(clamp01(.1 + (sp.spinIndex / B.startSpins) * .55));
   bandEl(b.cells);
   const order = b.cells.map(([r, c]) => [r, c]), mt = new Set(sp.newlyMelted.map(([r, c]) => r * 5 + c));
