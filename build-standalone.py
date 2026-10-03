@@ -81,7 +81,7 @@ def assemble(slug, standalone):
         'SHELL_CSS': read(SF, 'shell', 'slot-shell.css'), 'SLOT_CSS': read(sd, 'slot.css'),
         'SHELL_DEFS': read(SF, 'shell', 'shell-defs.svg'), 'SYMBOLS': read(sd, 'symbols.svg'),
         'SCENE': read(sd, 'scene.html'), 'LOGO': read(sd, 'logo.html'), 'FRAME': read(sd, 'frame.html'),
-        'CHARACTER': read(sd, 'character.html'), 'SIDE': read(sd, 'side.html'), 'INFO': info,
+        'CHARACTER': read(sd, 'character.html'), 'SIDE': read(sd, 'side.html') + (read(sd, 'sweep.html') if os.path.exists(os.path.join(sd, 'sweep.html')) else ''), 'INFO': info,
         'SCRIPTS': scripts.replace('</script', '<\\/script'),
     }
     html = re.sub(r'\{\{([A-Z_]+)\}\}', lambda m: parts[m.group(1)], read(SF, 'shell', 'template.html'))

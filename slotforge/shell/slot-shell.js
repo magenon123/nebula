@@ -290,7 +290,7 @@ $('big').onclick = () => { skipBig = true; };
 /* ---------- switch to turbo in the middle of a spin or bonus ---------- */
 function speedUp() {
   if (turbo || !busy) return; turbo = true; store.set(P + '_turbo', true); refreshUi();
-  try { document.getAnimations().forEach(a => { const e = a.effect, t = e && e.target; if (!t || !t.closest || e.getComputedTiming().iterations === Infinity) return; if (t.closest('#grid, #lnkB, #lnkT, #fxl, #fsBox, #msg')) a.updatePlaybackRate(a.playbackRate / .45); }); } catch {}
+  try { document.getAnimations().forEach(a => { const e = a.effect, t = e && e.target; if (!t || !t.closest || e.getComputedTiming().iterations === Infinity) return; if (t.closest('#grid, #lnkB, #lnkT, #fxl, #fsBox, #msg, #sweep')) a.updatePlaybackRate(a.playbackRate / .45); }); } catch {}
   say('TURBO ON', false);
 }
 document.addEventListener('pointerdown', e => {

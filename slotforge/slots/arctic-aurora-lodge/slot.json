@@ -1,0 +1,167 @@
+{
+ "id": "arctic-aurora-lodge",
+ "title": "Arctic Aurora Lodge: Trapper's Night",
+ "logoText": "ARCTIC AURORA LODGE",
+ "infoTitle": "ARCTIC AURORA LODGE · HOW IT PLAYS",
+ "api": "/api/slot/arctic-aurora-lodge/spin",
+ "engineSource": "slotforge/engines/arctic-aurora-lodge.js",
+ "storage": "aal",
+ "walletKey": "arcticAuroraLodgeWallet",
+ "startBalance": 1000,
+ "bets": [
+  0.1,
+  0.2,
+  0.3,
+  0.4,
+  0.5,
+  0.6,
+  0.8,
+  1,
+  1.5,
+  2,
+  2.5,
+  3,
+  4,
+  5,
+  6,
+  8,
+  10,
+  12,
+  15,
+  20,
+  25,
+  30,
+  40,
+  50,
+  60,
+  80,
+  100,
+  150,
+  200,
+  250,
+  300,
+  400,
+  500,
+  750,
+  1000,
+  1500,
+  2000,
+  3000,
+  4000,
+  5000,
+  7500,
+  10000
+ ],
+ "defaultBet": 1,
+ "maxWin": 7500,
+ "anteCost": 2,
+ "scatterSym": 10,
+ "char": {
+  "el": "char",
+  "states": [
+   "spin",
+   "win",
+   "big",
+   "special",
+   "tease",
+   "bonus",
+   "maxwin",
+   "exhale",
+   "slump"
+  ],
+  "bonusClass": "bonusmode"
+ },
+ "tiers": [
+  {
+   "min": 100,
+   "name": "AURORA STORM",
+   "lv": 4,
+   "tag": "The whole sky is dancing!"
+  },
+  {
+   "min": 25,
+   "name": "NORTHERN BLAZE",
+   "lv": 3,
+   "tag": "Even Tuuli is speechless."
+  },
+  {
+   "min": 10,
+   "name": "GLACIER GLOW",
+   "lv": 2,
+   "tag": "The ice sings back."
+  },
+  {
+   "min": 5,
+   "name": "FIRST LIGHT",
+   "lv": 1,
+   "tag": "The lodge windows glow warmer."
+  }
+ ],
+ "autoBigLv": 3,
+ "text": {
+  "idle": "THE SKY IS QUIET. PLACE A BET",
+  "spin": "THE ICE SETTLES...",
+  "win": "THE AURORA PAYS {amt}",
+  "lose": "THE NIGHT STAYS DARK",
+  "freeSpin": "AURORA MUSE {n}",
+  "freeSpinRetrigger": ""
+ },
+ "fsLabel": "SPINS LEFT",
+ "ownCounter": true,
+ "buys": [
+  {
+   "key": "fs",
+   "mult": 86,
+   "sym": 10,
+   "vol": 3,
+   "name": "Aurora Muse",
+   "text": "Three FS embers drop at once and the aurora starts 10 free spins. Every spin it lights one symbol: that symbol wins from only 5 tiles and its ice blocks count double.",
+   "confirmTitle": "BUY AURORA MUSE?",
+   "confirmText": "AURORA MUSE: three FS land, then 10 free spins. Each spin one symbol is lit: it wins from 5 tiles and its blocks count double."
+  },
+  {
+   "key": "sweep",
+   "mult": 57,
+   "sym": 11,
+   "vol": 4,
+   "name": "Aurora Sweep",
+   "text": "Four Aurora Gems freeze the screen into a sheet of ice. Glowing bands melt it row by row and every cell they cross pays more.",
+   "confirmTitle": "BUY AURORA SWEEP?",
+   "confirmText": "AURORA SWEEP: four Aurora Gems land, then at least 4 bands of light sweep a 5x5 ice sheet. Cells crossed by several bands pay x2, x3 and more."
+  }
+ ],
+ "intro": {
+  "unit": "SPINS",
+  "ribbon": "AURORA MUSE",
+  "quote": "\"Look up. She is awake tonight.\"",
+  "tap": "TAP ANYWHERE TO BEGIN",
+  "chips": [
+   "THE AURORA LIGHTS ONE SYMBOL EVERY SPIN",
+   "LIT SYMBOL WINS FROM 5 TILES",
+   "LIT BLOCKS COUNT DOUBLE"
+  ]
+ },
+ "outro": {
+  "ribbon": "THE SKY GOES QUIET",
+  "label": "YOUR WINNINGS",
+  "quote": "\"The lights always return.\"",
+  "tap": "TAP ANYWHERE TO CONTINUE"
+ },
+ "audio": {
+  "reverb": {
+   "sec": 2.6,
+   "pow": 2.2,
+   "wet": 0.34,
+   "lp": 0.45
+  }
+ },
+ "fever": {
+  "name": "Northern Lights",
+  "sym": 9,
+  "vol": 3,
+  "text": "Pay 2x per spin: more giant ice blocks land and the FS embers and Aurora Gems come about 1.5 times as often. Stays on until you switch it off.",
+  "badge": "LIGHTS ×2",
+  "onMsg": "NORTHERN LIGHTS ON. TOTAL BET x2",
+  "offMsg": "NORTHERN LIGHTS OFF"
+ }
+}

@@ -32,10 +32,10 @@ Several symbols can win in one spin; `payout` of the step = sum. `mult == payout
 - The base win pays AND the bonus pays; `totalPayout = min(7500, basePayout + bonus.totalPayout)`; `capped:true` when the cap truncated.
 - Client order: drop grid (blocks fall in as one piece) -> win highlight (block win motion, links over `cells`) -> if `bonusType`, bonus intro splash.
 
-## Bought round (`bought:"fs"` cost 80, or `"sweep"` cost 55)
+## Bought round (`bought:"fs"` cost 86, or `"sweep"` cost 57)
 `initialGrid` + `initialBlocks` = the visible TRIGGER SPIN (a block layout that pays nothing), `trigger:{type,count,cells}` lists the scatters (fs: id 10, sweep: id 8) that land on it, `cascadeSteps:[]`, `basePayout:0`, then the intro splash.
 ```json
-{ "v":1, "cost":80, "bought":"fs", "bonusType":"fs", "initialGrid":[[2,3,4,3,0,6],[10,0,6,7,3,0],[2,7,10,3,6,3],[6,10,3,4,4,7],[4,7,3,4,4,2]],
+{ "v":1, "cost":86, "bought":"fs", "bonusType":"fs", "initialGrid":[[2,3,4,3,0,6],[10,0,6,7,3,0],[2,7,10,3,6,3],[6,10,3,4,4,7],[4,7,3,4,4,2]],
   "initialBlocks":[{"id":0,"sym":4,"r":3,"c":3,"size":2}], "trigger":{"type":"fs","count":3,"cells":[[1,0],[2,2],[3,1]]},
   "cascadeSteps":[], "basePayout":0, "bonusTriggered":true, "bonus":{ ... }, "totalPayout":79.794, "capped":false }
 ```
@@ -70,6 +70,6 @@ A cell pays `value x multiplier` where `multiplier = crossings + (prism ? 1 : 0)
 Example (5 gems, bought): bands [3,6,8,11,0] -> steps 13, 8, 16, 8, 17 = 62x.
 
 ## Misc
-- Cash values: 1,2,3,5,8,12,20,40,100,250,500. Pays come from `engine.info().pay` (rows per symbol 0..7, columns tiers 8-9..20+; tier 0 = `pay[s][0] * litLow`). Never retype them.
+- Cash values: 1,2,3,5,8,12,20,40,100,250,500,1000,2500 (the 1000/2500 cells are very rare; a 2500 cell crossed 3 times is the 7,500x cap). Pays come from `engine.info().pay` (rows per symbol 0..7, columns tiers 8-9..20+; tier 0 = `pay[s][0] * litLow`). Never retype them.
 - `capped:true` at 7,500x (gold MAX WIN screen).
-- Engine/slot.json must agree: `bets` = CFG.bets, `anteCost` 2, buys `fs` 80 and `sweep` 55, `maxWin` 7500. The luck mode is the standard `ante` flag (`cfg.anteCost`), labelled "Northern Lights" in the slot module; no MAX LUCK.
+- Engine/slot.json must agree: `bets` = CFG.bets, `anteCost` 2, buys `fs` 86 and `sweep` 57, `maxWin` 7500. The luck mode is the standard `ante` flag (`cfg.anteCost`), labelled "Northern Lights" in the slot module; no MAX LUCK.

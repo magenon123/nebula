@@ -32,26 +32,26 @@ export const CFG = {
   rows: ROWS, reels: COLS,
   bets: [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000],
   maxWin: 7500,
-  buy: { fs: { cost: 80 }, sweep: { cost: 55 } },
+  buy: { fs: { cost: 86 }, sweep: { cost: 57 } },
   anteCost: 2,
   // blocks per spin: weights for 0,1,2,... giant blocks
   n3W: [96, 4], n2W: [72, 23, 5],
   anteN3W: [91, 9], anteN2W: [62, 29, 8, 1],
   blockW: [16, 15, 14, 13, 9, 8, 6, 5],       // which pay symbol a block is
   symW: [12, 12, 12, 12, 11, 11, 10, 10],     // single cells
-  wildP: 0.008, fsP: 0.00981, gemP: 0.0224,    // per single cell
-  anteFsP: 0.0148, anteGemP: 0.0305,
+  wildP: 0.008, fsP: 0.0097, gemP: 0.0224,    // per single cell
+  anteFsP: 0.01472, anteGemP: 0.03008,
   // pay[s] = multipliers for tiers 8-9, 10-11, 12-14, 15-19, 20+
   pay: [[0.4, 1, 2.5, 8, 28], [0.5, 1.3, 3, 10, 35], [0.6, 1.6, 4, 12, 42], [0.8, 2, 5, 15, 50],
         [1, 2.5, 6, 20, 150], [1.5, 4, 10, 35, 350], [2, 5, 14, 50, 600], [3, 8, 20, 80, 900]],
   payScale: 0.9,
   litLow: 0.5,                                // tier 5-7 (lit symbol only) = litLow x tier 8-9
   // Free Spins (Aurora Muse)
-  fs: { spins: [10, 12, 15], retrigSpins: 5, maxSpins: 40, n3W: [50, 42, 8], n2W: [16, 30, 30, 14, 10], wildP: 0.0215, fsP: 0.014,
+  fs: { spins: [10, 12, 15], retrigSpins: 5, maxSpins: 40, n3W: [50, 42, 8], n2W: [16, 30, 30, 14, 10], wildP: 0.0221, fsP: 0.014,
         litW: [22, 20, 18, 16, 9, 7, 5, 3] },
   // Aurora Sweep
-  sweep: { maxBands: 8, pEmpty: 0.225, pPrism: 0.1,
-           valueW: [[1, 40], [2, 29], [3, 16], [5, 7.5], [8, 4], [12, 2.6], [20, 1.4], [40, 0.8], [100, 0.14], [250, 0.03], [500, 0.02], [1000, 0.0012], [2500, 0.0009]] },
+  sweep: { maxBands: 8, pEmpty: 0.234, pPrism: 0.1,
+           valueW: [[1, 40], [2, 29], [3, 16], [5, 7.5], [8, 4], [12, 2.6], [20, 1.4], [40, 0.8], [100, 0.14], [250, 0.03], [500, 0.02], [1000, 0.0012], [2500, 0.002]] },
   // buy trigger-count weights (measured to match the natural conditional distribution)
   buyFsCount: [[3, 93.8], [4, 5.9], [5, 0.3]],
   buySweepCount: [[4, 89.1], [5, 9.9], [6, 0.97], [7, 0.06], [8, 0.01]]
