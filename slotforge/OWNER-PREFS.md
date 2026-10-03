@@ -81,3 +81,9 @@ Weekly limit is nearly used up (resets next day 6pm UTC): keep work small and co
 
 ## Round 10 (owner): SIDE CHARACTER STYLE for all slots (reference images in slotforge/refs/characters/)
 Owner rejected the "realistic" Aino/Tuuli (v2) and reverted slot #4 to v1. He did NOT mean literal realism. Target = the side characters of the top Stake games (zeus.png Gates of Olympus, raccoon.png Hacksaw, dwarf.png): professional, high-quality game-art ILLUSTRATIONS of normal adult characters: strong clear silhouette, correct anatomy and proportions, confident posing, rich painted shading with controlled rim lights, crisp clean detail (armor, cloth, fur, metal), expressive but not goofy faces. NOT children's-cartoon (big heads, tube limbs, simple blobs), NOT airbrushed 3D doll, NOT photoreal. Applies to every new character; apply to Aino and Tuuli next.
+
+## Round 11 (owner): slot #4 Arctic Aurora Lodge APPROVED. Lessons for slot #5 and all after
+- It is NOT about realism. It is about VERY HIGH QUALITY illustration (top Stake games). Characters: clean strong silhouette, correct anatomy, painterly shading, crisp detail, expressive faces (refs in slotforge/refs/characters/). No kids-cartoon, no airbrushed 3D doll, no literal photo-realism.
+- Do not over-engineer art in one big leap: test the look first (one symbol + one background + the character), the owner approves, then build everything.
+- Shared package every slot has: free-spins style bonus with own twist, bet-up luck toggle, bonus buys, mid-spin turbo, MAX WIN screen, own unique bonus. Tails must be credible (a 7,500x cap must be reachable), RTP 96.0-96.5% in every mode.
+- Keep scene lightweight (baked static layers, ~35+ fps), keep file size sane, no stray clutter, own win motion per symbol, no counter flashes, themed music.

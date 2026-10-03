@@ -29,6 +29,8 @@ State: slot #3 Tea House revision. DONE and committed: engine (rin) with Tin Rus
 - IN PROGRESS: leo redrawing ONLY Aino + Tuuli in the owner's "Stake side-character" illustration style (OWNER-PREFS Round 10, refs in slotforge/refs/characters/). Files: slots/arctic-aurora-lodge/character.html, ainoSplash* in symbols.svg, ART-NOTES.md. If interrupted: check the character.html state, view it in a screenshot, finish or restore it from commit (the v1 character is in HEAD history before this work).
 - After that: lead rebuilds (python3 build-standalone.py arctic-aurora-lodge), runs node slotforge/shell/smoke-arctic.cjs, sends arctic-aurora-lodge-standalone.html to the owner for APPROVE/REVISE. Owner's other open wishes: none pending except approving slot #4.
 
+## SLOT #5 (started): Phase 0 = ONE concept doc plans/slot5-concept.md by maya + leo (different from slots 1-4; owner wants very-high-quality illustration look, strong market appeal, low risk), plus a look test (symbol + background + character) for owner approval BEFORE engine/art/client. Slots 1-4 all APPROVED. Resume: read OWNER-PREFS Round 9-11.
+
 ## Done
 - EmberClaw (slot #1): finished, math retuned to ~96.2% in all modes, files rebuilt. Do not touch except bug fixes.
 - Shared shell (`shell/`), slot module format (`slots/emberclaw/`), engine registry + generic server route (`engines/`, `server.js` marked section), math tools + tests (`tools/`), build script (`/home/user/nebula/build-standalone.py <slug>`).
