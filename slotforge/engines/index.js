@@ -2,8 +2,9 @@
 import * as emberclaw from './emberclaw.js';
 import * as grumbleAndBrine from './grumble-and-brine.js';
 import * as cloudtopTeaHouse from './cloudtop-tea-house.js';
+import * as arcticAuroraLodge from './arctic-aurora-lodge.js';
 
-const ENGINES = { emberclaw, 'grumble-and-brine': grumbleAndBrine, 'cloudtop-tea-house': cloudtopTeaHouse };
+const ENGINES = { emberclaw, 'grumble-and-brine': grumbleAndBrine, 'cloudtop-tea-house': cloudtopTeaHouse, 'arctic-aurora-lodge': arcticAuroraLodge };
 
 const REQUIRED = ['CFG', 'playRound', 'cryptoRng'];
 for (const [id, e] of Object.entries(ENGINES)) {
