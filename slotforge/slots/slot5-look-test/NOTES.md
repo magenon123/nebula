@@ -1,0 +1,15 @@
+# Slot #5 look test: Sirocco's Lamp Bazaar (leo)
+Files: symbol.png (Genie's Lamp hero on gold plate: 520px, 120px, 88px), background.png (1280x720, reel window 5x5 = 540x540 at x370 y96 marked), background-clean.svg (no marker), character.png (Sirocco, 500x760), compare.png (next to the three owner refs). Sources: gen-symbol.cjs, gen-bg.cjs, gen-char.cjs (seeded, reproducible), symbol.svg/background.svg/character.svg, shot.cjs (Playwright render: node shot.cjs <html|svg> <out.png> <w> <h>).
+
+## Technique (pure vector, no raster, no external files)
+- Lamp: plate = vertical gradient + tiled 8-point star pattern + frost noise + saffron glow + bevelled gold rim; lamp = layered multi-stop gold gradients (dark brown to cream with a hard rim band), clipped environment-reflection stripes, engraved palmettes laid on a cylinder (width scaled by cos of angle), lapis/ruby cabochons, contact shadow, smoke wisp. One light from the right.
+- Background: gradient dusk sky, sun with glow + god rays (screen blend), streak clouds lit from below near the sun, 3 dune layers (slopes facing the sun lit), 2 skyline silhouettes (domes, minarets with right rim light), bazaar rooftops with awnings, tiled terrace floor in perspective with long shadows falling left, balustrade, foreground pointed arch (left reveal catches the sun, right reveal in shade), unlit brass lamps, backlit cloth swags, dust motes, vignette, grain. ONE light: the low sun right/behind.
+- Sirocco: value-mass painting with gradient fills, right-half rim-light strokes, 2px dark outline, crossed arms (hides hands), gold paldrons/bracers/collar, plum turban with ruby brooch and plume, smoke tail ending in his lamp.
+
+## Honest critique
+- Lamp (7.5/10): metal, gems and plate read well and hold at 88px. Weak: engraving is repetitive and too fine at game size; body gold is slightly flat; smoke is a generic ribbon.
+- Background (7/10): the dusk mood, depth layers and single light work and are clearly different from slots 1-4. Weak: arch stone is plain (should have carved relief), rooftops a bit blocky, dunes show small step artefacts on the lit slopes, little life in the middle layer.
+- Sirocco (5.5-6/10): clean, readable silhouette, correct pose and colours, but he is BELOW the owner's reference tier: skin and cloth look like smooth vector gradients (the refs have painted texture, fur/cloth/metal micro detail and richer anatomy), forearms and hands are simplified, face is small and a little stiff. This is the vector ceiling without more iterations. To reach the refs we need either 2-3 more drawing passes on the face/arms/cloth, or an approved raster painting.
+
+## Perf plan
+Bake background-clean.svg once to a bitmap layer at load (no feTurbulence/blur per frame); animate only a few cheap overlays (sun rays opacity, dust motes <= 26, cloth swag sway). Symbols rasterised once per symbol and cached (the lamp is 10 KB of SVG). Character: split smoke tail, plume and eyes into separate groups, transform-only animation; the body is a cached bitmap. Expected total art < 300 KB.
