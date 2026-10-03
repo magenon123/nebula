@@ -31,6 +31,8 @@ State: slot #3 Tea House revision. DONE and committed: engine (rin) with Tin Rus
 
 ## SLOT #5 (started): Phase 0 = ONE concept doc plans/slot5-concept.md by maya + leo (different from slots 1-4; owner wants very-high-quality illustration look, strong market appeal, low risk), plus a look test (symbol + background + character) for owner approval BEFORE engine/art/client. Slots 1-4 all APPROVED. Resume: read OWNER-PREFS Round 9-11.
 
+## SLOT #5 APPROVED (concept + look test): slug `siroccos-lamp-bazaar`, spec = plans/slot5-concept.md (maya Sealed Chain mechanics, leo look), look test in slots/slot5-look-test/. Pipeline: rin engine (run the sim EARLY, chain compounds; if the 8,000x tail is unreachable lower the cap), leo full art in slots/siroccos-lamp-bazaar/ (same fragment format as Arctic/Tea House), then kai client, then lead verify + send siroccos-lamp-bazaar-standalone.html to the owner. Owner already accepted Sirocco as drawn in the test (6/10): do not spend extra passes on him unless cheap.
+
 ## Done
 - EmberClaw (slot #1): finished, math retuned to ~96.2% in all modes, files rebuilt. Do not touch except bug fixes.
 - Shared shell (`shell/`), slot module format (`slots/emberclaw/`), engine registry + generic server route (`engines/`, `server.js` marked section), math tools + tests (`tools/`), build script (`/home/user/nebula/build-standalone.py <slug>`).
