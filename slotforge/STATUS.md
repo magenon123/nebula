@@ -20,6 +20,8 @@ State: slot #3 Tea House revision. DONE and committed: engine (rin) with Tin Rus
 - #1 EmberClaw, #2 Grumble & Brine, #3 Koji's Cloudtop Tea House: all APPROVED. Only bug fixes.
 - #4: NOT started. Waiting for the owner's theme/hook. NEW DIRECTION (OWNER-PREFS Round 9): detailed/realistic art (not doodle), shared bonuses + its own unique bonus. First step when started: leo+maya concept doc incl. an art-direction test (one symbol + one background in the new realistic style) for owner approval BEFORE any engine/client work.
 
+## Slot #4 DECISION (owner delegated): pitch C, Arctic Aurora Lodge (plans/slot4-pitches.md). Owner: smallest risk, team decides details, must be able to compete in the market (so: realistic look, strong hooks, polish). Steps: (1) rin engine per maya's section C, (2) leo art-direction test (one symbol + one background in the realistic style) BEFORE the full art, owner sees the test, (3) then full art, kai client, lead verify. Resume: read plans/slot4-pitches.md pitch C.
+
 ## Done
 - EmberClaw (slot #1): finished, math retuned to ~96.2% in all modes, files rebuilt. Do not touch except bug fixes.
 - Shared shell (`shell/`), slot module format (`slots/emberclaw/`), engine registry + generic server route (`engines/`, `server.js` marked section), math tools + tests (`tools/`), build script (`/home/user/nebula/build-standalone.py <slug>`).
