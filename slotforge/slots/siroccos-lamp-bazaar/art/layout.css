@@ -1,0 +1,11 @@
+/* ---------- layout: 1600x900 stage. BOARD = 5x5 cells of 104 px = 520x520 at (520,184), right edge 1040, bottom 704 ---------- */
+#frameArt{left:480px;top:144px;width:600px;height:600px;display:block;pointer-events:none}
+#frame{left:520px;top:184px;width:520px;height:520px}
+#grid{position:relative;display:grid;grid-template-columns:repeat(5,104px);grid-template-rows:repeat(5,104px);width:520px;height:520px;overflow:hidden;background:rgba(0,0,0,0)}
+#frameFx{position:absolute;left:0;top:0;width:520px;height:520px;pointer-events:none;z-index:4;overflow:visible}
+#fxl{position:absolute;inset:0;z-index:6;pointer-events:none}
+#grid.focus .cell:not(.hit):not(.win){opacity:.55;filter:saturate(.7);transition:.25s}
+.cell{margin:2px;min-width:0;min-height:0}
+.cell.hit{z-index:2}
+/* chain mode: dim the tiles that are still free so the sealed (gold) ones read instantly */
+#grid.chain .cell:not(.sealed):not(.hit){filter:saturate(.8) brightness(.9)}

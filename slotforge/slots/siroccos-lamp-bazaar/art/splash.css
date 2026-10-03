@@ -1,0 +1,2 @@
+/* ---------- splash portraits (free-spins intro/outro): <svg class="sirSplash" viewBox="-50 20 600 520"><use href="#sirSplash"/></svg> (or #sirSplashSuper). Needs character.html in the page (it uses its baked images by id). ---------- */
+.sirSplash{width:400px;height:347px;display:block;margin:0 auto;overflow:visible}

@@ -1,0 +1,48 @@
+/* ---------- Astrolabe of Wishes (bonus scene). Add class "on" to #astro to show it. Rings: style --a (deg) + class go = turn to that angle with a long ease-out (duration --t); class idle on #astro = slow drift ---------- */
+#astro{left:0;top:0;width:1600px;height:900px;overflow:hidden;opacity:0;visibility:hidden;transition:opacity .8s,visibility 0s .8s;pointer-events:none;z-index:8}
+#astro.on{opacity:1;visibility:visible;transition:opacity .8s,visibility 0s}
+#astro .aVig{position:absolute;inset:0;background:radial-gradient(ellipse 60% 62% at 50% 48%,rgba(8,4,28,.1),rgba(8,4,28,.82) 85%)}
+#astro .aTitle{position:absolute;left:520px;top:18px;width:560px;height:70px}
+#astro .aTitle svg{width:560px;height:70px;overflow:visible}
+#astro .aWrap{position:absolute;left:450px;top:96px;width:700px;height:700px;transform-origin:50% 50%;--as:1;transform:scale(var(--as))}
+#astro .aWrap svg{position:absolute;left:0;top:0;width:700px;height:700px;overflow:visible;display:block}
+#astro .ring{position:absolute;left:0;top:0;width:700px;height:700px;--a:0;--t:3s;transform:rotate(calc(var(--a)*1deg));will-change:transform}
+#astro .ring.go{transition:transform var(--t) cubic-bezier(.08,.72,.14,1)}
+#astro.idle .ring{animation:aDrift 70s linear infinite}
+#astro.idle .r2{animation-duration:90s;animation-direction:reverse}#astro.idle .r3{animation-duration:55s}
+@keyframes aDrift{from{rotate:0deg}to{rotate:360deg}}
+#astro .aStand{position:absolute;left:350px;top:760px;width:900px;height:150px;overflow:visible}
+#astro .aFront,#astro .aBack{pointer-events:none}
+/* pointer pulse + sector landing flash */
+#astro .aPtr{transform-box:fill-box;transform-origin:50% 100%}
+#astro .aPtr.pulse{animation:aPp .5s cubic-bezier(.3,1.7,.5,1)}
+@keyframes aPp{0%{transform:scale(1.5)}100%{transform:none}}
+#astro .ring.landed .sec.hit path:first-child,#astro .ring .sec.hit path:first-child{filter:brightness(1.7)}
+#astro .ring .sec.hit text{fill:#fff;animation:aTx .6s ease-out}
+@keyframes aTx{0%{transform:scale(1.4)}}
+#astro .ring.magnet svg{filter:drop-shadow(0 0 12px rgba(255,200,80,.95));animation:aMag 1s ease-in-out infinite alternate}
+@keyframes aMag{from{opacity:.86}to{opacity:1}}
+/* held breath before the core stops */
+#astro .aHold{position:absolute;left:350px;top:350px;width:380px;height:380px;margin:-190px 0 0 -190px;border-radius:50%;box-shadow:0 0 0 0 rgba(255,220,120,0);opacity:0;pointer-events:none}
+#astro.tense .aHold{opacity:1;animation:aTn .5s ease-in-out infinite alternate}
+@keyframes aTn{from{box-shadow:0 0 14px 2px rgba(255,220,120,.35),inset 0 0 18px rgba(255,200,80,.2)}to{box-shadow:0 0 42px 10px rgba(255,220,120,.85),inset 0 0 40px rgba(255,200,80,.55)}}
+#astro .aHub .hubt{font-size:21px}
+/* prize rack and tally */
+#astro .aJ{position:absolute;left:1190px;top:190px;width:300px;padding:44px 18px 16px;border-radius:18px;background:linear-gradient(180deg,rgba(40,18,90,.88),rgba(14,6,40,.9));box-shadow:0 0 0 3px #c98a2a,0 0 0 5px #3a1c06,0 8px 24px rgba(0,0,0,.6),inset 0 0 22px rgba(255,190,70,.2)}
+#astro .aJT{position:absolute;left:0;right:0;top:12px;text-align:center;font:900 15px/1 var(--toon);letter-spacing:4px;color:#ffe08a;text-shadow:0 1px 0 #3a1408}
+#astro .j{position:relative;display:flex;align-items:center;gap:10px;height:62px;margin-bottom:8px;padding:0 14px 0 8px;border-radius:12px;background:linear-gradient(180deg,#1c1050,#0c0630);box-shadow:inset 0 0 10px #000,0 0 0 1.5px #7a3d14;transition:box-shadow .3s,filter .3s;filter:saturate(.7) brightness(.85)}
+#astro .j svg{width:44px;height:44px;flex:none}
+#astro .j i{font:900 15px/1 var(--toon);font-style:normal;letter-spacing:2px;color:#e8d8ff;flex:1}
+#astro .j b{font:900 20px/1 var(--toon);color:#ffe9a0;text-shadow:0 1px 0 #3a1408}
+#astro .j.grand i{color:#ffb0a8}#astro .j.major i{color:#b8ffc8}#astro .j.minor i{color:#b0fff4}
+#astro .j.lit{filter:none;box-shadow:inset 0 0 12px rgba(255,200,80,.5),0 0 0 2px #fff0a8,0 0 24px rgba(255,200,80,.95);animation:aJl .5s ease-in-out infinite alternate}
+@keyframes aJl{from{transform:scale(1)}to{transform:scale(1.04)}}
+#astro .aTally{position:absolute;left:110px;top:240px;width:290px;padding:18px 16px;border-radius:18px;background:linear-gradient(180deg,rgba(40,18,90,.88),rgba(14,6,40,.9));box-shadow:0 0 0 3px #c98a2a,0 0 0 5px #3a1c06,0 8px 24px rgba(0,0,0,.6);display:grid;grid-template-columns:1fr 24px 1fr;gap:4px 0;align-items:center;text-align:center}
+#astro .aTally span{display:block;font:900 11px/1 var(--toon);letter-spacing:2px;color:#b89ae8;margin-bottom:5px}
+#astro .aTally b{display:block;font:900 26px/1 var(--toon);color:#fff3c0;text-shadow:0 1px 0 #7a3d14,0 0 10px rgba(255,190,70,.6)}
+#astro .aTally .tx{font:900 22px/1 var(--toon);color:#ffd27a}
+#astro .aTally .t3{grid-column:1/4;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,210,120,.3)}
+#astro .aTally .tt{grid-column:1/4;margin-top:8px;padding-top:10px;border-top:1px solid rgba(255,210,120,.3)}
+#astro .aTally .tt b{font-size:40px;color:#ffe08a}
+#astro .aTally.pop b{animation:aPop .5s cubic-bezier(.3,1.7,.5,1)}
+@keyframes aPop{0%{transform:scale(1.4);filter:brightness(1.8)}100%{transform:none}}

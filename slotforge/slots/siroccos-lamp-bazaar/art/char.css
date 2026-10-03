@@ -1,0 +1,154 @@
+/* ---------- Sirocco (rig of baked layers + live vector face). 500x760 design space shown at 410x623 ---------- */
+#char{left:1150px;top:127px;width:410px;height:623px;pointer-events:none;overflow:visible;--spd:1}
+#char .cl{position:absolute;left:0;top:0;width:410px;height:623px;overflow:visible;display:block}
+#char .eye.e1,#char .eye.e2,#char .lash.l1,#char .lids,#char .mo.m1,#char .mo.m2,#char .mo.m3,#char .fow,#char #sAuraS,#char .sp{opacity:0}
+#char #sAuraS{transition:opacity .6s}
+#char #sFigS,#char #sTailS{will-change:transform}
+#char #sAll{transform-origin:250px 600px;transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
+#char .uL{transform-origin:154px 262px}#char .uR{transform-origin:346px 262px}
+#char .fL{transform-origin:140px 392px}#char .fR{transform-origin:360px 394px}
+#char .tapL{transform-origin:140px 392px}#char .tapR{transform-origin:360px 394px}
+#char .uL,#char .uR,#char .fL,#char .fR{transition:transform .55s cubic-bezier(.3,1.35,.5,1)}
+#char .ffw,#char .fow{transition:opacity .2s}
+#char #sHead{transform-origin:250px 224px;transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
+#char #sPlume{transform-origin:254px 94px}
+#char .brR,#char .brL{transition:transform .35s cubic-bezier(.3,1.5,.5,1)}
+#char .brR{transform-origin:270px 132px}#char .brL{transform-origin:232px 137px}
+#char .pup{transition:transform .3s}
+#char .mo.m1{transform-origin:250px 190px}
+/* ---------- IDLE: breathing, tail sway, blink, plume + lamp glow, finger tap ---------- */
+#char #sFigS{transform-origin:250px 600px;animation:sBr 4.2s ease-in-out infinite}
+@keyframes sBr{0%,100%{transform:scale(1,1)}50%{transform:scale(1.004,1.011)}}
+#char #sTailS{transform-origin:250px 500px;animation:sTl 6s ease-in-out infinite alternate}
+@keyframes sTl{from{transform:rotate(-1.6deg) translateX(-2px)}to{transform:rotate(1.8deg) translateX(3px)}}
+#char .lids{animation:sBl 5.6s steps(1,end) infinite}
+@keyframes sBl{0%,93%{opacity:0}94%,97%{opacity:1}98%,100%{opacity:0}}
+#char.win .lids,#char.big .lids,#char.maxwin .lids,#char.exhale .lids,#char.bonus .lids,#char.special .lids,#char.tease .lids{animation:none}
+#char #sPlume{animation:sPl 4.6s ease-in-out infinite alternate}
+@keyframes sPl{from{transform:rotate(-2.6deg)}to{transform:rotate(3.2deg)}}
+#char #sLampG{animation:sLg 2.8s ease-in-out infinite alternate;opacity:.28}
+@keyframes sLg{from{opacity:.14}to{opacity:.4}}
+#char .pf{opacity:0;transform-box:fill-box;transform-origin:center;animation:sPf 5.4s ease-out infinite}
+#char .pf1{animation-delay:-1.8s}#char .pf2{animation-delay:-3.6s}
+@keyframes sPf{0%{opacity:0;transform:translate(0,0) scale(.5)}20%{opacity:.7}100%{opacity:0;transform:translate(-30px,-60px) scale(1.7)}}
+#char .tapR{animation:sTp 7s ease-in-out infinite}
+@keyframes sTp{0%,70%,100%{transform:none}73%{transform:rotate(-1.6deg)}76%{transform:none}79%{transform:rotate(-1.6deg)}82%{transform:none}}
+#char .brR{transform:translateY(-0px)}
+#char.spin .uL{transform:rotate(-36.09deg)}#char.spin .fL{transform:translate(79.26px,-16.7px) rotate(166.98deg)}#char.spin .uR{transform:rotate(34.92deg)}#char.spin .fR{transform:translate(-78.08px,-15.75px) rotate(-167.18deg)}
+#char.spin .fL .ffw{opacity:0}#char.spin .fL .fow{opacity:1}
+#char.spin .fR .ffw{opacity:0}#char.spin .fR .fow{opacity:1}
+#char.win .uL{transform:rotate(-8.51deg)}#char.win .fL{transform:translate(19.39px,0.64px) rotate(-113.05deg)}#char.win .uR{transform:rotate(5.55deg)}#char.win .fR{transform:translate(-12.83px,0.74px) rotate(111.48deg)}
+#char.win .fL .ffw{opacity:0}#char.win .fL .fow{opacity:1}
+#char.win .fR .ffw{opacity:0}#char.win .fR .fow{opacity:1}
+#char.big .uL{transform:rotate(76.25deg)}#char.big .fL{transform:translate(-115.6px,-112.71px) rotate(-51.81deg)}#char.big .uR{transform:rotate(-78.05deg)}#char.big .fR{transform:translate(118.04px,-118.37px) rotate(51.1deg)}
+#char.big .fL .ffw{opacity:0}#char.big .fL .fow{opacity:1}
+#char.big .fR .ffw{opacity:0}#char.big .fR .fow{opacity:1}
+#char.special .uL{transform:rotate(0deg)}#char.special .fL{transform:translate(0px,0px) rotate(0deg)}#char.special .uR{transform:rotate(36.82deg)}#char.special .fR{transform:translate(-81.9px,-17.94px) rotate(1.98deg)}
+#char.special .fR .ffw{opacity:0}#char.special .fR .fow{opacity:1}
+#char.tease .uL{transform:rotate(0deg)}#char.tease .fL{transform:translate(0px,0px) rotate(0deg)}#char.tease .uR{transform:rotate(5.6deg)}#char.tease .fR{transform:translate(-12.95px,0.74px) rotate(78.84deg)}
+#char.tease .fR .ffw{opacity:0}#char.tease .fR .fow{opacity:1}
+#char.exhale .uL{transform:rotate(0deg)}#char.exhale .fL{transform:translate(0px,0px) rotate(0deg)}#char.exhale .uR{transform:rotate(0deg)}#char.exhale .fR{transform:translate(0px,0px) rotate(0deg)}
+#char.slump .uL{transform:rotate(51.69deg)}#char.slump .fL{transform:translate(-96.68px,-60.39px) rotate(54.83deg)}#char.slump .uR{transform:rotate(-50.32deg)}#char.slump .fR{transform:translate(96.53px,-58.49px) rotate(-53.48deg)}
+#char.slump .fL .ffw{opacity:0}#char.slump .fL .fow{opacity:1}
+#char.slump .fR .ffw{opacity:0}#char.slump .fR .fow{opacity:1}
+#char.bonus .uL{transform:rotate(0deg)}#char.bonus .fL{transform:translate(0px,0px) rotate(0deg)}#char.bonus .uR{transform:rotate(-32.5deg)}#char.bonus .fR{transform:translate(68.73px,-28.19px) rotate(62deg)}
+#char.bonus .fR .ffw{opacity:0}#char.bonus .fR .fow{opacity:1}
+#char.bonusmode .uL{transform:rotate(0deg)}#char.bonusmode .fL{transform:translate(0px,0px) rotate(0deg)}#char.bonusmode .uR{transform:rotate(0deg)}#char.bonusmode .fR{transform:translate(0px,0px) rotate(0deg)}
+#char.maxwin .uL{transform:rotate(40.51deg)}#char.maxwin .fL{transform:translate(-81.08px,-40.25px) rotate(-82.07deg)}#char.maxwin .uR{transform:rotate(-42.49deg)}#char.maxwin .fR{transform:translate(85.49px,-44.12px) rotate(81.22deg)}
+#char.maxwin .fL .ffw{opacity:0}#char.maxwin .fL .fow{opacity:1}
+#char.maxwin .fR .ffw{opacity:0}#char.maxwin .fR .fow{opacity:1}
+#char.spin #sHead{transform:translate(0,0px) rotate(2deg)}
+#char.spin .eye.e0{opacity:1}#char.spin .eye.e1{opacity:0}#char.spin .eye.e2{opacity:0}#char.spin .lash.l0{opacity:1}#char.spin .lash.l1{opacity:0}
+#char.spin .mo.m0{opacity:1}#char.spin .mo.m1{opacity:0}#char.spin .mo.m2{opacity:0}#char.spin .mo.m3{opacity:0}
+#char.spin .brR{transform:translateY(-4px) rotate(-3.2deg)}#char.spin .brL{transform:translateY(-1.4px)}
+#char.spin #sAll{transform:translate(0,-2px)}
+#char.win #sHead{transform:translate(0,0px) rotate(-2deg)}
+#char.win .eye.e0{opacity:0}#char.win .eye.e1{opacity:0}#char.win .eye.e2{opacity:1}#char.win .lash.l0{opacity:0}#char.win .lash.l1{opacity:0}
+#char.win .mo.m0{opacity:0}#char.win .mo.m1{opacity:1}#char.win .mo.m2{opacity:0}#char.win .mo.m3{opacity:0}
+#char.win .brR{transform:translateY(0px) rotate(0deg)}#char.win .brL{transform:translateY(0px)}
+#char.win #sAll{transform:translate(0,-8px)}
+#char.big #sHead{transform:translate(0,0px) rotate(-5deg)}
+#char.big .eye.e0{opacity:0}#char.big .eye.e1{opacity:1}#char.big .eye.e2{opacity:0}#char.big .lash.l0{opacity:0}#char.big .lash.l1{opacity:1}
+#char.big .mo.m0{opacity:0}#char.big .mo.m1{opacity:1}#char.big .mo.m2{opacity:0}#char.big .mo.m3{opacity:0}
+#char.big .brR{transform:translateY(-4px) rotate(-3.2deg)}#char.big .brL{transform:translateY(-1.4px)}
+#char.big #sAll{transform:translate(0,-26px)}
+#char.special #sHead{transform:translate(0,0px) rotate(3deg)}
+#char.special .eye.e0{opacity:0}#char.special .eye.e1{opacity:1}#char.special .eye.e2{opacity:0}#char.special .lash.l0{opacity:0}#char.special .lash.l1{opacity:1}
+#char.special .mo.m0{opacity:1}#char.special .mo.m1{opacity:0}#char.special .mo.m2{opacity:0}#char.special .mo.m3{opacity:0}
+#char.special .brR{transform:translateY(-6px) rotate(-4.800000000000001deg)}#char.special .brL{transform:translateY(-2.0999999999999996px)}
+#char.special #sAll{transform:rotate(-1.5deg)}
+#char.tease #sHead{transform:translate(0,3px) rotate(7deg)}
+#char.tease .eye.e0{opacity:0}#char.tease .eye.e1{opacity:1}#char.tease .eye.e2{opacity:0}#char.tease .lash.l0{opacity:0}#char.tease .lash.l1{opacity:1}
+#char.tease .mo.m0{opacity:1}#char.tease .mo.m1{opacity:0}#char.tease .mo.m2{opacity:0}#char.tease .mo.m3{opacity:0}
+#char.tease .brR{transform:translateY(-8px) rotate(-6.4deg)}#char.tease .brL{transform:translateY(-2.8px)}
+#char.tease #sAll{transform:rotate(-3deg) translate(-8px,0)}
+#char.exhale #sHead{transform:translate(0,0px) rotate(-3deg)}
+#char.exhale .eye.e0{opacity:0}#char.exhale .eye.e1{opacity:0}#char.exhale .eye.e2{opacity:1}#char.exhale .lash.l0{opacity:0}#char.exhale .lash.l1{opacity:0}
+#char.exhale .mo.m0{opacity:1}#char.exhale .mo.m1{opacity:0}#char.exhale .mo.m2{opacity:0}#char.exhale .mo.m3{opacity:0}
+#char.exhale .brR{transform:translateY(0px) rotate(0deg)}#char.exhale .brL{transform:translateY(0px)}
+#char.slump #sHead{transform:translate(0,0px) rotate(5deg)}
+#char.slump .eye.e0{opacity:1}#char.slump .eye.e1{opacity:0}#char.slump .eye.e2{opacity:0}#char.slump .lash.l0{opacity:1}#char.slump .lash.l1{opacity:0}
+#char.slump .mo.m0{opacity:0}#char.slump .mo.m1{opacity:0}#char.slump .mo.m2{opacity:0}#char.slump .mo.m3{opacity:1}
+#char.slump .brR{transform:translateY(-3px) rotate(-2.4000000000000004deg)}#char.slump .brL{transform:translateY(-1.0499999999999998px)}
+#char.slump .pup{transform:translateY(-2.6px)}
+#char.slump #sAll{transform:translate(0,8px) scale(1,.985)}
+#char.bonus #sHead{transform:translate(0,0px) rotate(-3deg)}
+#char.bonus .eye.e0{opacity:0}#char.bonus .eye.e1{opacity:1}#char.bonus .eye.e2{opacity:0}#char.bonus .lash.l0{opacity:0}#char.bonus .lash.l1{opacity:1}
+#char.bonus .mo.m0{opacity:0}#char.bonus .mo.m1{opacity:1}#char.bonus .mo.m2{opacity:0}#char.bonus .mo.m3{opacity:0}
+#char.bonus .brR{transform:translateY(-4px) rotate(-3.2deg)}#char.bonus .brL{transform:translateY(-1.4px)}
+#char.bonus #sAll{transform:translate(0,-6px)}
+#char.bonusmode #sHead{transform:translate(0,0px) rotate(0deg)}
+#char.bonusmode .eye.e0{opacity:1}#char.bonusmode .eye.e1{opacity:0}#char.bonusmode .eye.e2{opacity:0}#char.bonusmode .lash.l0{opacity:1}#char.bonusmode .lash.l1{opacity:0}
+#char.bonusmode .mo.m0{opacity:1}#char.bonusmode .mo.m1{opacity:0}#char.bonusmode .mo.m2{opacity:0}#char.bonusmode .mo.m3{opacity:0}
+#char.bonusmode .brR{transform:translateY(-2px) rotate(-1.6deg)}#char.bonusmode .brL{transform:translateY(-0.7px)}
+#char.maxwin #sHead{transform:translate(0,0px) rotate(-5deg)}
+#char.maxwin .eye.e0{opacity:0}#char.maxwin .eye.e1{opacity:0}#char.maxwin .eye.e2{opacity:1}#char.maxwin .lash.l0{opacity:0}#char.maxwin .lash.l1{opacity:0}
+#char.maxwin .mo.m0{opacity:0}#char.maxwin .mo.m1{opacity:1}#char.maxwin .mo.m2{opacity:0}#char.maxwin .mo.m3{opacity:0}
+#char.maxwin .brR{transform:translateY(0px) rotate(0deg)}#char.maxwin .brL{transform:translateY(0px)}
+#char.maxwin #sAll{transform:translate(0,-34px)}
+
+/* default lash l0 visible, others hidden handled by the class rules above */
+#char .lash.l0{opacity:1}
+/* ---------- state animations ---------- */
+#char.spin #sFigS{animation:sSpin calc(.95s*var(--spd)) ease-out}
+@keyframes sSpin{0%{transform:scale(1)}30%{transform:scale(1.012)}100%{transform:scale(1)}}
+#char.spin .uR{animation:sSwU calc(.95s*var(--spd)) ease-in-out both}#char.spin .fR{animation:sSwF calc(.95s*var(--spd)) ease-in-out both}
+@keyframes sSwU{0%{transform:rotate(34.92deg)}50%{transform:rotate(-27.81deg)}100%{transform:rotate(36.16deg)}}
+@keyframes sSwF{0%{transform:translate(-78.08px,-15.75px) rotate(-167.18deg)}50%{transform:translate(59.97px,-21.78px) rotate(-51.66deg)}100%{transform:translate(-80.58px,-17.16px) rotate(-40.64deg)}}
+
+#char.win #sAll{animation:sWin calc(1.5s*var(--spd)) ease-in-out}
+@keyframes sWin{0%{transform:translateY(0)}20%{transform:translateY(-14px)}40%{transform:translateY(0)}60%{transform:translateY(-10px)}80%{transform:translateY(0)}100%{transform:translateY(-8px)}}
+#char.win .mo.m1,#char.big .mo.m1,#char.maxwin .mo.m1{animation:sLaugh .34s ease-in-out infinite alternate}
+@keyframes sLaugh{from{transform:scaleY(.62)}to{transform:scaleY(1.05)}}
+#char.win .sp,#char.big .sp,#char.maxwin .sp,#char.bonus .sp{animation:sSp calc(1.4s*var(--spd)) ease-out both;animation-delay:var(--d)}
+#char.maxwin .sp,#char.bonusmode .sp{animation-iteration-count:infinite}
+@keyframes sSp{0%{opacity:0;transform:translate(0,0) scale(.3) rotate(0)}25%{opacity:1}100%{opacity:0;transform:translate(0,-60px) scale(1.3) rotate(80deg)}}
+#char .sp{transform-box:fill-box;transform-origin:center}
+#char.big #sAuraS,#char.maxwin #sAuraS,#char.bonusmode #sAuraS{opacity:1}
+#char #sMand{transform-origin:250px 330px}#char #sRays{transform-origin:250px 330px}
+#char.big #sMand,#char.maxwin #sMand,#char.bonusmode #sMand{animation:sSpin2 18s linear infinite}
+#char.big #sRays,#char.maxwin #sRays{animation:sSpin2 30s linear infinite reverse}
+#char.bonusmode #sRays{opacity:0}
+@keyframes sSpin2{to{transform:rotate(360deg)}}
+#char.big #sAll{animation:sBig calc(3.2s*var(--spd)) ease-in-out}
+@keyframes sBig{0%{transform:translateY(0)}18%{transform:translateY(-34px)}40%{transform:translateY(-22px)}60%{transform:translateY(-34px)}85%{transform:translateY(-24px)}100%{transform:translateY(-26px)}}
+#char.maxwin #sAll{animation:sMax 2.4s ease-in-out infinite alternate}
+@keyframes sMax{from{transform:translateY(-30px)}to{transform:translateY(-42px)}}
+#char.special #sBang,#char.bonus #sBang{opacity:1;animation:sBg calc(.9s*var(--spd)) cubic-bezier(.3,1.7,.5,1) both}
+@keyframes sBg{0%{transform:scale(0) translateY(20px)}100%{transform:none}}
+#char #sBang{transform-box:fill-box;transform-origin:50% 100%}
+#char.tease #sAll,#char.tease #sFigS{}
+#char.tease .pup{transform:translate(-1.8px,.4px)}
+#char.exhale #sAll{animation:sEx 1.1s ease-in-out both}
+@keyframes sEx{0%{transform:rotate(-3deg) translate(-8px,0)}40%{transform:translateY(-10px) scale(1.02)}100%{transform:none}}
+#char.slump #sAll{animation:sSl 1.2s ease-out both}
+@keyframes sSl{0%{transform:translateY(-6px)}100%{transform:translateY(8px) scale(1,.985)}}
+#char.bonus #sLampG,#char.bonusmode #sLampG,#char.maxwin #sLampG{animation:sLgb .5s ease-in-out infinite alternate;opacity:.9}
+@keyframes sLgb{from{opacity:.55;transform:scale(1)}to{opacity:1;transform:scale(1.14)}}
+#char #sLampG{transform-box:fill-box;transform-origin:center}
+#char.bonus #sAll{animation:sBon calc(1.4s*var(--spd)) ease-out}
+@keyframes sBon{0%{transform:none}30%{transform:translateY(-12px)}60%{transform:translateY(0)}100%{transform:translateY(-6px)}}
+#char.bonus .tapR,#char.bonusmode .tapR{animation:none}
+#char.bonusmode #sHead{animation:sNod .7s ease-in-out infinite alternate}
+@keyframes sNod{from{transform:rotate(-1.5deg)}to{transform:rotate(2.5deg) translateY(2px)}}
+#char.bonusmode .eye.e0 .pup circle:first-child{fill:#ffc040}

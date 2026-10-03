@@ -1,0 +1,22 @@
+/* ---------- scene: 2 baked bitmaps + 2 ray layers + a swaying lamp + 18 motes ---------- */
+#scene{left:0;top:0;width:1600px;height:900px;overflow:hidden;background:#12082a}
+#scene .bg{position:absolute;left:0;top:0;width:1600px;height:900px;display:block}
+#scene .night,#scene .rn,#scene .lamp.lit{opacity:0;transition:opacity 1.6s ease}
+#scene.bonus .night,#scene.bonus .rn,#scene.bonus .lamp.lit{opacity:1}
+#scene.bonus .rd{opacity:0}
+#scene .rays{position:absolute;left:0;top:0;width:1600px;height:900px;display:block;pointer-events:none;will-change:opacity}
+#scene .rd{transition:opacity 1.6s;animation:rayA 9s ease-in-out infinite alternate}
+#scene .rn{animation:rayB 11s ease-in-out infinite alternate}
+@keyframes rayA{from{opacity:.3}to{opacity:.62}}
+@keyframes rayB{from{opacity:.25}to{opacity:.55}}
+
+#scene .lampW{position:absolute;left:225px;top:-2px;width:88px;height:413px;transform-origin:50% 0;will-change:transform;animation:lampSw 7s ease-in-out infinite alternate}
+#scene .lamp{position:absolute;left:0;top:0;width:88px;height:413px;display:block}
+@keyframes lampSw{from{transform:rotate(-1.4deg)}to{transform:rotate(1.6deg)}}
+#scene .halo{position:absolute;left:176px;top:278px;width:186px;height:186px;border-radius:50%;background:radial-gradient(circle,rgba(255,226,150,.85),rgba(255,170,60,.32) 42%,rgba(255,150,40,0) 70%);opacity:0;transition:opacity 1.6s;will-change:opacity;pointer-events:none}
+#scene.bonus .halo{opacity:1;animation:haloF 3.1s ease-in-out infinite alternate}
+@keyframes haloF{from{opacity:.75}to{opacity:1}}
+#scene .motes{position:absolute;inset:0;pointer-events:none}
+#scene .motes i{position:absolute;border-radius:50%;background:#ffe3a0;opacity:0;animation:moteF linear infinite;will-change:transform,opacity}
+#scene.bonus .motes i{background:#cfe0ff}
+@keyframes moteF{0%{opacity:0;transform:translate(0,0)}15%{opacity:.7}85%{opacity:.5}100%{opacity:0;transform:translate(-46px,-70px)}}

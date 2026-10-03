@@ -1,0 +1,25 @@
+/* ---------- cell plates: night-purple lacquer tile with an 8-point star pattern, gold/silver/bronze bevelled rim by tier (symbol id decides) ---------- */
+.cell{position:relative;box-sizing:border-box;border-radius:17px;border:4px solid transparent;
+ --r1:#fff3c0;--r3:#f6b93a;--r2:#8a4c10;--glow:rgba(255,160,70,.6);--pa:#4a1f66;--pb:#2c1650;--pc:#170c33;--c1:#1fa5b8;--c2:#e0354f;
+ background:
+  radial-gradient(circle at 9px 9px,var(--c1) 0 2.6px,transparent 3.4px) padding-box,
+  radial-gradient(circle at calc(100% - 9px) 9px,var(--c1) 0 2.6px,transparent 3.4px) padding-box,
+  radial-gradient(circle at 9px calc(100% - 9px),var(--c2) 0 2.6px,transparent 3.4px) padding-box,
+  radial-gradient(circle at calc(100% - 9px) calc(100% - 9px),var(--c2) 0 2.6px,transparent 3.4px) padding-box,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpath d='M22 4L26 14 36 10 30 20 40 22 30 26 36 36 26 30 22 40 18 30 8 36 14 26 4 22 14 20 8 10 18 14Z' fill='none' stroke='%23ffcf7a' stroke-width='.9' opacity='.2'/%3E%3C/svg%3E") 0 0/26px 26px padding-box,
+  radial-gradient(ellipse 80% 62% at 58% 104%,var(--glow),transparent 72%) padding-box,
+  linear-gradient(180deg,var(--pa),var(--pb) 52%,var(--pc)) padding-box,
+  linear-gradient(135deg,var(--r1),var(--r3) 28%,var(--r2) 58%,var(--r3) 84%,var(--r1)) border-box;
+ box-shadow:inset 0 0 0 1px rgba(40,14,4,.85),inset 0 0 13px rgba(0,0,0,.6),inset 0 2px 1px rgba(255,235,170,.3),0 0 0 1.5px rgba(30,10,4,.85),0 3px 6px rgba(0,0,0,.5)}
+.cell::before{content:"";position:absolute;left:5%;right:5%;top:2px;height:32%;border-radius:12px 12px 60% 60%/12px 12px 40% 40%;background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,0));pointer-events:none}
+.cell svg.g{position:absolute;left:0%;top:0%;width:100%;height:100%;overflow:visible;z-index:1}
+/* low = bronze, mid = silver, high = gold, specials get their own plate */
+.cell:has(use[href="#s0"]),.cell:has(use[href="#s1"]),.cell:has(use[href="#s2"]){--r1:#ffd9b0;--r3:#d98a52;--r2:#6a3416;--c1:#e8a070;--c2:#e8a070;--glow:rgba(255,130,60,.5)}
+.cell:has(use[href="#s3"]),.cell:has(use[href="#s4"]),.cell:has(use[href="#s5"]){--r1:#ffffff;--r3:#c4d2ec;--r2:#56688c;--c1:#8ae8ff;--c2:#8ae8ff;--glow:rgba(140,190,255,.5);--pa:#3e2670;--pb:#26194f;--pc:#120c30}
+.cell:has(use[href="#s6"]),.cell:has(use[href="#s7"]),.cell:has(use[href="#s8"]){--glow:rgba(255,170,60,.72)}
+.cell:has(use[href="#s8"]){--glow:rgba(255,190,70,.85);box-shadow:inset 0 0 0 1px rgba(40,14,4,.85),inset 0 0 13px rgba(0,0,0,.5),inset 0 2px 1px rgba(255,235,170,.4),0 0 0 1.5px rgba(30,10,4,.85),0 0 12px rgba(255,190,70,.5),0 3px 6px rgba(0,0,0,.5)}
+.cell:has(use[href="#s9"]){--pa:#0f4a66;--pb:#0a2c52;--pc:#06142c;--glow:rgba(60,240,230,.7);--c1:#7fffee;--c2:#7fffee;box-shadow:inset 0 0 0 1px rgba(4,30,40,.85),inset 0 0 14px rgba(0,0,0,.5),inset 0 2px 1px rgba(255,255,255,.35),0 0 0 1.5px rgba(30,10,4,.85),0 0 14px rgba(60,230,230,.65),0 3px 6px rgba(0,0,0,.5)}
+.cell:has(use[href="#s10"]){--pa:#6a2410;--pb:#43140c;--pc:#1c0806;--glow:rgba(255,150,40,.85);--r1:#fffbe0;--c1:#ffd070;--c2:#ffd070;box-shadow:inset 0 0 0 1px rgba(40,14,4,.85),inset 0 0 13px rgba(0,0,0,.5),inset 0 2px 1px rgba(255,235,170,.4),0 0 0 1.5px rgba(30,10,4,.85),0 0 14px rgba(255,150,40,.7),0 3px 6px rgba(0,0,0,.5)}
+.cell:has(use[href="#s11"]){--pa:#1b2f6a;--pb:#102250;--pc:#070d2a;--glow:rgba(255,200,90,.65);--r1:#ffeeb8;--c1:#7fe4ff;--c2:#7fe4ff;box-shadow:inset 0 0 0 1px rgba(40,14,4,.85),inset 0 0 13px rgba(0,0,0,.5),inset 0 2px 1px rgba(255,235,170,.4),0 0 0 1.5px rgba(30,10,4,.85),0 0 12px rgba(120,220,255,.5),0 3px 6px rgba(0,0,0,.5)}
+.cell:has(use[href^="#s12"]){--pa:#3a1a6a;--pb:#220f4a;--pc:#100628;--glow:rgba(190,120,255,.7);--c1:#ffe08a;--c2:#ffe08a}
+.cell:has(use[href="#s12_2"]){--glow:rgba(60,220,230,.7)}.cell:has(use[href="#s12_3"]){--glow:rgba(60,220,130,.7)}.cell:has(use[href="#s12_10"]){--glow:rgba(255,70,100,.75)}.cell:has(use[href="#s12_25"]){--glow:rgba(255,230,140,.9);--r1:#fff;box-shadow:inset 0 0 0 1px rgba(40,14,4,.85),inset 0 0 13px rgba(0,0,0,.4),0 0 0 1.5px rgba(30,10,4,.85),0 0 14px rgba(255,230,140,.8),0 3px 6px rgba(0,0,0,.5)}

@@ -1,0 +1,6 @@
+const fs=require('fs'),path=require('path');const {withBrowser}=require('./lib.cjs');const R=n=>fs.readFileSync(path.join(__dirname,'..',n),'utf8');
+const html=`<!doctype html><meta charset="utf-8"><style>body{margin:0;background:#000}#stage{position:relative;width:1600px;height:900px;overflow:hidden}#stage>*{position:absolute}${R('slot.css')}</style>${R('astro.html').replace('id="astro"','id="astro" class="on"')}`;
+(async()=>{await withBrowser(async b=>{const p=await b.newPage({viewport:{width:1600,height:900}});await p.setContent(`<div id="stage">${html.split('<style>')[0]}</div>`+'');await p.setContent(html.replace('<body','<body'));
+ await p.evaluate(()=>{const r=document.querySelector('.ring.r1');r.classList.add('go');r.style.setProperty('--t','1.5s');r.style.setProperty('--a','-1170')});
+ await p.waitForTimeout(1800);const tr=await p.evaluate(()=>getComputedStyle(document.querySelector('.ring.r1')).transform);console.log('r1 transform',tr);
+ await p.evaluate(()=>{document.getElementById('astro').classList.add('tense');document.querySelector('.j.grand').classList.add('lit');document.querySelectorAll('#ro3').forEach(e=>e.textContent='99×');document.getElementById('aHubT').textContent='GRAND!'});await p.waitForTimeout(500);await p.screenshot({path:process.argv[2]});});})();

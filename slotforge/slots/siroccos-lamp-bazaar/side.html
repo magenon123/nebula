@@ -1,0 +1,31 @@
+<!-- Chain meter (leo). #chain sits left of the board at stage (366,190) 106x510. Top: CHAIN tag with the big multiplier text (.cv, e.g. x3; in Free Wishes it can read x8, x12 ...). Ladder x1..x5: set ONE class m1..m5 on #chain (steps up to it light up, the current one pulses); add "fs" in Free Wishes (cap note shown), add "pop" for 0.5 s on every increase (remove it after). GEMS: put the gem sum in .gsum (e.g. ×7) and add class "on" to #chain.hasGems to show it. -->
+<div id="chain" class="m1">
+ <svg class="chBack" viewBox="0 0 106 510" stroke-linejoin="round" stroke-linecap="round">
+<defs>
+<linearGradient id="chG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7a3d14"/><stop offset=".3" stop-color="#e79a2c"/><stop offset=".6" stop-color="#fff0a0"/><stop offset=".85" stop-color="#f1a72f"/><stop offset="1" stop-color="#ffe9a0"/></linearGradient>
+<linearGradient id="chGd" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="106" y2="510"><stop offset="0" stop-color="#7a3d14"/><stop offset=".3" stop-color="#d98a22"/><stop offset=".5" stop-color="#fff0a8"/><stop offset=".72" stop-color="#e79a2c"/><stop offset="1" stop-color="#ffe08a"/></linearGradient>
+<linearGradient id="chW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a1c72"/><stop offset=".5" stop-color="#1c0e48"/><stop offset="1" stop-color="#0c0624"/></linearGradient>
+<linearGradient id="chL" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0a2060"/><stop offset=".6" stop-color="#1b4ec0"/><stop offset="1" stop-color="#2a82e8"/></linearGradient>
+<pattern id="chZ" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M13 2 L17 9 L24 13 L17 17 L13 24 L9 17 L2 13 L9 9Z" fill="none" stroke="#f0b858" stroke-width=".8" opacity=".35"/></pattern>
+<radialGradient id="chR" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#ffb0a8"/><stop offset=".3" stop-color="#e0354f"/><stop offset="1" stop-color="#4a0618"/></radialGradient>
+</defs>
+<rect x="3" y="14" width="100" height="492" rx="16" fill="#000" opacity=".5" transform="translate(0 6)"/>
+<rect x="2" y="8" width="102" height="494" rx="16" fill="#2a1006"/>
+<rect x="4" y="10" width="98" height="490" rx="14" fill="url(#chG)"/>
+<rect x="9" y="15" width="88" height="480" rx="10" fill="url(#chL)"/>
+<rect x="9" y="15" width="88" height="480" rx="10" fill="url(#chZ)"/>
+<rect x="9" y="15" width="88" height="480" rx="10" fill="none" stroke="#2a1006" stroke-width="2"/>
+<rect x="14" y="20" width="78" height="470" rx="7" fill="url(#chW)"/>
+<rect x="14" y="20" width="78" height="470" rx="7" fill="none" stroke="url(#chG)" stroke-width="1.6"/>
+<path d="M16,22 H90" stroke="#fff" stroke-opacity=".35" stroke-width="1.2"/>
+<path d="M10,16 C10,12 14,10 18,10" stroke="#fff6c0" stroke-opacity=".9" stroke-width="1.2" fill="none"/>
+<ellipse cx="53" cy="172" rx="3.6" ry="3" fill="none" stroke="#2a1006" stroke-width="3.6"/><ellipse cx="53" cy="172" rx="3.6" ry="3" fill="none" stroke="url(#chG)" stroke-width="1.8"/><ellipse cx="53" cy="183" rx="2.2" ry="4.6" fill="none" stroke="#2a1006" stroke-width="3.6"/><ellipse cx="53" cy="183" rx="2.2" ry="4.6" fill="none" stroke="url(#chG)" stroke-width="1.8"/><ellipse cx="53" cy="228" rx="3.6" ry="3" fill="none" stroke="#2a1006" stroke-width="3.6"/><ellipse cx="53" cy="228" rx="3.6" ry="3" fill="none" stroke="url(#chG)" stroke-width="1.8"/><ellipse cx="53" cy="239" rx="2.2" ry="4.6" fill="none" stroke="#2a1006" stroke-width="3.6"/><ellipse cx="53" cy="239" rx="2.2" ry="4.6" fill="none" stroke="url(#chG)" stroke-width="1.8"/><ellipse cx="53" cy="284" rx="3.6" ry="3" fill="none" stroke="#2a1006" stroke-width="3.6"/><ellipse cx="53" cy="284" rx="3.6" ry="3" fill="none" stroke="url(#chG)" stroke-width="1.8"/><ellipse cx="53" cy="295" rx="2.2" ry="4.6" fill="none" stroke="#2a1006" stroke-width="3.6"/><ellipse cx="53" cy="295" rx="2.2" ry="4.6" fill="none" stroke="url(#chG)" stroke-width="1.8"/><ellipse cx="53" cy="340" rx="3.6" ry="3" fill="none" stroke="#2a1006" stroke-width="3.6"/><ellipse cx="53" cy="340" rx="3.6" ry="3" fill="none" stroke="url(#chG)" stroke-width="1.8"/><ellipse cx="53" cy="351" rx="2.2" ry="4.6" fill="none" stroke="#2a1006" stroke-width="3.6"/><ellipse cx="53" cy="351" rx="2.2" ry="4.6" fill="none" stroke="url(#chG)" stroke-width="1.8"/>
+<path d="M22,366 H84" stroke="url(#chG)" stroke-width="1.6" opacity=".8"/>
+<path d="M22,128 H84" stroke="url(#chG)" stroke-width="1.6" opacity=".8"/>
+<circle cx="10" cy="14" r="5.4" fill="#2a1006"/><circle cx="10" cy="14" r="4.2" fill="url(#chG)"/><circle cx="10" cy="14" r="2.4" fill="url(#chR)"/><circle cx="9.2" cy="13" r=".8" fill="#fff"/><circle cx="96" cy="14" r="5.4" fill="#2a1006"/><circle cx="96" cy="14" r="4.2" fill="url(#chG)"/><circle cx="96" cy="14" r="2.4" fill="url(#chR)"/><circle cx="95.2" cy="13" r=".8" fill="#fff"/><circle cx="10" cy="496" r="5.4" fill="#2a1006"/><circle cx="10" cy="496" r="4.2" fill="url(#chG)"/><circle cx="10" cy="496" r="2.4" fill="url(#chR)"/><circle cx="9.2" cy="495" r=".8" fill="#fff"/><circle cx="96" cy="496" r="5.4" fill="#2a1006"/><circle cx="96" cy="496" r="4.2" fill="url(#chG)"/><circle cx="96" cy="496" r="2.4" fill="url(#chR)"/><circle cx="95.2" cy="495" r=".8" fill="#fff"/>
+</svg>
+ <div class="chTag"><b class="chLbl">CHAIN</b><i class="cv">×1</i></div>
+ <div class="chSteps"><i class="st s5"><b>×5</b></i><i class="st s4"><b>×4</b></i><i class="st s3"><b>×3</b></i><i class="st s2"><b>×2</b></i><i class="st s1"><b>×1</b></i></div>
+ <div class="chGem"><svg viewBox="0 0 128 128"><use href="#s12"/></svg><b class="gsum">×0</b><span>GEMS</span></div>
+ <b class="chNote">FREE WISHES<br>NEVER RESETS</b>
+</div>

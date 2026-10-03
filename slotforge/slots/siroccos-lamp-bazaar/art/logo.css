@@ -1,0 +1,4 @@
+/* ---------- logo ---------- */
+#logo{left:450px;top:-10px;width:660px;height:150px;overflow:visible;pointer-events:none}
+#logo .lgShine{animation:lgSh 7s ease-in-out infinite}
+@keyframes lgSh{0%,55%{transform:translateX(0) skewX(-20deg)}100%{transform:translateX(900px) skewX(-20deg)}}
