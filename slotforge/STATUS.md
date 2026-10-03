@@ -16,6 +16,10 @@ Step B: rin engine (new bonuses, buys, every mode 96.0-96.5%, tests), then kai c
 ## RESUME NOTE (written in case a usage limit stops everything)
 State: slot #3 Tea House revision. DONE and committed: engine (rin) with Tin Rush + Free Spins + Super + 3 buys (60/21/75x), all modes 96.2-96.4%, 68 tests pass; art revision (leo); design 02-new-bonuses.md. IN PROGRESS: kai's client for the new bonuses (slots/cloudtop-tea-house/slot.js, slot.json, info.html, shell/smoke-cloudtop.cjs). To resume: read this file, OWNER-PREFS.md Round 7, run `node slotforge/shell/smoke-cloudtop.cjs`; whatever fails is the remaining work (new bonuses UI, 3-card buy screen, counter-flash check, msg line wrap, splash portraits). Then lead verifies (all three smoke tests + node --test slotforge/tools/*.test.js) and sends cloudtop-tea-house-standalone.html to the owner. Never delete or regenerate finished files; everything is in git on branch claude/emberclaw-slot-design-7a060n.
 
+## Slots status
+- #1 EmberClaw, #2 Grumble & Brine, #3 Koji's Cloudtop Tea House: all APPROVED. Only bug fixes.
+- #4: NOT started. Waiting for the owner's theme/hook. NEW DIRECTION (OWNER-PREFS Round 9): detailed/realistic art (not doodle), shared bonuses + its own unique bonus. First step when started: leo+maya concept doc incl. an art-direction test (one symbol + one background in the new realistic style) for owner approval BEFORE any engine/client work.
+
 ## Done
 - EmberClaw (slot #1): finished, math retuned to ~96.2% in all modes, files rebuilt. Do not touch except bug fixes.
 - Shared shell (`shell/`), slot module format (`slots/emberclaw/`), engine registry + generic server route (`engines/`, `server.js` marked section), math tools + tests (`tools/`), build script (`/home/user/nebula/build-standalone.py <slug>`).

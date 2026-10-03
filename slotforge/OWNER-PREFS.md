@@ -72,3 +72,9 @@ Owner approved the concept with the notes in STATUS.md. The lead calls itself "T
 Every slot gets a bet-up bonus-chance toggle ("Deep Pressure", "Forge Fever", "FS Luck" for the Tea House: 2x cost, bonus much likelier, RTP 96% in that mode too). Other extras still vary per slot. The Tea House has it as of this round (2x, FS drums ~6x as likely).
 Also: Tin Rush slow-drop tease starts at the 5th tin (one short of 6), FS tease stays at the 2nd drum. Tin value chips sit in the top-left of the cell, never over the TIN tag. Tea House max win = 5,000x.
 Weekly limit is nearly used up (resets next day 6pm UTC): keep work small and commit/push every step.
+
+## Round 9 (owner): Tea House APPROVED. New direction for ALL future slots
+- Slot #3 (Koji's Cloudtop Tea House) is approved.
+- STOP the doodle look. From slot #4 on: much more detailed and realistic art (rendered lighting, depth, materials, real-looking symbols and backgrounds, a detailed character), in every slot. Existing slots 1-3 stay as they are unless the owner asks.
+- Every slot has SHARED bonuses (the standard set all slots carry: free-spins style bonus with its own twist, bet-up luck mode "FS/bonus luck", bonus buys, mid-spin turbo, big-win tiers, MAX WIN screen; MAX LUCK stays rare) AND its OWN unique bonus. Shared parts are reused from the shell/engine templates; the unique bonus must differ from all existing slots (variety rule still applies).
+- Weekly usage limit is tight: lead does small fixes itself; agents only for big builds; always commit/push and keep STATUS.md resume notes current.
