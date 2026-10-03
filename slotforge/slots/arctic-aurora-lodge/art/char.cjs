@@ -41,7 +41,7 @@ const mitten = (x, y, rot, col = 'red', sx = 1) => `<g transform="translate(${x}
 const furCuff = (x, y, rx = 17) => `<path d="${fur(ell(x, y, rx, 8, 14), { seed: Math.round(x), len: 4, step: 5, sweep: .3 })}" fill="${furC}" stroke="#7a6446" stroke-width=".6" stroke-opacity=".6"/>`;
 // ---------------- Aino
 const parka = 'M120 166Q100 178 98 208Q96 236 100 252Q86 300 64 358L268 358Q244 300 232 252Q236 236 232 208Q230 178 210 166Q165 152 120 166Z';
-const limb = (d, w1, c1, c2, hi, rim) => `<path d="${d}" fill="none" stroke="#08153a" stroke-width="${w1 + 3.4}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${c1}" stroke-width="${w1}" stroke-linecap="round"/><path d="${d}" transform="translate(${hi[0]} ${hi[1]})" fill="none" stroke="${c2}" stroke-opacity=".55" stroke-width="${w1 * .32}" stroke-linecap="round"/>${rim ? `<path d="${d}" transform="translate(${rim[0]} ${rim[1]})" fill="none" stroke="#7dffc4" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>` : ''}`;
+const limb = (d, w1, c1, c2, hi, rim) => `<path d="${d}" fill="none" stroke="#08153a" stroke-width="${w1 + 3.4}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${c1}" stroke-width="${w1}" stroke-linecap="round"/><path d="${d}" transform="translate(${hi[0]} ${hi[1]})" fill="none" stroke="${c2}" stroke-opacity=".4" stroke-width="${w1 * .22}" stroke-linecap="round"/>${rim ? `<path d="${d}" transform="translate(${rim[0]} ${rim[1]})" fill="none" stroke="#7dffc4" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>` : ''}`;
 const aino = `
  <g id="cBody">
   <ellipse cx="165" cy="362" rx="112" ry="14" fill="#02060e" opacity=".5"/>
@@ -70,15 +70,15 @@ const aino = `
   ${strokes({ n: 70, seed: 9, box: [100, 152, 230, 182], dir: (x, y) => Math.PI / 2, len: [4, 8], w: .9, color: '#fff', op: .8 })}
  </g>
  <!-- arm L (viewer's left): holds the lantern -->
- <g id="cArmL">${limb('M114 182Q96 200 90 236', 30, S.lin(90, 180, 120, 240, [[0, '#4a74c8'], [1, '#1c3c88']]), '#bcd4ff', [-6, 0], null)}
-  <g id="cForeL">${limb('M90 236Q86 266 94 294', 25, S.lin(80, 236, 110, 296, [[0, '#3f68bc'], [1, '#14307a']]), '#bcd4ff', [-5, 0], null)}
+ <g id="cArmL">${limb('M114 182Q96 200 90 236', 25, S.lin(90, 180, 120, 240, [[0, '#4a74c8'], [1, '#1c3c88']]), '#bcd4ff', [-6, 0], null)}
+  <g id="cForeL">${limb('M90 236Q86 266 94 294', 21, S.lin(80, 236, 110, 296, [[0, '#3f68bc'], [1, '#14307a']]), '#bcd4ff', [-5, 0], null)}
    <path d="M80 286Q94 296 108 288L108 296Q94 304 80 296Z" fill="${redV(0, 286, 0, 300)}" stroke="#3a0610" stroke-width="1"/>
    ${furCuff(94, 290, 17)}${mitten(94, 300, 4)}
    <g id="cLant"><circle cx="94" cy="344" r="38" fill="${S.rad(94, 344, 38, [[0, '#ffd890', .8], [.5, '#ffa840', .28], [1, '#ff9a30', 0]])}" class="cLGlow" style="mix-blend-mode:screen"/><use href="#s5" x="58" y="296" width="72" height="72"/></g>
   </g></g>
  <!-- arm R (viewer's right) -->
- <g id="cArmR">${limb('M216 182Q238 200 244 236', 30, S.lin(210, 180, 250, 240, [[0, '#3a64b8'], [1, '#0e2860']]), '#9fc0ff', [-5, 0], [7, 0])}
-  <g id="cForeR">${limb('M244 236Q248 266 240 294', 25, S.lin(230, 236, 262, 296, [[0, '#2f56a8'], [1, '#0c2258']]), '#9fc0ff', [-4, 0], [6, 0])}
+ <g id="cArmR">${limb('M216 182Q238 200 244 236', 25, S.lin(210, 180, 250, 240, [[0, '#3a64b8'], [1, '#0e2860']]), '#9fc0ff', [-5, 0], [7, 0])}
+  <g id="cForeR">${limb('M244 236Q248 266 240 294', 21, S.lin(230, 236, 262, 296, [[0, '#2f56a8'], [1, '#0c2258']]), '#9fc0ff', [-4, 0], [6, 0])}
    <path d="M224 286Q238 296 254 288L254 296Q238 304 224 296Z" fill="${redV(0, 286, 0, 300)}" stroke="#3a0610" stroke-width="1"/>
    ${furCuff(240, 290, 17)}${mitten(240, 300, -4, 'red', -1)}</g></g>
  <!-- head -->
@@ -142,20 +142,22 @@ const tuuli = `<g id="cDog" transform="translate(-34 4)">
    <path d="M380 222V226" stroke="#10151f" stroke-width="1.4"/>
    <path d="M350 172Q352 160 366 158" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.6" stroke-linecap="round"/>
   </g>
-  <g id="cFog"><circle class="fg1" cx="392" cy="226" r="7" fill="${S.rad(392, 226, 8, [[0, '#fff', .7], [1, '#cfe8ff', 0]])}"/><circle class="fg2" cx="392" cy="226" r="8" fill="${S.rad(392, 226, 9, [[0, '#fff', .6], [1, '#cfe8ff', 0]])}"/></g>
- </g>`;
-const svg = `<div id="char"><svg viewBox="0 0 480 410" stroke-linejoin="round" stroke-linecap="round" overflow="visible">
+</g>`;
+const VB = 'viewBox="0 0 480 410" stroke-linejoin="round" stroke-linecap="round" overflow="visible"';
+const svg = `<div id="char">
+<svg class="cl" id="cBackS" ${VB}>
  <defs>${S.defs.join('')}</defs>
  <g id="cCorona" opacity="0"><ellipse cx="240" cy="170" rx="260" ry="190" fill="${corona}"/><g id="cRays" fill="${S.rad(240, 170, 260, [[0, '#fff', .6], [1, '#9dffe0', 0]])}">${Array.from({ length: 12 }, (_, i) => { const a = i * 30 * Math.PI / 180, px = Math.cos(a + 1.5708), py = Math.sin(a + 1.5708); return `<path d="M${f(240 + 270 * Math.cos(a))} ${f(170 + 270 * Math.sin(a))}L${f(240 + 8 * px)} ${f(170 + 8 * py)}L${f(240 - 8 * px)} ${f(170 - 8 * py)}Z"/>`; }).join('')}</g></g>
  <mask id="chFade"><rect width="480" height="410" fill="url(#chFadeG)"/></mask><linearGradient id="chFadeG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".12" stop-color="#fff"/><stop offset=".88" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
  <g mask="url(#chFade)"><path d="M0 410V352Q40 322 120 336Q240 316 340 334Q430 322 480 346V410Z" fill="${snowG}"/><path d="M0 352Q40 322 120 336Q240 316 340 334Q430 322 480 346" fill="none" stroke="#9ffbd8" stroke-opacity=".55" stroke-width="2.4"/></g>
- <g id="cAll">
-  <g id="cAino">${aino}</g>
-  ${tuuli}
- </g>
- <g mask="url(#chFade)"><path d="M0 410V372Q60 352 150 366Q260 350 360 364Q440 352 480 368V410Z" fill="${S.lin(0, 352, 0, 410, [[0, '#7aa8cc'], [.4, '#2c5688'], [1, '#0c1c3c']])}"/><path d="M0 372Q60 352 150 366Q260 350 360 364Q440 352 480 368" fill="none" stroke="#9ffbd8" stroke-opacity=".5" stroke-width="2.4"/></g>
- <g id="cBang" opacity="0"><path d="M246 18l-6 30h12z" fill="#ffe08a" stroke="#4a2c08" stroke-width="1.6"/><circle cx="246" cy="58" r="5.4" fill="#ffe08a" stroke="#4a2c08" stroke-width="1.6"/></g>
-</svg></div>
+</svg>
+<svg class="cl" id="cAinoS" ${VB}><g id="cAll"><g id="cAino">${aino}</g></g></svg>
+<i class="cLG"></i>
+<svg class="cl" id="cDogS" ${VB}>${tuuli}</svg>
+<svg class="cl" id="cFogS" ${VB}><g id="cFog"><circle class="fg1" cx="358" cy="230" r="7" fill="${S.rad(358, 230, 8, [[0, '#fff', .7], [1, '#cfe8ff', 0]])}"/><circle class="fg2" cx="358" cy="230" r="8" fill="${S.rad(358, 230, 9, [[0, '#fff', .6], [1, '#cfe8ff', 0]])}"/></g></svg>
+<svg class="cl" id="cFrontS" ${VB}><g mask="url(#chFade)"><path d="M0 410V372Q60 352 150 366Q260 350 360 364Q440 352 480 368V410Z" fill="${S.lin(0, 352, 0, 410, [[0, '#7aa8cc'], [.4, '#2c5688'], [1, '#0c1c3c']])}"/><path d="M0 372Q60 352 150 366Q260 350 360 364Q440 352 480 368" fill="none" stroke="#9ffbd8" stroke-opacity=".5" stroke-width="2.4"/></g>
+ <g id="cBang" opacity="0"><path d="M240 14l-6 30h12z" fill="#ffe08a" stroke="#4a2c08" stroke-width="1.6"/><circle cx="240" cy="54" r="5.4" fill="#ffe08a" stroke="#4a2c08" stroke-width="1.6"/></g></svg>
+</div>
 `;
 fs.writeFileSync(path.join(__dirname, '../character.html'), `<!-- Aino the guide + Tuuli the husky. viewBox 480x410 at stage (1120,340). Ids: cCorona(cRays) cAll cAino(cBody cBraid cArmL(cForeL cLant cLGlow) cArmR(cForeR) cHead(cLids cBrows cMouth .m0 .m1 .m2, .cPup)) cDog(cDTail cDBody cDHead(cDEarL cDEarR cDEyes cDLids cDJaw .jc/.jo) cFog) cBang -->\n` + svg);
 console.log('character.html', (svg.length / 1024) | 0, 'KB');
