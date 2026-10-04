@@ -234,6 +234,8 @@ function countUp(el, to, ms, from = 0, onTick) {
       const k = skipBig ? 1 : Math.min(1, (t - t0) / ms); el.textContent = fmt(from + (to - from) * (1 - Math.pow(1 - k, 3)));
       k < 1 ? requestAnimationFrame(f) : res(); })(t0); });
 }
+/* TEMP preview switch: add ?nochar=1 to the address to hide the character beside the board (nothing is removed) */
+if (/[?&]nochar=1/.test(location.search)) { const st = document.createElement('style'); st.textContent = '#char{display:none!important}'; document.head.appendChild(st); }
 /* floating "+$x.xx" pop at a screen point, inside #fxl (the board's fx layer) */
 function pop(sx, sy, text, layer = $('fxl')) {
   const g = layer.getBoundingClientRect(), e = document.createElement('div'); e.className = 'pop'; e.textContent = text;
