@@ -3593,7 +3593,7 @@ function go(key){
     if(el){
       const hiding=key!==s;
       el.hidden=hiding;
-      if(hiding){const fr=$('frame-'+s);if(fr)fr.src='';}
+      if(hiding){const fr=$('frame-'+s);if(fr){const nw=fr.cloneNode(false);nw.src='';fr.parentNode.replaceChild(nw,fr);}}
     }
   });
   if(key==='olympian-storm'){const f=$('frame-olympian-storm');if(!f.src||!f.src.includes('olympian'))f.src='/olympian-storm.html';}
