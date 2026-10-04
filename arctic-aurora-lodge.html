@@ -2749,7 +2749,8 @@ function setBusy(b) {
 }
 async function go(buy) {
   if (busy) return; setBusy(true); sfx.spin(); closeMenu();
-  let inBonus = false; const wd = setTimeout(() => { if (busy && !inBonus) { setBusy(false); hooks.restoreBoard && hooks.restoreBoard(); say('That round got stuck and was reset. Your balance is safe; spin again.'); } }, 45000);   // watchdog for a hung base spin if (cfg.text.spin) say(cfg.text.spin);
+  let inBonus = false; const wd = setTimeout(() => { if (busy && !inBonus) { setBusy(false); hooks.restoreBoard && hooks.restoreBoard(); say('That round got stuck and was reset. Your balance is safe; spin again.'); } }, 45000);   // watchdog for a hung base spin
+  if (cfg.text.spin) say(cfg.text.spin);
   $('win').textContent = fmt(0); $('fsBox').hidden = true;
   const stake = BETS[bi]; let out = { payout: 0, bonus: false, tier: null };
   try {
