@@ -29,8 +29,22 @@ const T = () => (turbo || boost) ? .45 : 1;
 /* wait() re-reads T() every frame, so switching to turbo in the middle of a wait shortens the rest of it */
 const wait = ms => new Promise(res => { let prog = 0, last = performance.now(); const tick = now => { prog += (now - last) / Math.max(1, ms * T()); last = now; if (prog >= 1) res(); else requestAnimationFrame(tick); }; if (ms <= 0) res(); else requestAnimationFrame(tick); });
 
-/* the 1600x900 stage is scaled to fit the window */
-function fit() { STAGE_S = Math.min(innerWidth / 1600, innerHeight / 900); $('stage').style.setProperty('--s', STAGE_S); }
+/* the 1600x900 stage is scaled to fit the window. In a portrait window (a phone held upright) the board, logo and side meters are
+   grouped in #ga and zoomed to the screen width, the picture fills the whole screen, and the buttons stack along the bottom. */
+const GA = (() => { const ga = document.createElement('div'), st = $('stage'); ga.id = 'ga';
+  const HUD = new Set(['scene', 'msg', 'fsBox', 'turboBadge', 'feverBadge', 'buyOpen', 'barL', 'barR', 'spin', 'bAuto', 'menu']);
+  [...st.children].filter(e => !HUD.has(e.id)).forEach(e => ga.appendChild(e)); st.insertBefore(ga, $('msg')); return ga; })();
+function fit() {
+  const st = $('stage'), port = innerHeight > innerWidth * 1.02; document.body.classList.toggle('portrait', port);
+  if (!port) { STAGE_S = Math.min(innerWidth / 1600, innerHeight / 900); st.style.setProperty('--s', STAGE_S); return; }
+  const W = 900, H = Math.max(1500, Math.round(W * innerHeight / innerWidth)), s = Math.min(innerWidth / W, innerHeight / H);
+  const fr = $('frame'), pt = cfg.portrait || {};
+  const fl = fr.offsetLeft, ft = fr.offsetTop, fw = fr.offsetWidth || 520, fh = fr.offsetHeight || 520;
+  const left = fl - (pt.left != null ? pt.left : 210), right = fl + fw + (pt.right != null ? pt.right : 70), g = Math.min(1.5, W / (right - left));   // room for the side meter on the left
+  const bottom = ft + fh + 30, avail = H - 600, gy = Math.max(0, (avail - bottom * g) / 2), gx = W / 2 - g * (left + right) / 2;
+  st.style.setProperty('--s', s); st.style.setProperty('--H', H + 'px'); st.style.setProperty('--g', g); st.style.setProperty('--gx', gx / g + 'px'); st.style.setProperty('--gy', gy / g + 'px'); st.style.setProperty('--sc', H / 900);
+  STAGE_S = s * g;   // what the board's pop-ups and shards measure against
+}
 addEventListener('resize', fit); fit();
 
 /* ---------- audio: everything is synthesised, nothing is sampled. The shell owns the primitives; the slot owns the recipes ---------- */
@@ -276,20 +290,47 @@ function tapWait(id, autoMs, minMs = 450) { return new Promise(res => { const m 
 
 /* ---------- big win overlay ---------- */
 let bonusDone = false;
-const tierOf = x => cfg.tiers.find(t => x >= t.min) || null;
+/* Win levels, as multiples of the bet. Nothing below 20x gets a win screen. The screen climbs through every level the win reaches. */
+const LADDER = cfg.winLevels || [{ min: 20, name: 'BIG WIN', lv: 1 }, { min: 50, name: 'MEGA WIN', lv: 2 }, { min: 100, name: 'EPIC WIN', lv: 3 }, { min: 250, name: 'LEGENDARY WIN', lv: 4 }];
+const tierOf = x => { let t = null; for (const l of LADDER) if (x >= l.min) t = l; return t; };
+let bigTap = null;
+function coinRain(lv) {   // gold coins tumbling down the win screen; heavier with each level
+  const box = $('bigCoins'); if (!box) return () => {};
+  const spawn = () => { if (box.childElementCount > 70) return;
+    const c = document.createElement('i'), sz = 22 + Math.random() * 30, x = Math.random() * 100, dur = (2600 + Math.random() * 2200) * T(), rot = (Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 720);
+    c.style.cssText = `left:${x}%;width:${sz}px;height:${sz}px`;
+    box.appendChild(c);
+    const an = c.animate([{ transform: 'translateY(-14vh) rotateY(0deg) rotateZ(' + (Math.random() * 40 - 20) + 'deg)', opacity: 1 }, { transform: `translateY(112vh) rotateY(${rot}deg) rotateZ(${Math.random() * 60 - 30}deg)`, opacity: 1 }], { duration: dur, easing: 'cubic-bezier(.35,0,.7,.9)' });
+    an.onfinish = () => c.remove(); };
+  for (let i = 0; i < 14 + lv * 6; i++) setTimeout(spawn, Math.random() * 500);
+  const iv = setInterval(spawn, Math.max(30, 150 - lv * 20));
+  return () => { clearInterval(iv); setTimeout(() => { box.textContent = ''; }, 300); };
+}
 async function bigWin(x, amt) {
   const t = tierOf(x); if (!t) return null;
-  const lv = t.lv, bigMark = {}, isMax = x >= cfg.maxWin - 1e-9;   // the cap itself gets its own gold presentation
-  $('big').classList.toggle('maxwin', isMax); $('big').dataset.lv = lv;
-  $('bigT').textContent = isMax ? 'MAX WIN' : t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = (bonusDone ? 'BONUS COMPLETE. ' : '') + (isMax ? 'THE MAXIMUM. YOU HIT THE CEILING!' : t.tag || '');
-  $('big').classList.add('show'); char('big', 3300); shake(lv + .6); flash(lv); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
-  if (isMax) { coins(160); embers(260, innerWidth / 2, innerHeight / 2, true); setTimeout(() => { if ($('big').classList.contains('show')) { coins(120); flash(3); } }, 2200 * T()); }
-  sfx.big(lv); music.duck([0, .5, .38, .28, .2][lv] || .3, 1.2 + lv * .8, 1.6); music.stinger('win');
-  await Promise.race([countUp($('bigA'), amt, (isMax ? 5200 : 1400 + lv * 700) * T() + 300, 0, k => { sfx.tick(k); if (lv >= 2 && !(bigMark.a) && k > .35) { bigMark.a = 1; shake(lv * .45); } if (lv >= 3 && !bigMark.b && k > .7) { bigMark.b = 1; shake(lv * .6); flash(lv - 1); embers(40 * lv, innerWidth / 2, innerHeight / 2, true); } }), sleep(20000)]);
-  await sleep(auto.left > 0 ? 700 : isMax ? 3500 : 1500 + lv * 300);
-  $('big').classList.remove('show'); bonusDone = false; return t.name;
+  const isMax = x >= cfg.maxWin - 1e-9;   // the cap itself gets its own gold presentation
+  const steps = LADDER.filter(l => x >= l.min).map(l => ({ ...l })); if (isMax) steps.push({ min: x, name: 'MAX WIN', lv: 5, max: true });
+  const B = $('big'), title = $('bigT'), amtEl = $('bigA');
+  amtEl.textContent = fmt(0); $('bigX').textContent = ''; if ($('bigTag')) $('bigTag').textContent = bonusDone ? 'BONUS COMPLETE' : '';
+  B.classList.add('show'); let stopRain = coinRain(1), from = 0, cur = 0;
+  const showStep = (st, first) => {
+    B.classList.toggle('maxwin', !!st.max); B.dataset.lv = st.lv; title.textContent = st.name;
+    title.style.animation = 'none'; void title.offsetWidth; title.style.animation = '';   // replay the pop-in for the new level
+    stopRain(); stopRain = coinRain(st.lv);
+    const k = Math.min(4, st.lv); shake(k + .6); flash(k);
+    sfx.big(k); music.duck([0, .5, .38, .28, .2][k] || .2, 1.2 + k * .8, 1.6); if (first) music.stinger('win');
+  };
+  for (let i = 0; i < steps.length; i++) {
+    const st = steps[i], last = i === steps.length - 1, to = last ? amt : amt * (steps[i + 1].min / x);
+    cur = i; showStep(st, i === 0);
+    await Promise.race([countUp(amtEl, to, (last ? 2000 + st.lv * 500 : 1500) * T() + 250, from, k => sfx.tick(k)), sleep(20000)]);
+    from = to; if (!last) await sleep(180);
+  }
+  $('bigX').textContent = x.toFixed(1) + 'x BET'; sfx.hit();
+  await Promise.race([new Promise(r => { bigTap = r; }), sleep(auto.left > 0 ? 700 : (steps[cur].max ? 6000 : 3200))]); bigTap = null;
+  stopRain(); B.classList.remove('show'); bonusDone = false; return t.lv;
 }
-$('big').onclick = () => { skipBig = true; };
+$('big').onclick = () => { skipBig = true; if (bigTap) bigTap(); };
 
 /* ---------- switch to turbo in the middle of a spin or bonus ---------- */
 function speedUp() {
@@ -355,7 +396,7 @@ async function runAuto() {
     refreshUi(); const o = await go(null);
     if (o.err) break;
     auto.left--;
-    if ((o.bonus && auto.stopFeat) || (o.tier && auto.stopBig && cfg.tiers.find(t => t.name === o.tier).lv >= cfg.autoBigLv)) break;
+    if ((o.bonus && auto.stopFeat) || (o.tier && auto.stopBig)) break;
     if (BETS[bi] * mult() > balance + 1e-9) { say('Not enough balance — autoplay stopped.'); break; }
     await wait(450);
   }
@@ -436,6 +477,7 @@ addEventListener('keydown', e => {
   if (e.code === 'Space') { e.preventDefault(); if (!busy) go(null); else speedUp(); }
 });
 
+window.__sf = { bigWin };   // test handle: lets the browser tests show the win screen at a chosen size
 /* ---------- the API handed to the slot ---------- */
 const S = {
   cfg, $, store, fmt, music, fx: FX, shards: FX.shards, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
@@ -451,7 +493,7 @@ document.title = cfg.title + (LOCAL ? ' (offline demo)' : '');
 $('authName').textContent = cfg.logoText;
 $('buyOpen').querySelector('svg').innerHTML = `<use href="#s${cfg.scatterSym}"/>`;
 $('feverBadge').textContent = cfg.fever ? cfg.fever.badge : '';
-const bigTier = cfg.tiers.find(t => t.lv === cfg.autoBigLv); $('swBigTxt').textContent = `Stop on a big win (${bigTier.min}x+)`;
+$('swBigTxt').textContent = `Stop on a big win (${LADDER[0].min}x+)`;
 $('bbRow').innerHTML =
   (cfg.fever ? `<div class="bbc"><div class="med">${sym(cfg.fever.sym)}</div><h3>${cfg.fever.name}</h3><p>${cfg.fever.text}</p><div class="vol" data-n="${cfg.fever.vol}"><span>VOLATILITY</span></div><div class="price" id="pa">${ANTE_COST}x BET</div><button class="go or" id="ante">ACTIVATE</button></div>` : '') +
   (LUCK_COST ? `<div class="bbc"><div class="med">${sym(cfg.luck.sym)}</div><h3>${cfg.luck.name}</h3><p>${cfg.luck.text}</p><div class="vol" data-n="${cfg.luck.vol}"><span>VOLATILITY</span></div><div class="price" id="pl">${LUCK_COST}x BET</div><button class="go or" id="luck">ACTIVATE</button></div>` : '') +
@@ -494,7 +536,7 @@ hooks.paintIdle();
   Promise.all([Promise.race([fontsReady, new Promise(r => setTimeout(r, 4500))]), new Promise(r => setTimeout(r, MIN))]).then(() => {
     $('lmFill').style.width = '100%'; $('lmTxt').textContent = 'READY';
     setTimeout(() => { el.classList.add('ready'); const go = e => { if (e.type === 'keydown' && !['Space', 'Enter'].includes(e.code)) return; e.preventDefault(); removeEventListener('keydown', go); el.classList.add('out'); setTimeout(() => el.remove(), 700);
-      try { if (matchMedia('(pointer:coarse)').matches) { const d = document.documentElement, rf = d.requestFullscreen || d.webkitRequestFullscreen; if (rf && !document.fullscreenElement) Promise.resolve(rf.call(d)).then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape')).catch(() => {}); } } catch {} };
+      try { if (matchMedia('(pointer:coarse)').matches) { const d = document.documentElement, rf = d.requestFullscreen || d.webkitRequestFullscreen; if (rf && !document.fullscreenElement) Promise.resolve(rf.call(d)).catch(() => {}); } } catch {} };
       el.addEventListener('pointerdown', go, { once: true }); addEventListener('keydown', go); }, 350);
   });
 })();

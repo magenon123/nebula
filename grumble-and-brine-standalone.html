@@ -257,8 +257,8 @@ button:disabled{cursor:not-allowed}
 
 /* ---- phones: portrait shows a rotate prompt (the stage is 16:9) ---- */
 html,body{touch-action:manipulation;-webkit-touch-callout:none}
-#rotateM{display:none;position:fixed;inset:0;z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse at 50% 40%,#1d1b2c,#07060d);color:#fff;text-align:center;padding:24px}
-@media (orientation:portrait) and (max-width:820px){#rotateM{display:flex}}
+#rotateM{display:none!important;position:fixed;inset:0;z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse at 50% 40%,#1d1b2c,#07060d);color:#fff;text-align:center;padding:24px}
+
 #rotateM .rmPhone{width:64px;height:110px;border:6px solid var(--gold,#ffd95e);border-radius:14px;position:relative;animation:rmTurn 2.4s ease-in-out infinite;box-shadow:0 0 30px rgba(255,200,60,.4)}
 #rotateM .rmPhone::after{content:"";position:absolute;left:50%;bottom:6px;width:14px;height:4px;margin-left:-7px;border-radius:3px;background:var(--gold,#ffd95e)}
 @keyframes rmTurn{0%,20%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
@@ -267,7 +267,7 @@ html,body{touch-action:manipulation;-webkit-touch-callout:none}
 
 /* ---- big win scene: blurred game, tier-coloured rotating light, halo, banner + plaque ---- */
 #big{background:radial-gradient(ellipse at 50% 46%,rgba(8,10,20,.35),rgba(2,3,8,.9) 78%);--bc:#ffb02e;overflow:hidden}
-#big[data-lv="1"]{--bc:#5ad0ff}#big[data-lv="2"]{--bc:#7dff9a}#big[data-lv="3"]{--bc:#ffb02e}#big[data-lv="4"]{--bc:#ff5a8a}
+#big[data-lv="1"]{--bc:#ffb02e}#big[data-lv="2"]{--bc:#ff7a3a}#big[data-lv="3"]{--bc:#c85cff}#big[data-lv="4"]{--bc:#ff4f7a}#big[data-lv="5"]{--bc:#ffd34a}
 #bigBlur{position:absolute;inset:0;backdrop-filter:blur(7px) saturate(1.2);-webkit-backdrop-filter:blur(7px) saturate(1.2)}
 #bigRays{position:absolute;left:50%;top:46%;width:240vmax;height:240vmax;margin:-120vmax 0 0 -120vmax;background:repeating-conic-gradient(color-mix(in srgb,var(--bc) 42%,transparent) 0 5deg,transparent 5deg 15deg);-webkit-mask:radial-gradient(circle,#000 4%,transparent 58%);mask:radial-gradient(circle,#000 4%,transparent 58%);animation:mwSpin 40s linear infinite;pointer-events:none;opacity:.9}
 #bigGlow{position:absolute;left:50%;top:48%;width:min(90vw,980px);height:min(60vh,560px);transform:translate(-50%,-50%);background:radial-gradient(ellipse,color-mix(in srgb,var(--bc) 55%,transparent),transparent 68%);filter:blur(10px);animation:bgPulse 1.8s ease-in-out infinite alternate;pointer-events:none}
@@ -285,6 +285,33 @@ html,body{touch-action:manipulation;-webkit-touch-callout:none}
 #loadM .lmWarn{position:absolute;left:0;right:0;bottom:6vh;text-align:center;padding:0 7vw;font:700 clamp(13px,1.6vw,18px)/1.4 sans-serif;color:#ffd0a0;opacity:0;animation:lmWarnIn .4s 8s forwards;pointer-events:none}
 @keyframes lmWarnIn{to{opacity:1}}
 #loadM.ready .lmWarn{display:none}
+
+/* ===== win screen v3: coin rain instead of spinning rays ===== */
+#bigRays,#big.maxwin::before{display:none!important}
+#bigCoins{position:absolute;inset:0;overflow:hidden;pointer-events:none;perspective:700px;z-index:1}
+#bigCoins i{position:absolute;top:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6b8 0,#ffd23a 38%,#d38a0c 78%,#8a5206 100%);box-shadow:inset 0 0 0 3px rgba(130,76,6,.75),inset 0 0 0 6px rgba(255,236,150,.55),0 3px 8px rgba(0,0,0,.45);will-change:transform}
+#bigCoins i::after{content:"$";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 55% var(--toon,Impact),sans-serif;color:#9a5a08;text-shadow:0 1px 0 rgba(255,240,170,.8)}
+#bigCard{z-index:3}
+
+/* ===== portrait (phone held upright): same game, re-laid out ===== */
+#ga{position:absolute;left:0;top:0;width:1600px;height:900px;pointer-events:none}
+#ga>*{position:absolute;pointer-events:auto}
+body.portrait #stage{width:900px;height:var(--H,1600px)}
+body.portrait #ga{zoom:var(--g,1);left:var(--gx,0px);top:var(--gy,0px)}   /* zoom, not transform: a scaled SVG logo gets cropped by the browser's layer bounds */
+body.portrait #scene{left:-350px!important;top:calc((var(--H,1600px) - 900px)/2)!important;width:1600px!important;height:900px!important;transform:scale(var(--sc,1.7));transform-origin:50% 50%}
+body.portrait #msg{left:30px;width:840px;top:auto;bottom:402px;font-size:30px;height:48px}
+body.portrait #barL{left:30px;top:auto;bottom:292px;width:840px}
+body.portrait #barR{left:30px;top:auto;bottom:170px;width:520px}
+body.portrait #spin{left:612px;top:auto;bottom:50px;width:230px;height:230px}
+body.portrait #spin svg{width:120px;height:120px}
+body.portrait #bAuto{left:30px;top:auto;bottom:70px;width:84px;height:84px}
+body.portrait #buyOpen{left:170px;top:auto;bottom:24px;zoom:.62;transform-origin:50% 100%}
+body.portrait #buyOpen .ch{display:none}
+body.portrait #turboBadge{left:30px;top:auto;bottom:455px}
+body.portrait #feverBadge{left:200px;top:auto;bottom:455px}
+body.portrait #fsBox{left:20px;top:20px}
+body.portrait #menu{left:30px;top:auto;bottom:392px;width:340px}
+body.portrait #menu button{font-size:22px;padding:14px 14px}
 
 /* Grumble & Brine ART CSS (leo). Concatenate into slot.css (or load after the shell CSS). Layout, scene motion, board/cells, Current Strip,
    Tide Gauge and Captain Barnacle states. Keyframes are prefixed gb* (shell owns blink/rot/flick/wob/bigin: not redefined). */
@@ -1168,7 +1195,7 @@ html,body{touch-action:manipulation;-webkit-touch-callout:none}
 </div></div>
 <canvas id="fx"></canvas><div id="flash"></div>
 <div id="auth" hidden><div><h1 id="authName"></h1><p style="font-family:var(--ui)">Sign in to Nebula first, then reopen this game.</p></div></div>
-<div id="big"><div id="bigBlur"></div><div id="bigRays"></div><div id="bigGlow"></div><div id="bigCard"><div id="bigT"></div><div id="bigA"></div><div id="bigX"></div></div></div>
+<div id="big"><div id="bigBlur"></div><div id="bigCoins"></div><div id="bigGlow"></div><div id="bigCard"><div id="bigT"></div><div id="bigA"></div><div id="bigX"></div></div></div>
 
 <!-- bonus buy screen (cards are generated from slot.json: fever + buys) -->
 <div class="modal bb" id="buyM" hidden>
@@ -1727,8 +1754,22 @@ const T = () => (turbo || boost) ? .45 : 1;
 /* wait() re-reads T() every frame, so switching to turbo in the middle of a wait shortens the rest of it */
 const wait = ms => new Promise(res => { let prog = 0, last = performance.now(); const tick = now => { prog += (now - last) / Math.max(1, ms * T()); last = now; if (prog >= 1) res(); else requestAnimationFrame(tick); }; if (ms <= 0) res(); else requestAnimationFrame(tick); });
 
-/* the 1600x900 stage is scaled to fit the window */
-function fit() { STAGE_S = Math.min(innerWidth / 1600, innerHeight / 900); $('stage').style.setProperty('--s', STAGE_S); }
+/* the 1600x900 stage is scaled to fit the window. In a portrait window (a phone held upright) the board, logo and side meters are
+   grouped in #ga and zoomed to the screen width, the picture fills the whole screen, and the buttons stack along the bottom. */
+const GA = (() => { const ga = document.createElement('div'), st = $('stage'); ga.id = 'ga';
+  const HUD = new Set(['scene', 'msg', 'fsBox', 'turboBadge', 'feverBadge', 'buyOpen', 'barL', 'barR', 'spin', 'bAuto', 'menu']);
+  [...st.children].filter(e => !HUD.has(e.id)).forEach(e => ga.appendChild(e)); st.insertBefore(ga, $('msg')); return ga; })();
+function fit() {
+  const st = $('stage'), port = innerHeight > innerWidth * 1.02; document.body.classList.toggle('portrait', port);
+  if (!port) { STAGE_S = Math.min(innerWidth / 1600, innerHeight / 900); st.style.setProperty('--s', STAGE_S); return; }
+  const W = 900, H = Math.max(1500, Math.round(W * innerHeight / innerWidth)), s = Math.min(innerWidth / W, innerHeight / H);
+  const fr = $('frame'), pt = cfg.portrait || {};
+  const fl = fr.offsetLeft, ft = fr.offsetTop, fw = fr.offsetWidth || 520, fh = fr.offsetHeight || 520;
+  const left = fl - (pt.left != null ? pt.left : 210), right = fl + fw + (pt.right != null ? pt.right : 70), g = Math.min(1.5, W / (right - left));   // room for the side meter on the left
+  const bottom = ft + fh + 30, avail = H - 600, gy = Math.max(0, (avail - bottom * g) / 2), gx = W / 2 - g * (left + right) / 2;
+  st.style.setProperty('--s', s); st.style.setProperty('--H', H + 'px'); st.style.setProperty('--g', g); st.style.setProperty('--gx', gx / g + 'px'); st.style.setProperty('--gy', gy / g + 'px'); st.style.setProperty('--sc', H / 900);
+  STAGE_S = s * g;   // what the board's pop-ups and shards measure against
+}
 addEventListener('resize', fit); fit();
 
 /* ---------- audio: everything is synthesised, nothing is sampled. The shell owns the primitives; the slot owns the recipes ---------- */
@@ -1974,20 +2015,47 @@ function tapWait(id, autoMs, minMs = 450) { return new Promise(res => { const m 
 
 /* ---------- big win overlay ---------- */
 let bonusDone = false;
-const tierOf = x => cfg.tiers.find(t => x >= t.min) || null;
+/* Win levels, as multiples of the bet. Nothing below 20x gets a win screen. The screen climbs through every level the win reaches. */
+const LADDER = cfg.winLevels || [{ min: 20, name: 'BIG WIN', lv: 1 }, { min: 50, name: 'MEGA WIN', lv: 2 }, { min: 100, name: 'EPIC WIN', lv: 3 }, { min: 250, name: 'LEGENDARY WIN', lv: 4 }];
+const tierOf = x => { let t = null; for (const l of LADDER) if (x >= l.min) t = l; return t; };
+let bigTap = null;
+function coinRain(lv) {   // gold coins tumbling down the win screen; heavier with each level
+  const box = $('bigCoins'); if (!box) return () => {};
+  const spawn = () => { if (box.childElementCount > 70) return;
+    const c = document.createElement('i'), sz = 22 + Math.random() * 30, x = Math.random() * 100, dur = (2600 + Math.random() * 2200) * T(), rot = (Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 720);
+    c.style.cssText = `left:${x}%;width:${sz}px;height:${sz}px`;
+    box.appendChild(c);
+    const an = c.animate([{ transform: 'translateY(-14vh) rotateY(0deg) rotateZ(' + (Math.random() * 40 - 20) + 'deg)', opacity: 1 }, { transform: `translateY(112vh) rotateY(${rot}deg) rotateZ(${Math.random() * 60 - 30}deg)`, opacity: 1 }], { duration: dur, easing: 'cubic-bezier(.35,0,.7,.9)' });
+    an.onfinish = () => c.remove(); };
+  for (let i = 0; i < 14 + lv * 6; i++) setTimeout(spawn, Math.random() * 500);
+  const iv = setInterval(spawn, Math.max(30, 150 - lv * 20));
+  return () => { clearInterval(iv); setTimeout(() => { box.textContent = ''; }, 300); };
+}
 async function bigWin(x, amt) {
   const t = tierOf(x); if (!t) return null;
-  const lv = t.lv, bigMark = {}, isMax = x >= cfg.maxWin - 1e-9;   // the cap itself gets its own gold presentation
-  $('big').classList.toggle('maxwin', isMax); $('big').dataset.lv = lv;
-  $('bigT').textContent = isMax ? 'MAX WIN' : t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = (bonusDone ? 'BONUS COMPLETE. ' : '') + (isMax ? 'THE MAXIMUM. YOU HIT THE CEILING!' : t.tag || '');
-  $('big').classList.add('show'); char('big', 3300); shake(lv + .6); flash(lv); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
-  if (isMax) { coins(160); embers(260, innerWidth / 2, innerHeight / 2, true); setTimeout(() => { if ($('big').classList.contains('show')) { coins(120); flash(3); } }, 2200 * T()); }
-  sfx.big(lv); music.duck([0, .5, .38, .28, .2][lv] || .3, 1.2 + lv * .8, 1.6); music.stinger('win');
-  await Promise.race([countUp($('bigA'), amt, (isMax ? 5200 : 1400 + lv * 700) * T() + 300, 0, k => { sfx.tick(k); if (lv >= 2 && !(bigMark.a) && k > .35) { bigMark.a = 1; shake(lv * .45); } if (lv >= 3 && !bigMark.b && k > .7) { bigMark.b = 1; shake(lv * .6); flash(lv - 1); embers(40 * lv, innerWidth / 2, innerHeight / 2, true); } }), sleep(20000)]);
-  await sleep(auto.left > 0 ? 700 : isMax ? 3500 : 1500 + lv * 300);
-  $('big').classList.remove('show'); bonusDone = false; return t.name;
+  const isMax = x >= cfg.maxWin - 1e-9;   // the cap itself gets its own gold presentation
+  const steps = LADDER.filter(l => x >= l.min).map(l => ({ ...l })); if (isMax) steps.push({ min: x, name: 'MAX WIN', lv: 5, max: true });
+  const B = $('big'), title = $('bigT'), amtEl = $('bigA');
+  amtEl.textContent = fmt(0); $('bigX').textContent = ''; if ($('bigTag')) $('bigTag').textContent = bonusDone ? 'BONUS COMPLETE' : '';
+  B.classList.add('show'); let stopRain = coinRain(1), from = 0, cur = 0;
+  const showStep = (st, first) => {
+    B.classList.toggle('maxwin', !!st.max); B.dataset.lv = st.lv; title.textContent = st.name;
+    title.style.animation = 'none'; void title.offsetWidth; title.style.animation = '';   // replay the pop-in for the new level
+    stopRain(); stopRain = coinRain(st.lv);
+    const k = Math.min(4, st.lv); shake(k + .6); flash(k);
+    sfx.big(k); music.duck([0, .5, .38, .28, .2][k] || .2, 1.2 + k * .8, 1.6); if (first) music.stinger('win');
+  };
+  for (let i = 0; i < steps.length; i++) {
+    const st = steps[i], last = i === steps.length - 1, to = last ? amt : amt * (steps[i + 1].min / x);
+    cur = i; showStep(st, i === 0);
+    await Promise.race([countUp(amtEl, to, (last ? 2000 + st.lv * 500 : 1500) * T() + 250, from, k => sfx.tick(k)), sleep(20000)]);
+    from = to; if (!last) await sleep(180);
+  }
+  $('bigX').textContent = x.toFixed(1) + 'x BET'; sfx.hit();
+  await Promise.race([new Promise(r => { bigTap = r; }), sleep(auto.left > 0 ? 700 : (steps[cur].max ? 6000 : 3200))]); bigTap = null;
+  stopRain(); B.classList.remove('show'); bonusDone = false; return t.lv;
 }
-$('big').onclick = () => { skipBig = true; };
+$('big').onclick = () => { skipBig = true; if (bigTap) bigTap(); };
 
 /* ---------- switch to turbo in the middle of a spin or bonus ---------- */
 function speedUp() {
@@ -2053,7 +2121,7 @@ async function runAuto() {
     refreshUi(); const o = await go(null);
     if (o.err) break;
     auto.left--;
-    if ((o.bonus && auto.stopFeat) || (o.tier && auto.stopBig && cfg.tiers.find(t => t.name === o.tier).lv >= cfg.autoBigLv)) break;
+    if ((o.bonus && auto.stopFeat) || (o.tier && auto.stopBig)) break;
     if (BETS[bi] * mult() > balance + 1e-9) { say('Not enough balance — autoplay stopped.'); break; }
     await wait(450);
   }
@@ -2134,6 +2202,7 @@ addEventListener('keydown', e => {
   if (e.code === 'Space') { e.preventDefault(); if (!busy) go(null); else speedUp(); }
 });
 
+window.__sf = { bigWin };   // test handle: lets the browser tests show the win screen at a chosen size
 /* ---------- the API handed to the slot ---------- */
 const S = {
   cfg, $, store, fmt, music, fx: FX, shards: FX.shards, betLbl, sleep, wait, T, tpl, sfx, say, shake, flash, embers, coins, char, countUp, pop, openM, closeM, tapWait, refreshUi, bigWin,
@@ -2149,7 +2218,7 @@ document.title = cfg.title + (LOCAL ? ' (offline demo)' : '');
 $('authName').textContent = cfg.logoText;
 $('buyOpen').querySelector('svg').innerHTML = `<use href="#s${cfg.scatterSym}"/>`;
 $('feverBadge').textContent = cfg.fever ? cfg.fever.badge : '';
-const bigTier = cfg.tiers.find(t => t.lv === cfg.autoBigLv); $('swBigTxt').textContent = `Stop on a big win (${bigTier.min}x+)`;
+$('swBigTxt').textContent = `Stop on a big win (${LADDER[0].min}x+)`;
 $('bbRow').innerHTML =
   (cfg.fever ? `<div class="bbc"><div class="med">${sym(cfg.fever.sym)}</div><h3>${cfg.fever.name}</h3><p>${cfg.fever.text}</p><div class="vol" data-n="${cfg.fever.vol}"><span>VOLATILITY</span></div><div class="price" id="pa">${ANTE_COST}x BET</div><button class="go or" id="ante">ACTIVATE</button></div>` : '') +
   (LUCK_COST ? `<div class="bbc"><div class="med">${sym(cfg.luck.sym)}</div><h3>${cfg.luck.name}</h3><p>${cfg.luck.text}</p><div class="vol" data-n="${cfg.luck.vol}"><span>VOLATILITY</span></div><div class="price" id="pl">${LUCK_COST}x BET</div><button class="go or" id="luck">ACTIVATE</button></div>` : '') +
@@ -2192,7 +2261,7 @@ hooks.paintIdle();
   Promise.all([Promise.race([fontsReady, new Promise(r => setTimeout(r, 4500))]), new Promise(r => setTimeout(r, MIN))]).then(() => {
     $('lmFill').style.width = '100%'; $('lmTxt').textContent = 'READY';
     setTimeout(() => { el.classList.add('ready'); const go = e => { if (e.type === 'keydown' && !['Space', 'Enter'].includes(e.code)) return; e.preventDefault(); removeEventListener('keydown', go); el.classList.add('out'); setTimeout(() => el.remove(), 700);
-      try { if (matchMedia('(pointer:coarse)').matches) { const d = document.documentElement, rf = d.requestFullscreen || d.webkitRequestFullscreen; if (rf && !document.fullscreenElement) Promise.resolve(rf.call(d)).then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape')).catch(() => {}); } } catch {} };
+      try { if (matchMedia('(pointer:coarse)').matches) { const d = document.documentElement, rf = d.requestFullscreen || d.webkitRequestFullscreen; if (rf && !document.fullscreenElement) Promise.resolve(rf.call(d)).catch(() => {}); } } catch {} };
       el.addEventListener('pointerdown', go, { once: true }); addEventListener('keydown', go); }, 350);
   });
 })();
