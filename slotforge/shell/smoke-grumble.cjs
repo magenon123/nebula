@@ -111,7 +111,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   check('Deep Pressure: modal closes', !(await vis('#buyM')));
   check('Deep Pressure: TOTAL BET $2.00 (2x), bar hot, badge', s.betLbl === 'TOTAL BET' && s.bet === '$2.00' && s.hot && s.fever, JSON.stringify(s));
   const bb = (await state()).bal; await clk('#spin'); check('Deep Pressure spin settles', await settle()); s = await state(); check('Deep Pressure: spin charged', s.bal !== bb);
-  await clk('#buyOpen'); await sleep(200); check('card shows DEACTIVATE', (await txt('#ante')) === 'DEACTIVATE'); await clk('#ante'); await sleep(250); s = await state();
+  check('sign glows while Deep Pressure is on', await page.evaluate(() => document.getElementById('buyOpen').classList.contains('lit'))); await clk('#buyOpen'); await sleep(250); s = await state();
   check('Deep Pressure off: bar back to BET $1.00', s.betLbl === 'BET' && s.bet === '$1.00' && !s.hot && !s.fever, JSON.stringify(s));
 
   // Dive Ticket: confirm cancel, then accept -> trigger spin (buoys land) -> intro -> dives -> outro

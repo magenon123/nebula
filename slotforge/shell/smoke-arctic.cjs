@@ -194,7 +194,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   { const b0 = (await state()).bal; await clk('#buyOpen'); await sleep(250); await clk('#ante'); await sleep(300); s = await state();
     check('ante on: buy screen closes, badge, bar shows total risk', !(await vis('#buyM')) && s.fever && s.hot && /LIGHTS/.test(await txt('#feverBadge')), JSON.stringify(s));
     await shot('20-ante-on'); const bA = usd((await state()).bal); await clk('#spin'); check('ante spin settles', await settle()); { const e = await state(); check('ante spin costs 2x (balance = before - 2 + win)', Math.abs(usd(e.bal) - (bA - 2 + usd(e.win))) < .01, bA + ' -> ' + e.bal + ' win ' + e.win); }
-    await clk('#buyOpen'); await sleep(250); await clk('#ante'); await sleep(300); s = await state(); check('ante off: badge gone, bar normal', !s.fever && !s.hot, JSON.stringify(s)); }
+    await clk('#buyOpen'); await sleep(300); s = await state(); check('sign tap switches ante off (sign glow gone)', !(await page.evaluate(() => document.getElementById('buyOpen').classList.contains('lit')))); check('ante off: badge gone, bar normal', !s.fever && !s.hot, JSON.stringify(s)); }
 
   // gold MAX WIN screen at the 7,500x cap (mutated real sweep round)
   await page.evaluate(MUT(`x => x.bought === 'sweep' && x.bonus.spins.length >= 4`, 3, `x => { const sp = x.bonus.spins; const sum = sp.reduce((a, d) => a + d.totalPayout, 0); sp[sp.length - 1].totalPayout += 7500 - sum; x.bonus.totalPayout = 7500; x.totalPayout = 7500; x.capped = true; }`));
