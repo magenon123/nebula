@@ -37,23 +37,23 @@ export const CFG = {
   rows: ROWS, reels: COLS,
   bets: [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000],
   maxWin: 8000,
-  buy: { fs: { cost: 85 }, astrolabe: { cost: 58 }, super: { cost: 210 } },
+  buy: { fs: { cost: 66 }, astrolabe: { cost: 43 }, super: { cost: 105 } },
   anteCost: 2,
   // pay[s] = x bet for runs of 3 / 4 / 5 (before the stage multiplier); 0 = that run length does not pay (the 3 low symbols pay from 4)
-  pay: [[0, 0.02, 0.1], [0, 0.02, 0.1], [0, 0.02, 0.1], [0.01, 0.06, 0.3], [0.01, 0.06, 0.3], [0.01, 0.06, 0.3], [0.02, 0.12, 0.7], [0.02, 0.12, 0.7], [0.03, 0.2, 1.2]],
+  pay: [[0, 0.03, 0.15], [0, 0.03, 0.15], [0, 0.03, 0.15], [0.02, 0.1, 0.5], [0.02, 0.1, 0.5], [0.02, 0.1, 0.5], [0.03, 0.2, 1.2], [0.03, 0.2, 1.2], [0.05, 0.35, 2]],
   stageMultCap: 5,
   // tile weights per mode (9 pay symbols); wild only on reels 2-4 (index 1..3)
-  base: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.02, fsP: 0.01453, astroP: 0.01255, gemP: 0.0036, payScale: 1, gemFree: 0 },
-  luck: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.02, fsP: 0.02080, astroP: 0.01802, gemP: 0.0036, payScale: 1, gemFree: 0.12 },
+  base: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.008, fsP: 0.01453, astroP: 0.01255, gemP: 0.0038, payScale: 1, gemFree: 0 },
+  luck: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.008, fsP: 0.02117, astroP: 0.01802, gemP: 0.00386, payScale: 1, gemFree: 0.15 },
   gemW: [[2, 40], [3, 26], [5, 17], [10, 11], [25, 6]],
   maxGems: 4,
   fs: { spins: { 3: 10, 4: 12, 5: 15 }, superFrom: 4, start: 1, cap: 12, superStart: 3, superCap: 15, retrig: { 3: 4, 4: 6 }, maxSpins: 40,
-        symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.04, fsP: 0.01453, gemP: 0.008, payScale: 1, gemW: [[2, 10], [3, 15], [5, 20], [10, 30], [25, 25]] },
+        symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.03, fsP: 0.01453, gemP: 0.00593, superGemP: 0.0059, payScale: 1, gemW: [[2, 10], [3, 15], [5, 20], [10, 30], [25, 25]] },
   astro: {
     spins: { 3: 4, 4: 6, 5: 8 },
     outer: { v: [1, 2, 1, 3, 2, 5, 1, 4, 2, 10, 3, 40], w: [16, 13, 16, 10, 12, 6, 16, 8, 12, 2.5, 6, 0.4] },
     middle: { v: [1, 2, 1, 3, 2, 5, 1, 2, 10, 25], w: [18, 14, 18, 10, 14, 5, 18, 9, 1.6, 0.3] },
-    core: { kind: ['', 'mini', '', 'minor', '', 'major', '', 'grand'], w: [20, 2.2, 20, 0.9, 20, 0.17, 20, 0.09], jackpot: { mini: 25, minor: 100, major: 500, grand: 2500 } },
+    core: { kind: ['', 'mini', '', 'minor', '', 'major', '', 'grand'], w: [20, 2.05, 20, 0.9, 20, 0.17, 20, 0.09], jackpot: { mini: 25, minor: 100, major: 500, grand: 2500 } },
     magnet: 2
   },
   // The scatter count of a bought round is drawn from the NATURAL distribution (binomial over the 25 stage-1 tiles with the base-mode scatter
@@ -65,6 +65,7 @@ const binom = (n, k, p) => { let r = 1; for (let i = 1; i <= k; i++) r = r * (n 
 export const buyCountW = (p, lo) => { const w = []; for (let k = lo; k <= 5; k++) w.push([k, binom(ROWS * COLS, k, p)]); return w; };
 const pickW = (rng, tbl) => { let t = 0; for (const e of tbl) t += e[1]; let u = rng() * t; for (const e of tbl) { u -= e[1]; if (u < 0) return e[0]; } return tbl[tbl.length - 1][0]; };
 const drawIdx = (rng, w) => { let t = 0; for (const x of w) t += x; let u = rng() * t; for (let i = 0; i < w.length; i++) { u -= w[i]; if (u < 0) return i; } return w.length - 1; };
+const rd = x => Math.round(x * 1e6) / 1e6;     // strip float noise from money (all pays are multiples of 0.01)
 const grid0 = v => Array.from({ length: ROWS }, () => new Array(COLS).fill(v));
 const copy = g => g.map(r => r.slice());
 
@@ -87,28 +88,35 @@ function drawTile(rng, P, col, scatters, gemsLeft) {
 
 /* ---------- run evaluation ---------- */
 /* grid: ids; isNew[r][c] true when the tile landed in this stage. Returns runs [{sym,dir,len,cells,wilds,pay}] (pay = x bet before the stage multiplier) */
+/* every straight line of >= 3 cells, built once: [{dir, cells:[[r,c]...]}] */
+const LINES = (() => {
+  const L = [];
+  for (const [dir, dr, dc] of DIRS) for (let r0 = 0; r0 < ROWS; r0++) for (let c0 = 0; c0 < COLS; c0++) {
+    const pr = r0 - dr, pc = c0 - dc;
+    if (pr >= 0 && pr < ROWS && pc >= 0 && pc < COLS) continue;           // not the start of a line
+    const cells = []; for (let r = r0, c = c0; r >= 0 && r < ROWS && c >= 0 && c < COLS; r += dr, c += dc) cells.push([r, c]);
+    if (cells.length >= 3) L.push({ dir, cells });
+  }
+  return L;
+})();
 export function findRuns(grid, isNew, payScale = 1) {
   const runs = [];
-  for (const [dir, dr, dc] of DIRS) {
-    for (let r0 = 0; r0 < ROWS; r0++) for (let c0 = 0; c0 < COLS; c0++) {
-      const pr = r0 - dr, pc = c0 - dc;
-      if (pr >= 0 && pr < ROWS && pc >= 0 && pc < COLS) continue;           // not the start of a line
-      const line = []; for (let r = r0, c = c0; r >= 0 && r < ROWS && c >= 0 && c < COLS; r += dr, c += dc) line.push([r, c]);
-      if (line.length < 3) continue;
-      for (let s = 0; s < NPAY; s++) {
-        let i = 0;
-        while (i < line.length) {
-          const ok = k => { const g = grid[line[k][0]][line[k][1]]; return g === s || g === WILD; };
-          if (!ok(i)) { i++; continue; }
-          let j = i; while (j < line.length && ok(j)) j++;
-          const len = j - i;
-          if (len >= 3) {
-            const cells = line.slice(i, j); let real = 0, fresh = false; const wilds = [];
-            for (const [r, c] of cells) { if (grid[r][c] === s) real++; else wilds.push([r, c]); if (isNew[r][c]) fresh = true; }
-            if (real > 0 && fresh && CFG.pay[s][len - 3] > 0) runs.push({ sym: s, dir, len, cells, wilds, pay: CFG.pay[s][len - 3] * payScale });
-          }
-          i = j;
+  for (const { dir, cells: line } of LINES) {
+    const n = line.length;
+    for (let s = 0; s < NPAY; s++) {
+      let i = 0;
+      while (i < n) {
+        let g = grid[line[i][0]][line[i][1]];
+        if (g !== s && g !== WILD) { i++; continue; }
+        let j = i + 1;
+        while (j < n) { g = grid[line[j][0]][line[j][1]]; if (g !== s && g !== WILD) break; j++; }
+        const len = j - i;
+        if (len >= 3 && CFG.pay[s][len - 3] > 0) {
+          const cells = line.slice(i, j); let real = 0, fresh = false; const wilds = [];
+          for (const [r, c] of cells) { if (grid[r][c] === s) real++; else wilds.push([r, c]); if (isNew[r][c]) fresh = true; }
+          if (real > 0 && fresh) runs.push({ sym: s, dir, len, cells, wilds, pay: CFG.pay[s][len - 3] * payScale });
         }
+        i = j;
       }
     }
   }
@@ -150,7 +158,7 @@ function playChain(rng, o) {
     }
     let sum = 0;
     for (const run of runs) { sum += run.pay; for (const [r, c] of run.cells) seal(r, c); }
-    const payout = sum * m; total += payout;
+    const payout = rd(sum * m); total = rd(total + payout);
     stages.push({ stage: k, mult: m, grid: copy(grid), sealed: sealedBefore, runs, payout, newlySealed,
       gems: gems.filter(g => g.stage <= k).map(g => ({ r: g.r, c: g.c, value: g.value, isNew: g.stage === k })), chainTotal: total });
     if (!runs.length) break;
@@ -159,7 +167,7 @@ function playChain(rng, o) {
     if (full) break;
   }
   const gemSum = gems.reduce((a, g) => a + g.value, 0);
-  const payout = total > 0 && gemSum > 0 ? total * gemSum : total;
+  const payout = rd(total > 0 && gemSum > 0 ? total * gemSum : total);
   return { stages, base: total, gemSum: total > 0 ? gemSum : 0, gemsOnBoard: gemSum, gems: gems.map(g => ({ r: g.r, c: g.c, value: g.value })), payout, scatters: scat, multEnd: mult };
 }
 
@@ -173,13 +181,13 @@ function playFs(rng, n, capLeft) {
   const cap = sup ? F.superCap : F.cap;
   while (left > 0 && done < F.maxSpins) {
     const multStart = mult;
-    const ch = playChain(rng, { P, gemW: F.gemW, scatters: true, mult, cap });
+    const ch = playChain(rng, { P: sup && F.superGemP ? { ...P, gemP: F.superGemP } : P, gemW: F.gemW, scatters: true, mult, cap });
     mult = ch.multEnd; left--; done++;
     let retrigger = 0; const nfs = ch.scatters.fs.length;
     if (nfs >= 3) { const add = nfs >= 4 ? F.retrig[4] : F.retrig[3]; if (done + left + add <= F.maxSpins) { retrigger = add; left += add; extra += add; } }
     const uncapped = ch.payout; let pay = ch.payout;
-    if (total + pay >= capLeft) { pay = capLeft - total; capped = true; left = 0; }
-    total += pay;
+    if (total + pay >= capLeft) { pay = rd(capLeft - total); capped = true; left = 0; }
+    total = rd(total + pay);
     const sp = { spinIndex: done, spinsLeft: left, stages: ch.stages, chain: chainInfo(ch), scatters: { count: nfs, cells: ch.scatters.fs }, multStart, multEnd: mult, uncappedPayout: uncapped, totalPayout: pay };
     if (retrigger) sp.retrigger = retrigger;
     spins.push(sp);
@@ -255,11 +263,11 @@ export function playRound(rng, { buy = null, ante = false, luck = false } = {}) 
   if (nA >= 3) {
     const b = playAstro(rng, nA, maxWin - base);
     round.bonusTriggered = true; round.bonusType = 'astrolabe'; round.bonus = bonusObj(b, { scatters: nA, ...withRings() });
-    round.totalPayout = Math.min(maxWin, base + b.total); round.capped = b.capped || round.totalPayout >= maxWin;
+    round.totalPayout = rd(Math.min(maxWin, base + b.total)); round.capped = b.capped || round.totalPayout >= maxWin;
   } else if (nF >= 3) {
     const b = playFs(rng, nF, maxWin - base);
     round.bonusTriggered = true; round.bonusType = b.kind; round.bonus = bonusObj(b, fsExtra(b, nF));
-    round.totalPayout = Math.min(maxWin, base + b.total); round.capped = b.capped || round.totalPayout >= maxWin;
+    round.totalPayout = rd(Math.min(maxWin, base + b.total)); round.capped = b.capped || round.totalPayout >= maxWin;
   }
   return round;
 }
