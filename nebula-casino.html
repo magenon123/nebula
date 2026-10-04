@@ -1518,6 +1518,46 @@ select{
           <div style="font-size:12px;font-weight:700;color:var(--txt)">Olympian Storm</div>
           <div style="font-size:11px;color:var(--muted)">Pragmatic Play</div>
         </div>
+        <div class="tile-wrap">
+          <button class="tile-g" onclick="go('emberclaw')" style="background:radial-gradient(at 0 0,#ff6a00,#00000000 50%),radial-gradient(at 100% 0,#ff3c00,#00000000 50%),radial-gradient(at 0 100%,#c23b00,#00000000 50%),radial-gradient(at 100% 100%,#ff8c00,#00000000 50%)">
+            <span class="em">🔥</span>
+          </button>
+          <div class="tile-playing"><i></i>214 playing</div>
+          <div style="font-size:12px;font-weight:700;color:var(--txt)">Emberclaw</div>
+          <div style="font-size:11px;color:var(--muted)">Molten Reforge</div>
+        </div>
+        <div class="tile-wrap">
+          <button class="tile-g" onclick="go('grumble-and-brine')" style="background:radial-gradient(at 0 0,#005f6b,#00000000 50%),radial-gradient(at 100% 0,#00878a,#00000000 50%),radial-gradient(at 0 100%,#003d4d,#00000000 50%),radial-gradient(at 100% 100%,#006b6b,#00000000 50%)">
+            <span class="em">🦞</span>
+          </button>
+          <div class="tile-playing"><i></i>187 playing</div>
+          <div style="font-size:12px;font-weight:700;color:var(--txt)">Grumble &amp; Brine</div>
+          <div style="font-size:11px;color:var(--muted)">Deep Salvage</div>
+        </div>
+        <div class="tile-wrap">
+          <button class="tile-g" onclick="go('cloudtop-tea-house')" style="background:radial-gradient(at 0 0,#7ec8e3,#00000000 50%),radial-gradient(at 100% 0,#a8d8ea,#00000000 50%),radial-gradient(at 0 100%,#4bb3c6,#00000000 50%),radial-gradient(at 100% 100%,#d0eaf5,#00000000 50%)">
+            <span class="em">🍵</span>
+          </button>
+          <div class="tile-playing"><i></i>143 playing</div>
+          <div style="font-size:12px;font-weight:700;color:var(--txt)">Cloudtop Tea House</div>
+          <div style="font-size:11px;color:var(--muted)">SlotForge</div>
+        </div>
+        <div class="tile-wrap">
+          <button class="tile-g" onclick="go('arctic-aurora-lodge')" style="background:radial-gradient(at 0 0,#00c6ff,#00000000 50%),radial-gradient(at 100% 0,#0072ff,#00000000 50%),radial-gradient(at 0 100%,#7f00ff,#00000000 50%),radial-gradient(at 100% 100%,#00c6ff,#00000000 50%)">
+            <span class="em">🌌</span>
+          </button>
+          <div class="tile-playing"><i></i>298 playing</div>
+          <div style="font-size:12px;font-weight:700;color:var(--txt)">Arctic Aurora Lodge</div>
+          <div style="font-size:11px;color:var(--muted)">SlotForge</div>
+        </div>
+        <div class="tile-wrap">
+          <button class="tile-g" onclick="go('siroccos-lamp-bazaar')" style="background:radial-gradient(at 0 0,#f7971e,#00000000 50%),radial-gradient(at 100% 0,#ffd200,#00000000 50%),radial-gradient(at 0 100%,#c47a00,#00000000 50%),radial-gradient(at 100% 100%,#f7971e,#00000000 50%)">
+            <span class="em">🏮</span>
+          </button>
+          <div class="tile-playing"><i></i>176 playing</div>
+          <div style="font-size:12px;font-weight:700;color:var(--txt)">Sirocco's Lamp Bazaar</div>
+          <div style="font-size:11px;color:var(--muted)">SlotForge</div>
+        </div>
       </div>
     </div>
   </div>
@@ -3479,7 +3519,7 @@ const GAMES=[
   // Playing counts based on real Stake data
   const REAL_COUNTS={mines:2229,dice:1942,limbo:1578,plinko:1034,keno:1344,
     wheel:160,flip:197,hilo:465,tower:339,chicken:353,baccarat:66,blackjack:1184,pump:127,
-    rps:66,cases:30,snakes:155,moles:310,'olympian-storm':359,'lake-legend':67};
+    rps:66,cases:30,snakes:155,moles:310,'olympian-storm':359,emberclaw:214,'grumble-and-brine':187,'cloudtop-tea-house':143,'arctic-aurora-lodge':298,'siroccos-lamp-bazaar':176};
   const seedCount=k=>REAL_COUNTS[k]||(120+((k.split('').reduce((s,c)=>s*31+c.charCodeAt(0),0))%800));
   const counts=Object.fromEntries(GAMES.map(g=>[g[0],seedCount(g[0])]));
   const total=Object.values(counts).reduce((a,b)=>a+b,0);
