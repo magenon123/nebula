@@ -3578,8 +3578,7 @@ function go(key){
   document.querySelectorAll('.side-item').forEach(x=>x.classList.toggle('on',x.dataset.g===key));
   if(home){
     document.querySelectorAll('.slot-iframe').forEach(fr=>{
-      try{if(fr.contentDocument)fr.contentDocument.querySelectorAll('audio,video').forEach(a=>{a.muted=true;a.pause();a.src='';});}catch(_){}
-      try{if(fr.contentWindow&&fr.contentWindow.AudioContext){}}catch(_){}
+      try{const w=fr.contentWindow;if(w){if(w.ac&&w.ac.suspend)w.ac.suspend();if(w.ac&&w.ac.close)w.ac.close();}}catch(_){}
       const nw=fr.cloneNode(false);fr.parentNode.replaceChild(nw,fr);
     });
     document.querySelectorAll('[id^="slot-"]').forEach(el=>el.hidden=true);
