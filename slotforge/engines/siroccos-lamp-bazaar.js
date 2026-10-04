@@ -43,8 +43,8 @@ export const CFG = {
   pay: [[0, 0.03, 0.15], [0, 0.03, 0.15], [0, 0.03, 0.15], [0.02, 0.1, 0.5], [0.02, 0.1, 0.5], [0.02, 0.1, 0.5], [0.03, 0.2, 1.2], [0.03, 0.2, 1.2], [0.05, 0.35, 2]],
   stageMultCap: 5,
   // tile weights per mode (9 pay symbols); wild only on reels 2-4 (index 1..3)
-  base: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.008, fsP: 0.01453, astroP: 0.01255, gemP: 0.0031, payScale: 1, gemFree: 0 },
-  luck: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.008, fsP: 0.02132, astroP: 0.01802, gemP: 0.0031, payScale: 1, gemFree: 0.15 },
+  base: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.008, fsP: 0.01453, astroP: 0.01255, gemP: 0.00316, payScale: 1, gemFree: 0 },
+  luck: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.008, fsP: 0.02110, astroP: 0.01802, gemP: 0.0031, payScale: 1, gemFree: 0.15 },
   gemW: [[2, 40], [3, 26], [5, 17], [10, 11], [25, 6]],
   maxGems: 4,
   fs: { spins: { 3: 10, 4: 12, 5: 15 }, superFrom: 4, start: 1, cap: 12, superStart: 3, superCap: 15, retrig: { 3: 4, 4: 6 }, maxSpins: 40,

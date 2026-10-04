@@ -35,6 +35,10 @@ All money below is **x base bet**. The server multiplies by the stake. Nothing e
 `basePayout = min(maxWin, chain.payout)`, `totalPayout = min(maxWin, basePayout + bonus.totalPayout)`, `capped` true when the cap truncated the round (gold MAX WIN screen at 8,000x).
 A bonus is triggered by the scatters of stage 1 (3+ FS or 3+ Astrolabes, Astrolabe wins a tie, probability about 1e-8). It starts after the whole base chain has been shown. If the chain alone reaches the cap there is no bonus.
 
+## 3b. Money granularity (exact in cents at the $0.10 stake)
+
+Every payout the client shows or sums (`stage.payout`, `chain.base`, `chain.payout`, `spin.totalPayout`, `bonus.totalPayout`, `basePayout`, `totalPayout`) is a **multiple of 0.1x**. Run pays (`run.pay`, table values such as 0.02) are only the exact ingredients; a stage's `payout` is its `exactPayout` rounded to the 0.1 grid: a paid stage below 0.1x shows 0.1x, above that it is rounded up or down with UNBIASED stochastic rounding (expectation kept). `chain.base` is exactly the sum of the stage `payout`s (no hidden remainder), gems multiply by an integer, the cap 8,000 is on the grid. Show `stage.payout`, never `exactPayout` or `run.pay` as money.
+
 ## 4. A stage (one landing of tiles inside a chain)
 
 ```
@@ -43,7 +47,8 @@ A bonus is triggered by the scatters of stage 1 (3+ FS or 3+ Astrolabes, Astrola
   grid[5][5],               // the board AFTER the tiles landed this stage (sealed tiles unchanged)
   sealed[5][5],             // 1 = tile was sealed BEFORE this stage (it did not move). Every 0 tile fell in new this stage. Stage 1: all 0
   runs: [ { sym, dir:'h'|'v'|'d'|'a', len:3..5, cells:[[r,c]...], wilds:[[r,c]...], pay } ],   // paid runs, pay = x bet BEFORE mult
-  payout,                   // = sum(run.pay) * mult
+  exactPayout,              // = sum(run.pay) * mult (unrounded, for information only)
+  payout,                   // what the player is paid for this stage: exactPayout rounded to the 0.1x grid (see below), always a multiple of 0.1, min 0.1 for a paid stage
   newlySealed: [[r,c]...],  // tiles that get the gold seal at the end of this stage: all run cells + gems landed this stage (+ the triggering scatters on stage 1)
   gems: [ {r,c,value,isNew} ],   // ALL gems on the board after this stage (isNew = landed this stage)
   chainTotal }              // running sum of payouts of stages 1..k (before the gem multiplier)
@@ -78,7 +83,7 @@ spin:  { spinIndex, spinsLeft, outer:{idx,value}, middle:{idx,value}, core:{idx,
 
 ## 8. Examples (real engine output, seed `sfc32(20261003)`)
 
-### 8.1 Base round, 3 stages, a wild link and a x2 gem (pays 0.40x)
+### 8.1 Base round, 3 stages, a wild link and a x2 gem (pays 0.6x)
 ```json
 {
   "v": 1,
@@ -87,22 +92,22 @@ spin:  { spinIndex, spinsLeft, outer:{idx,value}, middle:{idx,value}, core:{idx,
   "bought": null,
   "bonusType": null,
   "initialGrid": [
-    [7, 6, 1, 3, 4],
-    [3, 9, 6, 4, 2],
-    [3, 8, 4, 6, 6],
-    [6, 8, 8, 2, 8],
-    [12, 1, 0, 0, 7]
+    [1, 6, 2, 4, 7],
+    [7, 4, 8, 7, 1],
+    [7, 3, 4, 7, 2],
+    [1, 9, 3, 4, 2],
+    [1, 5, 6, 3, 5]
   ],
   "stages": [
     {
       "stage": 1,
       "mult": 1,
       "grid": [
-        [7, 6, 1, 3, 4],
-        [3, 9, 6, 4, 2],
-        [3, 8, 4, 6, 6],
-        [6, 8, 8, 2, 8],
-        [12, 1, 0, 0, 7]
+        [1, 6, 2, 4, 7],
+        [7, 4, 8, 7, 1],
+        [7, 3, 4, 7, 2],
+        [1, 9, 3, 4, 2],
+        [1, 5, 6, 3, 5]
       ],
       "sealed": [
         [0, 0, 0, 0, 0],
@@ -113,117 +118,126 @@ spin:  { spinIndex, spinsLeft, outer:{idx,value}, middle:{idx,value}, core:{idx,
       ],
       "runs": [
         {
-          "sym": 8,
-          "dir": "v",
-          "len": 3,
-          "cells": [[1, 1], [2, 1], [3, 1]],
-          "wilds": [[1, 1]],
-          "pay": 0.05
-        },
-        {
-          "sym": 6,
+          "sym": 4,
           "dir": "d",
           "len": 3,
-          "cells": [[0, 1], [1, 2], [2, 3]],
+          "cells": [[1, 1], [2, 2], [3, 3]],
           "wilds": [],
-          "pay": 0.03
+          "pay": 0.02
         },
         {
-          "sym": 4,
-          "dir": "a",
+          "sym": 3,
+          "dir": "d",
           "len": 3,
-          "cells": [[0, 4], [1, 3], [2, 2]],
+          "cells": [[2, 1], [3, 2], [4, 3]],
           "wilds": [],
           "pay": 0.02
         }
       ],
+      "exactPayout": 0.04,
       "payout": 0.1,
-      "newlySealed": [[4, 0], [1, 1], [2, 1], [3, 1], [0, 1], [1, 2], [2, 3], [0, 4], [1, 3], [2, 2]],
-      "gems": [
-        {"r": 4, "c": 0, "value": 2, "isNew": true}
-      ],
+      "newlySealed": [[1, 1], [2, 2], [3, 3], [2, 1], [3, 2], [4, 3]],
+      "gems": [],
       "chainTotal": 0.1
     },
     {
       "stage": 2,
       "mult": 2,
       "grid": [
-        [1, 6, 0, 4, 4],
-        [8, 9, 6, 4, 8],
-        [2, 8, 4, 6, 2],
-        [4, 8, 8, 0, 0],
-        [12, 7, 1, 7, 7]
+        [3, 6, 1, 3, 3],
+        [6, 4, 3, 2, 3],
+        [1, 3, 4, 6, 12],
+        [7, 4, 3, 4, 6],
+        [4, 9, 3, 3, 1]
       ],
       "sealed": [
-        [0, 1, 0, 0, 1],
-        [0, 1, 1, 1, 0],
-        [0, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0],
         [0, 1, 0, 0, 0],
-        [1, 0, 0, 0, 0]
+        [0, 1, 1, 0, 0],
+        [0, 0, 1, 1, 0],
+        [0, 0, 0, 1, 0]
       ],
       "runs": [
         {
-          "sym": 8,
-          "dir": "d",
+          "sym": 3,
+          "dir": "h",
           "len": 3,
-          "cells": [[1, 0], [2, 1], [3, 2]],
+          "cells": [[4, 1], [4, 2], [4, 3]],
+          "wilds": [[4, 1]],
+          "pay": 0.02
+        },
+        {
+          "sym": 3,
+          "dir": "a",
+          "len": 3,
+          "cells": [[0, 3], [1, 2], [2, 1]],
           "wilds": [],
-          "pay": 0.05
+          "pay": 0.02
+        },
+        {
+          "sym": 4,
+          "dir": "a",
+          "len": 3,
+          "cells": [[2, 2], [3, 1], [4, 0]],
+          "wilds": [],
+          "pay": 0.02
         }
       ],
-      "payout": 0.1,
-      "newlySealed": [[1, 0], [3, 2]],
+      "exactPayout": 0.12,
+      "payout": 0.2,
+      "newlySealed": [[2, 4], [4, 1], [4, 2], [0, 3], [1, 2], [3, 1], [4, 0]],
       "gems": [
-        {"r": 4, "c": 0, "value": 2, "isNew": false}
+        {"r": 2, "c": 4, "value": 2, "isNew": true}
       ],
-      "chainTotal": 0.2
+      "chainTotal": 0.3
     },
     {
       "stage": 3,
       "mult": 3,
       "grid": [
-        [1, 6, 8, 8, 4],
-        [8, 9, 6, 4, 0],
-        [6, 8, 4, 6, 3],
-        [0, 8, 8, 7, 8],
-        [12, 0, 2, 1, 2]
+        [6, 5, 0, 3, 3],
+        [8, 4, 3, 1, 0],
+        [3, 3, 4, 4, 12],
+        [1, 4, 3, 4, 3],
+        [4, 9, 3, 3, 5]
       ],
       "sealed": [
-        [0, 1, 0, 0, 1],
-        [1, 1, 1, 1, 0],
-        [0, 1, 1, 1, 0],
+        [0, 0, 0, 1, 0],
         [0, 1, 1, 0, 0],
-        [1, 0, 0, 0, 0]
+        [0, 1, 1, 0, 1],
+        [0, 1, 1, 1, 0],
+        [1, 1, 1, 1, 0]
       ],
       "runs": [],
+      "exactPayout": 0,
       "payout": 0,
       "newlySealed": [],
       "gems": [
-        {"r": 4, "c": 0, "value": 2, "isNew": false}
+        {"r": 2, "c": 4, "value": 2, "isNew": false}
       ],
-      "chainTotal": 0.2
+      "chainTotal": 0.3
     }
   ],
   "chain": {
     "stages": 3,
-    "base": 0.2,
+    "base": 0.3,
     "gemSum": 2,
     "gemsOnBoard": 2,
     "gems": [
-      {"r": 4, "c": 0, "value": 2}
+      {"r": 2, "c": 4, "value": 2}
     ],
-    "payout": 0.4
+    "payout": 0.6
   },
   "cascadeSteps": [
     {"stage": 1, "payout": 0.1},
-    {"stage": 2, "payout": 0.1},
+    {"stage": 2, "payout": 0.2},
     {"stage": 3, "payout": 0}
   ],
   "scatters": {"fs": {"count": 0, "cells": []}, "astro": {"count": 0, "cells": []}},
-  "basePayout": 0.4,
+  "basePayout": 0.6,
   "bonusTriggered": false,
   "bonus": null,
-  "totalPayout": 0.4,
+  "totalPayout": 0.6,
   "capped": false
 }
 ```
@@ -274,6 +288,7 @@ spin:  { spinIndex, spinsLeft, outer:{idx,value}, middle:{idx,value}, core:{idx,
               [0, 0, 0, 0, 0]
             ],
             "runs": [],
+            "exactPayout": 0,
             "payout": 0,
             "newlySealed": [],
             "gems": [],
@@ -333,10 +348,11 @@ spin:  { spinIndex, spinsLeft, outer:{idx,value}, middle:{idx,value}, core:{idx,
                 "pay": 0.02
               }
             ],
-            "payout": 0.04,
+            "exactPayout": 0.04,
+            "payout": 0.1,
             "newlySealed": [[2, 2], [3, 2], [4, 2], [0, 4], [1, 3]],
             "gems": [],
-            "chainTotal": 0.04
+            "chainTotal": 0.1
           },
           {
             "stage": 2,
@@ -381,40 +397,41 @@ spin:  { spinIndex, spinsLeft, outer:{idx,value}, middle:{idx,value}, core:{idx,
                 "pay": 0.1
               }
             ],
-            "payout": 0.44,
+            "exactPayout": 0.44,
+            "payout": 0.4,
             "newlySealed": [[3, 0], [1, 2], [2, 3], [3, 4], [3, 1]],
             "gems": [
               {"r": 3, "c": 0, "value": 10, "isNew": true}
             ],
-            "chainTotal": 0.48
+            "chainTotal": 0.5
           },
           {"…": "stages 3 and 4 omitted in this document"}
         ],
         "chain": {
           "stages": 4,
-          "base": 0.54,
+          "base": 0.7,
           "gemSum": 10,
           "gemsOnBoard": 10,
           "gems": [
             {"r": 3, "c": 0, "value": 10}
           ],
-          "payout": 5.4
+          "payout": 7
         },
         "scatters": {"count": 0, "cells": []},
         "multStart": 1,
         "multEnd": 4,
-        "uncappedPayout": 5.4,
-        "totalPayout": 5.4
+        "uncappedPayout": 7,
+        "totalPayout": 7
       },
       {"…": "spins 3-10 omitted in this document"}
     ],
-    "totalPayout": 39.92,
+    "totalPayout": 31.7,
     "scatters": 3,
     "super": false,
     "startMult": 1,
     "multCap": 12
   },
-  "totalPayout": 39.92,
+  "totalPayout": 31.7,
   "capped": false
 }
 ```
@@ -427,13 +444,13 @@ spin:  { spinIndex, spinsLeft, outer:{idx,value}, middle:{idx,value}, core:{idx,
   "ante": false,
   "bought": "astrolabe",
   "initialGrid": [
-    [5, 1, 11, 2, 0],
-    [6, 5, 6, 2, 5],
-    [4, 3, 0, 1, 8],
-    [2, 7, 3, 11, 5],
-    [6, 4, 8, 5, 11]
+    [3, 7, 5, 2, 4],
+    [5, 8, 3, 7, 7],
+    [4, 11, 3, 8, 1],
+    [4, 1, 6, 2, 11],
+    [5, 3, 11, 7, 3]
   ],
-  "trigger": {"type": "astrolabe", "count": 3, "cells": [[0, 2], [3, 3], [4, 4]]},
+  "trigger": {"type": "astrolabe", "count": 3, "cells": [[2, 1], [3, 4], [4, 2]]},
   "stages": [],
   "cascadeSteps": [],
   "basePayout": 0,
@@ -446,53 +463,53 @@ spin:  { spinIndex, spinsLeft, outer:{idx,value}, middle:{idx,value}, core:{idx,
       {
         "spinIndex": 1,
         "spinsLeft": 3,
-        "outer": {"idx": 10, "value": 3},
-        "middle": {"idx": 1, "value": 2},
-        "core": {"idx": 1, "kind": "mini", "jackpot": 25},
+        "outer": {"idx": 5, "value": 5},
+        "middle": {"idx": 2, "value": 1},
+        "core": {"idx": 2, "kind": "", "jackpot": 0},
         "magnet": {"outer": false, "middle": false},
-        "cash": 6,
-        "uncappedPayout": 31,
-        "magnetNext": {"outer": false, "middle": false},
-        "totalPayout": 31
+        "cash": 5,
+        "uncappedPayout": 5,
+        "magnetNext": {"outer": true, "middle": false},
+        "totalPayout": 5
       },
       {
         "spinIndex": 2,
         "spinsLeft": 2,
-        "outer": {"idx": 9, "value": 10},
-        "middle": {"idx": 0, "value": 1},
+        "outer": {"idx": 4, "value": 2},
+        "middle": {"idx": 5, "value": 5},
         "core": {"idx": 4, "kind": "", "jackpot": 0},
-        "magnet": {"outer": false, "middle": false},
+        "magnet": {"outer": true, "middle": false},
         "cash": 10,
         "uncappedPayout": 10,
-        "magnetNext": {"outer": true, "middle": false},
+        "magnetNext": {"outer": false, "middle": true},
         "totalPayout": 10
       },
       {
         "spinIndex": 3,
         "spinsLeft": 1,
-        "outer": {"idx": 9, "value": 10},
+        "outer": {"idx": 3, "value": 3},
         "middle": {"idx": 5, "value": 5},
-        "core": {"idx": 4, "kind": "", "jackpot": 0},
-        "magnet": {"outer": true, "middle": false},
-        "cash": 50,
-        "uncappedPayout": 50,
-        "magnetNext": {"outer": true, "middle": true},
-        "totalPayout": 50
+        "core": {"idx": 5, "kind": "major", "jackpot": 500},
+        "magnet": {"outer": false, "middle": true},
+        "cash": 15,
+        "uncappedPayout": 515,
+        "magnetNext": {"outer": false, "middle": true},
+        "totalPayout": 515
       },
       {
         "spinIndex": 4,
         "spinsLeft": 0,
-        "outer": {"idx": 4, "value": 2},
-        "middle": {"idx": 2, "value": 1},
+        "outer": {"idx": 0, "value": 1},
+        "middle": {"idx": 0, "value": 1},
         "core": {"idx": 4, "kind": "", "jackpot": 0},
-        "magnet": {"outer": true, "middle": true},
-        "cash": 2,
-        "uncappedPayout": 2,
+        "magnet": {"outer": false, "middle": true},
+        "cash": 1,
+        "uncappedPayout": 1,
         "magnetNext": {"outer": false, "middle": false},
-        "totalPayout": 2
+        "totalPayout": 1
       }
     ],
-    "totalPayout": 93,
+    "totalPayout": 531,
     "scatters": 3,
     "rings": {
       "outer": [1, 2, 1, 3, 2, 5, 1, 4, 2, 10, 3, 40],
@@ -500,40 +517,36 @@ spin:  { spinIndex, spinsLeft, outer:{idx,value}, middle:{idx,value}, core:{idx,
       "core": ["", "mini", "", "minor", "", "major", "", "grand"]
     }
   },
-  "totalPayout": 93,
+  "totalPayout": 531,
   "capped": false
 }
 ```
 
 ## 9. Measured math
 
-All numbers are from the engine itself (`node tools/sim.js siroccos-lamp-bazaar <mode> <rounds> <seeds>`, sfc32 seeds, 95% CI = max of round-level and seed-to-seed SE). Shells: the sim figures are x bet per cost.
+Numbers from the engine itself (`node tools/sim.js siroccos-lamp-bazaar <mode> <rounds> <seeds>`, sfc32 seeds; 95% CI = larger of round-level and seed-to-seed SE). All payouts are on the 0.1x grid (section 3b); the stochastic rounding keeps the expectation.
 
-| mode | cost | rounds (4 seeds each batch) | RTP | 95% CI |
+| mode | cost | rounds | RTP | 95% CI |
 |---|---|---|---|---|
-| base | 1 | 2 x 208M (pooled 416M) | 96.16% | +-0.17 |
-| ante "Djinn's Favour" | 2 | 2 x 128M (pooled 256M) | 96.10% | +-0.30 |
-| buy fs (Free Wishes) | 66 | 8M | 96.32% | +-0.16 |
-| buy astrolabe | 43 | 48M | 96.37% | +-0.12 |
-| buy super | 105 | 4M | 96.27% | +-0.20 |
+| base | 1 | 208M (4 seeds x 52M), final config | 96.28% | +-0.24 |
+| ante "Djinn's Favour" | 2 | 256M (2 x 128M, 96.11 and 96.02) | 96.07% | +-0.19 |
+| buy fs | 66 | 16M | 96.37% | +-0.12 |
+| buy astrolabe | 43 | 48M | 96.38% | +-0.12 |
+| buy super | 105 | 6M (+4M earlier 96.27) | 96.45% | +-0.16 |
 
-Bonus EVs (x bet, natural scatter mix): Free Wishes 63.6x, SUPER 101x, Astrolabe 41.4x. Buy price = EV / 0.963 rounded: 66 / 105 / 43. Base: first-stage hit 29.0%, bonus 1 in 108 (FS 1 in 180, Astrolabe 1 in 270); ante: bonus 1 in 40 (FS 1 in 65, Astrolabe 1 in 100), hit 27.7%.
-Base RTP split: chain + gems about 45.6%, Free Wishes about 35.3%, Astrolabe about 15.3%.
+Prices: Free Wishes 66x, Astrolabe 43x, SUPER 105x (EV 63.6x / 41.4x / 101x, unchanged by the 0.1x grid). Base: first-stage run hit 29.1% (paid hit rate equals it because a paid stage shows at least 0.1x), bonus 1 in 108 (Free Wishes 1 in 180, Astrolabe 1 in 270). Ante: hit 27.8%, bonus 1 in 40.
+How the 0.1x grid works: a stage's exact pay (runs x multiplier, e.g. 0.04) is shown as at least 0.1x; above 0.1x it is rounded up or down with unbiased stochastic rounding. The small-pay inflation (+4.5 points on the base chain) was paid for by lowering the base/ante Wish Gem rate (0.0038 to 0.00316 / 0.0031 per tile) and the ante Free Wishes rate (1 in 65.5), and Free Wishes gem rate 0.00586.
 
-Tail (share of rounds paying at least X x bet; 20M rounds base, 2M FS buy, 1.2M super buy, 12M Astrolabe buy, 20M ante):
+Tail (rounds paying at least X x bet; 20M base, 20M ante, 2M FS buy, 1.2M SUPER buy, 12M Astrolabe buy):
 
 | >= x bet | base | ante | buy fs | buy super | buy astrolabe |
 |---|---|---|---|---|---|
-| 10 | 1 in 67 | 1 in 37 | 1 in 2 | 1 in 1 | 1 in 1 |
-| 100 | 1 in 629 | 1 in 271 | 1 in 6 | 1 in 4 | 1 in 16 |
-| 500 | 1 in 5,470 | 1 in 2,041 | 1 in 46 | 1 in 24 | 1 in 78 |
-| 1,000 | 1 in 22,371 | 1 in 8,160 | 1 in 218 | 1 in 97 | 1 in 221 |
-| 2,000 | 1 in 51,546 | 1 in 18,939 | 1 in 2,053 | 1 in 780 | 1 in 225 (GRAND 2,500) |
-| 4,000 | 1 in 20M | 1 in 2M | 1 in 37k | 1 in 14.8k | 1 in 118k |
-| 8,000 (cap) | not seen in 700M | 1 in 128M (seen once) | 1 in 2M | 1 in 600k | not seen in 48M |
+| 100 | 1 in 665 | 1 in 276 | 1 in 6 | 1 in 4 | 1 in 16 |
+| 500 | 1 in 5.6k | 1 in 2.0k | 1 in 46 | 1 in 24 | 1 in 78 |
+| 1,000 | 1 in 22.8k | 1 in 8.2k | 1 in 225 | 1 in 97 | 1 in 221 |
+| 2,000 | 1 in 51.5k | 1 in 18.2k | 1 in 2.1k | 1 in 770 | 1 in 225 (GRAND 2,500) |
+| 4,000 | 1 in 4M | 1 in 1.7M | 1 in 48k | 1 in 12.5k | 1 in 118k |
+| 8,000 (cap) | seen once in 208M | seen 2x in 256M | 1 in 2M | about 1 in 600k | not seen in 48M |
 
-The 8,000x cap is reachable (Free Wishes at x12-x15 with 3-4 high gems; SUPER buy hits it about once in 600k). In the base game it is about 1 in 1e8-1e9, which is a real but very rare event. Max seen in base sims: 7,154x.
-Rules the bounded loops rely on: 25 stages per chain, 40 spins per Free Wishes, 8 Astrolabe spins; all tested in `tools/sirocco.test.js`.
-
-Known side effects: low symbols pay only from a run of 4 (a run of 3 of a low symbol does not seal; this is what brings the first-stage hit rate to 29%, with 9 symbols and 4 directions the plain rule would be about 43%). Pays are small at the bottom (3 mid symbols 0.02x) because a chain pays several stages; at stakes below $0.50 the server's cent rounding of tiny wins slightly lowers the RTP (wins under 0.05x at $0.10).
+The cap is reachable (Free Wishes at x12-x15 with several high gems) but extremely rare in base. Bounded loops: 25 stages per chain, 40 Free Wishes spins, 8 Astrolabe spins (tested in `tools/sirocco.test.js`). Low symbols pay only from a run of 4 (keeps the first-stage hit rate at 29%).
 
