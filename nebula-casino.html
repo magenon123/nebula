@@ -1519,40 +1519,40 @@ select{
           <div style="font-size:11px;color:var(--muted)">Pragmatic Play</div>
         </div>
         <div class="tile-wrap">
-          <button class="tile-g" onclick="go('emberclaw')" style="background:radial-gradient(at 0 0,#ff6a00,#00000000 50%),radial-gradient(at 100% 0,#ff3c00,#00000000 50%),radial-gradient(at 0 100%,#c23b00,#00000000 50%),radial-gradient(at 100% 100%,#ff8c00,#00000000 50%)">
-            <span class="em">🔥</span>
+          <button class="tile-g" onclick="go('emberclaw')" style="background:#1a0800;padding:0;overflow:hidden">
+            <img src="/card-emberclaw.webp" style="width:100%;height:100%;object-fit:cover;display:block">
           </button>
           <div class="tile-playing"><i></i>214 playing</div>
           <div style="font-size:12px;font-weight:700;color:var(--txt)">Emberclaw</div>
           <div style="font-size:11px;color:var(--muted)">Molten Reforge</div>
         </div>
         <div class="tile-wrap">
-          <button class="tile-g" onclick="go('grumble-and-brine')" style="background:radial-gradient(at 0 0,#005f6b,#00000000 50%),radial-gradient(at 100% 0,#00878a,#00000000 50%),radial-gradient(at 0 100%,#003d4d,#00000000 50%),radial-gradient(at 100% 100%,#006b6b,#00000000 50%)">
-            <span class="em">🦞</span>
+          <button class="tile-g" onclick="go('grumble-and-brine')" style="background:#001a1f;padding:0;overflow:hidden">
+            <img src="/card-grumble-and-brine.webp" style="width:100%;height:100%;object-fit:cover;display:block">
           </button>
           <div class="tile-playing"><i></i>187 playing</div>
           <div style="font-size:12px;font-weight:700;color:var(--txt)">Grumble &amp; Brine</div>
           <div style="font-size:11px;color:var(--muted)">Deep Salvage</div>
         </div>
         <div class="tile-wrap">
-          <button class="tile-g" onclick="go('cloudtop-tea-house')" style="background:radial-gradient(at 0 0,#7ec8e3,#00000000 50%),radial-gradient(at 100% 0,#a8d8ea,#00000000 50%),radial-gradient(at 0 100%,#4bb3c6,#00000000 50%),radial-gradient(at 100% 100%,#d0eaf5,#00000000 50%)">
-            <span class="em">🍵</span>
+          <button class="tile-g" onclick="go('cloudtop-tea-house')" style="background:#d0eaf5;padding:0;overflow:hidden">
+            <img src="/card-cloudtop-tea-house.webp" style="width:100%;height:100%;object-fit:cover;display:block">
           </button>
           <div class="tile-playing"><i></i>143 playing</div>
           <div style="font-size:12px;font-weight:700;color:var(--txt)">Cloudtop Tea House</div>
           <div style="font-size:11px;color:var(--muted)">SlotForge</div>
         </div>
         <div class="tile-wrap">
-          <button class="tile-g" onclick="go('arctic-aurora-lodge')" style="background:radial-gradient(at 0 0,#00c6ff,#00000000 50%),radial-gradient(at 100% 0,#0072ff,#00000000 50%),radial-gradient(at 0 100%,#7f00ff,#00000000 50%),radial-gradient(at 100% 100%,#00c6ff,#00000000 50%)">
-            <span class="em">🌌</span>
+          <button class="tile-g" onclick="go('arctic-aurora-lodge')" style="background:#000d1a;padding:0;overflow:hidden">
+            <img src="/card-arctic-aurora-lodge.webp" style="width:100%;height:100%;object-fit:cover;display:block">
           </button>
           <div class="tile-playing"><i></i>298 playing</div>
           <div style="font-size:12px;font-weight:700;color:var(--txt)">Arctic Aurora Lodge</div>
           <div style="font-size:11px;color:var(--muted)">SlotForge</div>
         </div>
         <div class="tile-wrap">
-          <button class="tile-g" onclick="go('siroccos-lamp-bazaar')" style="background:radial-gradient(at 0 0,#f7971e,#00000000 50%),radial-gradient(at 100% 0,#ffd200,#00000000 50%),radial-gradient(at 0 100%,#c47a00,#00000000 50%),radial-gradient(at 100% 100%,#f7971e,#00000000 50%)">
-            <span class="em">🏮</span>
+          <button class="tile-g" onclick="go('siroccos-lamp-bazaar')" style="background:#1a0e00;padding:0;overflow:hidden">
+            <img src="/card-siroccos-lamp-bazaar.webp" style="width:100%;height:100%;object-fit:cover;display:block">
           </button>
           <div class="tile-playing"><i></i>176 playing</div>
           <div style="font-size:12px;font-weight:700;color:var(--txt)">Sirocco's Lamp Bazaar</div>
@@ -3577,7 +3577,11 @@ function go(key){
   $('lobby').hidden=!home; $('gameWrap').hidden=home;
   document.querySelectorAll('.side-item').forEach(x=>x.classList.toggle('on',x.dataset.g===key));
   if(home){
-    document.querySelectorAll('.slot-iframe').forEach(fr=>{if(fr.src){const nw=fr.cloneNode(false);fr.parentNode.replaceChild(nw,fr);}});
+    document.querySelectorAll('.slot-iframe').forEach(fr=>{
+      try{if(fr.contentDocument)fr.contentDocument.querySelectorAll('audio,video').forEach(a=>{a.muted=true;a.pause();a.src='';});}catch(_){}
+      try{if(fr.contentWindow&&fr.contentWindow.AudioContext){}}catch(_){}
+      const nw=fr.cloneNode(false);fr.parentNode.replaceChild(nw,fr);
+    });
     document.querySelectorAll('[id^="slot-"]').forEach(el=>el.hidden=true);
     $('panels').style.display='';
     document.querySelector('.frame-body').classList.remove('slot-active');
