@@ -1479,7 +1479,8 @@ let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, luck = false, busy = f
 let soundOn = store.get(P + '_snd', true), turbo = store.get(P + '_turbo', false), musicOn = store.get(P + '_mus', true), sndVol = store.get(P + '_sndv', .85), musVol = store.get(P + '_musv', .7);
 const MUS_GAIN = .9;   // slider 100% = this much of the music bus; calibrated so the soundtrack sits well below the effects
 let auto = { left: 0, stopFeat: true, stopBig: false, pickN: 25 }, skipBig = false;
-const T = () => turbo ? .45 : 1;
+let boost = false;   // one-round speed-up (tap during a spin/bonus); the persistent turbo toggle stays in the menu
+const T = () => (turbo || boost) ? .45 : 1;
 /* wait() re-reads T() every frame, so switching to turbo in the middle of a wait shortens the rest of it */
 const wait = ms => new Promise(res => { let prog = 0, last = performance.now(); const tick = now => { prog += (now - last) / Math.max(1, ms * T()); last = now; if (prog >= 1) res(); else requestAnimationFrame(tick); }; if (ms <= 0) res(); else requestAnimationFrame(tick); });
 
@@ -1744,12 +1745,12 @@ $('big').onclick = () => { skipBig = true; };
 
 /* ---------- switch to turbo in the middle of a spin or bonus ---------- */
 function speedUp() {
-  if (turbo || !busy) return; turbo = true; store.set(P + '_turbo', true); refreshUi();
+  if (turbo || boost || !busy) return; boost = true;
   try { document.getAnimations().forEach(a => { const e = a.effect, t = e && e.target; if (!t || !t.closest || e.getComputedTiming().iterations === Infinity) return; if (t.closest('#grid, #lnkB, #lnkT, #fxl, #fsBox, #msg, #sweep')) a.updatePlaybackRate(a.playbackRate / .45); }); } catch {}
-  say('TURBO ON', false);
+  say('SPEEDING UP', false);
 }
 document.addEventListener('pointerdown', e => {
-  if (!busy || turbo || e.target.closest('button, .modal, #big, input')) return;
+  if (!busy || turbo || boost || e.target.closest('button, .modal, #big, input')) return;
   if (document.querySelector('.modal:not([hidden])') || $('big').classList.contains('show')) return;
   if (e.target.closest('#stage')) speedUp();
 });
@@ -1794,7 +1795,7 @@ async function go(buy) {
     out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
     out.tier = await bigWin(R.totalPayout, j.payout);
   } catch (e) { say(e.message); out.err = true; }
-  setBusy(false); refreshUi(); return out;
+  boost = false; setBusy(false); refreshUi(); return out;
 }
 
 /* ---------- autoplay ---------- */
