@@ -3579,7 +3579,7 @@ function go(key){
   if(home){
     document.querySelectorAll('.slot-iframe').forEach(fr=>{
       try{const w=fr.contentWindow;if(w){if(w.ac&&w.ac.suspend)w.ac.suspend();if(w.ac&&w.ac.close)w.ac.close();}}catch(_){}
-      const nw=fr.cloneNode(false);fr.parentNode.replaceChild(nw,fr);
+      const nw=fr.cloneNode(false);nw.src='';fr.parentNode.replaceChild(nw,fr);
     });
     document.querySelectorAll('[id^="slot-"]').forEach(el=>el.hidden=true);
     $('panels').style.display='';
@@ -3605,6 +3605,9 @@ function go(key){
       if(hiding){const fr=$('frame-'+s);if(fr){const nw=fr.cloneNode(false);nw.src='';fr.parentNode.replaceChild(nw,fr);}}
     }
   });
+  // Seed slot wallet from Nebula balance so the game starts with the player's real balance
+  const SLOT_WALLETS={'emberclaw':'emberclawWallet','grumble-and-brine':'grumbleBrineWallet','cloudtop-tea-house':'cloudtopTeaHouseWallet','arctic-aurora-lodge':'arcticAuroraLodgeWallet','siroccos-lamp-bazaar':'siroccosLampBazaarWallet'};
+  const wk=SLOT_WALLETS[key];if(wk&&bal>0){try{localStorage.setItem(wk,String(round2(bal)));}catch{}}
   if(key==='olympian-storm'){const f=$('frame-olympian-storm');if(!f.src||!f.src.includes('olympian'))f.src='/olympian-storm.html';}
   if(key==='lake-legend'){const f=$('frame-lake-legend');if(!f.src||!f.src.includes('lake'))f.src='/lake-legend.html';}
   if(key==='emberclaw'){const f=$('frame-emberclaw');if(!f.src||!f.src.includes('emberclaw'))f.src='/emberclaw.html';}
