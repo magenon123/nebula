@@ -65,3 +65,9 @@ Idle (software renderer, 1600x900, rAF counter, 4 s windows): **34-39 fps** on t
 
 ## Honest critique v4 (Kalle)
 Strong readable silhouette, characterful face (moustache, pipe, hat) and story props (catch, lantern pole), distinct from other slots. But it is in the raccoon tier at best (about 6/10), clearly below dwarf/Zeus in painterly depth: shading is offset-crescent cel shading (graphic, a bit sticker-like, cyan rim is uniform), torso is boxy and the sleeves are sausage-like, hands are mitten blobs, the face is small (about 40 px) so expression is limited, raised arms bend stiffly. Next step if wanted: hand-painted fold shapes on torso/sleeves, a narrower waist, bigger face with painted brows, per-edge rim variation.
+
+## Kalle v4.1 fix (owner: "head doesn't fit the hat, shirt too big, legs too far right")
+- Head/hat: the hat sat ~15 px above the face (background showed between brim and brows). Hat + feather now lowered (dy -8 instead of -20), squeezed to 84% width, face shape extended up under the hat (forehead fill + shade under the brim), right flap shortened/narrowed to hang beside the cheek, ties moved with it. Pivots `#cHatG 240,60`, `#cFeather 203,52`.
+- Parka: torso path narrowed from 190 to ~150 px with a real waist; yoke, hem band, diamonds, belt, knife, mittens re-fitted; sleeves 44/37 -> 37/31 (forearms 31/27); elbows pulled in (EL 134, ER 340), right fist and the aurora char moved 10 px left (fish cx 337, pivots in char4.css/assemble.cjs).
+- Legs: trousers, cuffs and boots wrapped in `translate(-19 0)`, the pair is now centred on x=240 (the body centre) in all states.
+- Still weak: legs are rather long vs the short torso, cel-shaded look unchanged (about 6/10).
