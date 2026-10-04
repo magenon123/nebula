@@ -1,0 +1,177 @@
+{
+ "id": "siroccos-lamp-bazaar",
+ "title": "Sirocco's Lamp Bazaar",
+ "logoText": "SIROCCO'S LAMP BAZAAR",
+ "infoTitle": "SIROCCO'S LAMP BAZAAR · HOW IT PLAYS",
+ "api": "/api/slot/siroccos-lamp-bazaar/spin",
+ "engineSource": "slotforge/engines/siroccos-lamp-bazaar.js",
+ "storage": "slb",
+ "walletKey": "siroccosLampBazaarWallet",
+ "startBalance": 1000,
+ "bets": [
+  0.1,
+  0.2,
+  0.3,
+  0.4,
+  0.5,
+  0.6,
+  0.8,
+  1,
+  1.5,
+  2,
+  2.5,
+  3,
+  4,
+  5,
+  6,
+  8,
+  10,
+  12,
+  15,
+  20,
+  25,
+  30,
+  40,
+  50,
+  60,
+  80,
+  100,
+  150,
+  200,
+  250,
+  300,
+  400,
+  500,
+  750,
+  1000,
+  1500,
+  2000,
+  3000,
+  4000,
+  5000,
+  7500,
+  10000
+ ],
+ "defaultBet": 1,
+ "maxWin": 8000,
+ "anteCost": 2,
+ "scatterSym": 10,
+ "char": {
+  "el": "char",
+  "states": [
+   "spin",
+   "win",
+   "big",
+   "special",
+   "tease",
+   "bonus",
+   "maxwin",
+   "exhale",
+   "slump"
+  ],
+  "bonusClass": "bonusmode"
+ },
+ "tiers": [
+  {
+   "min": 200,
+   "name": "GENIE'S BLESSING",
+   "lv": 4,
+   "tag": "Sirocco bows to no one. Tonight he bows to you."
+  },
+  {
+   "min": 50,
+   "name": "LAMP ABLAZE",
+   "lv": 3,
+   "tag": "The whole bazaar turns to look."
+  },
+  {
+   "min": 20,
+   "name": "DJINN'S DELIGHT",
+   "lv": 2,
+   "tag": "A wish well spent."
+  },
+  {
+   "min": 5,
+   "name": "GOLDEN HOUR",
+   "lv": 1,
+   "tag": "The sun lingers on your stall."
+  }
+ ],
+ "autoBigLv": 3,
+ "text": {
+  "idle": "BAZAAR OPEN. PLACE A BET",
+  "spin": "THE TILES TUMBLE...",
+  "win": "THE LAMP PAYS {amt}",
+  "lose": "THE SAND SETTLES",
+  "freeSpin": "FREE WISH {n}",
+  "freeSpinRetrigger": ""
+ },
+ "fsLabel": "WISHES LEFT",
+ "ownCounter": true,
+ "buys": [
+  {
+   "key": "fs",
+   "mult": 66,
+   "sym": 10,
+   "vol": 3,
+   "name": "Free Wishes",
+   "text": "Three or more FS suns blaze at once and Sirocco grants 10 free wishes. The chain multiplier never resets and climbs with every winning link.",
+   "confirmTitle": "BUY FREE WISHES?",
+   "confirmText": "FREE WISHES: 3 or more FS land, then 10+ free spins where the chain multiplier never resets (up to x12)."
+  },
+  {
+   "key": "astrolabe",
+   "mult": 43,
+   "sym": 11,
+   "vol": 4,
+   "name": "Astrolabe of Wishes",
+   "text": "Three or more Astrolabes land. Three rings turn and stop one by one: cash, a multiplier, and maybe a WISH jackpot up to GRAND.",
+   "confirmTitle": "BUY ASTROLABE OF WISHES?",
+   "confirmText": "ASTROLABE OF WISHES: 3 or more Astrolabes land, then 4 to 8 spins of three rings: cash x multiplier, plus a jackpot wish if the core lights."
+  },
+  {
+   "key": "super",
+   "mult": 105,
+   "sym": 8,
+   "vol": 5,
+   "name": "Three Wishes",
+   "text": "Four or five FS land: the SUPER round. The chain multiplier starts at x3, climbs to x15, and never resets.",
+   "confirmTitle": "BUY THREE WISHES?",
+   "confirmText": "THREE WISHES (SUPER): 4 or 5 FS land, then 12 or 15 free spins with the multiplier starting at x3 and capped at x15."
+  }
+ ],
+ "intro": {
+  "unit": "WISHES",
+  "ribbon": "FREE WISHES",
+  "quote": "\"Rub the lamp once. The sun does the rest.\"",
+  "tap": "TAP ANYWHERE TO MAKE A WISH",
+  "chips": [
+   "THE CHAIN MULTIPLIER NEVER RESETS",
+   "EVERY WINNING LINK RAISES IT BY ONE",
+   "GEMS STILL MULTIPLY EACH CHAIN"
+  ]
+ },
+ "outro": {
+  "ribbon": "THE WISHES ARE SPENT",
+  "label": "YOUR WINNINGS",
+  "quote": "\"The lamp is warm. Come back at sunset.\"",
+  "tap": "TAP ANYWHERE TO CONTINUE"
+ },
+ "audio": {
+  "reverb": {
+   "sec": 2.4,
+   "pow": 2.2,
+   "wet": 0.3,
+   "lp": 0.5
+  }
+ },
+ "fever": {
+  "name": "Djinn's Favour",
+  "sym": 9,
+  "vol": 3,
+  "text": "Pay 2x per spin: bonuses trigger about three times as often and Wish Gems sometimes arrive for free. Stays on until you switch it off.",
+  "badge": "FAVOUR ×2",
+  "onMsg": "DJINN'S FAVOUR ON. TOTAL BET x2",
+  "offMsg": "DJINN'S FAVOUR OFF"
+ }
+}

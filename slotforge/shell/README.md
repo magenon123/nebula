@@ -111,3 +111,10 @@ Takes ~5 minutes. `node regress.cjs <other-standalone.html>` checks another slot
 * The build embeds the engine's `info()` as `SLOT_CFG.engineData.info` when the engine has no `PAYTABLE` export (paytable, lines, jackpots for the info screen, also in the server build).
 * `shell/slot-music.js` voices added: `koto`, `shaku` (shakuhachi), `tok` (wood block). Smoke test: `node slotforge/shell/smoke-cloudtop.cjs`.
 * Hold-and-win pattern: `hooks.clearBoard` can be a no-op during the bonus (the shell calls it before every bonus step); `hooks.bonusMode(on)` is the place to set a flag and a dusk class.
+
+## Slot #5 notes (siroccos-lamp-bazaar)
+* `build-standalone.py` also appends the optional fragment `astro.html` (full-stage overlay) after `side.html` (+ `sweep.html` / `flare.html`).
+* Cascade-with-seals pattern: stage list in the round, sealed tiles stay in the DOM, free tiles `FX.out` + new cells `FX.drop`; `#chain` meter + gem-sum, multiply moment with a count-up banner (`slots/siroccos-lamp-bazaar/slot.js`, `playChain`).
+* The shell owns the class `pop` (floating +$ pills): never put `pop` on your own elements, use another class (`bump`).
+* Rotating-ring bonus: set `--a` / `--t` on a ring with class `go` and wait on its CSS transition (`getAnimations()`), `updatePlaybackRate(4)` in turbo.
+* Smoke test: `node slotforge/shell/smoke-sirocco.cjs` (about 12 minutes; forces rounds with `SLOT_ENGINE.playRound`).
