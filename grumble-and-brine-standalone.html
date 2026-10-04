@@ -1248,7 +1248,7 @@ body.portrait #menu button{font-size:22px;padding:14px 14px}
 <script>
 'use strict';
 /* ---- slot config (slots/grumble-and-brine/slot.json) ---- */
-const SLOT_CFG = {"id": "grumble-and-brine", "title": "Grumble & Brine: Deep Salvage", "logoText": "GRUMBLE & BRINE", "infoTitle": "GRUMBLE & BRINE · DEEP SALVAGE", "api": "/api/slot/grumble-and-brine/spin", "engineSource": "slotforge/engines/grumble-and-brine.js", "storage": "gb", "walletKey": "grumbleBrineWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 7500, "anteCost": 2, "scatterSym": 10, "char": {"el": "char", "states": ["spin", "win", "big", "special", "wince"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "KRAKEN", "lv": 4, "tag": "RELEASE THE KRAKEN MONEY!"}, {"min": 25, "name": "SALVAGE", "lv": 3, "tag": "Now THAT is a haul!"}, {"min": 10, "name": "BARNACLE", "lv": 2, "tag": "Stuck to the hull and paying."}, {"min": 5, "name": "BUBBLE", "lv": 1, "tag": "Meh. Pocket change."}], "autoBigLv": 3, "text": {"idle": "PLACE YOUR BET, KID", "spin": "SIFTING THE JUNK...", "win": "SALVAGED {amt}", "lose": "JUST JUNK", "freeSpin": "DEEP DIVE: DIVE {n} OF {total}", "freeSpinRetrigger": "  ·  +{r} DIVES!"}, "fsLabel": "DIVE", "fsCounter": "running", "fever": {"name": "Deep Pressure", "sym": 4, "vol": 3, "text": "Bet more, dive deeper. Each spin costs 2x your bet, and the Deep Dive becomes about 3.3 times as likely.", "badge": "DEEP PRESSURE ×2", "onMsg": "DEEP PRESSURE ON. TOTAL BET x2", "offMsg": "PRESSURE RELEASED"}, "buys": [{"key": "dive", "mult": 100, "sym": 10, "vol": 4, "name": "Dive Ticket", "text": "Skip the sifting. Go straight to the Deep Dive with 8 free dives. Jellies drift left and grow.", "confirmTitle": "SIGN THE TICKET?", "confirmText": "DIVE TICKET: 3 Sonar Buoys ping and the Deep Dive starts right away with 8 free dives."}, {"key": "abyss", "mult": 500, "sym": 9, "vol": 5, "name": "Abyss Pass", "text": "The premium ticket. 12 dives, the Tide already at +2, a Jelly on every dive and more Jellies in the herd.", "confirmTitle": "SIGN THE TICKET?", "confirmText": "ABYSS PASS: 12 dives, Tide starts at +2, a guaranteed Jelly every dive. Only for the brave (and the broke)."}], "intro": {"unit": "FREE DIVES", "ribbon": "DEEP DIVE", "quote": "\"Fine. Hold your breath. Don't touch the Jellies.\"", "tap": "TAP ANYWHERE TO DIVE", "chips": ["JELLIES DRIFT LEFT", "TIDE RISES, JELLIES GROW", "2+ BUOYS: MORE DIVES"]}, "outro": {"ribbon": "SURFACING", "label": "YOU SALVAGED", "quote": "\"Hmph. Not bad. Don't get used to it.\"", "tap": "TAP ANYWHERE TO SURFACE"}, "audio": {"reverb": {"sec": 2.4, "pow": 2.2, "wet": 0.34, "lp": 0.37}}, "luckCost": 392, "luck": {"name": "MAX LUCK", "sym": 11, "vol": 5, "text": "Pay 392x per spin and keep it on. Every spin has a 5% chance of landing 3 golden MAX coins and winning 7,500x your bet. Leave it on for as many spins as you like.", "badge": "MAX LUCK ×392", "onMsg": "MAX LUCK ON. TOTAL BET x392", "offMsg": "MAX LUCK OFF"}, "loading": {"volatility": 4, "features": [{"sym": 9, "title": "DRIFTING JELLY", "text": "Lantern Jellies are wild, grow every drift and float left. Their values add in a reel, and the reels multiply."}, {"sym": 10, "title": "DEEP DIVE", "text": "Land 3 Sonar Buoys for 8 free dives. The Tide rises, the Jellies grow, and a Jelly is guaranteed every third dive."}]}, "engineData": {"paytable": [{"id": 0, "name": "Old Boot", "pays": {"3": null, "4": 0.12, "5": 0.35}}, {"id": 1, "name": "Tin Can", "pays": {"3": null, "4": 0.14, "5": 0.45}}, {"id": 2, "name": "Message Bottle", "pays": {"3": 0.04, "4": 0.14, "5": 0.41}}, {"id": 3, "name": "Rusty Key", "pays": {"3": 0.05, "4": 0.17, "5": 0.55}}, {"id": 4, "name": "Brass Compass", "pays": {"3": 0.07, "4": 0.21, "5": 0.7}}, {"id": 5, "name": "Barnacle Anchor", "pays": {"3": 0.1, "4": 0.35, "5": 1.1}}, {"id": 6, "name": "Coin Purse", "pays": {"3": 0.17, "4": 0.55, "5": 1.7}}, {"id": 7, "name": "Rusty Harpoon", "pays": {"3": 0.27, "4": 1, "5": 3.4}}, {"id": 8, "name": "Pearl Clam", "pays": {"3": 0.55, "4": 2.05, "5": 8.2}}], "payScale": 1, "scatterPay": {"3": 2, "4": 10, "5": 50}}};
+const SLOT_CFG = {"id": "grumble-and-brine", "title": "Grumble & Brine: Deep Salvage", "logoText": "GRUMBLE & BRINE", "infoTitle": "GRUMBLE & BRINE · DEEP SALVAGE", "api": "/api/slot/grumble-and-brine/spin", "engineSource": "slotforge/engines/grumble-and-brine.js", "storage": "gb", "walletKey": "grumbleBrineWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 7500, "anteCost": 2, "scatterSym": 10, "char": {"el": "char", "states": ["spin", "win", "big", "special", "wince"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "KRAKEN", "lv": 4, "tag": "RELEASE THE KRAKEN MONEY!"}, {"min": 25, "name": "SALVAGE", "lv": 3, "tag": "Now THAT is a haul!"}, {"min": 10, "name": "BARNACLE", "lv": 2, "tag": "Stuck to the hull and paying."}, {"min": 5, "name": "BUBBLE", "lv": 1, "tag": "Meh. Pocket change."}], "autoBigLv": 3, "text": {"idle": "PLACE YOUR BET, KID", "spin": "SIFTING THE JUNK...", "win": "SALVAGED {amt}", "lose": "JUST JUNK", "freeSpin": "DEEP DIVE: DIVE {n} OF {total}", "freeSpinRetrigger": "  ·  +{r} DIVES!"}, "fsLabel": "DIVE", "fsCounter": "running", "fever": {"name": "Deep Pressure", "sym": 4, "vol": 3, "text": "Bet more, dive deeper. Each spin costs 2x your bet, and the Deep Dive becomes about 3.3 times as likely.", "badge": "DEEP PRESSURE ×2", "onMsg": "DEEP PRESSURE ON. TOTAL BET x2", "offMsg": "PRESSURE RELEASED"}, "buys": [{"key": "dive", "mult": 100, "sym": 10, "vol": 4, "name": "Dive Ticket", "text": "Skip the sifting. Go straight to the Deep Dive with 8 free dives. Jellies drift left and grow.", "confirmTitle": "SIGN THE TICKET?", "confirmText": "DIVE TICKET: 3 Sonar Buoys ping and the Deep Dive starts right away with 8 free dives."}, {"key": "abyss", "mult": 500, "sym": 9, "vol": 5, "name": "Abyss Pass", "text": "The premium ticket. 12 dives, the Tide already at +2, a Jelly on every dive and more Jellies in the herd.", "confirmTitle": "SIGN THE TICKET?", "confirmText": "ABYSS PASS: 12 dives, Tide starts at +2, a guaranteed Jelly every dive. Only for the brave (and the broke)."}], "intro": {"unit": "FREE DIVES", "ribbon": "DEEP DIVE", "quote": "\"Fine. Hold your breath. Don't touch the Jellies.\"", "tap": "TAP ANYWHERE TO DIVE", "chips": ["JELLIES DRIFT LEFT", "TIDE RISES, JELLIES GROW", "2+ BUOYS: MORE DIVES"]}, "outro": {"ribbon": "SURFACING", "label": "YOU SALVAGED", "quote": "\"Hmph. Not bad. Don't get used to it.\"", "tap": "TAP ANYWHERE TO SURFACE"}, "audio": {"reverb": {"sec": 2.4, "pow": 2.2, "wet": 0.34, "lp": 0.37}}, "luckCost": 392, "luck": {"name": "MAX LUCK", "sym": 11, "vol": 5, "text": "Pay 392x per spin and keep it on. Every spin has a 5% chance of landing 3 golden MAX coins and winning 7,500x your bet. Leave it on for as many spins as you like. No bonus rounds can trigger while it is on.", "badge": "MAX LUCK ×392", "onMsg": "MAX LUCK ON. TOTAL BET x392", "offMsg": "MAX LUCK OFF"}, "loading": {"volatility": 4, "features": [{"sym": 9, "title": "DRIFTING JELLY", "text": "Lantern Jellies are wild, grow every drift and float left. Their values add in a reel, and the reels multiply."}, {"sym": 10, "title": "DEEP DIVE", "text": "Land 3 Sonar Buoys for 8 free dives. The Tide rises, the Jellies grow, and a Jelly is guaranteed every third dive."}]}, "engineData": {"paytable": [{"id": 0, "name": "Old Boot", "pays": {"3": null, "4": 0.12, "5": 0.35}}, {"id": 1, "name": "Tin Can", "pays": {"3": null, "4": 0.14, "5": 0.45}}, {"id": 2, "name": "Message Bottle", "pays": {"3": 0.04, "4": 0.14, "5": 0.41}}, {"id": 3, "name": "Rusty Key", "pays": {"3": 0.05, "4": 0.17, "5": 0.55}}, {"id": 4, "name": "Brass Compass", "pays": {"3": 0.07, "4": 0.21, "5": 0.7}}, {"id": 5, "name": "Barnacle Anchor", "pays": {"3": 0.1, "4": 0.35, "5": 1.1}}, {"id": 6, "name": "Coin Purse", "pays": {"3": 0.17, "4": 0.55, "5": 1.7}}, {"id": 7, "name": "Rusty Harpoon", "pays": {"3": 0.27, "4": 1, "5": 3.4}}, {"id": 8, "name": "Pearl Clam", "pays": {"3": 0.55, "4": 2.05, "5": 8.2}}], "payScale": 1, "scatterPay": {"3": 2, "4": 10, "5": 50}}};
 /* ---- STANDALONE MODE: the server engine is embedded and runs locally with play money. ---- */
 const SLOT_ENGINE = (() => {
 /* GRUMBLE & BRINE: Deep Salvage. Self-contained pure engine (SlotForge ENGINE-API v1). Spec: plans/grumble-and-brine/01-features-math.md.
@@ -1286,7 +1286,7 @@ const CFG = {
   // MAX LUCK (optional per-spin mode, like Deep Pressure): costs luckCost x bet. Each spin has luckP to show 3 golden MAX coins and pay the cap.
   // Total return = (1-luckP)*normal + luckP*maxWin = 0.96*luckCost  =>  luckP = 0.96*(luckCost-1)/(maxWin-0.96)
   luckCost: 392,
-  luckP: 0.050054,
+  luckP: 0.050235,   // recalibrated: a MAX LUCK miss never carries the bonus (missMean 0.5642), so luckP = (0.9625*luckCost - 0.5642)/(maxWin - 0.5642)
   luckTease: [[0, 80], [1, 12], [2, 8]],   // coins shown on a miss: cosmetic only (they replace non-winning cells in the opening board)
   weights: [11, 11, 11, 11, 11, 10, 10, 9, 8],
   pay: [[0, 0.12, 0.35], [0, 0.14, 0.45], [0.04, 0.14, 0.41], [0.05, 0.17, 0.55], [0.07, 0.21, 0.70], [0.10, 0.35, 1.10], [0.17, 0.55, 1.70], [0.27, 1.00, 3.40], [0.55, 2.05, 8.20]],
@@ -1458,7 +1458,8 @@ function playRound(rng, { ante = false, buy = null, luck = false } = {}) {
   const maxWin = CFG.maxWin, B = CFG.bonus;
   if (luck) {
     if (ante || buy) throw new Error('luck cannot combine with ante or buy');
-    const hit = rng() < CFG.luckP, gr = rollGrid(rng, CFG.scatterP, CFG.jellyP, 0, null);
+    const hit = rng() < CFG.luckP; let gr = rollGrid(rng, CFG.scatterP, CFG.jellyP, 0, null);
+    if (!hit) while (gr.buoyCells.length >= 3) gr = rollGrid(rng, CFG.scatterP, CFG.jellyP, 0, null);   // MAX LUCK never awards the bonus: a miss never carries 3 buoys
     if (hit) {   // a fresh board, three coins, nothing else: the normal spin is replaced by the cap
       const grid = emptyGrid(), w = CFG.weights, wt = w.reduce((a, b) => a + b, 0);
       for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) grid[r][c] = drawSym(rng, w, wt);
@@ -2022,41 +2023,56 @@ let bonusDone = false;
 const LADDER = cfg.winLevels || [{ min: 20, name: 'BIG WIN', lv: 1 }, { min: 50, name: 'MEGA WIN', lv: 2 }, { min: 100, name: 'EPIC WIN', lv: 3 }, { min: 250, name: 'LEGENDARY WIN', lv: 4 }];
 const tierOf = x => { let t = null; for (const l of LADDER) if (x >= l.min) t = l; return t; };
 let bigTap = null;
-function coinRain(lv) {   // gold coins tumbling down the win screen; heavier with each level
+/* Coins tumble down the win screen, hit the floor, bounce twice (smaller each time), then fall away. Heavier with each level. */
+function coinRain(lv) {
   const box = $('bigCoins'); if (!box) return () => {};
-  const spawn = () => { if (box.childElementCount > 70) return;
-    const c = document.createElement('i'), sz = 22 + Math.random() * 30, x = Math.random() * 100, dur = (2600 + Math.random() * 2200) * T(), rot = (Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 720);
-    c.style.cssText = `left:${x}%;width:${sz}px;height:${sz}px`;
-    box.appendChild(c);
-    const an = c.animate([{ transform: 'translateY(-14vh) rotateY(0deg) rotateZ(' + (Math.random() * 40 - 20) + 'deg)', opacity: 1 }, { transform: `translateY(112vh) rotateY(${rot}deg) rotateZ(${Math.random() * 60 - 30}deg)`, opacity: 1 }], { duration: dur, easing: 'cubic-bezier(.35,0,.7,.9)' });
+  const spawn = () => { if (box.childElementCount > 80) return;
+    const c = document.createElement('i'), sz = 22 + Math.random() * 30, dur = (3600 + Math.random() * 1400) * T(), rot = (Math.random() < .5 ? -1 : 1) * (540 + Math.random() * 900), tilt = Math.random() * 40 - 20;
+    c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px`; box.appendChild(c);
+    const F = 90, f = (y, k) => `translateY(${y}vh) rotateY(${rot * k}deg) rotateZ(${tilt}deg)`;
+    const an = c.animate([
+      { transform: f(-14, 0), offset: 0, easing: 'cubic-bezier(.55,0,.9,.55)' },
+      { transform: f(F, .38), offset: .40, easing: 'cubic-bezier(.1,.55,.45,1)' },                 // first hit
+      { transform: f(F - 17, .55), offset: .55, easing: 'cubic-bezier(.55,0,.9,.55)' },            // first bounce, high
+      { transform: f(F, .68), offset: .68, easing: 'cubic-bezier(.1,.55,.45,1)' },                 // second hit
+      { transform: f(F - 6, .78), offset: .76, easing: 'cubic-bezier(.55,0,.9,.55)' },             // second bounce, small
+      { transform: f(F, .86), offset: .83, easing: 'cubic-bezier(.5,0,.9,.6)' },                   // third touch, then it just falls
+      { transform: f(122, 1), offset: 1 }], { duration: dur });
     an.onfinish = () => c.remove(); };
-  for (let i = 0; i < 14 + lv * 6; i++) setTimeout(spawn, Math.random() * 500);
-  const iv = setInterval(spawn, Math.max(30, 150 - lv * 20));
-  return () => { clearInterval(iv); setTimeout(() => { box.textContent = ''; }, 300); };
+  for (let i = 0; i < 12 + lv * 5; i++) setTimeout(spawn, Math.random() * 400);
+  const iv = setInterval(spawn, Math.max(28, 130 - lv * 18));
+  return () => clearInterval(iv);   // stop making new coins; the ones in the air finish their fall
 }
 async function bigWin(x, amt) {
   const t = tierOf(x); if (!t) return null;
   const isMax = x >= cfg.maxWin - 1e-9;   // the cap itself gets its own gold presentation
   const steps = LADDER.filter(l => x >= l.min).map(l => ({ ...l })); if (isMax) steps.push({ min: x, name: 'MAX WIN', lv: 5, max: true });
-  const B = $('big'), title = $('bigT'), amtEl = $('bigA');
+  const N = steps.length, last = N - 1, B = $('big'), title = $('bigT'), amtEl = $('bigA');
+  const th = steps.map((st, i) => i === 0 ? 0 : amt * st.min / x), end = i => i === last ? amt : th[i + 1];   // the amount at which each level begins
+  const dur = i => (i === last ? 2200 + steps[i].lv * 450 : 1500) * T();
   amtEl.textContent = fmt(0); $('bigX').textContent = ''; if ($('bigTag')) $('bigTag').textContent = bonusDone ? 'BONUS COMPLETE' : '';
-  B.classList.add('show'); let stopRain = coinRain(1), from = 0, cur = 0;
-  const showStep = (st, first) => {
+  B.classList.add('show'); let stopRain = () => {}, seg = -1, segT0 = 0, done = false, lastTap = 0, lt = 0;
+  const showStep = (i, now) => {
+    seg = i; segT0 = now; const st = steps[i];
     B.classList.toggle('maxwin', !!st.max); B.dataset.lv = st.lv; title.textContent = st.name;
     title.style.animation = 'none'; void title.offsetWidth; title.style.animation = '';   // replay the pop-in for the new level
     stopRain(); stopRain = coinRain(st.lv);
-    const k = Math.min(4, st.lv); shake(k + .6); flash(k);
-    sfx.big(k); music.duck([0, .5, .38, .28, .2][k] || .2, 1.2 + k * .8, 1.6); if (first) music.stinger('win');
+    const k = Math.min(4, st.lv); shake(k + .6); flash(k); sfx.big(k); music.duck([0, .5, .38, .28, .2][k] || .2, 1.2 + k * .8, 1.6); if (i === 0) music.stinger('win');
   };
-  for (let i = 0; i < steps.length; i++) {
-    const st = steps[i], last = i === steps.length - 1, to = last ? amt : amt * (steps[i + 1].min / x);
-    cur = i; showStep(st, i === 0);
-    await Promise.race([countUp(amtEl, to, (last ? 2000 + st.lv * 500 : 1500) * T() + 250, from, k => sfx.tick(k)), sleep(20000)]);
-    from = to; if (!last) await sleep(180);
-  }
-  $('bigX').textContent = x.toFixed(1) + 'x BET'; sfx.hit();
-  await Promise.race([new Promise(r => { bigTap = r; }), sleep(auto.left > 0 ? 700 : (steps[cur].max ? 6000 : 3200))]); bigTap = null;
-  stopRain(); B.classList.remove('show'); bonusDone = false; return t.lv;
+  bigTap = () => { const now = performance.now(); if (now - lastTap < 220) return; lastTap = now;   // a tap goes straight to the next level; the count carries on from there
+    if (seg < last) showStep(seg + 1, now); else done = true; };
+  await new Promise(res => { showStep(0, performance.now());
+    (function f(now) {
+      let k = Math.max(0, (now - segT0) / dur(seg));   // (a frame timestamp can be a hair older than a tap)
+      while (k >= 1 && seg < last) { showStep(seg + 1, now); k = Math.max(0, (now - segT0) / dur(seg)); }   // crossed a level mid-count: switch without stopping
+      if (done || (seg === last && k >= 1)) { amtEl.textContent = fmt(amt); res(); return; }
+      const e = seg === last ? 1 - Math.pow(1 - k, 2.2) : k;   // steady speed between levels, a gentle slow-down only at the very end
+      const v = th[seg] + (end(seg) - th[seg]) * e; amtEl.textContent = fmt(v);
+      if (now - lt > 75) { lt = now; sfx.tick(Math.min(1, v / amt)); }
+      requestAnimationFrame(f); })(performance.now()); });
+  stopRain(); $('bigX').textContent = x.toFixed(1) + 'x BET'; sfx.hit(); bigTap = null;
+  await Promise.race([new Promise(r => { bigTap = r; }), sleep(auto.left > 0 ? 700 : (steps[last].max ? 6000 : 3200))]); bigTap = null;
+  B.classList.remove('show'); bonusDone = false; return t.lv;
 }
 $('big').onclick = () => { skipBig = true; if (bigTap) bigTap(); };
 
@@ -2376,9 +2392,10 @@ const dropOpt = (r, c, base = 0, fast = false) => fast
   ? { delay: base + c * 26 + (2 - r) * 30 + Math.random() * 14, dist: (r + 1) * CHT * .8 + 50, tilt: (Math.random() - .5) * 4, dur: 400 }
   : { delay: base + c * 92 + (2 - r) * 40 + Math.random() * 16, dist: (r + 1) * CHT + 60, tilt: (Math.random() - .5) * 5, dur: 560 };
 /* drop the listed [r,c]; one landing sound per reel at its touchdown; returns ms (unscaled) to the last touchdown */
+const LANDT = {};   // when each cell touches down (ms from the start of the drop): lets the MAX animation start the moment the third coin lands
 function dropCells(list, base = 0, fast = false) {
   let end = 0; const col = {};
-  list.forEach(([r, c]) => { const o = dropOpt(r, c, base, fast); FX.drop(at(r, c), o); const t = o.delay + o.dur * .58; end = Math.max(end, t); col[c] = Math.min(col[c] == null ? 1e9 : col[c], t); });
+  list.forEach(([r, c]) => { const o = dropOpt(r, c, base, fast); FX.drop(at(r, c), o); const t = o.delay + o.dur * .58; LANDT[r * 10 + c] = t; end = Math.max(end, t); col[c] = Math.min(col[c] == null ? 1e9 : col[c], t); });
   Object.keys(col).forEach(c => after(col[c], () => sfx.land(+c === COLS - 1 ? 2 : 1)));
   return end;
 }
@@ -2550,12 +2567,14 @@ async function playSpin(sp, run, ctx) {
   const stake = ctx.stake, steps = sp.steps || [], open = steps[0], jel = open ? open.jellies : [];
   char('spin', 950 * T());
   if (sp.tideBefore != null) setTide(sp.tideBefore, true);
-  paint(sp.initialGrid, jel); setStrip(jel, 0); sfx.drop(); const dt = dropTease(sp.initialGrid), e0 = dt.end;
+  paint(sp.initialGrid, jel); setStrip(jel, 0); sfx.drop(); for (const k in LANDT) delete LANDT[k]; const dt = dropTease(sp.initialGrid), e0 = dt.end;
   const buoys = buoyCells(sp.initialGrid), coins = ALL.filter(([r, c]) => sp.initialGrid[r][c] === MAXS);
-  coins.forEach(([r, c], i) => after(e0 - 120 + i * 40, () => { sfx.maxLand(i); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 12, SHARD[3], { power: 1 }); flash(1.2); }));
+  coins.forEach(([r, c], i) => after(Math.max(0, (LANDT[r * 10 + c] || e0) - 60), () => { sfx.maxLand(i); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 12, SHARD[3], { power: 1 }); flash(1.2); }));
   if (buoys.length) pingBuoys(buoys);
   if (jel.length) after(520, () => sfx.jelly());
-  await wait(e0 + 200);
+  const hit3 = coins.length >= 3, tCoin = hit3 ? Math.max(...coins.map(([r, c]) => LANDT[r * 10 + c] || e0)) : 0;
+  await wait(hit3 ? Math.min(e0 + 200, tCoin + 90) : e0 + 200);
+  if (hit3) GRID.getAnimations({ subtree: true }).forEach(a => { try { a.finish(); } catch {} });   // the third coin is down: finish the rest of the drop at once so the MAX animation starts now
   if (coins.length) {
     if (coins.length >= 3) {
       GRID.classList.add('focus'); const Rp = rope(coins, 0, 0); presentList(coins, Rp); coins.forEach(([r, c]) => at(r, c).classList.add('scat'));

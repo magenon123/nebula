@@ -2425,41 +2425,56 @@ let bonusDone = false;
 const LADDER = cfg.winLevels || [{ min: 20, name: 'BIG WIN', lv: 1 }, { min: 50, name: 'MEGA WIN', lv: 2 }, { min: 100, name: 'EPIC WIN', lv: 3 }, { min: 250, name: 'LEGENDARY WIN', lv: 4 }];
 const tierOf = x => { let t = null; for (const l of LADDER) if (x >= l.min) t = l; return t; };
 let bigTap = null;
-function coinRain(lv) {   // gold coins tumbling down the win screen; heavier with each level
+/* Coins tumble down the win screen, hit the floor, bounce twice (smaller each time), then fall away. Heavier with each level. */
+function coinRain(lv) {
   const box = $('bigCoins'); if (!box) return () => {};
-  const spawn = () => { if (box.childElementCount > 70) return;
-    const c = document.createElement('i'), sz = 22 + Math.random() * 30, x = Math.random() * 100, dur = (2600 + Math.random() * 2200) * T(), rot = (Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 720);
-    c.style.cssText = `left:${x}%;width:${sz}px;height:${sz}px`;
-    box.appendChild(c);
-    const an = c.animate([{ transform: 'translateY(-14vh) rotateY(0deg) rotateZ(' + (Math.random() * 40 - 20) + 'deg)', opacity: 1 }, { transform: `translateY(112vh) rotateY(${rot}deg) rotateZ(${Math.random() * 60 - 30}deg)`, opacity: 1 }], { duration: dur, easing: 'cubic-bezier(.35,0,.7,.9)' });
+  const spawn = () => { if (box.childElementCount > 80) return;
+    const c = document.createElement('i'), sz = 22 + Math.random() * 30, dur = (3600 + Math.random() * 1400) * T(), rot = (Math.random() < .5 ? -1 : 1) * (540 + Math.random() * 900), tilt = Math.random() * 40 - 20;
+    c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px`; box.appendChild(c);
+    const F = 90, f = (y, k) => `translateY(${y}vh) rotateY(${rot * k}deg) rotateZ(${tilt}deg)`;
+    const an = c.animate([
+      { transform: f(-14, 0), offset: 0, easing: 'cubic-bezier(.55,0,.9,.55)' },
+      { transform: f(F, .38), offset: .40, easing: 'cubic-bezier(.1,.55,.45,1)' },                 // first hit
+      { transform: f(F - 17, .55), offset: .55, easing: 'cubic-bezier(.55,0,.9,.55)' },            // first bounce, high
+      { transform: f(F, .68), offset: .68, easing: 'cubic-bezier(.1,.55,.45,1)' },                 // second hit
+      { transform: f(F - 6, .78), offset: .76, easing: 'cubic-bezier(.55,0,.9,.55)' },             // second bounce, small
+      { transform: f(F, .86), offset: .83, easing: 'cubic-bezier(.5,0,.9,.6)' },                   // third touch, then it just falls
+      { transform: f(122, 1), offset: 1 }], { duration: dur });
     an.onfinish = () => c.remove(); };
-  for (let i = 0; i < 14 + lv * 6; i++) setTimeout(spawn, Math.random() * 500);
-  const iv = setInterval(spawn, Math.max(30, 150 - lv * 20));
-  return () => { clearInterval(iv); setTimeout(() => { box.textContent = ''; }, 300); };
+  for (let i = 0; i < 12 + lv * 5; i++) setTimeout(spawn, Math.random() * 400);
+  const iv = setInterval(spawn, Math.max(28, 130 - lv * 18));
+  return () => clearInterval(iv);   // stop making new coins; the ones in the air finish their fall
 }
 async function bigWin(x, amt) {
   const t = tierOf(x); if (!t) return null;
   const isMax = x >= cfg.maxWin - 1e-9;   // the cap itself gets its own gold presentation
   const steps = LADDER.filter(l => x >= l.min).map(l => ({ ...l })); if (isMax) steps.push({ min: x, name: 'MAX WIN', lv: 5, max: true });
-  const B = $('big'), title = $('bigT'), amtEl = $('bigA');
+  const N = steps.length, last = N - 1, B = $('big'), title = $('bigT'), amtEl = $('bigA');
+  const th = steps.map((st, i) => i === 0 ? 0 : amt * st.min / x), end = i => i === last ? amt : th[i + 1];   // the amount at which each level begins
+  const dur = i => (i === last ? 2200 + steps[i].lv * 450 : 1500) * T();
   amtEl.textContent = fmt(0); $('bigX').textContent = ''; if ($('bigTag')) $('bigTag').textContent = bonusDone ? 'BONUS COMPLETE' : '';
-  B.classList.add('show'); let stopRain = coinRain(1), from = 0, cur = 0;
-  const showStep = (st, first) => {
+  B.classList.add('show'); let stopRain = () => {}, seg = -1, segT0 = 0, done = false, lastTap = 0, lt = 0;
+  const showStep = (i, now) => {
+    seg = i; segT0 = now; const st = steps[i];
     B.classList.toggle('maxwin', !!st.max); B.dataset.lv = st.lv; title.textContent = st.name;
     title.style.animation = 'none'; void title.offsetWidth; title.style.animation = '';   // replay the pop-in for the new level
     stopRain(); stopRain = coinRain(st.lv);
-    const k = Math.min(4, st.lv); shake(k + .6); flash(k);
-    sfx.big(k); music.duck([0, .5, .38, .28, .2][k] || .2, 1.2 + k * .8, 1.6); if (first) music.stinger('win');
+    const k = Math.min(4, st.lv); shake(k + .6); flash(k); sfx.big(k); music.duck([0, .5, .38, .28, .2][k] || .2, 1.2 + k * .8, 1.6); if (i === 0) music.stinger('win');
   };
-  for (let i = 0; i < steps.length; i++) {
-    const st = steps[i], last = i === steps.length - 1, to = last ? amt : amt * (steps[i + 1].min / x);
-    cur = i; showStep(st, i === 0);
-    await Promise.race([countUp(amtEl, to, (last ? 2000 + st.lv * 500 : 1500) * T() + 250, from, k => sfx.tick(k)), sleep(20000)]);
-    from = to; if (!last) await sleep(180);
-  }
-  $('bigX').textContent = x.toFixed(1) + 'x BET'; sfx.hit();
-  await Promise.race([new Promise(r => { bigTap = r; }), sleep(auto.left > 0 ? 700 : (steps[cur].max ? 6000 : 3200))]); bigTap = null;
-  stopRain(); B.classList.remove('show'); bonusDone = false; return t.lv;
+  bigTap = () => { const now = performance.now(); if (now - lastTap < 220) return; lastTap = now;   // a tap goes straight to the next level; the count carries on from there
+    if (seg < last) showStep(seg + 1, now); else done = true; };
+  await new Promise(res => { showStep(0, performance.now());
+    (function f(now) {
+      let k = Math.max(0, (now - segT0) / dur(seg));   // (a frame timestamp can be a hair older than a tap)
+      while (k >= 1 && seg < last) { showStep(seg + 1, now); k = Math.max(0, (now - segT0) / dur(seg)); }   // crossed a level mid-count: switch without stopping
+      if (done || (seg === last && k >= 1)) { amtEl.textContent = fmt(amt); res(); return; }
+      const e = seg === last ? 1 - Math.pow(1 - k, 2.2) : k;   // steady speed between levels, a gentle slow-down only at the very end
+      const v = th[seg] + (end(seg) - th[seg]) * e; amtEl.textContent = fmt(v);
+      if (now - lt > 75) { lt = now; sfx.tick(Math.min(1, v / amt)); }
+      requestAnimationFrame(f); })(performance.now()); });
+  stopRain(); $('bigX').textContent = x.toFixed(1) + 'x BET'; sfx.hit(); bigTap = null;
+  await Promise.race([new Promise(r => { bigTap = r; }), sleep(auto.left > 0 ? 700 : (steps[last].max ? 6000 : 3200))]); bigTap = null;
+  B.classList.remove('show'); bonusDone = false; return t.lv;
 }
 $('big').onclick = () => { skipBig = true; if (bigTap) bigTap(); };
 

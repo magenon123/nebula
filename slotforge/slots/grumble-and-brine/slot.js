@@ -90,9 +90,10 @@ const dropOpt = (r, c, base = 0, fast = false) => fast
   ? { delay: base + c * 26 + (2 - r) * 30 + Math.random() * 14, dist: (r + 1) * CHT * .8 + 50, tilt: (Math.random() - .5) * 4, dur: 400 }
   : { delay: base + c * 92 + (2 - r) * 40 + Math.random() * 16, dist: (r + 1) * CHT + 60, tilt: (Math.random() - .5) * 5, dur: 560 };
 /* drop the listed [r,c]; one landing sound per reel at its touchdown; returns ms (unscaled) to the last touchdown */
+const LANDT = {};   // when each cell touches down (ms from the start of the drop): lets the MAX animation start the moment the third coin lands
 function dropCells(list, base = 0, fast = false) {
   let end = 0; const col = {};
-  list.forEach(([r, c]) => { const o = dropOpt(r, c, base, fast); FX.drop(at(r, c), o); const t = o.delay + o.dur * .58; end = Math.max(end, t); col[c] = Math.min(col[c] == null ? 1e9 : col[c], t); });
+  list.forEach(([r, c]) => { const o = dropOpt(r, c, base, fast); FX.drop(at(r, c), o); const t = o.delay + o.dur * .58; LANDT[r * 10 + c] = t; end = Math.max(end, t); col[c] = Math.min(col[c] == null ? 1e9 : col[c], t); });
   Object.keys(col).forEach(c => after(col[c], () => sfx.land(+c === COLS - 1 ? 2 : 1)));
   return end;
 }
@@ -264,12 +265,14 @@ async function playSpin(sp, run, ctx) {
   const stake = ctx.stake, steps = sp.steps || [], open = steps[0], jel = open ? open.jellies : [];
   char('spin', 950 * T());
   if (sp.tideBefore != null) setTide(sp.tideBefore, true);
-  paint(sp.initialGrid, jel); setStrip(jel, 0); sfx.drop(); const dt = dropTease(sp.initialGrid), e0 = dt.end;
+  paint(sp.initialGrid, jel); setStrip(jel, 0); sfx.drop(); for (const k in LANDT) delete LANDT[k]; const dt = dropTease(sp.initialGrid), e0 = dt.end;
   const buoys = buoyCells(sp.initialGrid), coins = ALL.filter(([r, c]) => sp.initialGrid[r][c] === MAXS);
-  coins.forEach(([r, c], i) => after(e0 - 120 + i * 40, () => { sfx.maxLand(i); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 12, SHARD[3], { power: 1 }); flash(1.2); }));
+  coins.forEach(([r, c], i) => after(Math.max(0, (LANDT[r * 10 + c] || e0) - 60), () => { sfx.maxLand(i); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 12, SHARD[3], { power: 1 }); flash(1.2); }));
   if (buoys.length) pingBuoys(buoys);
   if (jel.length) after(520, () => sfx.jelly());
-  await wait(e0 + 200);
+  const hit3 = coins.length >= 3, tCoin = hit3 ? Math.max(...coins.map(([r, c]) => LANDT[r * 10 + c] || e0)) : 0;
+  await wait(hit3 ? Math.min(e0 + 200, tCoin + 90) : e0 + 200);
+  if (hit3) GRID.getAnimations({ subtree: true }).forEach(a => { try { a.finish(); } catch {} });   // the third coin is down: finish the rest of the drop at once so the MAX animation starts now
   if (coins.length) {
     if (coins.length >= 3) {
       GRID.classList.add('focus'); const Rp = rope(coins, 0, 0); presentList(coins, Rp); coins.forEach(([r, c]) => at(r, c).classList.add('scat'));

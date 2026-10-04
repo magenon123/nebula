@@ -36,7 +36,7 @@ export const CFG = {
   // MAX LUCK (optional per-spin mode): costs luckCost x bet; each spin has luckP to show 3 golden MAX coins and pay the cap.
   // Return = (1-luckP)*normal + luckP*maxWin = 0.96*luckCost  =>  luckP = 0.96*(luckCost-1)/(maxWin-0.96)
   luckCost: 496,
-  luckP: 0.050026,
+  luckP: 0.050181,   // recalibrated: a MAX LUCK miss never carries the bonus (missMean 0.7188), so luckP = (0.9625*luckCost - 0.7188)/(maxWin - 0.7188)
   luckTease: [[0, 80], [1, 12], [2, 8]],  // coins shown on a miss: cosmetic only (they sit on cells that never take part in a cluster)
 };
 
@@ -203,7 +203,8 @@ function playLuck(rng) {
     return { cost: CFG.luckCost, luck: { hit: true, cells }, initialGrid: g, openingEvents: [], openingGrid: clone(g), cascadeSteps: [], basePayout: CFG.maxWin, totalPayout: CFG.maxWin,
       bonusTriggered: false, freeSpinsAwarded: 0, bonus: null, capped: true };
   }
-  const r = playRound(rng, {}); r.cost = CFG.luckCost; r.luck = { hit: false, cells: [] };
+  let r; do { r = playRound(rng, {}); } while (r.bonusTriggered);   // MAX LUCK never awards the bonus: a miss is an ordinary round with no free spins (re-rolled until it has none)
+  r.cost = CFG.luckCost; r.luck = { hit: false, cells: [] };
   const count = pickW(rng, CFG.luckTease);
   if (count > 0 && !r.bonusTriggered) {
     const used = new Set(), mark = (a, b) => used.add(a * COLS + b);

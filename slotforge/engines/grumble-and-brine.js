@@ -34,7 +34,7 @@ export const CFG = {
   // MAX LUCK (optional per-spin mode, like Deep Pressure): costs luckCost x bet. Each spin has luckP to show 3 golden MAX coins and pay the cap.
   // Total return = (1-luckP)*normal + luckP*maxWin = 0.96*luckCost  =>  luckP = 0.96*(luckCost-1)/(maxWin-0.96)
   luckCost: 392,
-  luckP: 0.050054,
+  luckP: 0.050235,   // recalibrated: a MAX LUCK miss never carries the bonus (missMean 0.5642), so luckP = (0.9625*luckCost - 0.5642)/(maxWin - 0.5642)
   luckTease: [[0, 80], [1, 12], [2, 8]],   // coins shown on a miss: cosmetic only (they replace non-winning cells in the opening board)
   weights: [11, 11, 11, 11, 11, 10, 10, 9, 8],
   pay: [[0, 0.12, 0.35], [0, 0.14, 0.45], [0.04, 0.14, 0.41], [0.05, 0.17, 0.55], [0.07, 0.21, 0.70], [0.10, 0.35, 1.10], [0.17, 0.55, 1.70], [0.27, 1.00, 3.40], [0.55, 2.05, 8.20]],
@@ -206,7 +206,8 @@ export function playRound(rng, { ante = false, buy = null, luck = false } = {}) 
   const maxWin = CFG.maxWin, B = CFG.bonus;
   if (luck) {
     if (ante || buy) throw new Error('luck cannot combine with ante or buy');
-    const hit = rng() < CFG.luckP, gr = rollGrid(rng, CFG.scatterP, CFG.jellyP, 0, null);
+    const hit = rng() < CFG.luckP; let gr = rollGrid(rng, CFG.scatterP, CFG.jellyP, 0, null);
+    if (!hit) while (gr.buoyCells.length >= 3) gr = rollGrid(rng, CFG.scatterP, CFG.jellyP, 0, null);   // MAX LUCK never awards the bonus: a miss never carries 3 buoys
     if (hit) {   // a fresh board, three coins, nothing else: the normal spin is replaced by the cap
       const grid = emptyGrid(), w = CFG.weights, wt = w.reduce((a, b) => a + b, 0);
       for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) grid[r][c] = drawSym(rng, w, wt);

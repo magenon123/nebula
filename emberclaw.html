@@ -1476,7 +1476,7 @@ body.portrait #menu button{font-size:22px;padding:14px 14px}
 <script>
 'use strict';
 /* ---- slot config (slots/emberclaw/slot.json) ---- */
-const SLOT_CFG = {"id": "emberclaw", "title": "EmberClaw: Molten Reforge", "logoText": "EMBERCLAW", "infoTitle": "EMBERCLAW · MOLTEN REFORGE", "api": "/api/emberclaw/spin", "engineSource": "emberclaw-engine.js", "storage": "ec", "walletKey": "emberclawWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 9500, "anteCost": 3, "scatterSym": 8, "char": {"el": "char", "states": ["swing", "win", "big", "boom"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "LEGENDARY", "lv": 4}, {"min": 25, "name": "FORGED", "lv": 3}, {"min": 10, "name": "MOLTEN", "lv": 2}, {"min": 5, "name": "SPARK", "lv": 1}], "autoBigLv": 3, "text": {"idle": "Strike the anvil.", "win": "YOU FORGED {amt}", "lose": "Cold iron. Strike again.", "freeSpin": "Free spin {n}", "freeSpinRetrigger": "  ·  +{r} SPINS!"}, "fever": {"name": "Forge Fever", "sym": 8, "vol": 3, "text": "Each spin costs 3x your bet, but the bonus game is 5 times more likely to trigger!", "badge": "FORGE FEVER ×3", "onMsg": "FORGE FEVER ON · 5x BONUS CHANCE", "offMsg": "Forge Fever off"}, "buys": [{"key": "standard", "mult": 100, "sym": 6, "vol": 4, "name": "The Reforging", "text": "10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.", "confirmTitle": "THE REFORGING", "confirmText": "Skip straight to 10 free spins. The Forge Core heat carries over between spins."}, {"key": "preheated", "mult": 500, "sym": 7, "vol": 5, "name": "Pre-Heated", "text": "The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.", "confirmTitle": "PRE-HEATED", "confirmText": "10 free spins with the Forge Core already at 6 heat: you start with a reforged Wild and the Core primed."}], "intro": {"unit": "FREE SPINS", "ribbon": "THE REFORGING", "chips": ["THE CORE KEEPS ITS HEAT", "EVERY 3RD SPIN: GUARANTEED DETONATION", "2+ GEMS: +4 SPINS"]}, "outro": {"ribbon": "BONUS COMPLETE"}, "audio": {"reverb": {"sec": 1.7, "pow": 2.8, "wet": 0.28}}, "luckCost": 496, "luck": {"name": "MAX LUCK", "sym": 9, "vol": 5, "text": "Pay 496x per spin and keep it on. Every spin has a 5% chance of landing 3 golden MAX coins and winning 9,500x your bet. Leave it on for as many spins as you like.", "badge": "MAX LUCK ×496", "onMsg": "MAX LUCK ON. TOTAL BET x496", "offMsg": "MAX LUCK OFF"}, "loading": {"volatility": 4, "features": [{"sym": 7, "title": "FORGE HEAT", "text": "Every cluster stokes the Core. At 3 heat every win gets a flat bonus, at 6 a wild is reforged, at 9 the Core detonates and doubles every wild."}, {"sym": 8, "title": "THE REFORGING", "text": "Land 3 Forgefire Gems for 10 free spins. The heat never cools and the wilds snowball. 2 more gems add 4 spins."}]}, "engineData": {"paytable": [[0.1, 0.25, 0.5, 1.5], [0.15, 0.3, 0.6, 1.75], [0.2, 0.4, 0.8, 2], [0.4, 1, 2.5, 6], [0.6, 1.5, 3.5, 9], [1.5, 4, 10, 25], [3, 8, 20, 50]], "payScale": 1.049, "scatterPay": null}};
+const SLOT_CFG = {"id": "emberclaw", "title": "EmberClaw: Molten Reforge", "logoText": "EMBERCLAW", "infoTitle": "EMBERCLAW · MOLTEN REFORGE", "api": "/api/emberclaw/spin", "engineSource": "emberclaw-engine.js", "storage": "ec", "walletKey": "emberclawWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 9500, "anteCost": 3, "scatterSym": 8, "char": {"el": "char", "states": ["swing", "win", "big", "boom"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "LEGENDARY", "lv": 4}, {"min": 25, "name": "FORGED", "lv": 3}, {"min": 10, "name": "MOLTEN", "lv": 2}, {"min": 5, "name": "SPARK", "lv": 1}], "autoBigLv": 3, "text": {"idle": "Strike the anvil.", "win": "YOU FORGED {amt}", "lose": "Cold iron. Strike again.", "freeSpin": "Free spin {n}", "freeSpinRetrigger": "  ·  +{r} SPINS!"}, "fever": {"name": "Forge Fever", "sym": 8, "vol": 3, "text": "Each spin costs 3x your bet, but the bonus game is 5 times more likely to trigger!", "badge": "FORGE FEVER ×3", "onMsg": "FORGE FEVER ON · 5x BONUS CHANCE", "offMsg": "Forge Fever off"}, "buys": [{"key": "standard", "mult": 100, "sym": 6, "vol": 4, "name": "The Reforging", "text": "10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.", "confirmTitle": "THE REFORGING", "confirmText": "Skip straight to 10 free spins. The Forge Core heat carries over between spins."}, {"key": "preheated", "mult": 500, "sym": 7, "vol": 5, "name": "Pre-Heated", "text": "The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.", "confirmTitle": "PRE-HEATED", "confirmText": "10 free spins with the Forge Core already at 6 heat: you start with a reforged Wild and the Core primed."}], "intro": {"unit": "FREE SPINS", "ribbon": "THE REFORGING", "chips": ["THE CORE KEEPS ITS HEAT", "EVERY 3RD SPIN: GUARANTEED DETONATION", "2+ GEMS: +4 SPINS"]}, "outro": {"ribbon": "BONUS COMPLETE"}, "audio": {"reverb": {"sec": 1.7, "pow": 2.8, "wet": 0.28}}, "luckCost": 496, "luck": {"name": "MAX LUCK", "sym": 9, "vol": 5, "text": "Pay 496x per spin and keep it on. Every spin has a 5% chance of landing 3 golden MAX coins and winning 9,500x your bet. Leave it on for as many spins as you like. No bonus rounds can trigger while it is on.", "badge": "MAX LUCK ×496", "onMsg": "MAX LUCK ON. TOTAL BET x496", "offMsg": "MAX LUCK OFF"}, "loading": {"volatility": 4, "features": [{"sym": 7, "title": "FORGE HEAT", "text": "Every cluster stokes the Core. At 3 heat every win gets a flat bonus, at 6 a wild is reforged, at 9 the Core detonates and doubles every wild."}, {"sym": 8, "title": "THE REFORGING", "text": "Land 3 Forgefire Gems for 10 free spins. The heat never cools and the wilds snowball. 2 more gems add 4 spins."}]}, "engineData": {"paytable": [[0.1, 0.25, 0.5, 1.5], [0.15, 0.3, 0.6, 1.75], [0.2, 0.4, 0.8, 2], [0.4, 1, 2.5, 6], [0.6, 1.5, 3.5, 9], [1.5, 4, 10, 25], [3, 8, 20, 50]], "payScale": 1.049, "scatterPay": null}};
 /* ---- DEMO FALLBACK: opened without a Nebula login, the page plays with play money using this embedded copy of the engine. ---- */
 const DEMO_ENGINE = (() => {
 /* EMBERCLAW: Molten Reforge — server-side game engine.
@@ -1516,7 +1516,7 @@ const CFG = {
   // MAX LUCK (optional per-spin mode): costs luckCost x bet; each spin has luckP to show 3 golden MAX coins and pay the cap.
   // Return = (1-luckP)*normal + luckP*maxWin = 0.96*luckCost  =>  luckP = 0.96*(luckCost-1)/(maxWin-0.96)
   luckCost: 496,
-  luckP: 0.050026,
+  luckP: 0.050181,   // recalibrated: a MAX LUCK miss never carries the bonus (missMean 0.7188), so luckP = (0.9625*luckCost - 0.7188)/(maxWin - 0.7188)
   luckTease: [[0, 80], [1, 12], [2, 8]],  // coins shown on a miss: cosmetic only (they sit on cells that never take part in a cluster)
 };
 
@@ -1683,7 +1683,8 @@ function playLuck(rng) {
     return { cost: CFG.luckCost, luck: { hit: true, cells }, initialGrid: g, openingEvents: [], openingGrid: clone(g), cascadeSteps: [], basePayout: CFG.maxWin, totalPayout: CFG.maxWin,
       bonusTriggered: false, freeSpinsAwarded: 0, bonus: null, capped: true };
   }
-  const r = playRound(rng, {}); r.cost = CFG.luckCost; r.luck = { hit: false, cells: [] };
+  let r; do { r = playRound(rng, {}); } while (r.bonusTriggered);   // MAX LUCK never awards the bonus: a miss is an ordinary round with no free spins (re-rolled until it has none)
+  r.cost = CFG.luckCost; r.luck = { hit: false, cells: [] };
   const count = pickW(rng, CFG.luckTease);
   if (count > 0 && !r.bonusTriggered) {
     const used = new Set(), mark = (a, b) => used.add(a * COLS + b);
@@ -2225,41 +2226,56 @@ let bonusDone = false;
 const LADDER = cfg.winLevels || [{ min: 20, name: 'BIG WIN', lv: 1 }, { min: 50, name: 'MEGA WIN', lv: 2 }, { min: 100, name: 'EPIC WIN', lv: 3 }, { min: 250, name: 'LEGENDARY WIN', lv: 4 }];
 const tierOf = x => { let t = null; for (const l of LADDER) if (x >= l.min) t = l; return t; };
 let bigTap = null;
-function coinRain(lv) {   // gold coins tumbling down the win screen; heavier with each level
+/* Coins tumble down the win screen, hit the floor, bounce twice (smaller each time), then fall away. Heavier with each level. */
+function coinRain(lv) {
   const box = $('bigCoins'); if (!box) return () => {};
-  const spawn = () => { if (box.childElementCount > 70) return;
-    const c = document.createElement('i'), sz = 22 + Math.random() * 30, x = Math.random() * 100, dur = (2600 + Math.random() * 2200) * T(), rot = (Math.random() < .5 ? -1 : 1) * (360 + Math.random() * 720);
-    c.style.cssText = `left:${x}%;width:${sz}px;height:${sz}px`;
-    box.appendChild(c);
-    const an = c.animate([{ transform: 'translateY(-14vh) rotateY(0deg) rotateZ(' + (Math.random() * 40 - 20) + 'deg)', opacity: 1 }, { transform: `translateY(112vh) rotateY(${rot}deg) rotateZ(${Math.random() * 60 - 30}deg)`, opacity: 1 }], { duration: dur, easing: 'cubic-bezier(.35,0,.7,.9)' });
+  const spawn = () => { if (box.childElementCount > 80) return;
+    const c = document.createElement('i'), sz = 22 + Math.random() * 30, dur = (3600 + Math.random() * 1400) * T(), rot = (Math.random() < .5 ? -1 : 1) * (540 + Math.random() * 900), tilt = Math.random() * 40 - 20;
+    c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px`; box.appendChild(c);
+    const F = 90, f = (y, k) => `translateY(${y}vh) rotateY(${rot * k}deg) rotateZ(${tilt}deg)`;
+    const an = c.animate([
+      { transform: f(-14, 0), offset: 0, easing: 'cubic-bezier(.55,0,.9,.55)' },
+      { transform: f(F, .38), offset: .40, easing: 'cubic-bezier(.1,.55,.45,1)' },                 // first hit
+      { transform: f(F - 17, .55), offset: .55, easing: 'cubic-bezier(.55,0,.9,.55)' },            // first bounce, high
+      { transform: f(F, .68), offset: .68, easing: 'cubic-bezier(.1,.55,.45,1)' },                 // second hit
+      { transform: f(F - 6, .78), offset: .76, easing: 'cubic-bezier(.55,0,.9,.55)' },             // second bounce, small
+      { transform: f(F, .86), offset: .83, easing: 'cubic-bezier(.5,0,.9,.6)' },                   // third touch, then it just falls
+      { transform: f(122, 1), offset: 1 }], { duration: dur });
     an.onfinish = () => c.remove(); };
-  for (let i = 0; i < 14 + lv * 6; i++) setTimeout(spawn, Math.random() * 500);
-  const iv = setInterval(spawn, Math.max(30, 150 - lv * 20));
-  return () => { clearInterval(iv); setTimeout(() => { box.textContent = ''; }, 300); };
+  for (let i = 0; i < 12 + lv * 5; i++) setTimeout(spawn, Math.random() * 400);
+  const iv = setInterval(spawn, Math.max(28, 130 - lv * 18));
+  return () => clearInterval(iv);   // stop making new coins; the ones in the air finish their fall
 }
 async function bigWin(x, amt) {
   const t = tierOf(x); if (!t) return null;
   const isMax = x >= cfg.maxWin - 1e-9;   // the cap itself gets its own gold presentation
   const steps = LADDER.filter(l => x >= l.min).map(l => ({ ...l })); if (isMax) steps.push({ min: x, name: 'MAX WIN', lv: 5, max: true });
-  const B = $('big'), title = $('bigT'), amtEl = $('bigA');
+  const N = steps.length, last = N - 1, B = $('big'), title = $('bigT'), amtEl = $('bigA');
+  const th = steps.map((st, i) => i === 0 ? 0 : amt * st.min / x), end = i => i === last ? amt : th[i + 1];   // the amount at which each level begins
+  const dur = i => (i === last ? 2200 + steps[i].lv * 450 : 1500) * T();
   amtEl.textContent = fmt(0); $('bigX').textContent = ''; if ($('bigTag')) $('bigTag').textContent = bonusDone ? 'BONUS COMPLETE' : '';
-  B.classList.add('show'); let stopRain = coinRain(1), from = 0, cur = 0;
-  const showStep = (st, first) => {
+  B.classList.add('show'); let stopRain = () => {}, seg = -1, segT0 = 0, done = false, lastTap = 0, lt = 0;
+  const showStep = (i, now) => {
+    seg = i; segT0 = now; const st = steps[i];
     B.classList.toggle('maxwin', !!st.max); B.dataset.lv = st.lv; title.textContent = st.name;
     title.style.animation = 'none'; void title.offsetWidth; title.style.animation = '';   // replay the pop-in for the new level
     stopRain(); stopRain = coinRain(st.lv);
-    const k = Math.min(4, st.lv); shake(k + .6); flash(k);
-    sfx.big(k); music.duck([0, .5, .38, .28, .2][k] || .2, 1.2 + k * .8, 1.6); if (first) music.stinger('win');
+    const k = Math.min(4, st.lv); shake(k + .6); flash(k); sfx.big(k); music.duck([0, .5, .38, .28, .2][k] || .2, 1.2 + k * .8, 1.6); if (i === 0) music.stinger('win');
   };
-  for (let i = 0; i < steps.length; i++) {
-    const st = steps[i], last = i === steps.length - 1, to = last ? amt : amt * (steps[i + 1].min / x);
-    cur = i; showStep(st, i === 0);
-    await Promise.race([countUp(amtEl, to, (last ? 2000 + st.lv * 500 : 1500) * T() + 250, from, k => sfx.tick(k)), sleep(20000)]);
-    from = to; if (!last) await sleep(180);
-  }
-  $('bigX').textContent = x.toFixed(1) + 'x BET'; sfx.hit();
-  await Promise.race([new Promise(r => { bigTap = r; }), sleep(auto.left > 0 ? 700 : (steps[cur].max ? 6000 : 3200))]); bigTap = null;
-  stopRain(); B.classList.remove('show'); bonusDone = false; return t.lv;
+  bigTap = () => { const now = performance.now(); if (now - lastTap < 220) return; lastTap = now;   // a tap goes straight to the next level; the count carries on from there
+    if (seg < last) showStep(seg + 1, now); else done = true; };
+  await new Promise(res => { showStep(0, performance.now());
+    (function f(now) {
+      let k = Math.max(0, (now - segT0) / dur(seg));   // (a frame timestamp can be a hair older than a tap)
+      while (k >= 1 && seg < last) { showStep(seg + 1, now); k = Math.max(0, (now - segT0) / dur(seg)); }   // crossed a level mid-count: switch without stopping
+      if (done || (seg === last && k >= 1)) { amtEl.textContent = fmt(amt); res(); return; }
+      const e = seg === last ? 1 - Math.pow(1 - k, 2.2) : k;   // steady speed between levels, a gentle slow-down only at the very end
+      const v = th[seg] + (end(seg) - th[seg]) * e; amtEl.textContent = fmt(v);
+      if (now - lt > 75) { lt = now; sfx.tick(Math.min(1, v / amt)); }
+      requestAnimationFrame(f); })(performance.now()); });
+  stopRain(); $('bigX').textContent = x.toFixed(1) + 'x BET'; sfx.hit(); bigTap = null;
+  await Promise.race([new Promise(r => { bigTap = r; }), sleep(auto.left > 0 ? 700 : (steps[last].max ? 6000 : 3200))]); bigTap = null;
+  B.classList.remove('show'); bonusDone = false; return t.lv;
 }
 $('big').onclick = () => { skipBig = true; if (bigTap) bigTap(); };
 
@@ -2576,9 +2592,10 @@ function paint(grid, wilds = []) {
 /* ---------- drops and exits: staggered, with anticipation, squash and stretch, overshoot (see shell FX) ---------- */
 const dropOpt = (r, c, base = 0) => ({ delay: base + (4 - r) * 78 + c * 15 + Math.random() * 24, dist: (r + 1) * CH + 70, tilt: (Math.random() - .5) * 5, dur: 580 });
 /* drop the listed [r,c] cells; plays landing sounds per row; returns the ms (unscaled) until the last touchdown */
+const LANDT = {};   // when each cell touches down (ms from the start of the drop): lets the MAX animation start the moment the third coin lands
 function dropCells(list, base = 0) {
   let end = 0; const rows = {};
-  list.forEach(([r, c]) => { const o = dropOpt(r, c, base); FX.drop(at(r, c), o); const t = o.delay + o.dur * .58; end = Math.max(end, t); rows[r] = Math.min(rows[r] == null ? 1e9 : rows[r], t); });
+  list.forEach(([r, c]) => { const o = dropOpt(r, c, base); FX.drop(at(r, c), o); const t = o.delay + o.dur * .58; LANDT[r * 10 + c] = t; end = Math.max(end, t); rows[r] = Math.min(rows[r] == null ? 1e9 : rows[r], t); });
   Object.keys(rows).forEach(r => after(rows[r], () => sfx.land(+r)));
   return end;
 }
@@ -2709,10 +2726,12 @@ function fadeLinks(ms) { ['lnkB', 'lnkT'].forEach(id => { const l = document.get
 async function playSpin(sp, runningFrom, ctx) {
   const stake = ctx.stake, onWin = ctx.onWin;
   smithStrike();
-  paint(sp.initialGrid); sfx.drop(); const e0 = dropTease(sp.initialGrid).end;
+  paint(sp.initialGrid); sfx.drop(); for (const k in LANDT) delete LANDT[k]; const e0 = dropTease(sp.initialGrid).end;
   const coins = ALL.filter(([r, c]) => sp.initialGrid[r][c] === COIN);
-  coins.forEach(([r, c], i) => after(e0 - 120 + i * 40, () => { sfx.maxLand(i); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 12, SHARD[5], { power: 1 }); flash(1.2); }));
-  await wait(e0 + 170);
+  coins.forEach(([r, c], i) => after(Math.max(0, (LANDT[r * 10 + c] || e0) - 60), () => { sfx.maxLand(i); const b = at(r, c).getBoundingClientRect(); FX.shards(b.left + b.width / 2, b.top + b.height / 2, 12, SHARD[5], { power: 1 }); flash(1.2); }));
+  const hit3 = coins.length >= 3, tCoin = hit3 ? Math.max(...coins.map(([r, c]) => LANDT[r * 10 + c] || e0)) : 0;
+  await wait(hit3 ? Math.min(e0 + 170, tCoin + 90) : e0 + 170);
+  if (hit3) GRID.getAnimations({ subtree: true }).forEach(a => { try { a.finish(); } catch {} });   // the third coin is down: finish the rest of the drop at once so the MAX animation starts now
   if (coins.length) {
     if (coins.length >= 3) {
       GRID.classList.add('focus'); coins.forEach(([r, c], i) => { FX.act(at(r, c), i * 200, i); at(r, c).classList.add('scat'); if (i) seam(ctrOf(coins[i - 1][0], coins[i - 1][1]), ctrOf(r, c), i * 200 - 100, 240); });
