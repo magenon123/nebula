@@ -2,7 +2,7 @@
  "id": "siroccos-lamp-bazaar",
  "title": "Sirocco's Lamp Bazaar",
  "logoText": "SIROCCO'S LAMP BAZAAR",
- "infoTitle": "SIROCCO'S LAMP BAZAAR · HOW IT PLAYS",
+ "infoTitle": "SIROCCO'S LAMP BAZAAR \u00b7 HOW IT PLAYS",
  "api": "/api/slot/siroccos-lamp-bazaar/spin",
  "engineSource": "slotforge/engines/siroccos-lamp-bazaar.js",
  "storage": "slb",
@@ -170,8 +170,28 @@
   "sym": 9,
   "vol": 3,
   "text": "Pay 2x per spin: bonuses trigger about three times as often and Wish Gems sometimes arrive for free. Stays on until you switch it off.",
-  "badge": "FAVOUR ×2",
+  "badge": "FAVOUR \u00d72",
   "onMsg": "DJINN'S FAVOUR ON. TOTAL BET x2",
   "offMsg": "DJINN'S FAVOUR OFF"
+ },
+ "loading": {
+  "volatility": 4,
+  "features": [
+   {
+    "sym": 8,
+    "title": "SEALED CHAIN",
+    "text": "3 or more in a line are sealed in gold and the rest respin. Each link raises the multiplier to x5, and Wish Gems multiply the whole chain."
+   },
+   {
+    "sym": 10,
+    "title": "FREE WISHES",
+    "text": "Land 3 FS for free spins where the multiplier never resets. 4 FS start the Super round."
+   },
+   {
+    "sym": 11,
+    "title": "ASTROLABE OF WISHES",
+    "text": "Three rings stop one after another for cash, a multiplier and a jackpot of up to 2,500x."
+   }
+  ]
  }
 }

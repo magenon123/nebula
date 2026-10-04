@@ -169,5 +169,20 @@
   "badge": "MAX LUCK \u00d7392",
   "onMsg": "MAX LUCK ON. TOTAL BET x392",
   "offMsg": "MAX LUCK OFF"
+ },
+ "loading": {
+  "volatility": 4,
+  "features": [
+   {
+    "sym": 9,
+    "title": "DRIFTING JELLY",
+    "text": "Lantern Jellies are wild, grow every drift and float left. Their values add in a reel, and the reels multiply."
+   },
+   {
+    "sym": 10,
+    "title": "DEEP DIVE",
+    "text": "Land 3 Sonar Buoys for 8 free dives. The Tide rises, the Jellies grow, and a Jelly is guaranteed every third dive."
+   }
+  ]
  }
 }

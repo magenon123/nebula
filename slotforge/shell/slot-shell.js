@@ -374,12 +374,17 @@ function askBuy(kind) {
 function closeBuy(ok) { if (ok) { sfx.hit(); ante = false; luck = false; refreshUi(); } const k = pendingBuy; pendingBuy = null; closeM('confirm'); if (ok && k) go(k); }
 $('cYes').onclick = () => closeBuy(true);
 $('cNo').onclick = () => closeBuy(false);
-$('buyOpen').onclick = () => { if (busy) return; sfx.ui(); refreshUi(); openM('buyM'); };
+$('buyOpen').onclick = () => {
+  if (busy) return;
+  if (ante || luck) { const m = luck ? cfg.luck : cfg.fever; ante = false; luck = false; sfx.ui(); refreshUi(); say(m.offMsg); return; }   // tap the glowing sign again: mode off
+  sfx.ui(); refreshUi(); openM('buyM');
+};
 $('bbM').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
 $('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
 
 const mult = () => luck ? LUCK_COST : ante ? ANTE_COST : 1;
 function refreshUi() {
+  $('buyOpen').classList.toggle('lit', ante || luck); $('buyOpen').title = (ante || luck) ? 'Tap to switch the active mode off' : 'Bonus buy';
   const s = BETS[bi], risk = s * mult(); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
   $('barR').classList.toggle('hot', ante || luck); $('betLbl').textContent = ante || luck ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !(ante || luck); $('feverBadge').textContent = luck ? cfg.luck.badge : cfg.fever ? cfg.fever.badge : '';
   if (LUCK_COST) { $('luck').textContent = luck ? 'DEACTIVATE' : 'ACTIVATE'; $('luck').classList.toggle('or', !luck); $('luck').classList.toggle('off', luck); }
@@ -420,6 +425,7 @@ $('bInfo').onclick = () => { closeMenu(); openM('infoM'); };
 $('bFs').onclick = () => { closeMenu(); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch {} };
 addEventListener('keydown', e => {
   if (e.code === 'Escape') { for (const m of ['confirm', 'buyM', 'autoM', 'infoM']) if (!$(m).hidden) { m === 'confirm' ? closeBuy(false) : closeM(m); return; } closeMenu(); }
+  if (document.getElementById('loadM')) return;
   if (document.querySelector('.modal:not([hidden])')) return;
   if (e.code === 'Space') { e.preventDefault(); if (!busy) go(null); else speedUp(); }
 });
@@ -464,6 +470,26 @@ if (hooks.splashArt) for (const k of ['intro', 'outro']) $(k + 'M').querySelecto
 
 hooks.init(S);
 hooks.paintIdle();
+/* loading screen, then the 'what is in this game' screen (click to continue); data from slot.json 'loading' */
+(function loadingScreen() {
+  const el = $('loadM'), L = cfg.loading || {}; if (!el) return;
+  if (navigator.webdriver && !/[?&]load=1/.test(location.search)) { el.remove(); return; }   // automated tests skip the screen (add ?load=1 to see it)
+  const logo = document.getElementById('logo'); if (logo) { const c = logo.cloneNode(true); c.removeAttribute('id'); c.removeAttribute('filter'); c.style.cssText = ''; $('lmLogo').appendChild(c); } else $('lmLogo').innerHTML = `<div class="lmBig">${cfg.logoText || ''}</div>`;
+  const cards = (L.features || []).map(f => ({ title: f.title, text: f.text, ico: f.sym != null ? sym(f.sym) : (f.svg || ''), big: f.big }));
+  cards.push({ title: 'MAX WIN', text: L.maxText || `Win up to ${cfg.maxWin.toLocaleString('en-US')} times your bet.`, big: cfg.maxWin.toLocaleString('en-US') + 'x' });
+  $('lmCards').innerHTML = cards.map(c => `<div class="lmCard"><div class="lmIco">${c.big ? `<div class="lmBig">${c.big}</div>` : c.ico}</div><h3>${c.title}</h3><p>${c.text}</p></div>`).join('');
+  if (L.volatility) $('lmVol').innerHTML = 'VOLATILITY <b>' + [1, 2, 3, 4, 5].map(i => `<i class="${i <= L.volatility ? 'on' : ''}"></i>`).join('') + '</b>';
+  else $('lmVol').remove();
+  const t0 = performance.now(), MIN = 1900; let fill = 0;
+  const tick = () => { fill = Math.min(95, (performance.now() - t0) / MIN * 100); $('lmFill').style.width = fill + '%'; if (!el.classList.contains('ready')) requestAnimationFrame(tick); };
+  tick();
+  const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  Promise.all([fontsReady, new Promise(r => setTimeout(r, MIN))]).then(() => {
+    $('lmFill').style.width = '100%'; $('lmTxt').textContent = 'READY';
+    setTimeout(() => { el.classList.add('ready'); const go = e => { if (e.type === 'keydown' && !['Space', 'Enter'].includes(e.code)) return; e.preventDefault(); removeEventListener('keydown', go); el.classList.add('out'); setTimeout(() => el.remove(), 700); };
+      el.addEventListener('pointerdown', go, { once: true }); addEventListener('keydown', go); }, 350);
+  });
+})();
 refreshUi();
 say(cfg.text.idle + (LOCAL ? ' (Play-money demo)' : ''));
 if (LOCAL) { balance = wallet; $('bal').textContent = fmt(balance); }

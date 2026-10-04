@@ -214,3 +214,36 @@ button:disabled{cursor:not-allowed}
 @keyframes mwPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
 #big.maxwin #bigX{color:#2a1604;font-size:24px;text-shadow:0 2px 0 rgba(255,240,170,.7)}
 #big.maxwin #bigTag{font-size:clamp(22px,3.4vw,40px);color:#fff7c8;text-shadow:3px 4px 0 #1d1004,0 0 18px rgba(255,220,100,.9);letter-spacing:3px}
+
+/* Bonus Buy sign glows while a luck / bet-up mode is on; tapping it again switches the mode off */
+#buyOpen.lit .plq{box-shadow:inset 0 0 0 4px #ffd23a,0 0 38px rgba(255,200,40,.95),0 0 90px rgba(255,160,20,.6),0 8px 0 rgba(0,0,0,.45);animation:signLit 1.1s ease-in-out infinite alternate}
+@keyframes signLit{from{filter:brightness(1)}to{filter:brightness(1.35) saturate(1.2)}}
+#buyOpen.lit::after{content:"ON";position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);padding:1px 16px 0;border-radius:99px;background:#ffd23a;color:#1b1208;border:3px solid var(--ink);font-family:var(--toon);font-size:20px;letter-spacing:2px;box-shadow:0 3px 0 rgba(0,0,0,.45)}
+
+/* loading screen + "what's in this game" screen */
+#loadM{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.2vh;background:radial-gradient(ellipse at 50% 40%,rgba(10,14,28,.72),rgba(4,6,12,.94));backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);transition:opacity .6s ease;cursor:default;user-select:none}
+#loadM.out{opacity:0;pointer-events:none}
+#loadM .lmLogo{width:min(62vw,780px);filter:drop-shadow(0 8px 0 rgba(0,0,0,.45)) drop-shadow(0 0 30px var(--accent,#ffb02e))}
+#loadM .lmLogo svg{width:100%;height:auto;display:block;overflow:visible}
+#loadM .lmBar{width:min(46vw,520px);height:16px;border-radius:99px;border:4px solid var(--ink,#111);background:rgba(0,0,0,.55);box-shadow:inset 0 3px 6px rgba(0,0,0,.6),0 0 0 2px var(--gold,#ffd95e);overflow:hidden}
+#loadM .lmBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc2,#ff6a1a),var(--gold,#ffd95e));border-radius:99px;transition:width .25s linear}
+#loadM .lmTxt{font-family:var(--toon);font-size:clamp(18px,2.4vw,28px);letter-spacing:5px;color:var(--gold,#ffd95e);text-shadow:2px 3px 0 var(--ink,#000);animation:lmPulse 1.2s ease-in-out infinite alternate}
+@keyframes lmPulse{from{opacity:.55}to{opacity:1}}
+#loadM .lmVol{display:none;font-family:var(--toon);letter-spacing:3px;font-size:clamp(14px,1.8vw,22px);color:#fff;background:linear-gradient(var(--acc1,#e8503a),var(--acc2,#8a1c06));padding:4px 22px 2px;border-radius:10px 10px 18px 18px;border:4px solid var(--ink,#111);box-shadow:0 5px 0 rgba(0,0,0,.45)}
+#loadM .lmVol b{display:inline-block;margin-left:10px;letter-spacing:2px}
+#loadM .lmVol b i{display:inline-block;width:.8em;height:1em;margin:0 2px;background:#ffd95e;clip-path:polygon(50% 0,63% 36%,100% 36%,70% 58%,82% 100%,50% 74%,18% 100%,30% 58%,0 36%,37% 36%);opacity:.3}
+#loadM .lmVol b i.on{opacity:1}
+#loadM .lmCards{display:none;gap:clamp(10px,1.6vw,26px);justify-content:center;flex-wrap:wrap;max-width:94vw}
+#loadM .lmCard{width:clamp(180px,22vw,300px);padding:clamp(14px,2.2vh,26px) clamp(12px,1.4vw,22px);text-align:center;border-radius:20px 14px 22px 16px;border:5px solid var(--ink,#111);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(0,0,0,.35)),var(--panel,#2a1d26);box-shadow:inset 0 0 0 3px var(--gold,#ffd95e),0 12px 0 rgba(0,0,0,.45),0 0 40px rgba(0,0,0,.5);animation:lmIn .6s cubic-bezier(.2,1.3,.4,1) both}
+#loadM .lmCard:nth-child(2){animation-delay:.12s}#loadM .lmCard:nth-child(3){animation-delay:.24s}#loadM .lmCard:nth-child(4){animation-delay:.36s}
+@keyframes lmIn{from{opacity:0;transform:translateY(40px) scale(.85)}to{opacity:1;transform:none}}
+#loadM .lmIco{height:clamp(70px,13vh,120px);display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+#loadM .lmIco svg{height:100%;width:auto;overflow:visible;filter:drop-shadow(0 5px 0 rgba(0,0,0,.45)) drop-shadow(0 0 16px var(--accent,#ffb02e))}
+#loadM .lmBig{font-family:var(--toon);font-size:clamp(34px,5.4vw,70px);line-height:1;color:#fff;-webkit-text-stroke:5px var(--ink,#000);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink,#000),0 0 28px var(--accent,#ffb02e)}
+#loadM .lmCard h3{margin:6px 0 8px;font-family:var(--toon);font-weight:400;font-size:clamp(18px,2.2vw,30px);letter-spacing:1.5px;color:var(--gold,#ffd95e);text-shadow:2px 3px 0 var(--ink,#000)}
+#loadM .lmCard p{margin:0;font-size:clamp(12px,1.3vw,17px);line-height:1.4;font-weight:700;color:#f3e9e0;text-shadow:0 2px 0 rgba(0,0,0,.6)}
+#loadM .lmTap{display:none;font-family:var(--toon);font-size:clamp(22px,3vw,40px);letter-spacing:4px;color:#fff3c8;text-shadow:3px 4px 0 var(--ink,#000),0 0 22px var(--accent,#ffb02e);animation:lmPulse 1s ease-in-out infinite alternate;cursor:pointer}
+#loadM.ready{cursor:pointer}
+#loadM.ready .lmBar,#loadM.ready .lmTxt{display:none}
+#loadM.ready .lmVol{display:inline-block}#loadM.ready .lmCards{display:flex}#loadM.ready .lmTap{display:block}
+#loadM.ready .lmLogo{width:min(40vw,500px)}

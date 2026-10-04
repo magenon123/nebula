@@ -222,6 +222,39 @@ button:disabled{cursor:not-allowed}
 #big.maxwin #bigX{color:#2a1604;font-size:24px;text-shadow:0 2px 0 rgba(255,240,170,.7)}
 #big.maxwin #bigTag{font-size:clamp(22px,3.4vw,40px);color:#fff7c8;text-shadow:3px 4px 0 #1d1004,0 0 18px rgba(255,220,100,.9);letter-spacing:3px}
 
+/* Bonus Buy sign glows while a luck / bet-up mode is on; tapping it again switches the mode off */
+#buyOpen.lit .plq{box-shadow:inset 0 0 0 4px #ffd23a,0 0 38px rgba(255,200,40,.95),0 0 90px rgba(255,160,20,.6),0 8px 0 rgba(0,0,0,.45);animation:signLit 1.1s ease-in-out infinite alternate}
+@keyframes signLit{from{filter:brightness(1)}to{filter:brightness(1.35) saturate(1.2)}}
+#buyOpen.lit::after{content:"ON";position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);padding:1px 16px 0;border-radius:99px;background:#ffd23a;color:#1b1208;border:3px solid var(--ink);font-family:var(--toon);font-size:20px;letter-spacing:2px;box-shadow:0 3px 0 rgba(0,0,0,.45)}
+
+/* loading screen + "what's in this game" screen */
+#loadM{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.2vh;background:radial-gradient(ellipse at 50% 40%,rgba(10,14,28,.72),rgba(4,6,12,.94));backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);transition:opacity .6s ease;cursor:default;user-select:none}
+#loadM.out{opacity:0;pointer-events:none}
+#loadM .lmLogo{width:min(62vw,780px);filter:drop-shadow(0 8px 0 rgba(0,0,0,.45)) drop-shadow(0 0 30px var(--accent,#ffb02e))}
+#loadM .lmLogo svg{width:100%;height:auto;display:block;overflow:visible}
+#loadM .lmBar{width:min(46vw,520px);height:16px;border-radius:99px;border:4px solid var(--ink,#111);background:rgba(0,0,0,.55);box-shadow:inset 0 3px 6px rgba(0,0,0,.6),0 0 0 2px var(--gold,#ffd95e);overflow:hidden}
+#loadM .lmBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc2,#ff6a1a),var(--gold,#ffd95e));border-radius:99px;transition:width .25s linear}
+#loadM .lmTxt{font-family:var(--toon);font-size:clamp(18px,2.4vw,28px);letter-spacing:5px;color:var(--gold,#ffd95e);text-shadow:2px 3px 0 var(--ink,#000);animation:lmPulse 1.2s ease-in-out infinite alternate}
+@keyframes lmPulse{from{opacity:.55}to{opacity:1}}
+#loadM .lmVol{display:none;font-family:var(--toon);letter-spacing:3px;font-size:clamp(14px,1.8vw,22px);color:#fff;background:linear-gradient(var(--acc1,#e8503a),var(--acc2,#8a1c06));padding:4px 22px 2px;border-radius:10px 10px 18px 18px;border:4px solid var(--ink,#111);box-shadow:0 5px 0 rgba(0,0,0,.45)}
+#loadM .lmVol b{display:inline-block;margin-left:10px;letter-spacing:2px}
+#loadM .lmVol b i{display:inline-block;width:.8em;height:1em;margin:0 2px;background:#ffd95e;clip-path:polygon(50% 0,63% 36%,100% 36%,70% 58%,82% 100%,50% 74%,18% 100%,30% 58%,0 36%,37% 36%);opacity:.3}
+#loadM .lmVol b i.on{opacity:1}
+#loadM .lmCards{display:none;gap:clamp(10px,1.6vw,26px);justify-content:center;flex-wrap:wrap;max-width:94vw}
+#loadM .lmCard{width:clamp(180px,22vw,300px);padding:clamp(14px,2.2vh,26px) clamp(12px,1.4vw,22px);text-align:center;border-radius:20px 14px 22px 16px;border:5px solid var(--ink,#111);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(0,0,0,.35)),var(--panel,#2a1d26);box-shadow:inset 0 0 0 3px var(--gold,#ffd95e),0 12px 0 rgba(0,0,0,.45),0 0 40px rgba(0,0,0,.5);animation:lmIn .6s cubic-bezier(.2,1.3,.4,1) both}
+#loadM .lmCard:nth-child(2){animation-delay:.12s}#loadM .lmCard:nth-child(3){animation-delay:.24s}#loadM .lmCard:nth-child(4){animation-delay:.36s}
+@keyframes lmIn{from{opacity:0;transform:translateY(40px) scale(.85)}to{opacity:1;transform:none}}
+#loadM .lmIco{height:clamp(70px,13vh,120px);display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+#loadM .lmIco svg{height:100%;width:auto;overflow:visible;filter:drop-shadow(0 5px 0 rgba(0,0,0,.45)) drop-shadow(0 0 16px var(--accent,#ffb02e))}
+#loadM .lmBig{font-family:var(--toon);font-size:clamp(34px,5.4vw,70px);line-height:1;color:#fff;-webkit-text-stroke:5px var(--ink,#000);paint-order:stroke fill;text-shadow:0 5px 0 var(--ink,#000),0 0 28px var(--accent,#ffb02e)}
+#loadM .lmCard h3{margin:6px 0 8px;font-family:var(--toon);font-weight:400;font-size:clamp(18px,2.2vw,30px);letter-spacing:1.5px;color:var(--gold,#ffd95e);text-shadow:2px 3px 0 var(--ink,#000)}
+#loadM .lmCard p{margin:0;font-size:clamp(12px,1.3vw,17px);line-height:1.4;font-weight:700;color:#f3e9e0;text-shadow:0 2px 0 rgba(0,0,0,.6)}
+#loadM .lmTap{display:none;font-family:var(--toon);font-size:clamp(22px,3vw,40px);letter-spacing:4px;color:#fff3c8;text-shadow:3px 4px 0 var(--ink,#000),0 0 22px var(--accent,#ffb02e);animation:lmPulse 1s ease-in-out infinite alternate;cursor:pointer}
+#loadM.ready{cursor:pointer}
+#loadM.ready .lmBar,#loadM.ready .lmTxt{display:none}
+#loadM.ready .lmVol{display:inline-block}#loadM.ready .lmCards{display:flex}#loadM.ready .lmTap{display:block}
+#loadM.ready .lmLogo{width:min(40vw,500px)}
+
 /* EmberClaw slot CSS: scene wash, frame/grid/cells, Forge Core (side mechanic), Brann (character). The shell CSS loads first.
    NOTE: the eyes use the shell's @keyframes blink (the original file had two 'blink' keyframes and the later, opacity one won; kept identical). */
 .heatwash{left:-1500px;top:-1000px;width:4600px;height:2900px;pointer-events:none;background:radial-gradient(60% 50% at 50% 100%,rgba(255,80,10,calc(var(--heat)*.025)),transparent 70%);transition:background .6s}
@@ -354,6 +387,7 @@ button:disabled{cursor:not-allowed}
 .cell.maxs svg.g{filter:drop-shadow(0 0 12px rgba(255,210,58,.8));animation:wob 1.6s ease-in-out infinite alternate}
 
 </style></head><body>
+<div id="loadM"><div class="lmLogo" id="lmLogo"></div><div class="lmVol" id="lmVol"></div><div class="lmCards" id="lmCards"></div><div class="lmBar"><i id="lmFill"></i></div><div class="lmTxt" id="lmTxt">LOADING</div><div class="lmTap" id="lmTap">CLICK TO CONTINUE</div></div>
 
 <!-- ============ shared defs (wobble filters, hatch patterns) + this slot's symbols ============ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -1383,7 +1417,7 @@ button:disabled{cursor:not-allowed}
 <script>
 'use strict';
 /* ---- slot config (slots/emberclaw/slot.json) ---- */
-const SLOT_CFG = {"id": "emberclaw", "title": "EmberClaw: Molten Reforge", "logoText": "EMBERCLAW", "infoTitle": "EMBERCLAW · MOLTEN REFORGE", "api": "/api/emberclaw/spin", "engineSource": "emberclaw-engine.js", "storage": "ec", "walletKey": "emberclawWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 9500, "anteCost": 3, "scatterSym": 8, "char": {"el": "char", "states": ["swing", "win", "big", "boom"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "LEGENDARY", "lv": 4}, {"min": 25, "name": "FORGED", "lv": 3}, {"min": 10, "name": "MOLTEN", "lv": 2}, {"min": 5, "name": "SPARK", "lv": 1}], "autoBigLv": 3, "text": {"idle": "Strike the anvil.", "win": "YOU FORGED {amt}", "lose": "Cold iron. Strike again.", "freeSpin": "Free spin {n}", "freeSpinRetrigger": "  ·  +{r} SPINS!"}, "fever": {"name": "Forge Fever", "sym": 8, "vol": 3, "text": "Each spin costs 3x your bet, but the bonus game is 5 times more likely to trigger!", "badge": "FORGE FEVER ×3", "onMsg": "FORGE FEVER ON · 5x BONUS CHANCE", "offMsg": "Forge Fever off"}, "buys": [{"key": "standard", "mult": 100, "sym": 6, "vol": 4, "name": "The Reforging", "text": "10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.", "confirmTitle": "THE REFORGING", "confirmText": "Skip straight to 10 free spins. The Forge Core heat carries over between spins."}, {"key": "preheated", "mult": 500, "sym": 7, "vol": 5, "name": "Pre-Heated", "text": "The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.", "confirmTitle": "PRE-HEATED", "confirmText": "10 free spins with the Forge Core already at 6 heat: you start with a reforged Wild and the Core primed."}], "intro": {"unit": "FREE SPINS", "ribbon": "THE REFORGING", "chips": ["THE CORE KEEPS ITS HEAT", "EVERY 3RD SPIN: GUARANTEED DETONATION", "2+ GEMS: +4 SPINS"]}, "outro": {"ribbon": "BONUS COMPLETE"}, "audio": {"reverb": {"sec": 1.7, "pow": 2.8, "wet": 0.28}}, "luckCost": 496, "luck": {"name": "MAX LUCK", "sym": 9, "vol": 5, "text": "Pay 496x per spin and keep it on. Every spin has a 5% chance of landing 3 golden MAX coins and winning 9,500x your bet. Leave it on for as many spins as you like.", "badge": "MAX LUCK ×496", "onMsg": "MAX LUCK ON. TOTAL BET x496", "offMsg": "MAX LUCK OFF"}, "engineData": {"paytable": [[0.1, 0.25, 0.5, 1.5], [0.15, 0.3, 0.6, 1.75], [0.2, 0.4, 0.8, 2], [0.4, 1, 2.5, 6], [0.6, 1.5, 3.5, 9], [1.5, 4, 10, 25], [3, 8, 20, 50]], "payScale": 1.049, "scatterPay": null}};
+const SLOT_CFG = {"id": "emberclaw", "title": "EmberClaw: Molten Reforge", "logoText": "EMBERCLAW", "infoTitle": "EMBERCLAW · MOLTEN REFORGE", "api": "/api/emberclaw/spin", "engineSource": "emberclaw-engine.js", "storage": "ec", "walletKey": "emberclawWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 9500, "anteCost": 3, "scatterSym": 8, "char": {"el": "char", "states": ["swing", "win", "big", "boom"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "LEGENDARY", "lv": 4}, {"min": 25, "name": "FORGED", "lv": 3}, {"min": 10, "name": "MOLTEN", "lv": 2}, {"min": 5, "name": "SPARK", "lv": 1}], "autoBigLv": 3, "text": {"idle": "Strike the anvil.", "win": "YOU FORGED {amt}", "lose": "Cold iron. Strike again.", "freeSpin": "Free spin {n}", "freeSpinRetrigger": "  ·  +{r} SPINS!"}, "fever": {"name": "Forge Fever", "sym": 8, "vol": 3, "text": "Each spin costs 3x your bet, but the bonus game is 5 times more likely to trigger!", "badge": "FORGE FEVER ×3", "onMsg": "FORGE FEVER ON · 5x BONUS CHANCE", "offMsg": "Forge Fever off"}, "buys": [{"key": "standard", "mult": 100, "sym": 6, "vol": 4, "name": "The Reforging", "text": "10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.", "confirmTitle": "THE REFORGING", "confirmText": "Skip straight to 10 free spins. The Forge Core heat carries over between spins."}, {"key": "preheated", "mult": 500, "sym": 7, "vol": 5, "name": "Pre-Heated", "text": "The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.", "confirmTitle": "PRE-HEATED", "confirmText": "10 free spins with the Forge Core already at 6 heat: you start with a reforged Wild and the Core primed."}], "intro": {"unit": "FREE SPINS", "ribbon": "THE REFORGING", "chips": ["THE CORE KEEPS ITS HEAT", "EVERY 3RD SPIN: GUARANTEED DETONATION", "2+ GEMS: +4 SPINS"]}, "outro": {"ribbon": "BONUS COMPLETE"}, "audio": {"reverb": {"sec": 1.7, "pow": 2.8, "wet": 0.28}}, "luckCost": 496, "luck": {"name": "MAX LUCK", "sym": 9, "vol": 5, "text": "Pay 496x per spin and keep it on. Every spin has a 5% chance of landing 3 golden MAX coins and winning 9,500x your bet. Leave it on for as many spins as you like.", "badge": "MAX LUCK ×496", "onMsg": "MAX LUCK ON. TOTAL BET x496", "offMsg": "MAX LUCK OFF"}, "loading": {"volatility": 4, "features": [{"sym": 7, "title": "FORGE HEAT", "text": "Every cluster stokes the Core. At 3 heat every win gets a flat bonus, at 6 a wild is reforged, at 9 the Core detonates and doubles every wild."}, {"sym": 8, "title": "THE REFORGING", "text": "Land 3 Forgefire Gems for 10 free spins. The heat never cools and the wilds snowball. 2 more gems add 4 spins."}]}, "engineData": {"paytable": [[0.1, 0.25, 0.5, 1.5], [0.15, 0.3, 0.6, 1.75], [0.2, 0.4, 0.8, 2], [0.4, 1, 2.5, 6], [0.6, 1.5, 3.5, 9], [1.5, 4, 10, 25], [3, 8, 20, 50]], "payScale": 1.049, "scatterPay": null}};
 /* ---- STANDALONE MODE: the server engine is embedded and runs locally with play money. ---- */
 const SLOT_ENGINE = (() => {
 /* EMBERCLAW: Molten Reforge — server-side game engine.
@@ -2208,12 +2242,17 @@ function askBuy(kind) {
 function closeBuy(ok) { if (ok) { sfx.hit(); ante = false; luck = false; refreshUi(); } const k = pendingBuy; pendingBuy = null; closeM('confirm'); if (ok && k) go(k); }
 $('cYes').onclick = () => closeBuy(true);
 $('cNo').onclick = () => closeBuy(false);
-$('buyOpen').onclick = () => { if (busy) return; sfx.ui(); refreshUi(); openM('buyM'); };
+$('buyOpen').onclick = () => {
+  if (busy) return;
+  if (ante || luck) { const m = luck ? cfg.luck : cfg.fever; ante = false; luck = false; sfx.ui(); refreshUi(); say(m.offMsg); return; }   // tap the glowing sign again: mode off
+  sfx.ui(); refreshUi(); openM('buyM');
+};
 $('bbM').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
 $('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
 
 const mult = () => luck ? LUCK_COST : ante ? ANTE_COST : 1;
 function refreshUi() {
+  $('buyOpen').classList.toggle('lit', ante || luck); $('buyOpen').title = (ante || luck) ? 'Tap to switch the active mode off' : 'Bonus buy';
   const s = BETS[bi], risk = s * mult(); $('betV').style.fontSize = risk >= 10000 ? '22px' : risk >= 1000 ? '26px' : risk >= 100 ? '29px' : '';
   $('barR').classList.toggle('hot', ante || luck); $('betLbl').textContent = ante || luck ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !(ante || luck); $('feverBadge').textContent = luck ? cfg.luck.badge : cfg.fever ? cfg.fever.badge : '';
   if (LUCK_COST) { $('luck').textContent = luck ? 'DEACTIVATE' : 'ACTIVATE'; $('luck').classList.toggle('or', !luck); $('luck').classList.toggle('off', luck); }
@@ -2254,6 +2293,7 @@ $('bInfo').onclick = () => { closeMenu(); openM('infoM'); };
 $('bFs').onclick = () => { closeMenu(); try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); } catch {} };
 addEventListener('keydown', e => {
   if (e.code === 'Escape') { for (const m of ['confirm', 'buyM', 'autoM', 'infoM']) if (!$(m).hidden) { m === 'confirm' ? closeBuy(false) : closeM(m); return; } closeMenu(); }
+  if (document.getElementById('loadM')) return;
   if (document.querySelector('.modal:not([hidden])')) return;
   if (e.code === 'Space') { e.preventDefault(); if (!busy) go(null); else speedUp(); }
 });
@@ -2298,6 +2338,26 @@ if (hooks.splashArt) for (const k of ['intro', 'outro']) $(k + 'M').querySelecto
 
 hooks.init(S);
 hooks.paintIdle();
+/* loading screen, then the 'what is in this game' screen (click to continue); data from slot.json 'loading' */
+(function loadingScreen() {
+  const el = $('loadM'), L = cfg.loading || {}; if (!el) return;
+  if (navigator.webdriver && !/[?&]load=1/.test(location.search)) { el.remove(); return; }   // automated tests skip the screen (add ?load=1 to see it)
+  const logo = document.getElementById('logo'); if (logo) { const c = logo.cloneNode(true); c.removeAttribute('id'); c.removeAttribute('filter'); c.style.cssText = ''; $('lmLogo').appendChild(c); } else $('lmLogo').innerHTML = `<div class="lmBig">${cfg.logoText || ''}</div>`;
+  const cards = (L.features || []).map(f => ({ title: f.title, text: f.text, ico: f.sym != null ? sym(f.sym) : (f.svg || ''), big: f.big }));
+  cards.push({ title: 'MAX WIN', text: L.maxText || `Win up to ${cfg.maxWin.toLocaleString('en-US')} times your bet.`, big: cfg.maxWin.toLocaleString('en-US') + 'x' });
+  $('lmCards').innerHTML = cards.map(c => `<div class="lmCard"><div class="lmIco">${c.big ? `<div class="lmBig">${c.big}</div>` : c.ico}</div><h3>${c.title}</h3><p>${c.text}</p></div>`).join('');
+  if (L.volatility) $('lmVol').innerHTML = 'VOLATILITY <b>' + [1, 2, 3, 4, 5].map(i => `<i class="${i <= L.volatility ? 'on' : ''}"></i>`).join('') + '</b>';
+  else $('lmVol').remove();
+  const t0 = performance.now(), MIN = 1900; let fill = 0;
+  const tick = () => { fill = Math.min(95, (performance.now() - t0) / MIN * 100); $('lmFill').style.width = fill + '%'; if (!el.classList.contains('ready')) requestAnimationFrame(tick); };
+  tick();
+  const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  Promise.all([fontsReady, new Promise(r => setTimeout(r, MIN))]).then(() => {
+    $('lmFill').style.width = '100%'; $('lmTxt').textContent = 'READY';
+    setTimeout(() => { el.classList.add('ready'); const go = e => { if (e.type === 'keydown' && !['Space', 'Enter'].includes(e.code)) return; e.preventDefault(); removeEventListener('keydown', go); el.classList.add('out'); setTimeout(() => el.remove(), 700); };
+      el.addEventListener('pointerdown', go, { once: true }); addEventListener('keydown', go); }, 350);
+  });
+})();
 refreshUi();
 say(cfg.text.idle + (LOCAL ? ' (Play-money demo)' : ''));
 if (LOCAL) { balance = wallet; $('bal').textContent = fmt(balance); }

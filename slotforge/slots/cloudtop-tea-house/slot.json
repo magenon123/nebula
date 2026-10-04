@@ -173,5 +173,20 @@
   "badge": "FS LUCK \u00d72",
   "onMsg": "FS LUCK ON. TOTAL BET x2",
   "offMsg": "FS LUCK OFF"
+ },
+ "loading": {
+  "volatility": 4,
+  "features": [
+   {
+    "sym": 10,
+    "title": "TIN RUSH",
+    "text": "Land 6 Tea Tins for a hold-and-win round. Complete a row for the Kite Launch that doubles it, fill the board for the Grand Dragon Kite."
+   },
+   {
+    "sym": 16,
+    "title": "FREE SPINS",
+    "text": "3 FS drums give 10 free spins, 4 FS give the Super round. Every drawer that helps a win steeps and pays more next time."
+   }
+  ]
  }
 }

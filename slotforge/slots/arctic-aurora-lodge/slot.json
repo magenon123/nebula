@@ -2,7 +2,7 @@
  "id": "arctic-aurora-lodge",
  "title": "Arctic Aurora Lodge: Trapper's Night",
  "logoText": "ARCTIC AURORA LODGE",
- "infoTitle": "ARCTIC AURORA LODGE · HOW IT PLAYS",
+ "infoTitle": "ARCTIC AURORA LODGE \u00b7 HOW IT PLAYS",
  "api": "/api/slot/arctic-aurora-lodge/spin",
  "engineSource": "slotforge/engines/arctic-aurora-lodge.js",
  "storage": "aal",
@@ -160,8 +160,28 @@
   "sym": 9,
   "vol": 3,
   "text": "Pay 2x per spin: more giant ice blocks land and the FS embers and Aurora Gems come about 1.5 times as often. Stays on until you switch it off.",
-  "badge": "LIGHTS ×2",
+  "badge": "LIGHTS \u00d72",
   "onMsg": "NORTHERN LIGHTS ON. TOTAL BET x2",
   "offMsg": "NORTHERN LIGHTS OFF"
+ },
+ "loading": {
+  "volatility": 3,
+  "features": [
+   {
+    "sym": 8,
+    "title": "GIANT ICE BLOCKS",
+    "text": "Win with 8 or more of a kind anywhere. Giant 2x2 and 3x3 blocks count all of their cells."
+   },
+   {
+    "sym": 10,
+    "title": "AURORA MUSE",
+    "text": "Land 3 FS for free spins. Each spin the aurora lights one symbol: it wins from 5 and its blocks count double."
+   },
+   {
+    "sym": 11,
+    "title": "AURORA SWEEP",
+    "text": "Land 4 Aurora Gems. Bands of light melt a 5x5 ice sheet, and cash crossed by several bands pays more."
+   }
+  ]
  }
 }

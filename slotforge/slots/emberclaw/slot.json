@@ -155,5 +155,20 @@
   "badge": "MAX LUCK \u00d7496",
   "onMsg": "MAX LUCK ON. TOTAL BET x496",
   "offMsg": "MAX LUCK OFF"
+ },
+ "loading": {
+  "volatility": 4,
+  "features": [
+   {
+    "sym": 7,
+    "title": "FORGE HEAT",
+    "text": "Every cluster stokes the Core. At 3 heat every win gets a flat bonus, at 6 a wild is reforged, at 9 the Core detonates and doubles every wild."
+   },
+   {
+    "sym": 8,
+    "title": "THE REFORGING",
+    "text": "Land 3 Forgefire Gems for 10 free spins. The heat never cools and the wilds snowball. 2 more gems add 4 spins."
+   }
+  ]
  }
 }
