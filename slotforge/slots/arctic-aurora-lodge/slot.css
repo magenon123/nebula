@@ -99,157 +99,173 @@
 #aura .gsLbl{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:900 9.5px/1 var(--toon);letter-spacing:2px;color:#7fa8d8}
 
 /* ===== char.css ===== */
-/* ---------- Aino + Tuuli (v3 illustration). Layers are separate <svg> elements so idle motion repaints only small layers.
-   Pivots are in design space (SVG user units inside the 1.18x scaled group). ---------- */
+/* ---------- Old Kalle Havu (v4 illustration, c3 pipeline). Layers are separate <svg> elements so idle motion repaints only small areas.
+   Pivots are in design space (480x410 viewBox, identical to px inside #char). ---------- */
 #char{left:1120px;top:340px;width:480px;height:410px;pointer-events:none;overflow:visible;--spd:1}
 #char .cl{position:absolute;left:0;top:0;width:480px;height:410px;overflow:visible;display:block}
-#char .cLG{position:absolute;left:15px;top:202px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(255,216,144,.8),rgba(255,168,64,.28) 50%,rgba(255,154,48,0) 72%);mix-blend-mode:screen;transform-origin:50% 50%;animation:cLf 2.6s ease-in-out infinite}
-@keyframes cLf{0%,100%{opacity:.8;transform:scale(1)}30%{opacity:1;transform:scale(1.08)}60%{opacity:.7;transform:scale(.94)}}
-#char #cMouth .m1,#char #cMouth .m2,#char #cDJaw .jo,#char #cBackS #cCorona{opacity:0}
-#char #cFog circle{opacity:0}
-/* shared transform origins */
-#cAino,#cAll{transform-origin:165px 358px}
-#cHead{transform-origin:168px 120px}#cBraid{transform-origin:204px 100px}
-#cArmR{transform-origin:208px 133px}#cForeR{transform-origin:243.7px 178.7px}#cArmL{transform-origin:124px 133px}#cForeL{transform-origin:93.3px 182.2px}
-#cLant{transform-origin:0px 56px}
-#cLids,#cBrows,#cMouth,.cEyeL,.cEyeR{transform-origin:169px 84px}
-.cPup,.cDPup{transform-box:fill-box;transform-origin:center}
-#cDog{transform-origin:386px 354px}#cDHead{transform-origin:352px 228px}#cDEarL{transform-origin:332px 172px}#cDEarR{transform-origin:348px 176px}#cDTail{transform-origin:447px 248px}#cDJaw{transform-origin:322px 214px}#cDBody{transform-origin:386px 340px}
-#cRays{transform-origin:240px 170px}
-/* ---------- IDLE: breathing (whole layer, compositor), blink, tail wag, braid + lantern sway, fog puffs ---------- */
-#cAinoS{animation:cBr 4s ease-in-out infinite;transform-origin:165px 358px;will-change:transform}
-@keyframes cBr{0%,100%{transform:scale(1,1)}50%{transform:scale(1.004,1.012)}}
-#cLids{animation:cBl 5.4s steps(1,end) infinite}
-@keyframes cBl{0%,94%{opacity:0}95%,97%{opacity:1}98%,100%{opacity:0}}
-#cDogS{animation:cBr 3.4s ease-in-out -1s infinite;transform-origin:386px 354px;will-change:transform}
-#cDTail{animation:cWag 2.8s ease-in-out infinite}
-@keyframes cWag{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(7deg)}}
-#cDEarL{animation:cEar 7s ease-in-out infinite}#cDEarR{animation:cEar 9s ease-in-out -3s infinite}
-@keyframes cEar{0%,90%,100%{transform:none}93%{transform:rotate(-8deg)}96%{transform:rotate(3deg)}}
-#cDLids{animation:cBl 6.6s steps(1,end) -2s infinite}
-#cFog .fg1{animation:cFg 4.4s ease-out infinite}#cFog .fg2{animation:cFg 4.4s ease-out -2.2s infinite}
-#cFog circle{transform-box:fill-box;transform-origin:center}
-@keyframes cFg{0%{opacity:0;transform:translate(0,3px) scale(.5)}20%{opacity:.7}100%{opacity:0;transform:translate(-18px,-12px) scale(2.2)}}
-#cBraid{animation:cBd 5s ease-in-out infinite}@keyframes cBd{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(2.2deg)}}
-#cLant{animation:cLs 3.6s ease-in-out infinite}@keyframes cLs{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(3deg)}}
+#char .cLG{position:absolute;left:-2px;top:110px;width:92px;height:92px;border-radius:50%;background:radial-gradient(circle,rgba(255,216,144,.75),rgba(255,168,64,.26) 50%,rgba(255,154,48,0) 72%);mix-blend-mode:screen;transform-origin:50% 50%;animation:kLf 2.6s ease-in-out infinite}
+@keyframes kLf{0%,100%{opacity:.8;transform:scale(1)}30%{opacity:1;transform:scale(1.08)}60%{opacity:.7;transform:scale(.94)}}
+#char #cMouth .m1,#char #cMouth .m2,#char #cBackS #cCorona{opacity:0}
+#char #cSmoke circle{opacity:0}
+#cBang{transform-box:fill-box;transform-origin:50% 100%}
+/* pivots */
+#cAll,#cKalle{transform-origin:240px 392px}
+#cHead{transform-origin:240px 104px}#cHatG{transform-origin:240px 62px}#cFeather{transform-origin:196px 41px}
+#cArmL{transform-origin:168px 126px}#cForeL{transform-origin:126px 178px}#cArmR{transform-origin:312px 126px}#cForeR{transform-origin:348px 186px}#cFish{transform-origin:347px 254px}
+#cBrows{transform-origin:240px 70px}.cEyeL{transform-origin:224px 78px}.cEyeR{transform-origin:256px 78px}#cLids{transform-origin:240px 78px}#cMouth{transform-origin:240px 110px}
+#cLant{transform-origin:44px 130px}#cRays{transform-origin:240px 140px}
+.cPup{transform-box:fill-box;transform-origin:center}
+/* ---------- IDLE ---------- */
+#cKalle{animation:kBr 4.2s ease-in-out infinite;will-change:transform}
+@keyframes kBr{0%,100%{transform:scale(1,1)}50%{transform:scale(1.004,1.011)}}
+#cHeadS{animation:kNd 6.4s ease-in-out infinite;transform-origin:240px 104px;will-change:transform}
+@keyframes kNd{0%,100%{transform:rotate(-.6deg) translateY(.4px)}50%{transform:rotate(.9deg) translateY(-.6px)}}
+#cArmLS{animation:kAL 4.2s ease-in-out infinite;transform-origin:168px 126px;will-change:transform}#cArmRS{animation:kAR 4.2s ease-in-out -.5s infinite;transform-origin:312px 126px;will-change:transform}
+@keyframes kAL{0%,100%{transform:rotate(.5deg)}50%{transform:rotate(-.9deg)}}@keyframes kAR{0%,100%{transform:rotate(-.4deg)}50%{transform:rotate(.9deg)}}
+#cLids{animation:kBl 5.6s steps(1,end) infinite}
+@keyframes kBl{0%,94%{opacity:0}95%,97%{opacity:1}98%,100%{opacity:0}}
+.cPup{animation:kGl 9s ease-in-out infinite}
+@keyframes kGl{0%,38%,100%{transform:none}46%,70%{transform:translate(-1.3px,.2px)}78%,92%{transform:translate(.9px,-.3px)}}
+#cFish{animation:kFs 3.8s ease-in-out infinite}@keyframes kFs{0%,100%{transform:rotate(-3.6deg)}50%{transform:rotate(3.8deg)}}
+#cFishGlow{animation:kGw 2.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}@keyframes kGw{0%,100%{opacity:.55}50%{opacity:.95}}
+#cFeather{animation:kFt 3.4s ease-in-out infinite}@keyframes kFt{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(3.2deg)}}
+#cEmber circle{animation:kEm 1.7s ease-in-out infinite;transform-box:fill-box;transform-origin:center}@keyframes kEm{0%,100%{opacity:.75;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+#cSmoke circle{transform-box:fill-box;transform-origin:center;animation:kSm 4.8s ease-out infinite}#cSmoke .sm2{animation-delay:-1.6s}#cSmoke .sm3{animation-delay:-3.2s}
+@keyframes kSm{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:.7}100%{opacity:0;transform:translate(-14px,-30px) scale(3.4)}}
+#cLant{animation:kLs 3.8s ease-in-out infinite}@keyframes kLs{0%,100%{transform:rotate(-2.4deg)}50%{transform:rotate(2.8deg)}}
 /* ---------- STATES (the shell toggles one class on #char; --spd scales time for turbo) ---------- */
-#char{--t:calc(1s*var(--spd,1))}
-/* spin: looks up at the sky, free arm lifts a little, dog lifts her head */
-#char.spin #cHead{animation:cSpH calc(.95s*var(--spd)) ease-out both}
-#char.spin .cPup{animation:cSpP calc(.95s*var(--spd)) ease-out both}
-#char.spin #cBrows{animation:cSpB calc(.95s*var(--spd)) ease-out both}
-#char.spin #cArmR{animation:cSpA calc(.95s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
-#char.spin #cDHead{animation:cSpD calc(.95s*var(--spd)) ease-out both}
-@keyframes cSpH{0%{transform:none}25%{transform:rotate(2deg) translateY(2px)}60%{transform:rotate(-5deg) translateY(-3px)}100%{transform:rotate(-4deg) translateY(-2px)}}
-@keyframes cSpP{0%{transform:none}30%{transform:none}70%,100%{transform:translateY(-1.6px)}}
-@keyframes cSpB{0%{transform:none}60%,100%{transform:translateY(-2.4px)}}
-@keyframes cSpA{0%{transform:none}30%{transform:rotate(6deg)}70%,100%{transform:rotate(-16deg)}}
-@keyframes cSpD{0%{transform:none}30%{transform:rotate(-3deg)}70%,100%{transform:rotate(9deg) translateY(-2px)}}
-/* win: smile, free hand waves, lantern lifts, Tuuli yips */
-#char.win #cMouth .m0{opacity:0}#char.win #cMouth .m1{opacity:1}
-#char.win #cArmR{animation:cWiA calc(1.5s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
-#char.win #cForeR{animation:cWiF calc(1.5s*var(--spd)) ease-in-out both}
-#char.win #cArmL{animation:cWiL calc(1.5s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
-#char.win #cHead{animation:cWiH calc(1.5s*var(--spd)) ease-in-out both}
-#char.win #cDJaw .jo{opacity:1}
-#char.win #cDHead{animation:cWiD calc(1.5s*var(--spd)) ease-in-out both}
-#char.win #cDTail{animation:cWag .35s ease-in-out infinite}
-#char.win .cLG{animation:cLf .6s ease-in-out infinite}
-@keyframes cWiA{0%{transform:none}18%{transform:rotate(8deg)}40%,80%{transform:rotate(-104deg)}100%{transform:none}}
-@keyframes cWiF{0%,40%{transform:none}46%{transform:rotate(-84deg)}56%{transform:rotate(-108deg)}66%{transform:rotate(-72deg)}76%{transform:rotate(-104deg)}88%{transform:rotate(-84deg)}100%{transform:none}}
-@keyframes cWiL{0%{transform:none}25%{transform:rotate(-4deg)}45%,80%{transform:rotate(-12deg)}100%{transform:none}}
-@keyframes cWiH{0%{transform:none}20%{transform:rotate(-3deg) translateY(2px)}45%{transform:rotate(4deg) translateY(-2px)}70%{transform:rotate(-2deg)}100%{transform:none}}
-@keyframes cWiD{0%{transform:none}15%{transform:translateY(4px) rotate(-3deg)}30%{transform:translateY(-4px) rotate(6deg)}45%{transform:translateY(3px) rotate(-2deg)}60%{transform:translateY(-4px) rotate(5deg)}80%,100%{transform:none}}
-/* big: both arms up, hops, aurora corona flares */
-#char.big #cMouth .m0{opacity:0}#char.big #cMouth .m1{opacity:1}
-#char.big #cAll{animation:cBgH calc(3.2s*var(--spd)) ease-in-out both}
-#char.big #cArmR{animation:cBgR calc(3.2s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
-#char.big #cArmL{animation:cBgL calc(3.2s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
-#char.big #cForeR{animation:cBgFr calc(3.2s*var(--spd)) ease-in-out both}
-#char.big #cForeL{animation:cBgFl calc(3.2s*var(--spd)) ease-in-out both}
-#char.big #cHead{animation:cBgHd calc(3.2s*var(--spd)) ease-in-out both}
-#char.big #cDog{animation:cBgD calc(3.2s*var(--spd)) ease-in-out both}
-#char.big #cDJaw .jo{opacity:1}
-#char.big #cDTail{animation:cWag .25s ease-in-out infinite}
-#char.big #cCorona{animation:cCor calc(3.2s*var(--spd)) ease-in-out both}
-#char.big #cRays{animation:cRot calc(6.4s*var(--spd)) linear both}
-@keyframes cBgH{0%{transform:none}8%{transform:scale(1.04,.94)}18%{transform:translateY(-22px) scale(.97,1.04)}30%{transform:scale(1.04,.95)}42%{transform:translateY(-20px) scale(.97,1.04)}54%{transform:scale(1.03,.96)}66%{transform:translateY(-14px)}78%{transform:scale(1.02,.98)}100%{transform:none}}
-@keyframes cBgR{0%{transform:none}12%{transform:rotate(10deg)}28%,80%{transform:rotate(-132deg)}100%{transform:none}}
-@keyframes cBgL{0%{transform:none}12%{transform:rotate(-8deg)}28%,80%{transform:rotate(124deg)}100%{transform:none}}
-@keyframes cBgFr{0%,28%{transform:none}34%{transform:rotate(-84deg)}48%{transform:rotate(-100deg)}62%{transform:rotate(-76deg)}80%{transform:rotate(-86deg)}100%{transform:none}}
-@keyframes cBgFl{0%,28%{transform:none}40%{transform:rotate(30deg)}56%{transform:rotate(44deg)}70%{transform:rotate(30deg)}84%,100%{transform:none}}
-@keyframes cBgHd{0%{transform:none}30%{transform:rotate(-6deg)}60%{transform:rotate(5deg)}100%{transform:none}}
-@keyframes cBgD{0%{transform:none}10%{transform:scale(1.03,.95)}22%{transform:translateY(-26px)}34%{transform:scale(1.04,.95)}46%{transform:translateY(-22px)}60%{transform:scale(1.03,.96)}74%{transform:translateY(-12px)}100%{transform:none}}
-@keyframes cCor{0%{opacity:0}18%,76%{opacity:1}100%{opacity:0}}
-@keyframes cRot{from{transform:rotate(0)}to{transform:rotate(140deg)}}
-/* special: points at the sky (arm up beside the hood, clear of the face), "!" pops */
-#char.special #cMouth .m0{opacity:0}#char.special #cMouth .m2{opacity:1}
-#char.special #cArmR{animation:cSpcA calc(.9s*var(--spd)) cubic-bezier(.3,.9,.4,1.2) both}
-#char.special #cForeR{animation:cSpcF calc(.9s*var(--spd)) cubic-bezier(.3,.9,.4,1.2) both}
-#char.special #cHead{animation:cSpcH calc(.9s*var(--spd)) ease-out both}
-#char.special #cBrows{transform:translateY(-2.4px)}
-#char.special .cEyeL,#char.special .cEyeR{transform:scale(1.1)}
-#char.special #cBang{animation:cBangA calc(.9s*var(--spd)) ease-out both}
-#char.special #cDEarL,#char.special #cDEarR{animation:none;transform:translateY(-3px)}
-#char.special #cDHead{animation:cSpD calc(.9s*var(--spd)) ease-out both}
-@keyframes cSpcA{0%{transform:none}35%{transform:rotate(-128deg)}60%{transform:rotate(-120deg)}100%{transform:rotate(-122deg)}}
-@keyframes cSpcF{0%{transform:none}35%{transform:rotate(-108deg)}60%{transform:rotate(-98deg)}100%{transform:rotate(-102deg)}}
-@keyframes cSpcH{0%{transform:none}35%{transform:rotate(-5deg) translateY(-2px)}100%{transform:rotate(-4deg) translateY(-1px)}}
-@keyframes cBangA{0%{opacity:0;transform:translateY(10px) scale(.4)}30%{opacity:1;transform:translateY(-4px) scale(1.2)}55%{transform:scale(1)}100%{opacity:1}}
-/* tease: held breath. everything freezes, eyes wide, dog crouches with ears flat */
-#char.tease #cMouth .m0{opacity:0}#char.tease #cMouth .m2{opacity:1;transform:scale(.55);transform-origin:170px 101px}
-#char.tease #cAinoS,#char.tease #cDogS,#char.tease #cBraid,#char.tease #cLids,#char.tease #cDTail,#char.tease #cDEarL,#char.tease #cDEarR,#char.tease #cDLids,#char.tease #cLant{animation:none}
-#char.tease .cEyeL,#char.tease .cEyeR{transform:scale(1.14)}
-#char.tease #cBrows{transform:translateY(-2.4px)}
-#char.tease #cHead{animation:cTsH calc(.5s*var(--spd)) ease-out both}
-#char.tease #cAino{animation:cTsA calc(.5s*var(--spd)) ease-out both}
-#char.tease #cDEarL{transform:rotate(26deg)}#char.tease #cDEarR{transform:rotate(26deg)}
-#char.tease #cDog{animation:cTsD calc(.5s*var(--spd)) ease-out both}
+/* spin: looks up at the sky, right hand hoists the catch a little */
+#char.spin #cHead{animation:kSpH calc(.95s*var(--spd)) ease-out both}
+#char.spin .cPup{animation:kSpP calc(.95s*var(--spd)) ease-out both}
+#char.spin #cBrows{animation:kSpB calc(.95s*var(--spd)) ease-out both}
+#char.spin #cArmR{animation:kSpA calc(.95s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.spin #cForeR{animation:kSpF calc(.95s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.spin #cFish{animation:kSpFi calc(.95s*var(--spd)) ease-out both}
+#char.spin #cArmL{animation:kSpL calc(.95s*var(--spd)) ease-out both}
+#char.spin #cHatG{animation:kHatS calc(.95s*var(--spd)) ease-out both}
+@keyframes kSpH{0%{transform:none}30%{transform:rotate(2deg) translateY(2px)}65%,100%{transform:rotate(-4deg) translateY(-2px)}}
+@keyframes kSpP{0%,30%{transform:none}70%,100%{transform:translateY(-1.5px)}}
+@keyframes kSpB{0%,30%{transform:none}70%,100%{transform:translateY(-2.2px)}}
+@keyframes kSpA{0%{transform:none}30%{transform:rotate(9deg)}70%,100%{transform:rotate(-16deg)}}
+@keyframes kSpF{0%{transform:none}30%{transform:rotate(8deg)}75%,100%{transform:rotate(-30deg)}}
+@keyframes kSpFi{0%,25%{transform:none}50%{transform:rotate(16deg)}80%{transform:rotate(-12deg)}100%{transform:rotate(3deg)}}
+@keyframes kSpL{0%{transform:none}60%,100%{transform:rotate(-6deg)}}
+@keyframes kHatS{0%{transform:none}35%{transform:rotate(1.5deg)}75%,100%{transform:rotate(-3deg)}}
+/* win: belly laugh, hoists the glowing char, beard jaw bobs */
+#char.win #cMouth .m1{opacity:1}
+#char.win #cArmR{animation:kWiA calc(1.5s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.win #cForeR{animation:kWiF calc(1.5s*var(--spd)) ease-in-out both}
+#char.win #cFish{animation:kWiFi calc(1.5s*var(--spd)) ease-in-out both}
+#char.win #cArmL{animation:kWiL calc(1.5s*var(--spd)) ease-in-out both}
+#char.win #cHead{animation:kWiH calc(1.5s*var(--spd)) ease-in-out both}
+#char.win #cBeard{animation:kWiB calc(1.5s*var(--spd)) ease-in-out both}
+#char.win #cHatG{animation:kWiHat calc(1.5s*var(--spd)) ease-in-out both}
+#char.win #cFeather{animation:kWiFe calc(1.5s*var(--spd)) ease-in-out both}
+#char.win #cFishGlow{animation:kGw .5s ease-in-out infinite}
+#char.win .cLG{animation:kLf .6s ease-in-out infinite}
+@keyframes kWiA{0%{transform:none}16%{transform:rotate(10deg)}38%{transform:rotate(-120deg)}48%,78%{transform:rotate(-110deg)}100%{transform:none}}
+@keyframes kWiF{0%,38%{transform:none}50%{transform:rotate(-26deg)}62%{transform:rotate(8deg)}74%{transform:rotate(-18deg)}88%{transform:rotate(-4deg)}100%{transform:none}}
+@keyframes kWiFi{0%,30%{transform:none}44%{transform:rotate(36deg)}58%{transform:rotate(-32deg)}72%{transform:rotate(22deg)}86%{transform:rotate(-10deg)}100%{transform:none}}
+@keyframes kWiL{0%{transform:none}20%{transform:rotate(-10deg)}40%{transform:rotate(4deg)}60%{transform:rotate(-8deg)}80%{transform:rotate(2deg)}100%{transform:none}}
+@keyframes kWiH{0%{transform:none}12%{transform:rotate(-3deg) translateY(1px)}24%{transform:rotate(-6deg) translateY(-2px)}36%{transform:rotate(-3deg) translateY(1.5px)}48%{transform:rotate(-6deg) translateY(-2px)}60%{transform:rotate(-3deg) translateY(1.5px)}72%{transform:rotate(-5deg) translateY(-1.5px)}100%{transform:none}}
+@keyframes kWiB{0%,10%{transform:none}24%{transform:translateY(3px)}36%{transform:none}48%{transform:translateY(3px)}60%{transform:none}72%{transform:translateY(2.4px)}86%,100%{transform:none}}
+@keyframes kWiHat{0%{transform:none}18%{transform:rotate(4deg)}30%{transform:rotate(-5deg) translateY(-2px)}44%{transform:rotate(3deg)}56%{transform:rotate(-4deg) translateY(-1.5px)}72%{transform:rotate(2deg)}100%{transform:none}}
+@keyframes kWiFe{0%{transform:none}25%{transform:rotate(-9deg)}45%{transform:rotate(7deg)}65%{transform:rotate(-6deg)}85%{transform:rotate(3deg)}100%{transform:none}}
+/* big: hops, both fists up, the char whirls, corona flares */
+#char.big #cMouth .m1{opacity:1}
+#char.big #cAll{animation:kBgH calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cArmR{animation:kBgR calc(3.2s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.big #cArmL{animation:kBgL calc(3.2s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.big #cForeR{animation:kBgFr calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cForeL{animation:kBgFl calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cFish{animation:kBgFi calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cHead{animation:kBgHd calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cBeard{animation:kWiB calc(1.6s*var(--spd)) ease-in-out 2 both}
+#char.big #cHatG{animation:kWiHat calc(1.6s*var(--spd)) ease-in-out 2 both}
+#char.big #cFeather{animation:kWiFe calc(1.6s*var(--spd)) ease-in-out 2 both}
+#char.big #cFishGlow{animation:kGw .35s ease-in-out infinite}
+#char.big #cCorona{animation:kCor calc(3.2s*var(--spd)) ease-in-out both}
+#char.big #cRays{animation:kRot calc(6.4s*var(--spd)) linear both}
+#char.big .cLG{animation:kLf .5s ease-in-out infinite}
+@keyframes kBgH{0%{transform:none}8%{transform:scale(1.04,.94)}18%{transform:translateY(-24px) scale(.97,1.04)}30%{transform:scale(1.04,.95)}42%{transform:translateY(-22px) scale(.97,1.04)}54%{transform:scale(1.03,.96)}66%{transform:translateY(-14px)}78%{transform:scale(1.02,.98)}100%{transform:none}}
+@keyframes kBgR{0%{transform:none}12%{transform:rotate(12deg)}28%{transform:rotate(-160deg)}38%,80%{transform:rotate(-150deg)}100%{transform:none}}
+@keyframes kBgL{0%{transform:none}12%{transform:rotate(-10deg)}28%{transform:rotate(160deg)}38%,80%{transform:rotate(150deg)}100%{transform:none}}
+@keyframes kBgFr{0%,28%{transform:none}42%{transform:rotate(-22deg)}58%{transform:rotate(10deg)}72%{transform:rotate(-18deg)}84%{transform:rotate(-6deg)}100%{transform:none}}
+@keyframes kBgFl{0%,28%{transform:none}40%{transform:rotate(40deg)}56%{transform:rotate(64deg)}70%{transform:rotate(40deg)}84%,100%{transform:none}}
+@keyframes kBgFi{0%,26%{transform:none}40%{transform:rotate(44deg)}54%{transform:rotate(-40deg)}68%{transform:rotate(30deg)}82%{transform:rotate(-16deg)}100%{transform:none}}
+@keyframes kBgHd{0%{transform:none}30%{transform:rotate(-7deg) translateY(-1px)}60%{transform:rotate(5deg)}100%{transform:none}}
+@keyframes kCor{0%{opacity:0}18%,76%{opacity:1}100%{opacity:0}}
+@keyframes kRot{from{transform:rotate(0)}to{transform:rotate(140deg)}}
+/* special: left fist shoots up beside the hat ("aha!"), clear of the face; "!" pops */
+#char.special #cMouth .m2{opacity:1}
+#char.special #cArmL{animation:kSpcA calc(.9s*var(--spd)) cubic-bezier(.3,.9,.4,1.2) both}
+#char.special #cForeL{animation:kSpcF calc(.9s*var(--spd)) cubic-bezier(.3,.9,.4,1.2) both}
+#char.special #cArmR{animation:kSpcR calc(.9s*var(--spd)) ease-out both}
+#char.special #cHead{animation:kSpcH calc(.9s*var(--spd)) ease-out both}
+#char.special #cBrows{transform:translateY(-2.6px)}
+#char.special .cEyeL,#char.special .cEyeR{transform:scale(1.12)}
+#char.special #cBang{animation:kBangA calc(.9s*var(--spd)) ease-out both}
+#char.special #cHatG{animation:kHatS calc(.9s*var(--spd)) ease-out both}
+@keyframes kSpcA{0%{transform:none}35%{transform:rotate(134deg)}60%,100%{transform:rotate(126deg)}}
+@keyframes kSpcF{0%{transform:none}35%{transform:rotate(76deg)}60%,100%{transform:rotate(66deg)}}
+@keyframes kSpcR{0%{transform:none}100%{transform:rotate(-8deg)}}
+@keyframes kSpcH{0%{transform:none}35%{transform:rotate(-5deg) translateY(-2px)}100%{transform:rotate(-4deg) translateY(-1px)}}
+@keyframes kBangA{0%{opacity:0;transform:translateY(10px) scale(.4)}30%{opacity:1;transform:translateY(-4px) scale(1.2)}55%{transform:scale(1)}100%{opacity:1}}
+/* tease: held breath. everything freezes, eyes wide, fists tense; add exhale (hit) / slump (miss) before removing */
+#char.tease #cMouth .m2{opacity:1;transform:scale(.55)}
+#char.tease #cKalle,#char.tease #cHeadS,#char.tease #cArmLS,#char.tease #cArmRS,#char.tease #cLids,#char.tease #cFish,#char.tease #cFeather,#char.tease #cLant,#char.tease .cPup,#char.tease #cEmber circle,#char.tease #cSmoke circle{animation:none}
+#char.tease .cEyeL,#char.tease .cEyeR{transform:scale(1.16)}
+#char.tease #cBrows{transform:translateY(-2.6px)}
+#char.tease #cHead{animation:kTsH calc(.5s*var(--spd)) ease-out both}
+#char.tease #cArmL{animation:kTsL calc(.5s*var(--spd)) ease-out both}
+#char.tease #cArmR{animation:kTsR calc(.5s*var(--spd)) ease-out both}
 #char.tease .cLG{animation:none;opacity:.5}
-@keyframes cTsH{to{transform:rotate(2deg) translateY(2px)}}@keyframes cTsA{to{transform:scale(1.01,.99) translateX(2px)}}@keyframes cTsD{to{transform:scale(1.02,.94)}}
-/* resolve tease: exhale (hit) / slump (miss), add before removing tease */
-#char.tease.exhale #cAino{animation:cExA calc(.6s*var(--spd)) ease-out both}
+@keyframes kTsH{to{transform:rotate(2deg) translateY(2px)}}@keyframes kTsL{to{transform:rotate(7deg)}}@keyframes kTsR{to{transform:rotate(-6deg)}}
+#char.tease.exhale #cAll{animation:kExA calc(.6s*var(--spd)) ease-out both}
 #char.tease.exhale #cMouth .m2{opacity:0}#char.tease.exhale #cMouth .m1{opacity:1}
-#char.tease.exhale #cDEarL,#char.tease.exhale #cDEarR{transform:none}#char.tease.exhale #cDog{animation:none}
-@keyframes cExA{0%{transform:none}35%{transform:translateY(-6px) scale(.98,1.03)}100%{transform:none}}
-#char.tease.slump #cHead{animation:cSlH calc(.6s*var(--spd)) ease-out both}
-#char.tease.slump #cMouth .m2{opacity:0}#char.tease.slump #cMouth .m0{opacity:1}
-#char.tease.slump #cDEarL,#char.tease.slump #cDEarR{transform:rotate(38deg)}
-@keyframes cSlH{0%{transform:none}100%{transform:rotate(5deg) translateY(4px)}}
-/* bonus intro: raises and lights the lantern */
-#char.bonus #cMouth .m0{opacity:0}#char.bonus #cMouth .m1{opacity:1}
-#char.bonus #cArmL{animation:cBnA calc(1.4s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
-#char.bonus #cForeL{animation:cBnF calc(1.4s*var(--spd)) ease-in-out both}
-#char.bonus .cLG{animation:cBnG calc(1.4s*var(--spd)) ease-out both}
-#char.bonus #cDJaw .jo{opacity:1}
-#char.bonus #cDog{animation:cBgD calc(1.4s*var(--spd)) ease-in-out both}
-#char.bonus #cCorona{animation:cCor calc(1.4s*var(--spd)) ease-in-out both}
-@keyframes cBnA{0%{transform:none}40%,80%{transform:rotate(138deg)}100%{transform:rotate(124deg)}}
-@keyframes cBnF{0%,40%{transform:none}60%{transform:rotate(30deg)}100%{transform:rotate(18deg)}}
-@keyframes cBnG{0%{opacity:.8;transform:scale(1)}50%,100%{opacity:1;transform:translateY(-190px) translateX(40px) scale(2.2)}}
-/* bonus mode (whole bonus, set by the shell): corona hums, head nods on the beat (84 bpm), dog wags fast */
+#char.tease.exhale #cHatG{animation:kWiHat calc(.6s*var(--spd)) ease-out both}
+@keyframes kExA{0%{transform:none}35%{transform:translateY(-6px) scale(.98,1.03)}100%{transform:none}}
+#char.tease.slump #cHead{animation:kSlH calc(.6s*var(--spd)) ease-out both}
+#char.tease.slump #cMouth .m2{opacity:0}
+#char.tease.slump #cArmR{animation:kSlR calc(.6s*var(--spd)) ease-out both}
+@keyframes kSlH{0%{transform:none}100%{transform:rotate(5deg) translateY(4px)}}@keyframes kSlR{to{transform:rotate(7deg)}}
+/* bonus intro: heaves the glowing char overhead, the lantern flares */
+#char.bonus #cMouth .m1{opacity:1}
+#char.bonus #cArmR{animation:kBnA calc(1.4s*var(--spd)) cubic-bezier(.3,.7,.3,1) both}
+#char.bonus #cForeR{animation:kBnF calc(1.4s*var(--spd)) ease-in-out both}
+#char.bonus #cFish{animation:kWiFi calc(1.4s*var(--spd)) ease-in-out both}
+#char.bonus #cFishGlow{animation:kBnGw calc(1.4s*var(--spd)) ease-out both}
+#char.bonus .cLG{animation:kBnG calc(1.4s*var(--spd)) ease-out both}
+#char.bonus #cCorona{animation:kCor calc(1.4s*var(--spd)) ease-in-out both}
+#char.bonus #cAll{animation:kBgH calc(1.4s*var(--spd)) ease-in-out both}
+@keyframes kBnA{0%{transform:none}40%{transform:rotate(-150deg)}80%{transform:rotate(-142deg)}100%{transform:rotate(-132deg)}}
+@keyframes kBnF{0%,40%{transform:none}60%{transform:rotate(-16deg)}100%{transform:rotate(-8deg)}}
+@keyframes kBnGw{0%{opacity:.6;transform:scale(1)}50%,100%{opacity:1;transform:scale(2.2)}}
+@keyframes kBnG{0%{opacity:.8;transform:scale(1)}50%,100%{opacity:1;transform:scale(1.9)}}
+/* bonus mode (set by the shell for the whole bonus): corona hums, head nods on the beat (84 bpm), the char glows */
 #char.bonusmode #cCorona{opacity:.38}
-#char.bonusmode #cRays{animation:cRot 60s linear infinite}
-#char.bonusmode #cHead{animation:cNod .714s ease-in-out infinite}
-#char.bonusmode #cDTail{animation:cWag .357s ease-in-out infinite}
-#char.bonusmode #cMouth .m0{opacity:0}#char.bonusmode #cMouth .m1{opacity:1}
-#char.bonusmode .cLG{transform:scale(1.5);animation:cLf 1.2s ease-in-out infinite}
-@keyframes cNod{0%,100%{transform:none}50%{transform:translateY(2px) rotate(1.5deg)}}
-/* max win: arms wide, corona full, both lift their heads, Tuuli howls */
-#char.maxwin #cMouth .m0{opacity:0}#char.maxwin #cMouth .m1{opacity:1}
+#char.bonusmode #cRays{animation:kRot 60s linear infinite}
+#char.bonusmode #cHeadS{animation:kNdB .714s ease-in-out infinite}
+#char.bonusmode #cMouth .m1{opacity:1}
+#char.bonusmode #cFishGlow{animation:kGw 1.2s ease-in-out infinite}
+#char.bonusmode .cLG{transform:scale(1.5);animation:kLf 1.2s ease-in-out infinite}
+@keyframes kNdB{0%,100%{transform:none}50%{transform:translateY(2px) rotate(1.5deg)}}
+/* max win: both fists up, corona full, head back */
+#char.maxwin #cMouth .m1{opacity:1}
 #char.maxwin #cCorona{opacity:1}
-#char.maxwin #cRays{animation:cRot 18s linear infinite}
-#char.maxwin #cArmR{animation:cMxR .8s cubic-bezier(.3,.9,.4,1.2) both}
-#char.maxwin #cForeR{animation:cMxFr .8s cubic-bezier(.3,.9,.4,1.2) both}
-#char.maxwin #cArmL{animation:cMxL .8s cubic-bezier(.3,.9,.4,1.2) both}
-#char.maxwin #cForeL{animation:cMxFl .8s cubic-bezier(.3,.9,.4,1.2) both}
-#char.maxwin #cHead{animation:cMxH .8s ease-out both}
-#char.maxwin #cDHead{animation:cMxD .8s ease-out both}
-#char.maxwin #cDJaw .jo{opacity:1}
-#char.maxwin #cDTail{animation:cWag .3s ease-in-out infinite}
-@keyframes cMxR{from{transform:none}to{transform:rotate(-112deg)}}@keyframes cMxFr{from{transform:none}to{transform:rotate(-62deg)}}
-@keyframes cMxL{from{transform:none}to{transform:rotate(104deg)}}@keyframes cMxFl{from{transform:none}to{transform:rotate(28deg)}}
-@keyframes cMxH{from{transform:none}to{transform:rotate(-5deg) translateY(-3px)}}@keyframes cMxD{from{transform:none}to{transform:rotate(22deg) translateY(-4px)}}
+#char.maxwin #cRays{animation:kRot 18s linear infinite}
+#char.maxwin #cArmR{animation:kMxR .8s cubic-bezier(.3,.9,.4,1.2) both}
+#char.maxwin #cForeR{animation:kMxFr .8s cubic-bezier(.3,.9,.4,1.2) both}
+#char.maxwin #cArmL{animation:kMxL .8s cubic-bezier(.3,.9,.4,1.2) both}
+#char.maxwin #cForeL{animation:kMxFl .8s cubic-bezier(.3,.9,.4,1.2) both}
+#char.maxwin #cHead{animation:kMxH .8s ease-out both}
+#char.maxwin #cFish{animation:kBgFi 1.4s ease-in-out infinite}
+#char.maxwin #cFishGlow{animation:kGw .4s ease-in-out infinite}
+#char.maxwin #cHatG{animation:kWiHat 1.2s ease-in-out infinite}
+#char.maxwin #cBeard{animation:kWiB 1.2s ease-in-out infinite}
+@keyframes kMxR{from{transform:none}to{transform:rotate(-146deg)}}@keyframes kMxFr{from{transform:none}to{transform:rotate(-14deg)}}
+@keyframes kMxL{from{transform:none}to{transform:rotate(146deg)}}@keyframes kMxFl{from{transform:none}to{transform:rotate(50deg)}}
+@keyframes kMxH{from{transform:none}to{transform:rotate(-5deg) translateY(-3px)}}
 
 /* ===== sweep.css ===== */
 /* ---------- Aurora Sweep: 5x5 ice sheet ---------- */

@@ -35,19 +35,21 @@ Cell classes (slot.css): `.cell`, `.hit`, `.focus` on `#grid`. Drop / out / land
 ## Aurora Sweep `#sweep`
 5x5 `.sc[data-r][data-c]`. `#sweep.on` fades the sheet in over the board. Per cell: `.melt` (thaw) + text in `.val` (e.g. `12x`), `.prism` (+ `.melt`) shows s12, `.empty`, `.x2..x5` crossing chip. Bands: append `<div class="band row r2 go">` / `col c1 go` / `dg1 go` (down-right) / `dg2 go` into `#sweepBands`, remove after 1.1 s; melt the cells under it when the band is mid-way (~0.45 s).
 
-## Aino and Tuuli `#char`
-slot.json: `char: {el:'char', states:['spin','win','big','special','tease','bonus','maxwin','exhale','slump'], bonusClass:'bonusmode'}`. Idle = no class (breathing, blink, tail wag, ear twitch, breath fog, lantern flicker, braid sway).
+## Old Kalle Havu `#char` (v4, replaces Aino + Tuuli, which were thrown away on the owner verdict)
+Ice-fisher / lodge keeper: wolf-fur hat (one flap tied up, owl feather, brass aurora badge), big white walrus moustache + beard with a braid, pipe (ember + smoke), rust reindeer parka with Sami trim, mittens + antler knife on the belt, fur mukluks, a glowing aurora char on a line in the right hand, ice-spud pole with the hurricane lantern (live `#s5`) beside him. No companion (cost). Variety vs other slots: human old trapper (no dwarf/crab/tanuki/genie).
+Pipeline `art/c3/` (do NOT run art/char.cjs, art/c2/*, or art/css.cjs, they would overwrite this or kai's CSS): `parts.cjs` (SVG parts; helpers in `lib.cjs`: outline + flat fill + 2-tone offset-crescent shadows + highlight + cyan aurora rim + warm lodge bounce; fur tufts; face vector in `face.cjs`), `node art/c3/bake.cjs` (WebP bakes to c3/out), `node art/c3/assemble.cjs` (writes character.html, splash-sym.txt and splices ainoSplash/ainoSplashSuper into symbols.svg), `node art/c3/install.cjs` (char4.css -> art/char.css and splices slot.css char section only, KAI part untouched). Test: `node art/c3/test.cjs out.png 1 "idle@300,win@700,big@1100" [clip] [refs]` (needs the built standalone).
+Same API: slot.json states unchanged; idle = no class. Layers: `#cBackS` (corona/rays, snow), `#cPropS` (pole+lantern), `.cLG`, `#cAll>#cKalle>#cBodyS #cArmLS #cArmRS(cFish) #cHeadS`, `#cFrontS` (snow, `#cBang`). Pivots in char4.css.
 | class | meaning |
 |---|---|
-| `spin` | looks up, brows up, right arm rises a little, dog's head lifts (.95 s) |
-| `win` | smile, free hand waves, lantern lifts, Tuuli yips (jaw open, head bobs, tail whip) 1.5 s |
-| `big` | 3 hops, both arms up, aurora corona + rotating rays flare, dog hops, 3.2 s |
-| `special` | points at the sky, "!" pops, O mouth, 0.9 s |
-| `tease` | hold: eyes wide, tiny O mouth, ears flat, dog crouches; add `exhale` (hit) or `slump` (miss) before removing |
-| `bonus` | 1.4 s intro: raises and lights the lantern, glow rises, corona, dog jumps. Then shell keeps `bonusmode`: corona hums, head nods on 84 bpm, fast tail |
-| `maxwin` | hold: arms wide, corona full + rays, both look up, dog howls |
-`--spd` on `#char` for turbo. Characters are separate stacked `<svg>`s (`#cBackS #cAinoS .cLG #cDogS #cFogS #cFrontS`) so idle motion repaints only small layers.
-**Splash portraits:** `symbols.svg` also holds `<symbol id="ainoSplash">` and `ainoSplashSuper` (corona + rotating rays), viewBox `40 6 420 360`. `splashArt: kind => \`<svg class="ainoSplash" viewBox="40 6 420 360" width="320" height="274"><use href="#ainoSplash${SUPER ? 'Super' : ''}"/></svg>\``. They reference the gradients of `#cBackS` (so the character fragment must be in the page). Not tested inside the real shell splash (needs a CSS size like the Tea House `.kojiSplash` rule: add `.ainoSplash{width:320px;height:274px;display:block;margin:0 auto}` when you wire it).
+| `spin` | looks up, brows up, right hand hoists the char a little, fish swings after |
+| `win` | belly laugh (beard jaw bobs, hat/feather lag), right arm throws the glowing char overhead, fish whips |
+| `big` | 3 hops, both fists up, corona + rays, fish whirls |
+| `special` | LEFT fist shoots up beside the hat (face stays clear), O mouth, "!" pops |
+| `tease` | frozen, eyes wide, fists tense; `exhale` (hit) hop + laugh, `slump` (miss) head drops |
+| `bonus` | heaves the char overhead, glow x2, lantern flare, corona |
+| `bonusmode` / `maxwin` | corona hum + nod on 84 bpm / both fists up, corona full, laughing |
+Splash: `ainoSplash`/`ainoSplashSuper` (ids kept) = waist-up portrait via `<use>` of the live images (Super: corona + left fist up + laugh). Size stays in kai's CSS.
+Idle cost: only compositor transforms (breath, head/arm sway) + small repaints (fish pendulum, feather, smoke, ember, lantern). character.html ~190 KB.
 
 ## Perf / bake notes
 Idle (software renderer, 1600x900, rAF counter, 4 s windows): **34-39 fps** on this machine (shell grain overlay not included in my test page; the shell's full-screen grain can cost ~5 fps more). Measured cost: each aurora curtain layer ~7 fps, so there are TWO (`.cu.c1`, `.cu.c2`); remove one (`display:none`) if a device is slow. Window flicker + smoke + flakes ~8 fps together (`#scene .flakes{display:none}` first). Symbol animations are released only on `.hit`. Scene/frame are bitmaps: re-run the art scripts to change them (they need Chromium via Playwright). No SVG filters at runtime anywhere. Standalone page weight: symbols 424 KB, scene 614 KB, frame ~150 KB, fonts 35 KB.
@@ -61,10 +63,5 @@ Idle (software renderer, 1600x900, rAF counter, 4 s windows): **34-39 fps** on t
 - Splash portraits and the Sweep sheet were rendered/checked only partly (sheet CSS reviewed in code, not screenshotted in motion).
 - Not done: win-connection art (not needed), bonus-mode scene beyond the violet tint, music/sfx spec.
 
-## v3 Aino + Tuuli (leo, owner Round 10 style: game-art illustration, NOT realism)
-Same ids/states/API as v1 (slot.js unchanged). Pipeline in `art/c2/`: `aino.cjs`/`tuuli.cjs` draw parts as SVG (gradients, layered fur tufts with per-tuft gradients, selective dark outline), `bake.cjs` renders them in Chromium to WebP (`c2/out/`), `assemble.cjs` writes `character.html` (WebP as data URIs + vector eyes/brows/mouth/lids), `splash-sym.txt` (ainoSplash/ainoSplashSuper reuse the same images via `<use>`), and `art/char.css` (from `c2/char3.css`). Then `node art/css.cjs && node art/build.cjs`. Test tools: `c2/test.cjs` (state screenshots, optional refs), `c2/fps.cjs`.
-- Aino: ~7 head adult guide, fur hood with clumped tufts, parka with red/gold/white Sami-style trim, belt gear, lantern (s5) in the left hand, right hand on hip. Design space is scaled 1.18x, figure rises above the #char box (overflow visible; head top about stage y 300). Tuuli: husky in 3/4 profile facing the board, harness with aurora gem tag, curled tail. Open mouth = `.jo` patch image in `#cDJaw`.
-- 'special': right arm goes up beside the hood (+forearm), clear of the face. Rotations of dog head are positive = nose up (she faces left).
-- Size: character.html ~204 KB. Idle fps: 39.5 with scene, 60 char only.
-## Honest critique v3
-Clean silhouette, confident stance, material detail (trim, leather, fur masses) is in the raccoon/dwarf family but below Zeus/dwarf in painterly depth: Aino's arms are still sleeve-tube stiff, her face is simple (about 6/10), fur reads as stylised tufts (spiky on boot cuffs), no cloth drape in motion. Tuuli is the stronger of the two (about 7/10); haunch and legs are simple.
+## Honest critique v4 (Kalle)
+Strong readable silhouette, characterful face (moustache, pipe, hat) and story props (catch, lantern pole), distinct from other slots. But it is in the raccoon tier at best (about 6/10), clearly below dwarf/Zeus in painterly depth: shading is offset-crescent cel shading (graphic, a bit sticker-like, cyan rim is uniform), torso is boxy and the sleeves are sausage-like, hands are mitten blobs, the face is small (about 40 px) so expression is limited, raised arms bend stiffly. Next step if wanted: hand-painted fold shapes on torso/sleeves, a narrower waist, bigger face with painted brows, per-edge rim variation.

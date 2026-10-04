@@ -1,0 +1,14 @@
+// live vector face (eyes, brows, mouths, lids). Coordinates in head design space; wrapped by the same transform as the head parts.
+const OL = '#0c0a16';
+const eye = (cx, cy, flip) => `<g class="${flip ? 'cEyeR' : 'cEyeL'}"><g transform="translate(${cx} ${cy}) scale(${flip ? -1.22 : 1.22} 1.22)">
+<clipPath id="ce${flip ? 'R' : 'L'}"><path d="M-7.4 .6Q-3.6 -4.6 1 -4.8Q6 -4.4 7.8 .4Q3.4 4.4 -1 4.4Q-5.4 4.2 -7.4 .6Z"/></clipPath>
+<path d="M-7.4 .6Q-3.6 -4.6 1 -4.8Q6 -4.4 7.8 .4Q3.4 4.4 -1 4.4Q-5.4 4.2 -7.4 .6Z" fill="#f2e8dc"/>
+<g clip-path="url(#ce${flip ? 'R' : 'L'})"><g class="cPup"><circle cx="-1.2" cy=".2" r="3.9" fill="#5a3a24"/><circle cx="-1.2" cy=".2" r="3" fill="#2f7fa8"/><circle cx="-1.2" cy=".2" r="1.7" fill="${OL}"/><circle cx="-2.4" cy="-1.2" r="1" fill="#fff"/></g><path d="M-9 -3Q0 -7 9 -3L9 -1Q0 -4 -9 -1Z" fill="#7a3a3a" opacity=".45"/></g>
+<path d="M-8 .8Q-3.6 -5.4 1.2 -5.4Q6.4 -5 8.6 .2" fill="none" stroke="${OL}" stroke-width="1.9" stroke-linecap="round"/><path d="M-6 3Q0 6.2 6 2.6" fill="none" stroke="#86443a" stroke-width="1" opacity=".8"/>
+<path d="M8 .4L11.4 -1.8M7.6 2L11 2.4" stroke="#86443a" stroke-width=".9" fill="none"/></g></g>`;
+const lid = (cx, cy, flip) => `<g transform="translate(${cx} ${cy}) scale(${flip ? -1 : 1} 1)"><path d="M-8 .6Q-3.6 -5.6 1.2 -5.6Q6.4 -5.2 8.8 .4Q4 5 -1 5Q-5.6 4.8 -8 .6Z" fill="#c98664"/><path d="M-8 1Q0 5 8.6 .8" fill="none" stroke="${OL}" stroke-width="1.8" stroke-linecap="round"/></g>`;
+const brow = flip => `<g ${flip ? 'transform="translate(480 0) scale(-1 1)"' : ''}><path d="M203 76Q207 64 224 64Q236 64 244 70Q238 70 232 72Q220 71 212 77Q208 79 203 76Z" fill="#f2ece2" stroke="${OL}" stroke-width="1.5" stroke-linejoin="round"/><path d="M207 72Q218 66 236 68M212 75Q222 71 238 72" fill="none" stroke="#9aa2c0" stroke-width="1" opacity=".7"/><path d="M203 76Q200 80 203 83M208 77Q206 82 209 85" stroke="#e6e0d8" stroke-width="1.6" fill="none"/></g>`;
+const mouths = `<g id="cMouth">
+<g class="m1"><path d="M221 108Q240 112 259 108Q258 126 240 128Q222 126 221 108Z" fill="#4a0c18" stroke="${OL}" stroke-width="1.6"/><path d="M224 109Q240 113 256 109L255 115Q240 118 225 115Z" fill="#f6f0e6"/><path d="M229 121Q240 116 251 121Q248 127 240 127Q232 127 229 121Z" fill="#d8566a"/><path d="M223 124Q232 130 240 129M257 124Q248 130 240 129" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".9"/></g>
+<g class="m2"><ellipse cx="240" cy="114" rx="6.4" ry="7.6" fill="#40081a" stroke="${OL}" stroke-width="1.5"/><ellipse cx="240" cy="118" rx="3.4" ry="2.6" fill="#d8566a"/><path d="M233 122Q240 128 247 122" stroke="#fff" stroke-width="1.4" fill="none" opacity=".8"/></g></g>`;
+module.exports = { eyes: eye(224, 78, 0) + eye(256, 78, 1), lids: lid(224, 78, 0) + lid(256, 78, 1), brows: brow(0) + brow(1), mouths };
