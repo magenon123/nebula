@@ -229,7 +229,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   await buy(1); check('turbo run: intro', await waitFor('#introM', 120000)); await sleep(900); await clk('#introM', { position: { x: 80, y: 80 } });
   await waitCond(() => !document.getElementById('fsBox').hidden && document.querySelectorAll('#grid .cell').length > 10, 30000); await sleep(2500);
   const t0 = Date.now(); await page.mouse.click(300, 800); await sleep(300);
-  check('mid-bonus turbo: badge shows, bonus finishes quickly', await page.evaluate(() => !document.getElementById('turboBadge').hidden));
+  check('tap speeds up this round only: no persistent turbo badge, stored turbo stays off', await page.evaluate(() => document.getElementById('turboBadge').hidden && !/true/.test(Object.keys(localStorage).filter(k => /_turbo$/.test(k)).map(k => localStorage[k]).join(','))));
   check('turbo bonus reaches the outro', await waitFor('#outroM', 120000), ((Date.now() - t0) / 1000).toFixed(0) + 's');
   check('turbo round settles', await settle()); await page.evaluate(NORMAL);
   // mid-bonus turbo in the Astrolabe too
