@@ -3590,7 +3590,11 @@ function go(key){
   document.querySelector('.frame-body').classList.toggle('slot-active',isSlot);
   SLOTS.forEach(s=>{
     const el=$('slot-'+s);
-    if(el)el.hidden=key!==s;
+    if(el){
+      const hiding=key!==s;
+      el.hidden=hiding;
+      if(hiding){const fr=$('frame-'+s);if(fr)fr.src='';}
+    }
   });
   if(key==='olympian-storm'){const f=$('frame-olympian-storm');if(!f.src||!f.src.includes('olympian'))f.src='/olympian-storm.html';}
   if(key==='lake-legend'){const f=$('frame-lake-legend');if(!f.src||!f.src.includes('lake'))f.src='/lake-legend.html';}
