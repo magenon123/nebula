@@ -80,8 +80,12 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   await clk('#spin'); await sleep(300);
   check('spin: button busy', await page.$eval('#spin', e => e.classList.contains('busy') || e.disabled));
   const sawHit = await waitCond(() => document.querySelectorAll('#grid .cell.hit').length >= 5, 30000); check('win: cluster cells enter the win pose', sawHit);
-  await sleep(250); await shot('03-win-links-a'); await sleep(350); await shot('03-win-links-b');
-  const lay = await page.evaluate(() => ({ b: !!document.getElementById('lnkT') && document.querySelectorAll('#lnkT path').length, t: !!document.getElementById('lnkT') && document.querySelectorAll('#lnkT rect').length }));
+  /* watch for the seams/links for up to 4s (they fade quickly, so a single sample after a fixed sleep is timing-dependent on a loaded machine) */
+  const lay = await page.evaluate(() => new Promise(res => { const best = { b: 0, t: 0 }, t0 = performance.now(); (function f() {
+    const has = !!document.getElementById('lnkT'), b = has ? document.querySelectorAll('#lnkT path').length : 0, t = has ? document.querySelectorAll('#lnkT rect').length : 0;
+    best.b = Math.max(best.b, b); best.t = Math.max(best.t, t);
+    (best.b >= 6 && best.t >= 2) || performance.now() - t0 > 4000 ? res(best) : requestAnimationFrame(f); })(); }));
+  await shot('03-win-links-a');
   check('win: molten seams + iron links drawn', lay.b >= 6 && lay.t >= 2, JSON.stringify(lay));
   check('spin settles', await settle()); s = await state(); await shot('04-after-spin');
   check('spin: win paid and balance moved', /^\$[\d,]+\.\d\d$/.test(s.win) && s.win !== '$0.00', s.win + ' / ' + s.bal);
