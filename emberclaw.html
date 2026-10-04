@@ -445,9 +445,8 @@ body.portrait #menu button{font-size:22px;padding:14px 14px}
 .cell.maxs svg.g{filter:drop-shadow(0 0 12px rgba(255,210,58,.8));animation:wob 1.6s ease-in-out infinite alternate}
 
 </style></head><body>
-<div id="rotateM"><div class="rmPhone"></div><div class="rmTxt">ROTATE YOUR PHONE</div><div class="rmSub">This game plays in landscape</div></div>
 <div id="loadM"><div class="lmLogo" id="lmLogo"></div><div class="lmVol" id="lmVol"></div><div class="lmCards" id="lmCards"></div><div class="lmBar"><i id="lmFill"></i></div><div class="lmTxt" id="lmTxt">LOADING</div><div class="lmTap" id="lmTap">CLICK TO CONTINUE</div><div class="lmWarn">Stuck here? Open this file in Chrome or Safari. File viewers and chat apps cannot run the game.</div></div><noscript><div style="position:fixed;inset:0;z-index:999;background:#111;color:#fff;padding:40px;font:20px/1.4 sans-serif">JavaScript is turned off or blocked here. Open this file in Chrome or Safari.</div></noscript>
-<script>window.addEventListener("error",function(e){var t=document.getElementById("lmTxt");if(t){t.textContent="ERROR: "+(e.message||"unknown")+" (line "+(e.lineno||"?")+")";t.style.color="#ff9090";t.style.animation="none";t.style.fontSize="14px";t.style.letterSpacing="1px";t.style.maxWidth="90vw";t.style.textAlign="center"}});setTimeout(function(){if(!window.__booted){var t=document.getElementById("lmTxt");if(t&&!/ERROR/.test(t.textContent)){t.textContent="The game did not start. Open this file in Chrome or Safari."}}},7000)</script>
+<script>window.addEventListener("error",function(e){if(window.__booted){var b=document.getElementById("errBar");if(!b){b=document.createElement("div");b.id="errBar";b.style.cssText="position:fixed;left:0;right:0;top:0;z-index:9999;background:#7a0f0f;color:#fff;font:12px/1.3 system-ui,sans-serif;padding:6px 10px;text-align:center";b.onclick=function(){b.remove()};document.body.appendChild(b)}b.textContent="Game error (tap to hide): "+(e.message||"unknown")+" line "+(e.lineno||"?");return}var t=document.getElementById("lmTxt");if(t){t.textContent="ERROR: "+(e.message||"unknown")+" (line "+(e.lineno||"?")+")";t.style.color="#ff9090";t.style.animation="none";t.style.fontSize="14px";t.style.letterSpacing="1px";t.style.maxWidth="90vw";t.style.textAlign="center"}});setTimeout(function(){if(!window.__booted){var t=document.getElementById("lmTxt");if(t&&!/ERROR/.test(t.textContent)){t.textContent="The game did not start. Open this file in Chrome or Safari."}}},7000)</script>
 
 <!-- ============ shared defs (wobble filters, hatch patterns) + this slot's symbols ============ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -1478,6 +1477,261 @@ body.portrait #menu button{font-size:22px;padding:14px 14px}
 'use strict';
 /* ---- slot config (slots/emberclaw/slot.json) ---- */
 const SLOT_CFG = {"id": "emberclaw", "title": "EmberClaw: Molten Reforge", "logoText": "EMBERCLAW", "infoTitle": "EMBERCLAW · MOLTEN REFORGE", "api": "/api/emberclaw/spin", "engineSource": "emberclaw-engine.js", "storage": "ec", "walletKey": "emberclawWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 9500, "anteCost": 3, "scatterSym": 8, "char": {"el": "char", "states": ["swing", "win", "big", "boom"], "bonusClass": "bonusmode"}, "tiers": [{"min": 100, "name": "LEGENDARY", "lv": 4}, {"min": 25, "name": "FORGED", "lv": 3}, {"min": 10, "name": "MOLTEN", "lv": 2}, {"min": 5, "name": "SPARK", "lv": 1}], "autoBigLv": 3, "text": {"idle": "Strike the anvil.", "win": "YOU FORGED {amt}", "lose": "Cold iron. Strike again.", "freeSpin": "Free spin {n}", "freeSpinRetrigger": "  ·  +{r} SPINS!"}, "fever": {"name": "Forge Fever", "sym": 8, "vol": 3, "text": "Each spin costs 3x your bet, but the bonus game is 5 times more likely to trigger!", "badge": "FORGE FEVER ×3", "onMsg": "FORGE FEVER ON · 5x BONUS CHANCE", "offMsg": "Forge Fever off"}, "buys": [{"key": "standard", "mult": 100, "sym": 6, "vol": 4, "name": "The Reforging", "text": "10 free spins. The Forge Core keeps its heat between spins and every 3rd spin opens with a guaranteed detonation.", "confirmTitle": "THE REFORGING", "confirmText": "Skip straight to 10 free spins. The Forge Core heat carries over between spins."}, {"key": "preheated", "mult": 500, "sym": 7, "vol": 5, "name": "Pre-Heated", "text": "The same bonus, but the Forge Core starts at 6 heat: a Wild is reforged before your first free spin.", "confirmTitle": "PRE-HEATED", "confirmText": "10 free spins with the Forge Core already at 6 heat: you start with a reforged Wild and the Core primed."}], "intro": {"unit": "FREE SPINS", "ribbon": "THE REFORGING", "chips": ["THE CORE KEEPS ITS HEAT", "EVERY 3RD SPIN: GUARANTEED DETONATION", "2+ GEMS: +4 SPINS"]}, "outro": {"ribbon": "BONUS COMPLETE"}, "audio": {"reverb": {"sec": 1.7, "pow": 2.8, "wet": 0.28}}, "luckCost": 496, "luck": {"name": "MAX LUCK", "sym": 9, "vol": 5, "text": "Pay 496x per spin and keep it on. Every spin has a 5% chance of landing 3 golden MAX coins and winning 9,500x your bet. Leave it on for as many spins as you like.", "badge": "MAX LUCK ×496", "onMsg": "MAX LUCK ON. TOTAL BET x496", "offMsg": "MAX LUCK OFF"}, "loading": {"volatility": 4, "features": [{"sym": 7, "title": "FORGE HEAT", "text": "Every cluster stokes the Core. At 3 heat every win gets a flat bonus, at 6 a wild is reforged, at 9 the Core detonates and doubles every wild."}, {"sym": 8, "title": "THE REFORGING", "text": "Land 3 Forgefire Gems for 10 free spins. The heat never cools and the wilds snowball. 2 more gems add 4 spins."}]}, "engineData": {"paytable": [[0.1, 0.25, 0.5, 1.5], [0.15, 0.3, 0.6, 1.75], [0.2, 0.4, 0.8, 2], [0.4, 1, 2.5, 6], [0.6, 1.5, 3.5, 9], [1.5, 4, 10, 25], [3, 8, 20, 50]], "payScale": 1.049, "scatterPay": null}};
+/* ---- DEMO FALLBACK: opened without a Nebula login, the page plays with play money using this embedded copy of the engine. ---- */
+const DEMO_ENGINE = (() => {
+/* EMBERCLAW: Molten Reforge — server-side game engine.
+ * Pure functions: no I/O, RNG injected. The client only animates what this returns. */
+
+const ROWS = 5, COLS = 6;
+const SYM = { IRON:0, COPPER:1, SILVER:2, HAMMER:3, TONGS:4, BLADE:5, CROWN:6, WILD:7, SCATTER:8 };
+const NAMES = ['Iron Shard','Copper Ingot','Silver Chain','Molten Hammer','Rune-Etched Tongs',
+  'Dragonbone Blade','Crown of Cinders','Ember Core Sigil','Forgefire Gem'];
+const LOW_MAX = SYM.SILVER;
+
+/* paytable: multiplier of bet per cluster size bucket [5-7, 8-9, 10-12, 13+] */
+const PAYTABLE = [
+  [0.10, 0.25, 0.5, 1.5], [0.15, 0.3, 0.6, 1.75], [0.2, 0.4, 0.8, 2],
+  [0.4, 1, 2.5, 6], [0.6, 1.5, 3.5, 9],
+  [1.5, 4, 10, 25], [3, 8, 20, 50]
+];
+const bucket = n => (n >= 13 ? 3 : n >= 10 ? 2 : n >= 8 ? 1 : 0);
+
+/* tunable math (see emberclaw-sim.js) */
+const CFG = {
+  weights: [12, 14, 13, 17, 19, 27, 29],   // refill + initial symbol weights
+  bonusWeights: [9.5, 9.5, 9.5, 14, 18, 22, 22], // leaner table during The Reforging (heat persists, so wilds snowball)
+  bonusFlatCap: 7,                        // in The Reforging the flat bonus stacks once per 3 heat, up to this many tiers
+  scatterP: 0.009018,                     // per-cell scatter chance on the initial grid (~1 in 403)
+  bonusScatterP: 0.01027,                 // per-cell scatter chance on free-spin boards (drives +4 retriggers; independent of the base trigger rate)
+  anteScatterP: 0.016177,                // Forge Fever: exactly 5x as likely as the natural bonus (~1 in 80.6)
+  payScale: 1.049,                        // global payout trim applied to every cluster win (RTP calibration)
+  heatFlat: 0.75,                         // heat >= 3: every cluster pays this flat bonus (spec said 0.5x; raised while tuning RTP)
+  maxWin: 9500,
+  freeSpins: 10, retriggerSpins: 4, retriggerMin: 2, maxBonusSpins: 100, maxSteps: 60,
+  bets: [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000],
+  buy: { standard: { cost: 100, heat: 1 }, preheated: { cost: 500, heat: 6 } },
+  bonusStartHeat: 1,                      // heat the Core starts at in a natural / Fever bonus (math tuning knob)
+  anteCost: 3,                            // Forge Fever costs 3x the bet
+  anteBonusWeights: [7.03, 7.03, 7.03, 14, 18, 22, 22], // Forge Fever bonuses use a richer table so the 3x price still returns ~96%
+  // MAX LUCK (optional per-spin mode): costs luckCost x bet; each spin has luckP to show 3 golden MAX coins and pay the cap.
+  // Return = (1-luckP)*normal + luckP*maxWin = 0.96*luckCost  =>  luckP = 0.96*(luckCost-1)/(maxWin-0.96)
+  luckCost: 496,
+  luckP: 0.050026,
+  luckTease: [[0, 80], [1, 12], [2, 8]],  // coins shown on a miss: cosmetic only (they sit on cells that never take part in a cluster)
+};
+
+function cryptoRng() {
+  return crypto.randomBytes(6).readUIntBE(0, 6) / 2 ** 48;   // uniform in [0,1), 48 bits
+}
+
+const newGrid = fill => Array.from({ length: ROWS }, () => Array(COLS).fill(fill));
+const clone = g => g.map(r => r.slice());
+
+function pickSymbol(rng, W = CFG.weights) {
+  let t = 0; for (const w of W) t += w;
+  let x = rng() * t;
+  for (let i = 0; i < W.length; i++) { x -= W[i]; if (x < 0) return i; }
+  return W.length - 1;
+}
+
+function initialGrid(rng, scatterP, W) {
+  const g = newGrid(0);
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
+    g[r][c] = rng() < scatterP ? SYM.SCATTER : pickSymbol(rng, W);
+  return g;
+}
+
+/* cluster detection: orthogonal adjacency, wilds join every cluster they touch */
+function findClusters(g, wm) {
+  const out = [];
+  for (let s = 0; s <= SYM.CROWN; s++) {
+    const seen = newGrid(false);
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      if (seen[r][c] || g[r][c] !== s) continue;       // start only from a real symbol
+      const cells = [], st = [[r, c]]; seen[r][c] = true;
+      let real = 0;
+      while (st.length) {
+        const [y, x] = st.pop(); cells.push([y, x]);
+        if (g[y][x] === s) real++;
+        for (const [dy, dx] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+          const ny = y + dy, nx = x + dx;
+          if (ny < 0 || nx < 0 || ny >= ROWS || nx >= COLS || seen[ny][nx]) continue;
+          const v = g[ny][nx];
+          if (v === s || v === SYM.WILD) { seen[ny][nx] = true; st.push([ny, nx]); }
+        }
+      }
+      if (cells.length >= 5 && real > 0) {
+        let mult = 0, wilds = 0;   // multiple wilds in a cluster add their multipliers
+        for (const [y, x] of cells) if (g[y][x] === SYM.WILD) { mult += wm[y][x]; wilds++; }
+        if (!wilds) mult = 1;
+        out.push({ symbol: s, size: cells.length, cells, wilds, wildMult: mult });
+      }
+    }
+  }
+  return out;
+}
+
+function reforge(g, wm, rng, mult = 1) {
+  const cand = [];
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (g[r][c] <= LOW_MAX) cand.push([r, c]);
+  if (!cand.length) return null;
+  const [r, c] = cand[Math.floor(rng() * cand.length)];
+  const was = g[r][c]; g[r][c] = SYM.WILD; wm[r][c] = mult;
+  return { r, c, was, mult };
+}
+
+/* Heat thresholds on the 9-notch Core: 3 = passive flat bonus, 6 = reforge, 9 = detonation.
+ * Each of reforge / detonation fires at most once per spin sequence (`fired`), even if bonus heat keeps climbing. */
+function heatEvents(from, to, g, wm, rng, fired) {
+  const ev = [];
+  for (let h = from + 1; h <= to; h++) {
+    const k = h % 9;
+    if (k === 6 && !fired.reforge) {
+      fired.reforge = true;
+      const f = reforge(g, wm, rng); if (f) ev.push({ type: 'reforge', heat: h, cells: [f] });
+    } else if (k === 0 && !fired.detonate) { fired.detonate = true; ev.push(detonate(g, wm, rng, h)); }
+  }
+  return ev;
+}
+function detonate(g, wm, rng, heat, forced = false) {
+  const doubled = [];
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
+    if (g[r][c] === SYM.WILD) { wm[r][c] *= 2; doubled.push({ r, c, mult: wm[r][c] }); }
+  const f = reforge(g, wm, rng);
+  return { type: 'detonate', heat, forced, doubled, cells: f ? [f] : [] };
+}
+const wildList = (g, wm) => {
+  const o = [];
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (g[r][c] === SYM.WILD) o.push({ r, c, mult: wm[r][c] });
+  return o;
+};
+
+/* One spin = initial grid + full cascade chain. heat0 is the Core heat carried in. */
+function playSpin(rng, { heat0 = 0, ante = false, forceDetonate = false, noScatter = false, inBonus = false, weights = CFG.weights } = {}) {
+  let g = initialGrid(rng, noScatter ? 0 : inBonus ? CFG.bonusScatterP : ante ? CFG.anteScatterP : CFG.scatterP, weights);
+  const wm = newGrid(1);
+  const out = { initialGrid: clone(g), startHeat: heat0, openingEvents: [], cascadeSteps: [], totalPayout: 0, scatters: 0 };
+  for (const row of g) for (const v of row) if (v === SYM.SCATTER) out.scatters++;
+
+  let heat = heat0;
+  // carried-in heat (pre-heated / persisted) already past thresholds on the fresh board
+  const fired = { reforge: false, detonate: false };
+  if (heat >= 6) out.openingEvents.push(...heatEvents(0, 6, g, wm, rng, fired));
+  if (heat >= 9) out.openingEvents.push(...heatEvents(6, 9, g, wm, rng, fired));
+  if (forceDetonate) { fired.detonate = true; out.openingEvents.push(detonate(g, wm, rng, heat, true)); }
+  out.openingGrid = clone(g); out.openingWilds = wildList(g, wm);
+
+  let total = 0;
+  for (let step = 0; step < CFG.maxSteps; step++) {
+    const clusters = findClusters(g, wm);
+    if (!clusters.length) break;
+    const tiers = heat < 3 ? 0 : inBonus ? Math.min(Math.floor(heat / 3), CFG.bonusFlatCap) : 1;
+    let payout = 0, wildClusters = 0;
+    const cleared = [], cl = [];
+    for (const k of clusters) {
+      const base = PAYTABLE[k.symbol][bucket(k.size)] + tiers * CFG.heatFlat;
+      const pay = base * k.wildMult * CFG.payScale;
+      payout += pay; if (k.wilds) wildClusters++;
+      cl.push({ symbol: k.symbol, size: k.size, payout: pay, wildMult: k.wildMult, cells: k.cells.map(([r, c]) => ({ r, c })) });
+      for (const [r, c] of k.cells) if (g[r][c] !== SYM.WILD && !cleared.some(q => q.r === r && q.c === c))
+        cleared.push({ r, c, sym: g[r][c] });
+    }
+    if (total + payout >= CFG.maxWin) { payout = CFG.maxWin - total; out.capped = true; }
+    total += payout;
+
+    for (const q of cleared) g[q.r][q.c] = -1;
+    const newCells = [];
+    for (const q of cleared) { const s = pickSymbol(rng, weights); g[q.r][q.c] = s; newCells.push({ r: q.r, c: q.c, sym: s }); }
+
+    const prev = heat; heat += 1 + wildClusters;
+    const reforgeEvents = out.capped ? [] : heatEvents(prev, heat, g, wm, rng, fired);
+    out.cascadeSteps.push({
+      clusters: cl, clearedCells: cleared, payout, newCells, coreHeat: heat, reforgeEvents,
+      wilds: wildList(g, wm), grid: clone(g)
+    });
+    if (out.capped) break;
+  }
+  out.totalPayout = total; out.endHeat = heat;
+  return out;
+}
+
+/* Full round: base spin (+ whole bonus if triggered). Payouts are in multiples of the base bet. */
+/* A bought bonus first plays a visible trigger spin: a board that lands n Forgefire Gems and pays nothing. */
+function triggerGrid(rng, n) {
+  let g;
+  for (let tries = 0; tries < 300; tries++) {
+    g = initialGrid(rng, 0, CFG.weights);
+    const used = [];
+    while (used.length < n) { const r = Math.floor(rng() * ROWS), c = Math.floor(rng() * COLS); if (!used.some(q => q[0] === r && q[1] === c)) used.push([r, c]); }
+    used.forEach(([r, c]) => { g[r][c] = SYM.SCATTER; });
+    if (!findClusters(g, newGrid(1)).length) break;
+  }
+  return g;
+}
+
+const COIN = 9;
+function shuffled(rng, a) { a = a.slice(); for (let i = 0; i < a.length - 1; i++) { const j = i + Math.floor(rng() * (a.length - i)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function pickW(rng, tab) { const t = tab.reduce((a, x) => a + x[1], 0); let u = rng() * t; for (const [v, w] of tab) { if ((u -= w) < 0) return v; } return tab[tab.length - 1][0]; }
+
+/* MAX LUCK round. Hit: a fresh cluster-free board with 3 coins, pays the cap. Miss: an ordinary base round; 0-2 teaser coins go on cells that are never part of any cluster, event or refill. */
+function playLuck(rng) {
+  const hit = rng() < CFG.luckP;
+  if (hit) {
+    let g; for (let t = 0; t < 400; t++) { g = initialGrid(rng, 0, CFG.weights); if (!findClusters(g, newGrid(1)).length) break; }
+    const pool = shuffled(rng, [].concat(...g.map((row, r) => row.map((_, c) => [r, c])))), cells = pool.slice(0, 3).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    cells.forEach(([r, c]) => { g[r][c] = COIN; });
+    return { cost: CFG.luckCost, luck: { hit: true, cells }, initialGrid: g, openingEvents: [], openingGrid: clone(g), cascadeSteps: [], basePayout: CFG.maxWin, totalPayout: CFG.maxWin,
+      bonusTriggered: false, freeSpinsAwarded: 0, bonus: null, capped: true };
+  }
+  const r = playRound(rng, {}); r.cost = CFG.luckCost; r.luck = { hit: false, cells: [] };
+  const count = pickW(rng, CFG.luckTease);
+  if (count > 0 && !r.bonusTriggered) {
+    const used = new Set(), mark = (a, b) => used.add(a * COLS + b);
+    r.cascadeSteps.forEach(st => { st.clusters.forEach(k => k.cells.forEach(q => mark(q.r, q.c))); st.clearedCells.forEach(q => mark(q.r, q.c)); st.newCells.forEach(q => mark(q.r, q.c)); st.wilds.forEach(q => mark(q.r, q.c));
+      (st.reforgeEvents || []).forEach(e => { (e.cells || []).forEach(q => mark(q.r, q.c)); (e.doubled || []).forEach(q => mark(q.r, q.c)); }); });
+    const free = []; for (let a = 0; a < ROWS; a++) for (let b = 0; b < COLS; b++) if (!used.has(a * COLS + b) && r.initialGrid[a][b] !== SYM.SCATTER && r.initialGrid[a][b] !== SYM.WILD) free.push([a, b]);
+    const cells = shuffled(rng, free).slice(0, count).sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+    if (cells.length === count) { const grids = [r.initialGrid, r.openingGrid, ...r.cascadeSteps.map(st => st.grid)]; cells.forEach(([a, b]) => grids.forEach(G => { if (G) G[a][b] = COIN; })); r.luck.cells = cells; }
+  }
+  return r;
+}
+
+function playRound(rng, { ante = false, buy = null, luck = false } = {}) {
+  if (luck) { if (ante || buy) throw new Error('luck cannot combine with ante or buy'); return playLuck(rng); }
+  const bonusFrom = (startHeat, bw = CFG.bonusWeights) => {
+    const spins = []; let heat = startHeat, left = CFG.freeSpins, n = 0, total = 0, awarded = CFG.freeSpins;
+    while (left > 0 && n < CFG.maxBonusSpins && total < CFG.maxWin) {
+      n++; left--;
+      const s = playSpin(rng, { heat0: heat, forceDetonate: n % 3 === 0, weights: bw, inBonus: true });
+      s.spinIndex = n; heat = s.endHeat; total += s.totalPayout;
+      if (s.scatters >= CFG.retriggerMin) { left += CFG.retriggerSpins; awarded += CFG.retriggerSpins; s.retrigger = CFG.retriggerSpins; }
+      s.spinsLeft = left;
+      spins.push(s);
+    }
+    return { spins, totalPayout: Math.min(total, CFG.maxWin), freeSpinsAwarded: awarded, startSpins: CFG.freeSpins, endHeat: heat };
+  };
+
+  if (buy) {
+    const b = CFG.buy[buy];
+    const bonus = bonusFrom(b.heat);
+    return { cost: b.cost, initialGrid: triggerGrid(rng, buy === 'preheated' ? 4 : 3), cascadeSteps: [], baseSpin: null, bonus, bonusTriggered: true,
+      freeSpinsAwarded: bonus.freeSpinsAwarded, totalPayout: bonus.totalPayout, bought: buy };
+  }
+  const base = playSpin(rng, { ante });
+  const trig = base.scatters >= 3;
+  let bonus = null, total = base.totalPayout;
+  if (trig) { bonus = bonusFrom(CFG.bonusStartHeat, ante ? CFG.anteBonusWeights : CFG.bonusWeights); total = Math.min(CFG.maxWin, total + bonus.totalPayout); }
+  return {
+    cost: ante ? CFG.anteCost : 1,
+    initialGrid: base.initialGrid, openingEvents: base.openingEvents, openingGrid: base.openingGrid,
+    cascadeSteps: base.cascadeSteps, basePayout: base.totalPayout,
+    totalPayout: total, bonusTriggered: trig, freeSpinsAwarded: trig ? bonus.freeSpinsAwarded : 0,
+    bonus, capped: !!base.capped || total >= CFG.maxWin
+  };
+}
+
+return { CFG, NAMES, PAYTABLE, ROWS, SYM, cryptoRng, playRound, playSpin };
+})();
 /* ---- shell music engine ---- */
 /* SlotForge music engine: fully synthesised looping soundtracks (Web Audio only, no files).
  *
@@ -1690,7 +1944,8 @@ const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
 
 const shellApi = { boot, $, store, fmt, betLbl, sleep, hooks: null, S: null };
 function boot(cfg, factory) {
-const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : null;   // standalone build: engine embedded, play money
+const hasLogin = (() => { try { return !!localStorage.getItem('stakeToken'); } catch { return false; } })();
+const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : (typeof DEMO_ENGINE !== 'undefined' && !hasLogin ? DEMO_ENGINE : null);   // no Nebula login: play-money demo, never a dead end   // standalone build: engine embedded, play money
 const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, LUCK_COST = cfg.luckCost || 0, BUYS = cfg.buys || [], P = cfg.storage || cfg.id;
 let hooks = {};
 let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, luck = false, busy = false, balance = 0, STAGE_S = 1;
@@ -1945,8 +2200,11 @@ async function api(body) {
     wallet = _r2(wallet - cost + payout); try { localStorage.setItem(cfg.walletKey, wallet); } catch {}
     return { round, stake, cost, payout, user: { balance: wallet } };
   }
-  const r = await fetch(API + cfg.api, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
-  const j = await r.json(); if (!r.ok) throw new Error(j.error || 'Spin failed'); return j;
+  const ac = new AbortController(), to = setTimeout(() => ac.abort(), 25000);   // a dead connection must not leave the game frozen
+  let r; try { r = await fetch(API + cfg.api, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body), signal: ac.signal }); }
+  catch (e) { throw new Error(e.name === 'AbortError' ? 'No answer from the server. Check your connection and try again.' : 'Could not reach the server. Check your connection.'); }
+  finally { clearTimeout(to); }
+  const j = await r.json().catch(() => { throw new Error('The server sent an unexpected answer. Try again.'); }); if (!r.ok) throw new Error(j.error || 'Spin failed'); return j;
 }
 function syncParent(u) { try { const a = parent !== window && parent._slotAPI; if (a) { a.bal = u.balance; a.paintBal(0); } } catch {} }
 
@@ -2023,7 +2281,8 @@ function setBusy(b) {
   $('bAuto').disabled = b && auto.left <= 0; $('spin').classList.toggle('busy', b && auto.left <= 0);
 }
 async function go(buy) {
-  if (busy) return; setBusy(true); sfx.spin(); closeMenu(); if (cfg.text.spin) say(cfg.text.spin);
+  if (busy) return; setBusy(true); sfx.spin(); closeMenu();
+  let inBonus = false; const wd = setTimeout(() => { if (busy && !inBonus) { setBusy(false); hooks.restoreBoard && hooks.restoreBoard(); say('That round got stuck and was reset. Your balance is safe; spin again.'); } }, 45000);   // watchdog for a hung base spin if (cfg.text.spin) say(cfg.text.spin);
   $('win').textContent = fmt(0); $('fsBox').hidden = true;
   const stake = BETS[bi]; let out = { payout: 0, bonus: false, tier: null };
   try {
@@ -2037,7 +2296,7 @@ async function go(buy) {
     const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b); } };
     run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
     if (R.bonusTriggered) {
-      out.bonus = true;
+      out.bonus = true; inBonus = true;
       await hooks.showTrigger(R); sfx.bonus(); music.duck(.12, 2.6, 1.6); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
       $('introN').textContent = R.bonus.startSpins; music.theme('bonus', 2.6); music.stinger('bonus'); await tapWait('introM', auto.left > 0 ? 1800 : 0);
       $('fsBox').hidden = false; $(cc.el).classList.add(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(true); if (ambCtl && ambCtl.bonus) ambCtl.bonus(true);
@@ -2060,7 +2319,7 @@ async function go(buy) {
     out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
     out.tier = await bigWin(R.totalPayout, j.payout);
   } catch (e) { say(e.message); out.err = true; }
-  boost = false; setBusy(false); refreshUi(); return out;
+  clearTimeout(wd); boost = false; setBusy(false); refreshUi(); return out;
 }
 
 /* ---------- autoplay ---------- */
@@ -2218,7 +2477,10 @@ say(cfg.text.idle + (LOCAL ? ' (Play-money demo)' : ''));
 if (LOCAL) { balance = wallet; $('bal').textContent = fmt(balance); }
 else if (!TOKEN) $('auth').hidden = false;
 else fetch(API + '/api/me', { headers: { authorization: 'Bearer ' + TOKEN } }).then(r => r.json())
-  .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); } else $('auth').hidden = false; });
+  .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); }
+    else if (typeof DEMO_ENGINE !== 'undefined') { try { localStorage.removeItem('stakeToken'); } catch {} location.reload(); }   // stale login: fall back to the play-money demo
+    else $('auth').hidden = false; })
+  .catch(() => {});
 }
 return shellApi;
 })();

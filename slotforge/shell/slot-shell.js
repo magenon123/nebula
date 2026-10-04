@@ -17,7 +17,8 @@ const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
 
 const shellApi = { boot, $, store, fmt, betLbl, sleep, hooks: null, S: null };
 function boot(cfg, factory) {
-const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : null;   // standalone build: engine embedded, play money
+const hasLogin = (() => { try { return !!localStorage.getItem('stakeToken'); } catch { return false; } })();
+const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : (typeof DEMO_ENGINE !== 'undefined' && !hasLogin ? DEMO_ENGINE : null);   // no Nebula login: play-money demo, never a dead end   // standalone build: engine embedded, play money
 const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, LUCK_COST = cfg.luckCost || 0, BUYS = cfg.buys || [], P = cfg.storage || cfg.id;
 let hooks = {};
 let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, luck = false, busy = false, balance = 0, STAGE_S = 1;
@@ -272,8 +273,11 @@ async function api(body) {
     wallet = _r2(wallet - cost + payout); try { localStorage.setItem(cfg.walletKey, wallet); } catch {}
     return { round, stake, cost, payout, user: { balance: wallet } };
   }
-  const r = await fetch(API + cfg.api, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
-  const j = await r.json(); if (!r.ok) throw new Error(j.error || 'Spin failed'); return j;
+  const ac = new AbortController(), to = setTimeout(() => ac.abort(), 25000);   // a dead connection must not leave the game frozen
+  let r; try { r = await fetch(API + cfg.api, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body), signal: ac.signal }); }
+  catch (e) { throw new Error(e.name === 'AbortError' ? 'No answer from the server. Check your connection and try again.' : 'Could not reach the server. Check your connection.'); }
+  finally { clearTimeout(to); }
+  const j = await r.json().catch(() => { throw new Error('The server sent an unexpected answer. Try again.'); }); if (!r.ok) throw new Error(j.error || 'Spin failed'); return j;
 }
 function syncParent(u) { try { const a = parent !== window && parent._slotAPI; if (a) { a.bal = u.balance; a.paintBal(0); } } catch {} }
 
@@ -350,7 +354,8 @@ function setBusy(b) {
   $('bAuto').disabled = b && auto.left <= 0; $('spin').classList.toggle('busy', b && auto.left <= 0);
 }
 async function go(buy) {
-  if (busy) return; setBusy(true); sfx.spin(); closeMenu(); if (cfg.text.spin) say(cfg.text.spin);
+  if (busy) return; setBusy(true); sfx.spin(); closeMenu();
+  let inBonus = false; const wd = setTimeout(() => { if (busy && !inBonus) { setBusy(false); hooks.restoreBoard && hooks.restoreBoard(); say('That round got stuck and was reset. Your balance is safe; spin again.'); } }, 45000);   // watchdog for a hung base spin if (cfg.text.spin) say(cfg.text.spin);
   $('win').textContent = fmt(0); $('fsBox').hidden = true;
   const stake = BETS[bi]; let out = { payout: 0, bonus: false, tier: null };
   try {
@@ -364,7 +369,7 @@ async function go(buy) {
     const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b); } };
     run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
     if (R.bonusTriggered) {
-      out.bonus = true;
+      out.bonus = true; inBonus = true;
       await hooks.showTrigger(R); sfx.bonus(); music.duck(.12, 2.6, 1.6); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
       $('introN').textContent = R.bonus.startSpins; music.theme('bonus', 2.6); music.stinger('bonus'); await tapWait('introM', auto.left > 0 ? 1800 : 0);
       $('fsBox').hidden = false; $(cc.el).classList.add(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(true); if (ambCtl && ambCtl.bonus) ambCtl.bonus(true);
@@ -387,7 +392,7 @@ async function go(buy) {
     out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
     out.tier = await bigWin(R.totalPayout, j.payout);
   } catch (e) { say(e.message); out.err = true; }
-  boost = false; setBusy(false); refreshUi(); return out;
+  clearTimeout(wd); boost = false; setBusy(false); refreshUi(); return out;
 }
 
 /* ---------- autoplay ---------- */
@@ -545,7 +550,10 @@ say(cfg.text.idle + (LOCAL ? ' (Play-money demo)' : ''));
 if (LOCAL) { balance = wallet; $('bal').textContent = fmt(balance); }
 else if (!TOKEN) $('auth').hidden = false;
 else fetch(API + '/api/me', { headers: { authorization: 'Bearer ' + TOKEN } }).then(r => r.json())
-  .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); } else $('auth').hidden = false; });
+  .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); }
+    else if (typeof DEMO_ENGINE !== 'undefined') { try { localStorage.removeItem('stakeToken'); } catch {} location.reload(); }   // stale login: fall back to the play-money demo
+    else $('auth').hidden = false; })
+  .catch(() => {});
 }
 return shellApi;
 })();

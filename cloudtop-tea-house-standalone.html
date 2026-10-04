@@ -746,9 +746,8 @@ symbol#kojiSplashSuper,symbol#kojiSplash{overflow:visible}
 .cell .m{transform-origin:0 0;left:10px;right:auto;top:9px;bottom:auto;transform:none;min-width:34px;padding:0 6px;font-size:17px;border-width:3px;line-height:1.25}
 
 </style></head><body>
-<div id="rotateM"><div class="rmPhone"></div><div class="rmTxt">ROTATE YOUR PHONE</div><div class="rmSub">This game plays in landscape</div></div>
 <div id="loadM"><div class="lmLogo" id="lmLogo"></div><div class="lmVol" id="lmVol"></div><div class="lmCards" id="lmCards"></div><div class="lmBar"><i id="lmFill"></i></div><div class="lmTxt" id="lmTxt">LOADING</div><div class="lmTap" id="lmTap">CLICK TO CONTINUE</div><div class="lmWarn">Stuck here? Open this file in Chrome or Safari. File viewers and chat apps cannot run the game.</div></div><noscript><div style="position:fixed;inset:0;z-index:999;background:#111;color:#fff;padding:40px;font:20px/1.4 sans-serif">JavaScript is turned off or blocked here. Open this file in Chrome or Safari.</div></noscript>
-<script>window.addEventListener("error",function(e){var t=document.getElementById("lmTxt");if(t){t.textContent="ERROR: "+(e.message||"unknown")+" (line "+(e.lineno||"?")+")";t.style.color="#ff9090";t.style.animation="none";t.style.fontSize="14px";t.style.letterSpacing="1px";t.style.maxWidth="90vw";t.style.textAlign="center"}});setTimeout(function(){if(!window.__booted){var t=document.getElementById("lmTxt");if(t&&!/ERROR/.test(t.textContent)){t.textContent="The game did not start. Open this file in Chrome or Safari."}}},7000)</script>
+<script>window.addEventListener("error",function(e){if(window.__booted){var b=document.getElementById("errBar");if(!b){b=document.createElement("div");b.id="errBar";b.style.cssText="position:fixed;left:0;right:0;top:0;z-index:9999;background:#7a0f0f;color:#fff;font:12px/1.3 system-ui,sans-serif;padding:6px 10px;text-align:center";b.onclick=function(){b.remove()};document.body.appendChild(b)}b.textContent="Game error (tap to hide): "+(e.message||"unknown")+" line "+(e.lineno||"?");return}var t=document.getElementById("lmTxt");if(t){t.textContent="ERROR: "+(e.message||"unknown")+" (line "+(e.lineno||"?")+")";t.style.color="#ff9090";t.style.animation="none";t.style.fontSize="14px";t.style.letterSpacing="1px";t.style.maxWidth="90vw";t.style.textAlign="center"}});setTimeout(function(){if(!window.__booted){var t=document.getElementById("lmTxt");if(t&&!/ERROR/.test(t.textContent)){t.textContent="The game did not start. Open this file in Chrome or Safari."}}},7000)</script>
 
 <!-- ============ shared defs (wobble filters, hatch patterns) + this slot's symbols ============ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -1566,7 +1565,8 @@ const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
 
 const shellApi = { boot, $, store, fmt, betLbl, sleep, hooks: null, S: null };
 function boot(cfg, factory) {
-const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : null;   // standalone build: engine embedded, play money
+const hasLogin = (() => { try { return !!localStorage.getItem('stakeToken'); } catch { return false; } })();
+const LOCAL = typeof SLOT_ENGINE !== 'undefined' ? SLOT_ENGINE : (typeof DEMO_ENGINE !== 'undefined' && !hasLogin ? DEMO_ENGINE : null);   // no Nebula login: play-money demo, never a dead end   // standalone build: engine embedded, play money
 const BETS = cfg.bets, ANTE_COST = cfg.anteCost || 0, LUCK_COST = cfg.luckCost || 0, BUYS = cfg.buys || [], P = cfg.storage || cfg.id;
 let hooks = {};
 let bi = BETS.indexOf(cfg.defaultBet || 1), ante = false, luck = false, busy = false, balance = 0, STAGE_S = 1;
@@ -1821,8 +1821,11 @@ async function api(body) {
     wallet = _r2(wallet - cost + payout); try { localStorage.setItem(cfg.walletKey, wallet); } catch {}
     return { round, stake, cost, payout, user: { balance: wallet } };
   }
-  const r = await fetch(API + cfg.api, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body) });
-  const j = await r.json(); if (!r.ok) throw new Error(j.error || 'Spin failed'); return j;
+  const ac = new AbortController(), to = setTimeout(() => ac.abort(), 25000);   // a dead connection must not leave the game frozen
+  let r; try { r = await fetch(API + cfg.api, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body), signal: ac.signal }); }
+  catch (e) { throw new Error(e.name === 'AbortError' ? 'No answer from the server. Check your connection and try again.' : 'Could not reach the server. Check your connection.'); }
+  finally { clearTimeout(to); }
+  const j = await r.json().catch(() => { throw new Error('The server sent an unexpected answer. Try again.'); }); if (!r.ok) throw new Error(j.error || 'Spin failed'); return j;
 }
 function syncParent(u) { try { const a = parent !== window && parent._slotAPI; if (a) { a.bal = u.balance; a.paintBal(0); } } catch {} }
 
@@ -1899,7 +1902,8 @@ function setBusy(b) {
   $('bAuto').disabled = b && auto.left <= 0; $('spin').classList.toggle('busy', b && auto.left <= 0);
 }
 async function go(buy) {
-  if (busy) return; setBusy(true); sfx.spin(); closeMenu(); if (cfg.text.spin) say(cfg.text.spin);
+  if (busy) return; setBusy(true); sfx.spin(); closeMenu();
+  let inBonus = false; const wd = setTimeout(() => { if (busy && !inBonus) { setBusy(false); hooks.restoreBoard && hooks.restoreBoard(); say('That round got stuck and was reset. Your balance is safe; spin again.'); } }, 45000);   // watchdog for a hung base spin if (cfg.text.spin) say(cfg.text.spin);
   $('win').textContent = fmt(0); $('fsBox').hidden = true;
   const stake = BETS[bi]; let out = { payout: 0, bonus: false, tier: null };
   try {
@@ -1913,7 +1917,7 @@ async function go(buy) {
     const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b); } };
     run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
     if (R.bonusTriggered) {
-      out.bonus = true;
+      out.bonus = true; inBonus = true;
       await hooks.showTrigger(R); sfx.bonus(); music.duck(.12, 2.6, 1.6); char('big', 2500); shake(true); flash(); embers(160); await sleep(500);
       $('introN').textContent = R.bonus.startSpins; music.theme('bonus', 2.6); music.stinger('bonus'); await tapWait('introM', auto.left > 0 ? 1800 : 0);
       $('fsBox').hidden = false; $(cc.el).classList.add(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(true); if (ambCtl && ambCtl.bonus) ambCtl.bonus(true);
@@ -1936,7 +1940,7 @@ async function go(buy) {
     out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
     out.tier = await bigWin(R.totalPayout, j.payout);
   } catch (e) { say(e.message); out.err = true; }
-  boost = false; setBusy(false); refreshUi(); return out;
+  clearTimeout(wd); boost = false; setBusy(false); refreshUi(); return out;
 }
 
 /* ---------- autoplay ---------- */
@@ -2094,7 +2098,10 @@ say(cfg.text.idle + (LOCAL ? ' (Play-money demo)' : ''));
 if (LOCAL) { balance = wallet; $('bal').textContent = fmt(balance); }
 else if (!TOKEN) $('auth').hidden = false;
 else fetch(API + '/api/me', { headers: { authorization: 'Bearer ' + TOKEN } }).then(r => r.json())
-  .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); } else $('auth').hidden = false; });
+  .then(j => { if (j.user) { balance = j.user.balance; $('bal').textContent = fmt(balance); }
+    else if (typeof DEMO_ENGINE !== 'undefined') { try { localStorage.removeItem('stakeToken'); } catch {} location.reload(); }   // stale login: fall back to the play-money demo
+    else $('auth').hidden = false; })
+  .catch(() => {});
 }
 return shellApi;
 })();
