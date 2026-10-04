@@ -1,0 +1,26 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Phone test</title>
+<style>body{margin:0;padding:18px;background:#10131c;color:#fff;font:16px/1.5 -apple-system,Segoe UI,Roboto,sans-serif}h1{font-size:22px;margin:0 0 6px}.r{padding:6px 10px;margin:4px 0;border-radius:8px;background:#1b2030}.ok{color:#7dff9a}.no{color:#ff8080}.s{opacity:.7;font-size:13px}</style></head><body>
+<h1>Slot phone test</h1><div class="s">Take a screenshot of this page and send it to me.</div>
+<div class="r" id="js"><span class="no">JavaScript is NOT running here. Open this file in Safari or Chrome.</span></div><div id="out"></div>
+<script>
+document.getElementById('js').innerHTML='<span class="ok">JavaScript runs</span>';
+var out=document.getElementById('out');
+function row(n,ok,extra){var d=document.createElement('div');d.className='r';d.innerHTML=n+': <span class="'+(ok?'ok':'no')+'">'+(ok?'yes':'NO')+'</span>'+(extra?' <span class="s">'+extra+'</span>':'');out.appendChild(d)}
+function t(n,f){try{var v=f();row(n,!!v,typeof v==='string'?v:'')}catch(e){row(n,false,String(e))}}
+t('Browser',function(){return navigator.userAgent.slice(0,90)});
+t('Screen size',function(){return innerWidth+'x'+innerHeight+' @'+devicePixelRatio});
+t('localStorage',function(){localStorage.setItem('t','1');return localStorage.getItem('t')==='1'});
+t('Audio (AudioContext)',function(){return !!(window.AudioContext||window.webkitAudioContext)});
+t('Animations (Element.animate)',function(){return typeof document.body.animate==='function'});
+t('getAnimations',function(){return typeof document.getAnimations==='function'});
+t('requestAnimationFrame',function(){return typeof requestAnimationFrame==='function'});
+t('Fullscreen API',function(){var d=document.documentElement;return !!(d.requestFullscreen||d.webkitRequestFullscreen)});
+t('CSS :has()',function(){return CSS.supports('selector(:has(a))')});
+t('CSS color-mix',function(){return CSS.supports('color','color-mix(in srgb,red 50%,blue)')});
+t('backdrop-filter',function(){return CSS.supports('backdrop-filter','blur(2px)')||CSS.supports('-webkit-backdrop-filter','blur(2px)')});
+t('Optional chaining / nullish',function(){return eval('(null)?.a ?? 1')===1});
+t('Promise.allSettled',function(){return typeof Promise.allSettled==='function'});
+var n=0,box=document.createElement('div');box.className='r';box.innerHTML='Animation frames in 2s: <b id="fr">0</b> <span class="s">(should be 60 or more)</span>';out.appendChild(box);
+(function f(){n++;requestAnimationFrame(f)})();setTimeout(function(){document.getElementById('fr').textContent=n},2000);
+window.addEventListener('error',function(e){var d=document.createElement('div');d.className='r no';d.textContent='ERROR: '+e.message;out.appendChild(d)});
+</script></body></html>
