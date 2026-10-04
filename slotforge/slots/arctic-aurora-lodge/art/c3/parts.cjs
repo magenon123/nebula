@@ -135,17 +135,17 @@ P_.fish = () => { setSeed(41);
 P_.face = () => { setSeed(51);
   let s = '';
   s += S('M204 78Q197 80 197 90Q199 100 206 98Z', O(PAL.skin, { ow: 1.6, k: .4 })); // left ear
-  s += S('M204 74Q200 90 206 104Q220 122 240 122Q262 122 274 104Q280 90 276 74Q260 62 240 64Q220 62 204 74Z', O(PAL.skin, { ow: 2.2, k: .8, grad: .2, over:
+  s += S('M204 74Q200 90 206 104Q220 122 240 122Q262 122 274 104Q280 90 276 74L278 46Q240 38 202 46Z', O(PAL.skin, { ow: 2.2, k: .8, grad: .2, over:
     `<ellipse cx="222" cy="90" rx="9" ry="6" fill="#e8666a" opacity=".38"/><ellipse cx="260" cy="90" rx="9" ry="6" fill="#e8666a" opacity=".3"/>` +
     stroke('M205 80Q211 84 214 82M206 86Q212 89 216 88', PAL.skin.sh2, 1, .8) + stroke('M276 80Q270 84 266 82M275 86Q269 89 265 88', PAL.skin.sh2, 1, .8) +
     stroke('M214 84Q224 90 234 86', PAL.skin.sh2, 1.1, .55) + stroke('M246 86Q256 90 266 84', PAL.skin.sh2, 1.1, .55) + // eye bags
     stroke('M216 94Q220 100 224 103M264 94Q260 100 256 103', PAL.skin.sh2, 1.1, .5) +
-    `<rect x="196" y="62" width="90" height="16" fill="url(#gBrim)" opacity=".9"/>` +
+    `<rect x="196" y="56" width="90" height="20" fill="url(#gBrim)" opacity=".9"/>` +
     `<ellipse cx="240" cy="108" rx="19" ry="5.5" fill="#3a1218"/><path d="M226 106Q240 103 254 106" fill="none" stroke="#7a3038" stroke-width="2"/>` }));
   // nose
   s += S('M240 72Q230 77 230 86Q230 93 240 94Q250 93 250 86Q250 77 240 72Z', O({ fill: '#e49272', sh1: '#bc5e4c', sh2: '#8c3a3a', hi: '#ffd0b0' }, { ow: 1.8, k: .5, over: `<ellipse cx="236.4" cy="91" rx="2" ry="1.2" fill="#5a2028" opacity=".7"/><ellipse cx="243.6" cy="91" rx="2" ry="1.2" fill="#5a2028" opacity=".7"/><ellipse cx="238" cy="84" rx="2.4" ry="3.6" fill="#fff" opacity=".35"/>` }));
   const bd = `<defs><linearGradient id="gBrim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a0a14" stop-opacity=".95"/><stop offset="1" stop-color="#1a0a14" stop-opacity="0"/></linearGradient></defs>`;
-  return part(bd + s, hb([190, 56, 100, 72]), 3.4, 0, HXF);
+  return part(bd + s, hb([190, 36, 100, 92]), 3.4, 0, HXF);
 };
 // beard: base mass + clumped locks + braid
 P_.beard = () => { setSeed(61); let s = '';
@@ -174,14 +174,14 @@ P_.pipe = () => { setSeed(81);
   s += S('M182 106L210 108L210 111L182 109Z', O(PAL.brass, { ow: 1, k: .2 }));
   return part(s, hb([176, 74, 60, 54], 4), 3.4, 0, HXF + ' translate(0 4)');
 };
+const SQ = s => `<g transform="translate(242 0) scale(.84 1) translate(-242 0)">${s}</g>`;
 P_.hat = () => { setSeed(91); let s = '';
   const fs = (x0, y0, x1, y1, n, cc) => strands(x0, y0, x1, y1, n, cc || [[PAL.fur.sh2, 1.2, .55], [PAL.fur.hi, 1.2, .8], ['#e6d4b8', .9, .6]], 11, 80);
   // right flap, hanging down
-  const rf = 'M266 62L308 60L314 92Q314 118 292 126Q272 118 268 96Z';
-  s += S('M266 62L310 60' + fur([[310, 60], [316, 92], [312, 110], [296, 124]], { len: 6, step: 6, side: -1 }) + fur([[296, 124], [280, 120], [268, 98], [264, 72]], { len: 6, step: 6, side: -1 }) + 'Z', O(PAL.fur, { ow: 2.2, over: fs(262, 60, 318, 128, 40) }));
+    s += S('M266 60L306 58' + fur([[306, 58], [311, 82], [308, 98], [292, 110]], { len: 6, step: 6, side: -1 }) + fur([[292, 110], [278, 104], [270, 88], [266, 70]], { len: 6, step: 6, side: -1 }) + 'Z', O(PAL.fur, { ow: 2.2, over: fs(262, 58, 314, 112, 30) }));
   // ties with beads
-  s += stroke('M286 124Q284 138 282 148M298 118Q304 132 304 146', OL, 4.4) + stroke('M286 124Q284 138 282 148M298 118Q304 132 304 146', '#a8723e', 2.2);
-  s += `<circle cx="282" cy="150" r="3.6" fill="#dcaa3c" stroke="${OL}" stroke-width="1.2"/><circle cx="304" cy="148" r="3.6" fill="#c8323c" stroke="${OL}" stroke-width="1.2"/>`;
+  s += stroke('M284 108Q282 120 281 130M296 104Q301 116 301 128', OL, 4.4) + stroke('M284 108Q282 120 281 130M296 104Q301 116 301 128', '#a8723e', 2.2);
+  s += `<circle cx="281" cy="132" r="3.6" fill="#dcaa3c" stroke="${OL}" stroke-width="1.2"/><circle cx="301" cy="130" r="3.6" fill="#c8323c" stroke="${OL}" stroke-width="1.2"/>`;
   // dome
   const dome = [[176, 72], [171, 56], [177, 38], [195, 22], [221, 12], [250, 9], [278, 14], [298, 27], [310, 44], [314, 62], [308, 76]];
   s += S('M176 72' + fur(dome, { len: 9, step: 9, side: -1, skew: .3 }) + 'L300 58Q240 56 180 58Z', O(PAL.fur, { ow: 2.6, k: 1.2, over: fs(170, 2, 318, 70, 90) + stroke('M190 24Q236 4 292 26', PAL.fur.hi, 1.6, .5) + stroke('M184 44Q176 60 182 70', PAL.fur.hi, 1.4, .45) }));
@@ -193,10 +193,12 @@ P_.hat = () => { setSeed(91); let s = '';
   s += S('M166 66Q170 52 192 49Q240 40 292 49Q314 54 318 70L316 80' + fur(brimBot, { len: 5, step: 7, side: -1, skew: .2 }) + 'Z', O(PAL.fur, { ow: 2.4, k: 1, rim: .7, over: fs(166, 44, 320, 80, 40) + stroke('M176 62Q240 48 310 62', PAL.fur.sh2, 2, .4) }));
   // brass aurora badge
   s += S('M240 30L251 43L240 56L229 43Z', O(PAL.brass, { ow: 1.8, k: .4, over: `<path d="M240 36L246 43L240 50L234 43Z" fill="#37e0d0" stroke="#0c4a58" stroke-width="1"/><path d="M238 38L240 41" stroke="#fff" stroke-width="1.4"/>` }));
-  return part(s, hb([140, -8, 190, 166], -20), 2.8, 0, HXF + ' translate(0 -20)');
+  s = SQ(s);
+  return part(s, hb([130, -12, 210, 140], -8), 2.8, 0, HXF + ' translate(0 -8)');
 };
 P_.feather = () => { setSeed(95);
   let s = S('M182 52Q164 34 154 -4Q178 10 190 42Z', O(PAL.cream, { ow: 1.8, k: .5, over: [0, 1, 2, 3].map(i => stroke(`M${190 - i * 6} ${42 - i * 11}L${178 - i * 6} ${38 - i * 11}`, '#6a4a3a', 2.2, .8)).join('') + stroke('M184 48Q168 28 156 -2', '#8a7862', 1.2, .9) }));
-  return part(s, hb([140, -20, 60, 80], -20), 3, 0, HXF + ' translate(0 -20)');
+  s = SQ(s);
+  return part(s, hb([140, -24, 60, 80], -8), 3, 0, HXF + ' translate(0 -8)');
 };
 module.exports = { P_, PAL };

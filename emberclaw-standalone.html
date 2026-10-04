@@ -281,6 +281,11 @@ html,body{touch-action:manipulation;-webkit-touch-callout:none}
 #big.maxwin{background:transparent}
 #big.maxwin #bigT{clip-path:none;background:linear-gradient(180deg,#fffbe0 0,#ffe066 38%,#f0a416 62%,#b8680a 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding:0}
 
+/* shown by CSS alone after 8s if the loading screen is still up (scripts blocked in a file viewer) */
+#loadM .lmWarn{position:absolute;left:0;right:0;bottom:6vh;text-align:center;padding:0 7vw;font:700 clamp(13px,1.6vw,18px)/1.4 sans-serif;color:#ffd0a0;opacity:0;animation:lmWarnIn .4s 8s forwards;pointer-events:none}
+@keyframes lmWarnIn{to{opacity:1}}
+#loadM.ready .lmWarn{display:none}
+
 /* EmberClaw slot CSS: scene wash, frame/grid/cells, Forge Core (side mechanic), Brann (character). The shell CSS loads first.
    NOTE: the eyes use the shell's @keyframes blink (the original file had two 'blink' keyframes and the later, opacity one won; kept identical). */
 .heatwash{left:-1500px;top:-1000px;width:4600px;height:2900px;pointer-events:none;background:radial-gradient(60% 50% at 50% 100%,rgba(255,80,10,calc(var(--heat)*.025)),transparent 70%);transition:background .6s}
@@ -414,7 +419,8 @@ html,body{touch-action:manipulation;-webkit-touch-callout:none}
 
 </style></head><body>
 <div id="rotateM"><div class="rmPhone"></div><div class="rmTxt">ROTATE YOUR PHONE</div><div class="rmSub">This game plays in landscape</div></div>
-<div id="loadM"><div class="lmLogo" id="lmLogo"></div><div class="lmVol" id="lmVol"></div><div class="lmCards" id="lmCards"></div><div class="lmBar"><i id="lmFill"></i></div><div class="lmTxt" id="lmTxt">LOADING</div><div class="lmTap" id="lmTap">CLICK TO CONTINUE</div></div>
+<div id="loadM"><div class="lmLogo" id="lmLogo"></div><div class="lmVol" id="lmVol"></div><div class="lmCards" id="lmCards"></div><div class="lmBar"><i id="lmFill"></i></div><div class="lmTxt" id="lmTxt">LOADING</div><div class="lmTap" id="lmTap">CLICK TO CONTINUE</div><div class="lmWarn">Stuck here? Open this file in Chrome or Safari. File viewers and chat apps cannot run the game.</div></div><noscript><div style="position:fixed;inset:0;z-index:999;background:#111;color:#fff;padding:40px;font:20px/1.4 sans-serif">JavaScript is turned off or blocked here. Open this file in Chrome or Safari.</div></noscript>
+<script>window.addEventListener("error",function(e){var t=document.getElementById("lmTxt");if(t){t.textContent="ERROR: "+(e.message||"unknown")+" (line "+(e.lineno||"?")+")";t.style.color="#ff9090";t.style.animation="none";t.style.fontSize="14px";t.style.letterSpacing="1px";t.style.maxWidth="90vw";t.style.textAlign="center"}});setTimeout(function(){if(!window.__booted){var t=document.getElementById("lmTxt");if(t&&!/ERROR/.test(t.textContent)){t.textContent="The game did not start. Open this file in Chrome or Safari."}}},7000)</script>
 
 <!-- ============ shared defs (wobble filters, hatch patterns) + this slot's symbols ============ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -2371,6 +2377,7 @@ hooks.init(S);
 hooks.paintIdle();
 /* loading screen, then the 'what is in this game' screen (click to continue); data from slot.json 'loading' */
 (function loadingScreen() {
+  window.__booted = true;
   const el = $('loadM'), L = cfg.loading || {}; if (!el) return;
   if (navigator.webdriver && !/[?&]load=1/.test(location.search)) { el.remove(); return; }   // automated tests skip the screen (add ?load=1 to see it)
   const logo = document.getElementById('logo'); if (logo) { const c = logo.cloneNode(true); c.removeAttribute('id'); c.removeAttribute('filter'); c.style.cssText = ''; $('lmLogo').appendChild(c); } else $('lmLogo').innerHTML = `<div class="lmBig">${cfg.logoText || ''}</div>`;

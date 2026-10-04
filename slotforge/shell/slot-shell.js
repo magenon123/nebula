@@ -476,6 +476,7 @@ hooks.init(S);
 hooks.paintIdle();
 /* loading screen, then the 'what is in this game' screen (click to continue); data from slot.json 'loading' */
 (function loadingScreen() {
+  window.__booted = true;
   const el = $('loadM'), L = cfg.loading || {}; if (!el) return;
   if (navigator.webdriver && !/[?&]load=1/.test(location.search)) { el.remove(); return; }   // automated tests skip the screen (add ?load=1 to see it)
   const logo = document.getElementById('logo'); if (logo) { const c = logo.cloneNode(true); c.removeAttribute('id'); c.removeAttribute('filter'); c.style.cssText = ''; $('lmLogo').appendChild(c); } else $('lmLogo').innerHTML = `<div class="lmBig">${cfg.logoText || ''}</div>`;

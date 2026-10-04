@@ -9,8 +9,8 @@
 #cBang{transform-box:fill-box;transform-origin:50% 100%}
 /* pivots */
 #cAll,#cKalle{transform-origin:240px 392px}
-#cHead{transform-origin:240px 104px}#cHatG{transform-origin:240px 62px}#cFeather{transform-origin:196px 41px}
-#cArmL{transform-origin:168px 126px}#cForeL{transform-origin:126px 178px}#cArmR{transform-origin:312px 126px}#cForeR{transform-origin:348px 186px}#cFish{transform-origin:347px 254px}
+#cHead{transform-origin:240px 104px}#cHatG{transform-origin:240px 60px}#cFeather{transform-origin:203px 52px}
+#cArmL{transform-origin:170px 126px}#cForeL{transform-origin:134px 178px}#cArmR{transform-origin:310px 126px}#cForeR{transform-origin:340px 186px}#cFish{transform-origin:337px 254px}
 #cBrows{transform-origin:240px 70px}.cEyeL{transform-origin:224px 78px}.cEyeR{transform-origin:256px 78px}#cLids{transform-origin:240px 78px}#cMouth{transform-origin:240px 110px}
 #cLant{transform-origin:44px 130px}#cRays{transform-origin:240px 140px}
 .cPup{transform-box:fill-box;transform-origin:center}
@@ -19,7 +19,7 @@
 @keyframes kBr{0%,100%{transform:scale(1,1)}50%{transform:scale(1.004,1.011)}}
 #cHeadS{animation:kNd 6.4s ease-in-out infinite;transform-origin:240px 104px;will-change:transform}
 @keyframes kNd{0%,100%{transform:rotate(-.6deg) translateY(.4px)}50%{transform:rotate(.9deg) translateY(-.6px)}}
-#cArmLS{animation:kAL 4.2s ease-in-out infinite;transform-origin:168px 126px;will-change:transform}#cArmRS{animation:kAR 4.2s ease-in-out -.5s infinite;transform-origin:312px 126px;will-change:transform}
+#cArmLS{animation:kAL 4.2s ease-in-out infinite;transform-origin:170px 126px;will-change:transform}#cArmRS{animation:kAR 4.2s ease-in-out -.5s infinite;transform-origin:310px 126px;will-change:transform}
 @keyframes kAL{0%,100%{transform:rotate(.5deg)}50%{transform:rotate(-.9deg)}}@keyframes kAR{0%,100%{transform:rotate(-.4deg)}50%{transform:rotate(.9deg)}}
 #cLids{animation:kBl 5.6s steps(1,end) infinite}
 @keyframes kBl{0%,94%{opacity:0}95%,97%{opacity:1}98%,100%{opacity:0}}
