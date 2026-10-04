@@ -16,7 +16,7 @@ const DEFS = rg('chCor', CX, CY, 270, [[0, '#ffffff', .55], [.25, '#7dffc4', .35
 let rays = ''; for (let i = 0; i < 16; i++) { const a = i * Math.PI / 8, w = .05; rays += `<path d="M${CX + Math.cos(a - w) * 18} ${CY + Math.sin(a - w) * 18}L${f(CX + Math.cos(a) * 330)} ${f(CY + Math.sin(a) * 330)}L${f(CX + Math.cos(a + w) * 18)} ${f(CY + Math.sin(a + w) * 18)}Z"/>`; }
 const eyeC = [hp(224, 78), hp(256, 78)];
 const ember = hp(196, 92), pivH = [240, 104], pivHat = hp(240, 60), pivFea = hp(182, 32);
-const SL = [168, 126], EL = [126, 178], SR = [312, 126], ER = [348, 186], HND = [347, 254];
+const SL = [170, 126], EL = [134, 178], SR = [310, 126], ER = [340, 186], HND = [337, 254];
 
 function head(ref) {
   const I = n => img(n, ref);
@@ -31,7 +31,7 @@ function bodyParts(ref, noFish) {
   const I = n => img(n, ref);
   return { body: `<g id="cBody">${I('body')}</g>`,
     armL: `<g id="cArmL">${I('armL')}<g id="cForeL">${I('foreL')}</g></g>`,
-    armR: `<g id="cArmR">${I('armR')}<g id="cForeR">${I('foreR')}${noFish ? '' : `<g id="cFish"><circle id="cFishGlow" cx="347" cy="296" r="44" fill="url(#chFishG)"/>${I('fish')}</g>`}</g></g>` };
+    armR: `<g id="cArmR">${I('armR')}<g id="cForeR">${I('foreR')}${noFish ? '' : `<g id="cFish"><circle id="cFishGlow" cx="337" cy="296" r="44" fill="url(#chFishG)"/>${I('fish')}</g>`}</g></g>` };
 }
 const B = bodyParts(false);
 const SVGA = 'class="cl" viewBox="0 0 480 410" stroke-linejoin="round" stroke-linecap="round" overflow="visible"';

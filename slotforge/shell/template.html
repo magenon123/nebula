@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>{{TITLE}}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Roboto:wght@500;700;900&display=swap" rel="stylesheet">
@@ -8,6 +8,7 @@
 {{SHELL_CSS}}
 {{SLOT_CSS}}
 </style></head><body>
+<div id="rotateM"><div class="rmPhone"></div><div class="rmTxt">ROTATE YOUR PHONE</div><div class="rmSub">This game plays in landscape</div></div>
 <div id="loadM"><div class="lmLogo" id="lmLogo"></div><div class="lmVol" id="lmVol"></div><div class="lmCards" id="lmCards"></div><div class="lmBar"><i id="lmFill"></i></div><div class="lmTxt" id="lmTxt">LOADING</div><div class="lmTap" id="lmTap">CLICK TO CONTINUE</div></div>
 
 <!-- ============ shared defs (wobble filters, hatch patterns) + this slot's symbols ============ -->
@@ -53,7 +54,7 @@
 </div></div>
 <canvas id="fx"></canvas><div id="flash"></div>
 <div id="auth" hidden><div><h1 id="authName"></h1><p style="font-family:var(--ui)">Sign in to Nebula first, then reopen this game.</p></div></div>
-<div id="big"><div id="bigT"></div><div id="bigA"></div><div id="bigX"></div></div>
+<div id="big"><div id="bigBlur"></div><div id="bigRays"></div><div id="bigGlow"></div><div id="bigCard"><div id="bigT"></div><div id="bigA"></div><div id="bigX"></div></div></div>
 
 <!-- bonus buy screen (cards are generated from slot.json: fever + buys) -->
 <div class="modal bb" id="buyM" hidden>

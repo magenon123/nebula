@@ -37,6 +37,7 @@ P_.prop = () => { setSeed(11);
 
 // ---------------- BODY: trousers, boots, parka, belt, gear, ruff ----------------
 P_.body = () => { setSeed(21); let s = '';
+  s += '<g transform="translate(-19 0)">';
   // trousers
   s += S('M208 256L254 256L252 346L204 346Z', O(PAL.trou, { ow: 2, over: stroke('M230 290Q226 316 224 340', '#0e1226', 1.4, .5) }));
   s += S('M262 256L310 256L316 346L264 346Z', O(PAL.trou, { ow: 2, over: stroke('M290 290Q292 316 296 340', '#0e1226', 1.4, .5) }));
@@ -49,25 +50,28 @@ P_.body = () => { setSeed(21); let s = '';
     return `M${x0} ${y1}L${x0} ${y0 + 2}` + fur(top, { len: 7, step: 6, side: -1 }) + `L${x1} ${y1}` + fur(bot, { len: 5, step: 7, side: -1 }) + 'Z'; };
   s += S(cuff(196, 258, 334, 352), O(PAL.ruff, { ow: 2, over: strands(196, 330, 258, 356, 22, [[PAL.ruff.sh2, 1, .6], [PAL.ruff.hi, 1, .8]], 8, 90) }));
   s += S(cuff(260, 322, 334, 352), O(PAL.ruff, { ow: 2, over: strands(260, 330, 322, 356, 22, [[PAL.ruff.sh2, 1, .6], [PAL.ruff.hi, 1, .8]], 8, 90) }));
+  s += '</g>';
   s += `<g transform="${UX}">`;
   // parka
-  const torso = 'M198 106Q176 112 160 122Q148 134 146 170Q146 214 140 266Q148 272 166 272Q202 280 240 278Q280 280 314 272Q336 270 344 264Q338 214 336 170Q334 134 320 122Q306 112 284 106Z';
-  let diam = ''; for (let x = 142; x < 346; x += 15) { const y = 264 + Math.sin((x - 240) / 70) * 1.5; diam += `<path d="M${x} ${y - 6}L${x + 6} ${y}L${x} ${y + 6}L${x - 6} ${y}Z" fill="#e8b830" stroke="#14265a" stroke-width=".8"/><path d="M${x} ${y - 2.6}L${x + 2.6} ${y}L${x} ${y + 2.6}L${x - 2.6} ${y}Z" fill="#c8323c"/>`; }
-  const folds = stroke('M178 150Q166 210 158 262', PAL.parka.sh2, 1.8, .55) + stroke('M310 148Q322 210 332 262', PAL.parka.sh2, 1.8, .55) + stroke('M196 224Q190 250 184 266', PAL.parka.sh2, 1.6, .5) + stroke('M284 224Q292 250 300 266', PAL.parka.sh2, 1.6, .5) + stroke('M170 152Q164 200 154 250', '#e8a05e', 1.2, .45) + stroke('M262 230Q268 252 272 268', PAL.parka.hi, 1.2, .35);
-  const yoke = `<path d="M150 134Q240 176 336 134L338 150Q240 194 148 152Z" fill="${PAL.blue.fill}" stroke="${OL}" stroke-width="1.2"/><path d="M149 144Q240 186 337 144" fill="none" stroke="#e8b830" stroke-width="2"/><path d="M150 150Q240 192 337 150" fill="none" stroke="#c8323c" stroke-width="1.6"/>`;
+  const torso = 'M202 106Q182 112 172 124Q164 136 165 170Q168 196 184 210Q172 240 164 264Q200 276 240 276Q282 276 316 264Q308 240 296 210Q312 196 315 170Q316 136 308 124Q298 112 278 106Z';
+  let diam = ''; for (let x = 160; x < 322; x += 14) { const y = 258 + Math.sin((x - 240) / 70) * 1.5; diam += `<path d="M${x} ${y - 6}L${x + 6} ${y}L${x} ${y + 6}L${x - 6} ${y}Z" fill="#e8b830" stroke="#14265a" stroke-width=".8"/><path d="M${x} ${y - 2.6}L${x + 2.6} ${y}L${x} ${y + 2.6}L${x - 2.6} ${y}Z" fill="#c8323c"/>`; }
+  const folds = stroke('M186 150Q178 200 172 256', PAL.parka.sh2, 1.8, .55) + stroke('M294 150Q302 200 308 256', PAL.parka.sh2, 1.8, .55) + stroke('M204 224Q200 246 196 262', PAL.parka.sh2, 1.6, .5) + stroke('M276 224Q280 246 284 262', PAL.parka.sh2, 1.6, .5) + stroke('M178 152Q172 200 168 246', '#e8a05e', 1.2, .45) + stroke('M262 230Q268 252 272 268', PAL.parka.hi, 1.2, .35);
+  const yoke = `<path d="M168 134Q240 170 312 134L314 148Q240 186 166 150Z" fill="${PAL.blue.fill}" stroke="${OL}" stroke-width="1.2"/><path d="M167 143Q240 180 313 143" fill="none" stroke="#e8b830" stroke-width="2"/><path d="M166 149Q240 186 314 149" fill="none" stroke="#c8323c" stroke-width="1.6"/>`;
   let laces = stroke('M240 108L240 204', '#26100e', 3.2, .9); for (let y = 118; y < 200; y += 10) laces += stroke(`M233 ${y}L247 ${y + 6}M247 ${y}L233 ${y + 6}`, '#c89058', 1.3, .95);
-  s += S(torso, O(PAL.parka, { ow: 2.6, over: folds + yoke + laces + `<path d="M132 246Q240 264 350 246L350 292L132 292Z" fill="${PAL.blue.fill}" stroke="${OL}" stroke-width="1.4"/>` + diam + stroke('M132 247Q240 265 350 247', '#e8b830', 1.8) }));
+  s += S(torso, O(PAL.parka, { ow: 2.6, over: folds + yoke + laces + `<path d="M150 244Q240 258 330 244L330 292L150 292Z" fill="${PAL.blue.fill}" stroke="${OL}" stroke-width="1.4"/>` + diam + stroke('M150 245Q240 259 330 245', '#e8b830', 1.8) }));
   // belt
-  s += S('M142 200Q240 213 340 200L342 216Q240 230 140 216Z', O(PAL.leather, { ow: 1.8, k: .5, over: [160, 200, 280, 310, 334].map(x => `<circle cx="${x}" cy="${211 + (x - 240) * .02 + 2}" r="1.6" fill="#d9b070"/>`).join('') }));
-  s += S('M222 202L246 205L246 222L222 219Z', O(PAL.brass, { ow: 1.8, k: .5, over: `<path d="M228 207L241 209L241 217L228 215Z" fill="#3a2410"/>` }));
+  s += S('M180 198Q240 209 300 198L302 213Q240 224 178 213Z', O(PAL.leather, { ow: 1.8, k: .5, over: [190, 206, 272, 288].map(x => `<circle cx="${x}" cy="${207 + (x - 240) * .02 + 2}" r="1.6" fill="#d9b070"/>`).join('') }));
+  s += S('M222 200L246 203L246 218L222 215Z', O(PAL.brass, { ow: 1.8, k: .5, over: `<path d="M228 205L241 207L241 213L228 211Z" fill="#3a2410"/>` }));
   // knife on right hip
+  s += '<g transform="translate(-22 -6)">';
   s += S('M298 218L310 220L314 256Q312 264 306 264L302 262Z', O(PAL.leather, { ow: 1.8, k: .6, over: stroke('M304 232L308 258', '#a8723e', 1, .6) + `<path d="M299 232L313 235L313 240L299 237Z" fill="#c9a050"/>` }));
   s += S('M298 202L311 205L310 221L297 218Z', O(PAL.cream, { ow: 1.6, k: .5, over: stroke('M299 200L299 214M304 201L304 215', '#a89070', 1, .6) }));
   s += S('M295 216L314 220L313 226L294 222Z', O(PAL.brass, { ow: 1.4, k: .4 }));
+  s += '</g>';
   // mittens hanging on a cord
-  s += stroke('M262 208Q268 212 266 216M284 210Q282 214 284 218', '#2a1a10', 1.6);
+  s += stroke('M254 204Q260 208 258 212M270 205Q268 209 270 213', '#2a1a10', 1.6);
   const mitt = (x, y, c, rot) => `<g transform="rotate(${rot} ${x} ${y})">` + S(`M${x} ${y}Q${x - 10} ${y + 2} ${x - 10} ${y + 16}Q${x - 9} ${y + 30} ${x} ${y + 31}Q${x + 10} ${y + 30} ${x + 10} ${y + 16}Q${x + 10} ${y + 2} ${x} ${y}ZM${x + 8} ${y + 14}Q${x + 17} ${y + 12} ${x + 15} ${y + 22}Q${x + 11} ${y + 24} ${x + 8} ${y + 22}Z`, O(c, { ow: 1.6, k: .5, over: `<rect x="${x - 11}" y="${y + 1}" width="22" height="7" fill="#f4eee0"/><path d="M${x - 9} ${y + 12}l4 -3 4 3 4 -3 4 3 4 -3" fill="none" stroke="#f4eee0" stroke-width="1.5"/>` })) + '</g>';
-  s += mitt(266, 214, PAL.red, 5) + mitt(284, 216, PAL.blue, -4);
+  s += mitt(258, 210, PAL.red, 5) + mitt(272, 211, PAL.blue, -4);
   // fur ruff collar
   const rp = [[186, 124], [180, 110], [190, 98], [208, 92], [240, 88], [272, 92], [290, 98], [300, 110], [294, 124]];
   s += S('M186 126' + fur(rp, { len: 8, step: 8, side: -1, skew: .2 }) + fur([[294, 124], [270, 140], [240, 144], [210, 140], [186, 126]], { len: 7, step: 8, side: -1 }) + 'Z', O(PAL.ruff, { ow: 2.2, over: strands(180, 88, 300, 146, 70, [[PAL.ruff.sh2, 1.1, .6], [PAL.ruff.hi, 1.1, .85], ['#fff6dc', .9, .6]], 10, 90) }));
@@ -76,53 +80,55 @@ P_.body = () => { setSeed(21); let s = '';
 };
 
 // ---------------- ARMS ----------------
-const SL = [168, 138], EL = [126, 190], WL = [160, 210];
-const SR = [312, 138], ER = [348, 198], WR = [344, 238];
+const SL = [170, 138], EL = [134, 190], WL = [162, 210];
+const SR = [310, 138], ER = [340, 198], WR = [334, 238];
 const sleeveFold = (a, b, n) => { let s = ''; for (let i = 1; i <= n; i++) { const t = i / (n + 1); s += stroke(`M${f(a[0] + (b[0] - a[0]) * t - 7)} ${f(a[1] + (b[1] - a[1]) * t - 5)}q7 4 15 1`, PAL.parka.sh2, 1.4, .5); } return s; };
 P_.armL = () => { setSeed(31);
-  let s = S(limb(SL, EL, 44, 37, -3), O(PAL.parka, { ow: 2.4, over: sleeveFold(SL, EL, 3) + stroke('M150 126Q132 160 118 186', '#e8a05e', 1.3, .4) }));
-  s += S('M108 192Q118 178 134 190Q132 204 118 208Z', O(PAL.leather, { ow: 1.6, k: .5, over: stroke('M112 194l14 8M114 200l12 5', '#2a1612', 1, .6) })); // elbow patch
+  let s = S(limb(SL, EL, 37, 31, -3), O(PAL.parka, { ow: 2.4, over: sleeveFold(SL, EL, 3) + stroke('M156 128Q142 160 128 184', '#e8a05e', 1.3, .4) }));
+  s += S('M116 192Q126 178 142 190Q140 204 126 208Z', O(PAL.leather, { ow: 1.6, k: .5, over: stroke('M120 194l14 8M122 200l12 5', '#2a1612', 1, .6) })); // elbow patch
   return part(s, ub([90, 106, 100, 112]), 2.2, 0, UX);
 };
 P_.foreL = () => { setSeed(32); const u = [(WL[0] - EL[0]), (WL[1] - EL[1])], L = Math.hypot(...u); u[0] /= L; u[1] /= L;
-  let s = S(limb(EL, WL, 37, 31, -1), O(PAL.parka, { ow: 2.3, over: sleeveFold(EL, WL, 2) }));
+  let s = S(limb(EL, WL, 31, 27, -1), O(PAL.parka, { ow: 2.3, over: sleeveFold(EL, WL, 2) }));
   // blue trim + fur cuff
   const c1 = [WL[0] - u[0] * 8, WL[1] - u[1] * 8], c2 = [WL[0] + u[0] * 0, WL[1] + u[1] * 0], c3 = [WL[0] + u[0] * 7, WL[1] + u[1] * 7];
-  s += S(limb(c1, c2, 34, 34), O(PAL.blue, { ow: 1.6, k: .5, over: stroke(`M${P(c1)}L${P(c2)}`, '#e8b830', 1.6) }));
-  s += S(limb(c2, c3, 38, 38), O(PAL.ruff, { ow: 1.8, k: .6, over: strands(150, 196, 176, 226, 14, [[PAL.ruff.sh2, 1, .6], ['#fff6dc', 1, .8]], 7, 20) }));
+  s += S(limb(c1, c2, 29, 29), O(PAL.blue, { ow: 1.6, k: .5, over: stroke(`M${P(c1)}L${P(c2)}`, '#e8b830', 1.6) }));
+  s += S(limb(c2, c3, 33, 33), O(PAL.ruff, { ow: 1.8, k: .6, over: strands(150, 196, 176, 226, 14, [[PAL.ruff.sh2, 1, .6], ['#fff6dc', 1, .8]], 7, 20) }));
   // mitt (fist on hip)
   s += S('M164 203Q178 197 192 202Q201 211 195 222Q181 229 168 224Q159 214 164 203Z', O(PAL.mitt, { ow: 2.2, k: .7, over: stroke('M174 204Q172 214 176 224M184 203Q183 214 186 224', PAL.mitt.sh2, 1.2, .7) + stroke('M163 214Q172 210 182 213', '#f4eee0', 1.4, .7) }));
   s += S('M166 205Q176 195 190 198Q192 206 184 209Q174 207 166 211Z', O(PAL.mitt, { ow: 1.6, k: .4 })); // thumb
   return part(s, ub([100, 176, 106, 64]), 2.4, 0, UX);
 };
 P_.armR = () => { setSeed(33);
-  let s = S(limb(SR, ER, 44, 37, 3), O(PAL.parka, { ow: 2.4, over: sleeveFold(SR, ER, 3) + stroke('M334 128Q354 160 360 190', '#e8a05e', 1.3, .35) }));
-  s += S(`M344 190Q356 184 366 194Q362 208 350 210Z`, O(PAL.leather, { ow: 1.6, k: .5, over: stroke('M348 192l12 8M349 198l11 5', '#2a1612', 1, .6) }));
+  let s = S(limb(SR, ER, 37, 31, 3), O(PAL.parka, { ow: 2.4, over: sleeveFold(SR, ER, 3) + stroke('M326 128Q344 160 350 188', '#e8a05e', 1.3, .35) }));
+  s += S(`M332 190Q344 184 354 194Q350 208 338 210Z`, O(PAL.leather, { ow: 1.6, k: .5, over: stroke('M336 192l12 8M337 198l11 5', '#2a1612', 1, .6) }));
   return part(s, ub([290, 112, 100, 106]), 2.2, 0, UX);
 };
 P_.foreR = () => { setSeed(34); const u = [(WR[0] - ER[0]), (WR[1] - ER[1])], L = Math.hypot(...u); u[0] /= L; u[1] /= L;
-  let s = S(limb(ER, WR, 37, 31, 1), O(PAL.parka, { ow: 2.3, over: sleeveFold(ER, WR, 2) }));
+  let s = S(limb(ER, WR, 31, 27, 1), O(PAL.parka, { ow: 2.3, over: sleeveFold(ER, WR, 2) }));
   const c1 = [WR[0] - u[0] * 7, WR[1] - u[1] * 7], c3 = [WR[0] + u[0] * 6, WR[1] + u[1] * 6];
-  s += S(limb(c1, WR, 34, 34), O(PAL.blue, { ow: 1.6, k: .5, over: stroke(`M${P(c1)}L${P(WR)}`, '#e8b830', 1.6) }));
-  s += S(limb(WR, c3, 38, 38), O(PAL.ruff, { ow: 1.8, k: .6, over: strands(330, 234, 366, 250, 14, [[PAL.ruff.sh2, 1, .6], ['#fff6dc', 1, .8]], 7, 90) }));
+  s += S(limb(c1, WR, 29, 29), O(PAL.blue, { ow: 1.6, k: .5, over: stroke(`M${P(c1)}L${P(WR)}`, '#e8b830', 1.6) }));
+  s += S(limb(WR, c3, 33, 33), O(PAL.ruff, { ow: 1.8, k: .6, over: strands(320, 234, 356, 250, 14, [[PAL.ruff.sh2, 1, .6], ['#fff6dc', 1, .8]], 7, 90) }));
   // mitt gripping the line: closed fist pointing down
+  s += '<g transform="translate(-10 0)">';
   s += S('M334 244Q347 240 360 245Q364 257 358 268Q347 273 337 268Q330 257 334 244Z', O(PAL.mitt, { ow: 2.2, k: .7, over: stroke('M338 252Q348 255 358 252M338 259Q348 262 358 259', PAL.mitt.sh2, 1.2, .7) + stroke('M334 250Q340 248 346 250', '#f4eee0', 1.4, .7) }));
   s += S('M332 246Q327 254 332 262Q338 262 340 256Q338 250 332 246Z', O(PAL.mitt, { ow: 1.6, k: .4 }));
-  return part(s, ub([316, 190, 60, 90]), 2.4, 0, UX);
+  s += '</g>';
+  return part(s, ub([306, 190, 60, 90]), 2.4, 0, UX);
 };
 
 // ---------------- AURORA CHAR on a line (origin: hand grip 347,268) ----------------
 P_.fish = () => { setSeed(41);
-  const cx = 347, y0 = 296; // mouth top
+  const cx = 337, y0 = 296; // mouth top
   const body = `M${cx} ${y0}Q${cx + 11} ${y0 + 8} ${cx + 13} ${y0 + 32}Q${cx + 13} ${y0 + 56} ${cx + 6} ${y0 + 72}L${cx + 16} ${y0 + 90}Q${cx + 6} ${y0 + 82} ${cx} ${y0 + 84}Q${cx - 6} ${y0 + 82} ${cx - 16} ${y0 + 90}L${cx - 6} ${y0 + 72}Q${cx - 13} ${y0 + 56} ${cx - 13} ${y0 + 32}Q${cx - 11} ${y0 + 8} ${cx} ${y0}Z`;
-  let s = stroke(`M347 266L347 ${y0 + 2}`, '#d8e8ff', 1.4, .9) + stroke(`M348 266L348 ${y0 + 2}`, OL, .8, .7);
+  let s = stroke(`M337 266L337 ${y0 + 2}`, '#d8e8ff', 1.4, .9) + stroke(`M338 266L338 ${y0 + 2}`, OL, .8, .7);
   // fins
   s += S(`M${cx + 12} ${y0 + 30}Q${cx + 28} ${y0 + 34} ${cx + 26} ${y0 + 50}Q${cx + 16} ${y0 + 44} ${cx + 11} ${y0 + 44}Z`, { fill: '#c46cf0', sh1: '#8a40c0', sh2: '#5a2a90', hi: '#f0b0ff', ow: 1.4, k: .4 });
   s += S(`M${cx - 12} ${y0 + 30}Q${cx - 28} ${y0 + 34} ${cx - 26} ${y0 + 50}Q${cx - 16} ${y0 + 44} ${cx - 11} ${y0 + 44}Z`, { fill: '#c46cf0', sh1: '#8a40c0', sh2: '#5a2a90', hi: '#f0b0ff', ow: 1.4, k: .4 });
   let spots = ''; for (let i = 0; i < 9; i++) spots += `<circle cx="${cx + (rnd() - .5) * 18}" cy="${y0 + 14 + rnd() * 48}" r="${1.2 + rnd() * 1.4}" fill="#ff8cc0" opacity=".9"/>`;
   s += S(body, { fill: '#25a592', sh1: '#167a78', sh2: '#0e4a5c', hi: '#7af0d0', ow: 2, k: .6, over: `<path d="M${cx - 14} ${y0 + 36}Q${cx} ${y0 + 56} ${cx + 14} ${y0 + 36}L${cx + 14} ${y0 + 72}L${cx - 14} ${y0 + 72}Z" fill="#e4c8ff" opacity=".55"/>` + stroke(`M${cx - 10} ${y0 + 18}Q${cx} ${y0 + 12} ${cx + 10} ${y0 + 18}`, '#0e3a48', 1.3, .7) + spots + stroke(`M${cx - 5} ${y0 + 6}Q${cx - 8} ${y0 + 30} ${cx - 5} ${y0 + 56}`, '#d8fff0', 1.4, .5) });
   s += `<circle cx="${cx + 5}" cy="${y0 + 9}" r="2.6" fill="#fff6c0" stroke="${OL}" stroke-width=".9"/><circle cx="${cx + 5.4}" cy="${y0 + 9}" r="1.1" fill="${OL}"/>`;
-  return part(s, ub([308, 262, 80, 132]), 2.4, 0, UX);
+  return part(s, ub([298, 262, 80, 132]), 2.4, 0, UX);
 };
 
 // ---------------- HEAD parts ----------------

@@ -273,18 +273,19 @@ function tapWait(id, autoMs, minMs = 450) { return new Promise(res => { const m 
   m.addEventListener('click', onc); addEventListener('keydown', onk); if (autoMs) setTimeout(fin, autoMs); }); }
 
 /* ---------- big win overlay ---------- */
+let bonusDone = false;
 const tierOf = x => cfg.tiers.find(t => x >= t.min) || null;
 async function bigWin(x, amt) {
   const t = tierOf(x); if (!t) return null;
   const lv = t.lv, bigMark = {}, isMax = x >= cfg.maxWin - 1e-9;   // the cap itself gets its own gold presentation
-  $('big').classList.toggle('maxwin', isMax);
-  $('bigT').textContent = isMax ? 'MAX WIN' : t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = isMax ? 'THE MAXIMUM. YOU HIT THE CEILING!' : t.tag || '';
+  $('big').classList.toggle('maxwin', isMax); $('big').dataset.lv = lv;
+  $('bigT').textContent = isMax ? 'MAX WIN' : t.name + ' WIN'; $('bigA').textContent = fmt(0); $('bigX').textContent = x.toFixed(1) + 'x BET'; if ($('bigTag')) $('bigTag').textContent = (bonusDone ? 'BONUS COMPLETE. ' : '') + (isMax ? 'THE MAXIMUM. YOU HIT THE CEILING!' : t.tag || '');
   $('big').classList.add('show'); char('big', 3300); shake(lv + .6); flash(lv); embers(30 * lv * lv, innerWidth / 2, innerHeight / 2, true); if (lv > 2) coins(60 * lv);
   if (isMax) { coins(160); embers(260, innerWidth / 2, innerHeight / 2, true); setTimeout(() => { if ($('big').classList.contains('show')) { coins(120); flash(3); } }, 2200 * T()); }
   sfx.big(lv); music.duck([0, .5, .38, .28, .2][lv] || .3, 1.2 + lv * .8, 1.6); music.stinger('win');
   await Promise.race([countUp($('bigA'), amt, (isMax ? 5200 : 1400 + lv * 700) * T() + 300, 0, k => { sfx.tick(k); if (lv >= 2 && !(bigMark.a) && k > .35) { bigMark.a = 1; shake(lv * .45); } if (lv >= 3 && !bigMark.b && k > .7) { bigMark.b = 1; shake(lv * .6); flash(lv - 1); embers(40 * lv, innerWidth / 2, innerHeight / 2, true); } }), sleep(20000)]);
   await sleep(auto.left > 0 ? 700 : isMax ? 3500 : 1500 + lv * 300);
-  $('big').classList.remove('show'); return t.name;
+  $('big').classList.remove('show'); bonusDone = false; return t.name;
 }
 $('big').onclick = () => { skipBig = true; };
 
@@ -332,9 +333,12 @@ async function go(buy) {
         run = await hooks.playSpin(sp, run, ctx); await wait(300);
       }
       $('fsBox').hidden = true; music.theme('base', 2.4); music.intensity(0); $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); if (ambCtl && ambCtl.bonus) ambCtl.bonus(false); $('outroV').textContent = fmt(0);
+      if (tierOf(R.totalPayout)) bonusDone = true;   // a big-win screen follows and shows the total: don't say the amount twice
+      else {
       openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
       await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);
       await tapWait('outroM', auto.left > 0 ? 1500 : 0);
+      }
     }
     $('win').textContent = fmt(j.payout); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user);
     out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
@@ -484,9 +488,10 @@ hooks.paintIdle();
   const tick = () => { fill = Math.min(95, (performance.now() - t0) / MIN * 100); $('lmFill').style.width = fill + '%'; if (!el.classList.contains('ready')) requestAnimationFrame(tick); };
   tick();
   const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
-  Promise.all([fontsReady, new Promise(r => setTimeout(r, MIN))]).then(() => {
+  Promise.all([Promise.race([fontsReady, new Promise(r => setTimeout(r, 4500))]), new Promise(r => setTimeout(r, MIN))]).then(() => {
     $('lmFill').style.width = '100%'; $('lmTxt').textContent = 'READY';
-    setTimeout(() => { el.classList.add('ready'); const go = e => { if (e.type === 'keydown' && !['Space', 'Enter'].includes(e.code)) return; e.preventDefault(); removeEventListener('keydown', go); el.classList.add('out'); setTimeout(() => el.remove(), 700); };
+    setTimeout(() => { el.classList.add('ready'); const go = e => { if (e.type === 'keydown' && !['Space', 'Enter'].includes(e.code)) return; e.preventDefault(); removeEventListener('keydown', go); el.classList.add('out'); setTimeout(() => el.remove(), 700);
+      try { if (matchMedia('(pointer:coarse)').matches) { const d = document.documentElement, rf = d.requestFullscreen || d.webkitRequestFullscreen; if (rf && !document.fullscreenElement) Promise.resolve(rf.call(d)).then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape')).catch(() => {}); } } catch {} };
       el.addEventListener('pointerdown', go, { once: true }); addEventListener('keydown', go); }, 350);
   });
 })();
