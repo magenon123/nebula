@@ -307,3 +307,10 @@ body.portrait #feverBadge{left:200px;top:auto;bottom:455px}
 body.portrait #fsBox{left:20px;top:20px}
 body.portrait #menu{left:30px;top:auto;bottom:392px;width:340px}
 body.portrait #menu button{font-size:22px;padding:14px 14px}
+
+/* ===== backdrop: blurred scene around the stage ===== */
+#backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+#backdrop>*{position:absolute;left:-4%;top:-4%;width:108%;height:108%;object-fit:cover;display:block;filter:blur(16px) saturate(1.1) brightness(.92)}
+#backdrop *{animation:none!important}
+#backdrop::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 55%,rgba(0,0,0,.28) 100%)}
+#shaker{background:transparent}

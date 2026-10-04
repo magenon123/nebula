@@ -35,6 +35,13 @@ const wait = ms => new Promise(res => { let prog = 0, last = performance.now(); 
 const GA = (() => { const ga = document.createElement('div'), st = $('stage'); ga.id = 'ga';
   const HUD = new Set(['scene', 'msg', 'fsBox', 'turboBadge', 'feverBadge', 'buyOpen', 'barL', 'barR', 'spin', 'bAuto', 'menu']);
   [...st.children].filter(e => !HUD.has(e.id)).forEach(e => ga.appendChild(e)); st.insertBefore(ga, $('msg')); return ga; })();
+/* Wide or tall windows: a blurred copy of the scene fills the space around the 16:9 stage (no black bars) */
+(function backdrop() {
+  const sc = $('scene'); if (!sc) return; let el = null;
+  if (sc.tagName.toLowerCase() === 'svg') { el = sc.cloneNode(true); el.removeAttribute('id'); el.removeAttribute('width'); el.removeAttribute('height'); el.setAttribute('preserveAspectRatio', 'xMidYMid slice'); }
+  else { const im = sc.querySelector('img'); if (im) { el = document.createElement('img'); el.src = im.src; el.alt = ''; } }
+  if (!el) return; const bd = document.createElement('div'); bd.id = 'backdrop'; bd.appendChild(el); document.body.insertBefore(bd, $('shaker'));
+})();
 function fit() {
   const st = $('stage'), port = innerHeight > innerWidth * 1.02; document.body.classList.toggle('portrait', port);
   if (!port) { STAGE_S = Math.min(innerWidth / 1600, innerHeight / 900); st.style.setProperty('--s', STAGE_S); return; }
@@ -382,7 +389,10 @@ async function go(buy) {
     const R = j.round; let run = 0;
     balance = j.user.balance - j.payout;  // show the stake leaving now, the win as it lands
     $('bal').textContent = fmt(balance);
-    const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b); } };
+    let early = null;   // a plain (no-bonus) big win starts its screen the moment the final win lands; the board's tidy-up finishes behind it
+    const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b);
+      if (!early && !R.bonusTriggered && j.payout > 0 && b >= j.payout - 0.005 && tierOf(R.totalPayout))
+        early = (async () => { await sleep(140 * T()); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user); return bigWin(R.totalPayout, j.payout); })(); } };
     run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
     if (R.bonusTriggered) {
       out.bonus = true; inBonus = true;
@@ -406,7 +416,7 @@ async function go(buy) {
     }
     $('win').textContent = fmt(j.payout); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user);
     out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
-    out.tier = await bigWin(R.totalPayout, j.payout);
+    out.tier = early ? await early : await bigWin(R.totalPayout, j.payout);
   } catch (e) { say(e.message); out.err = true; }
   clearTimeout(wd); boost = false; setBusy(false); refreshUi(); return out;
 }
