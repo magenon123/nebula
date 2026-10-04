@@ -1,6 +1,6 @@
 // node build.cjs -> ../symbols.svg + winvars.css  (symbols from syms-*.cjs, + extra.txt fragments such as seal/splash)
 const fs = require('fs'), path = require('path');
-const parts = ['syms-a.cjs', 'syms-b.cjs', 'syms-c.cjs', 'syms-d.cjs'].filter(p => fs.existsSync(path.join(__dirname, p)));
+const parts = ['syms-a.cjs', 'syms-b.cjs', 'syms-c.cjs', 'syms-d.cjs', 'syms-e.cjs'].filter(p => fs.existsSync(path.join(__dirname, p)));
 const all = {}; parts.forEach(p => Object.assign(all, require('./' + p)));
 const ord = k => { const m = k.match(/^s(\d+)(?:_(\d+))?$/); return m ? +m[1] * 100 + (+m[2] || 0) : 99999; };
 const ids = Object.keys(all).sort((a, b) => ord(a) - ord(b));

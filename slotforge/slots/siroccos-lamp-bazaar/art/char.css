@@ -1,7 +1,7 @@
 /* ---------- Sirocco (rig of baked layers + live vector face). 500x760 design space shown at 410x623 ---------- */
 #char{left:1150px;top:127px;width:410px;height:623px;pointer-events:none;overflow:visible;--spd:1}
 #char .cl{position:absolute;left:0;top:0;width:410px;height:623px;overflow:visible;display:block}
-#char .eye.e1,#char .eye.e2,#char .lash.l1,#char .lids,#char .mo.m1,#char .mo.m2,#char .mo.m3,#char .fow,#char #sAuraS,#char .sp{opacity:0}
+#char .eye.e1,#char .eye.e2,#char .lash.l1,#char .lids,#char .mo.m1,#char .mo.m2,#char .mo.m3,#char .fow,#char .fcw,#char #sAuraS,#char .sp{opacity:0}
 #char #sAuraS{transition:opacity .6s}
 #char #sFigS,#char #sTailS{will-change:transform}
 #char #sAll{transform-origin:250px 600px;transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
@@ -9,7 +9,7 @@
 #char .fL{transform-origin:140px 392px}#char .fR{transform-origin:360px 394px}
 #char .tapL{transform-origin:140px 392px}#char .tapR{transform-origin:360px 394px}
 #char .uL,#char .uR,#char .fL,#char .fR{transition:transform .55s cubic-bezier(.3,1.35,.5,1)}
-#char .ffw,#char .fow{transition:opacity .2s}
+#char .ffw,#char .fow,#char .fcw{transition:opacity .2s}
 #char #sHead{transform-origin:250px 224px;transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
 #char #sPlume{transform-origin:254px 94px}
 #char .brR,#char .brL{transition:transform .35s cubic-bezier(.3,1.5,.5,1)}
@@ -45,10 +45,10 @@
 #char.big .fR .ffw{opacity:0}#char.big .fR .fow{opacity:1}
 #char.special .uL{transform:rotate(0deg)}#char.special .fL{transform:translate(0px,0px) rotate(0deg)}#char.special .uR{transform:rotate(36.82deg)}#char.special .fR{transform:translate(-81.9px,-17.94px) rotate(1.98deg)}
 #char.special .fR .ffw{opacity:0}#char.special .fR .fow{opacity:1}
-#char.tease .uL{transform:rotate(0deg)}#char.tease .fL{transform:translate(0px,0px) rotate(0deg)}#char.tease .uR{transform:rotate(5.6deg)}#char.tease .fR{transform:translate(-12.95px,0.74px) rotate(78.84deg)}
-#char.tease .fR .ffw{opacity:0}#char.tease .fR .fow{opacity:1}
+#char.tease .uL{transform:rotate(0deg)}#char.tease .fL{transform:translate(0px,0px) rotate(0deg)}#char.tease .uR{transform:rotate(-25.15deg)}#char.tease .fR{transform:translate(54.78px,-18.47px) rotate(47.62deg)}
+#char.tease .fR .ffw{opacity:0}#char.tease .fR .fcw{opacity:1}
 #char.exhale .uL{transform:rotate(0deg)}#char.exhale .fL{transform:translate(0px,0px) rotate(0deg)}#char.exhale .uR{transform:rotate(0deg)}#char.exhale .fR{transform:translate(0px,0px) rotate(0deg)}
-#char.slump .uL{transform:rotate(51.69deg)}#char.slump .fL{transform:translate(-96.68px,-60.39px) rotate(54.83deg)}#char.slump .uR{transform:rotate(-50.32deg)}#char.slump .fR{transform:translate(96.53px,-58.49px) rotate(-53.48deg)}
+#char.slump .uL{transform:translateY(-7px) rotate(-26.91deg)}#char.slump .fL{transform:translateY(-7px) translate(60.36px,-7.74px) rotate(-132.68deg)}#char.slump .uR{transform:translateY(-7px) rotate(24.05deg)}#char.slump .fR{transform:translateY(-7px) translate(-55.01px,-5.75px) rotate(131.17deg)}
 #char.slump .fL .ffw{opacity:0}#char.slump .fL .fow{opacity:1}
 #char.slump .fR .ffw{opacity:0}#char.slump .fR .fow{opacity:1}
 #char.bonus .uL{transform:rotate(0deg)}#char.bonus .fL{transform:translate(0px,0px) rotate(0deg)}#char.bonus .uR{transform:rotate(-32.5deg)}#char.bonus .fR{transform:translate(68.73px,-28.19px) rotate(62deg)}
@@ -86,10 +86,10 @@
 #char.exhale .eye.e0{opacity:0}#char.exhale .eye.e1{opacity:0}#char.exhale .eye.e2{opacity:1}#char.exhale .lash.l0{opacity:0}#char.exhale .lash.l1{opacity:0}
 #char.exhale .mo.m0{opacity:1}#char.exhale .mo.m1{opacity:0}#char.exhale .mo.m2{opacity:0}#char.exhale .mo.m3{opacity:0}
 #char.exhale .brR{transform:translateY(0px) rotate(0deg)}#char.exhale .brL{transform:translateY(0px)}
-#char.slump #sHead{transform:translate(0,0px) rotate(5deg)}
+#char.slump #sHead{transform:translate(0,5px) rotate(5deg)}
 #char.slump .eye.e0{opacity:1}#char.slump .eye.e1{opacity:0}#char.slump .eye.e2{opacity:0}#char.slump .lash.l0{opacity:1}#char.slump .lash.l1{opacity:0}
 #char.slump .mo.m0{opacity:0}#char.slump .mo.m1{opacity:0}#char.slump .mo.m2{opacity:0}#char.slump .mo.m3{opacity:1}
-#char.slump .brR{transform:translateY(-3px) rotate(-2.4000000000000004deg)}#char.slump .brL{transform:translateY(-1.0499999999999998px)}
+#char.slump .brR{transform:translateY(-6px) rotate(-4.800000000000001deg)}#char.slump .brL{transform:translateY(-2.0999999999999996px)}
 #char.slump .pup{transform:translateY(-2.6px)}
 #char.slump #sAll{transform:translate(0,8px) scale(1,.985)}
 #char.bonus #sHead{transform:translate(0,0px) rotate(-3deg)}

@@ -34,9 +34,9 @@ const POSE = {
   win: { L: [40, 250], R: [460, 250], oL: 1, oR: 1 },
   big: { L: [92, 106], R: [408, 106], oL: 1, oR: 1, h: [105, 0] },
   special: { L: ARM.L.H0, R: [104, 318], oL: 0, oR: 1 },
-  tease: { L: ARM.L.H0, R: [364, 212], oL: 0, oR: 1, h: [80, 90] },
+  tease: { L: ARM.L.H0, R: [338, 226], oL: 0, oR: 1, cR: 1, h: [70, 110] },
   exhale: { L: ARM.L.H0, R: ARM.R.H0, oL: 0, oR: 0 },
-  slump: { L: [190, 446], R: [310, 446], oL: 1, oR: 1, h: [96, 70] },
+  slump: { L: [40, 290], R: [460, 290], oL: 1, oR: 1, h: [0, 100], lift: 7 },
   bonus: { L: ARM.L.H0, R: [392, 186], oL: 0, oR: 1, h: [75, 90] },
   bonusmode: { L: ARM.L.H0, R: ARM.R.H0, oL: 0, oR: 0 },
   maxwin: { L: [30, 168], R: [470, 168], oL: 1, oR: 1, h: [100, -10] },
@@ -44,7 +44,7 @@ const POSE = {
 const SW = { A: [442, 468], B: [270, 478], C: [112, 452] }; // spin: right wrist sweeps across the belly
 const FACE = { // head tilt deg, translate, eyes variant, mouth variant, brow raise right (px), pupils
   idle: { rot: 0, e: 0, m: 0, br: 0 }, spin: { rot: 2, e: 0, m: 0, br: 4 }, win: { rot: -2, e: 2, m: 1, br: 0 }, big: { rot: -5, e: 1, m: 1, br: 4 },
-  special: { rot: 3, e: 1, m: 0, br: 6 }, tease: { rot: 7, ty: 3, e: 1, m: 0, br: 8 }, exhale: { rot: -3, e: 2, m: 0, br: 0 }, slump: { rot: 5, e: 0, m: 3, br: 3, up: 1 },
+  special: { rot: 3, e: 1, m: 0, br: 6 }, tease: { rot: 7, ty: 3, e: 1, m: 0, br: 8 }, exhale: { rot: -3, e: 2, m: 0, br: 0 }, slump: { rot: 5, ty: 5, e: 0, m: 3, br: 6, up: 1 },
   bonus: { rot: -3, e: 1, m: 1, br: 4 }, bonusmode: { rot: 0, e: 0, m: 0, br: 2 }, maxwin: { rot: -5, e: 2, m: 1, br: 0 },
 };
 const BODY = { // whole-figure offsets
@@ -76,7 +76,7 @@ function face(live) {
 const place = (n, b, extra = '') => `<image id="ci_${n}" href="${img(n)}" x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}"${extra}/>`;
 const fbox = lf => [-40, -66, lf + 144, 132];
 const foreG = (k, cls) => { const A = ARM[k]; const lf = A.lf; const defDeg = deg(A.defF); const flip = k === 'R' ? ' scale(1 -1)' : ''; const b = fbox(lf);
-  return `<g class="tap${k}"><g class="f${k}"><g transform="translate(${A.E0[0]} ${A.E0[1]}) rotate(${n2(defDeg)})${flip}"><g class="ffw"><image id="ci_fore${k}" href="${img('fore' + k)}" x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}"/></g><g class="fow"><image id="ci_fore${k}_o" href="${img('fore' + k + '_o')}" x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}"/></g></g></g></g>`; };
+  return `<g class="tap${k}"><g class="f${k}"><g transform="translate(${A.E0[0]} ${A.E0[1]}) rotate(${n2(defDeg)})${flip}"><g class="ffw"><image id="ci_fore${k}" href="${img('fore' + k)}" x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}"/></g><g class="fow"><image id="ci_fore${k}_o" href="${img('fore' + k + '_o')}" x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}"/></g>${k === 'R' ? `<g class="fcw"><image id="ci_foreR_c" href="${img('foreR_c')}" x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}"/></g>` : ''}</g></g></g>`; };
 const pauld = `<g id="sPaul"><path d="M110,262 C112,226 160,216 186,238 C176,262 150,278 122,282 C112,278 108,270 110,262Z" fill="url(#goldA)" stroke="${OL}" stroke-width="2.6"/><path d="M110,262 C112,226 160,216 186,238 C176,262 150,278 122,282Z" fill="url(#goldV)"/><path d="M118,258 C124,238 152,228 174,238" fill="none" stroke="#fff0b0" stroke-width="2.2" opacity=".75"/>
 <path d="M390,262 C388,226 340,216 314,238 C324,262 350,278 378,282 C388,278 392,270 390,262Z" fill="url(#goldA)" stroke="${OL}" stroke-width="2.6"/><path d="M390,262 C388,226 340,216 314,238 C324,262 350,278 378,282Z" fill="url(#goldV)"/><path d="M380,256 C372,238 346,228 326,240" fill="none" stroke="#fff0b0" stroke-width="2.4" opacity=".85"/>
 <circle cx="146" cy="258" r="7" fill="url(#rubyC)" stroke="${OL}" stroke-width="1.8"/><circle cx="354" cy="258" r="7" fill="url(#rubyC)" stroke="${OL}" stroke-width="1.8"/></g>`;
@@ -121,7 +121,7 @@ const sel = (st, rest) => `#char.${st}${rest}`;
 let css = `/* ---------- Sirocco (rig of baked layers + live vector face). 500x760 design space shown at 410x623 ---------- */
 #char{left:1150px;top:127px;width:410px;height:623px;pointer-events:none;overflow:visible;--spd:1}
 #char .cl{position:absolute;left:0;top:0;width:410px;height:623px;overflow:visible;display:block}
-#char .eye.e1,#char .eye.e2,#char .lash.l1,#char .lids,#char .mo.m1,#char .mo.m2,#char .mo.m3,#char .fow,#char #sAuraS,#char .sp{opacity:0}
+#char .eye.e1,#char .eye.e2,#char .lash.l1,#char .lids,#char .mo.m1,#char .mo.m2,#char .mo.m3,#char .fow,#char .fcw,#char #sAuraS,#char .sp{opacity:0}
 #char #sAuraS{transition:opacity .6s}
 #char #sFigS,#char #sTailS{will-change:transform}
 #char #sAll{transform-origin:250px 600px;transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
@@ -129,7 +129,7 @@ let css = `/* ---------- Sirocco (rig of baked layers + live vector face). 500x7
 #char .fL{transform-origin:140px 392px}#char .fR{transform-origin:360px 394px}
 #char .tapL{transform-origin:140px 392px}#char .tapR{transform-origin:360px 394px}
 #char .uL,#char .uR,#char .fL,#char .fR{transition:transform .55s cubic-bezier(.3,1.35,.5,1)}
-#char .ffw,#char .fow{transition:opacity .2s}
+#char .ffw,#char .fow,#char .fcw{transition:opacity .2s}
 #char #sHead{transform-origin:250px 224px;transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
 #char #sPlume{transform-origin:254px 94px}
 #char .brR,#char .brL{transition:transform .35s cubic-bezier(.3,1.5,.5,1)}
@@ -159,9 +159,10 @@ const POSES = {};
 for (const [name, pz] of Object.entries(POSE)) {
   const L = ik('L', pz.L, pz.h), R = ik('R', pz.R, pz.h); POSES[name] = { L, R };
   if (name === 'idle') continue;
-  css += `#char.${name} .uL{transform:${tfU(L)}}#char.${name} .fL{transform:${tfF(L)}}#char.${name} .uR{transform:${tfU(R)}}#char.${name} .fR{transform:${tfF(R)}}\n`;
+  const lf = pz.lift ? `translateY(${-pz.lift}px) ` : '';
+  css += `#char.${name} .uL{transform:${lf}${tfU(L)}}#char.${name} .fL{transform:${lf}${tfF(L)}}#char.${name} .uR{transform:${lf}${tfU(R)}}#char.${name} .fR{transform:${lf}${tfF(R)}}\n`;
   if (pz.oL) css += `#char.${name} .fL .ffw{opacity:0}#char.${name} .fL .fow{opacity:1}\n`;
-  if (pz.oR) css += `#char.${name} .fR .ffw{opacity:0}#char.${name} .fR .fow{opacity:1}\n`;
+  if (pz.oR) css += `#char.${name} .fR .ffw{opacity:0}#char.${name} .fR .${pz.cR ? 'fcw' : 'fow'}{opacity:1}\n`;
 }
 for (const [name, fz] of Object.entries(FACE)) {
   if (name === 'idle') continue; const c = `#char.${name}`;

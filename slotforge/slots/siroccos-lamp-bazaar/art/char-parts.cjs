@@ -117,6 +117,20 @@ function handLocal(x, tone, lit, flip) { // open hand, fingers along +x, thumb o
   s += `<path d="M10,-6 C18,-2 24,-2 32,-6 M12,6 C20,10 26,10 32,6" fill="none" stroke="#0e3552" stroke-width="1.6" opacity=".45"/><path d="M4,-15 C14,-19 28,-17 35,-13" fill="none" stroke="${hi}" stroke-width="2" opacity=".8"/><circle cx="14" cy="0" r="3" fill="${dk}" opacity=".5"/>`;
   return `<g transform="translate(${n1(x - 4)},0) scale(1.42,${n1(1.42 * flip)})">${s}</g>`;
 }
+function handCupLocal(x, tone, flip) { // CUPPED hand (behind the ear): fingers together, bent toward -y (toward the head), thumb tucked
+  const dk = tone[0], md = tone[1], hi = tone[2]; let s = '';
+  const fing = [[-10.5, -8, 21, 15, 9.8], [-3.5, -12, 25, 17, 10.4], [3.5, -14, 24, 16, 10.2], [10.5, -16, 19, 13, 9.2]]; // base y, tilt, len1, len2, width
+  const pts = ([by, tl, l1, l2]) => { const a1 = tl * Math.PI / 180, a2 = a1 - 64 * Math.PI / 180, x0 = 32, p1 = [x0 + l1 * Math.cos(a1), by + l1 * Math.sin(a1)], p2 = [p1[0] + l2 * Math.cos(a2), p1[1] + l2 * Math.sin(a2)]; return `M${x0},${by} L${n1(p1[0])},${n1(p1[1])} L${n1(p2[0])},${n1(p2[1])}`; };
+  const th = 'M8,-13 L22,-26 L30,-24';
+  s += `<path d="${th}" stroke="${OL}" stroke-width="15" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
+  fing.forEach(f => { s += `<path d="${pts(f)}" fill="none" stroke="${OL}" stroke-width="${f[4] + 3.6}" stroke-linecap="round" stroke-linejoin="round"/>`; });
+  s += `<path d="M2,-18 C12,-22 28,-20 36,-15 L38,16 C28,21 12,21 2,18Z" fill="${OL}" stroke="${OL}" stroke-width="3" stroke-linejoin="round"/>`;
+  fing.forEach(f => { const d = pts(f); s += `<path d="${d}" fill="none" stroke="${md}" stroke-width="${f[4]}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${hi}" stroke-width="${n1(f[4] * .26)}" stroke-linecap="round" stroke-linejoin="round" transform="translate(0,${n1(f[4] * .28)})" opacity=".85"/>`; });
+  s += `<path d="${th}" fill="none" stroke="${md}" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/><path d="${th}" fill="none" stroke="${hi}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" transform="translate(1,1.5)"/>`;
+  s += `<path d="M2,-18 C12,-22 28,-20 36,-15 L38,16 C28,21 12,21 2,18Z" fill="${md}"/><path d="M2,-18 C12,-22 28,-20 36,-15 L38,16 C28,21 12,21 2,18Z" fill="url(#skinV)"/>`;
+  s += `<path d="M10,-6 C18,-2 24,-2 32,-6 M12,6 C20,10 26,10 32,6" fill="none" stroke="#0e3552" stroke-width="1.6" opacity=".45"/><path d="M4,-15 C14,-19 28,-17 35,-13" fill="none" stroke="${hi}" stroke-width="2" opacity=".8"/><circle cx="14" cy="0" r="3" fill="${dk}" opacity=".5"/>`;
+  return `<g transform="translate(${n1(x - 4)},0) scale(1.42,${n1(1.42 * flip)})">${s}</g>`;
+}
 const toneL = ['#1a5a8e', '#2a98b4', '#6ee0d8'], toneR = ['#2a98b4', '#6ee0d8', '#e0fffa'];
 const LFL = Math.hypot(178, 54), LFR = Math.hypot(176, 52);
 const fbox = lf => [-40, -66, lf + 144, 132];
@@ -126,6 +140,7 @@ P.foreL = arm(LFL, 54, 42, toneL, 'url(#skinH)', false, 1);
 P.foreR = arm(LFR, 56, 42, toneR, 'url(#skinH)', false, 1);
 P.foreL_o = arm(LFL, 54, 42, toneL, '', true, 1);
 P.foreR_o = arm(LFR, 56, 42, toneR, "", true, 1);
+P.foreR_c = wrapFore(LFR, forearmLocal(LFR, 56, 42, toneR) + bracerLocal(LFR, 56, 42, .28, .66) + handCupLocal(LFR, toneR, 1));
 
 // ---- head (skin, ears, earring, beard; NO eyes/brows/mouth/mustache: those are live vector) ----
 P.head = { bbox: [186, 94, 128, 156], scale: 1.8, svg: wrap([186, 94, 128, 156], `

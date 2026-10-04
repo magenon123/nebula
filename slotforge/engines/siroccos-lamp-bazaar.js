@@ -43,12 +43,12 @@ export const CFG = {
   pay: [[0, 0.03, 0.15], [0, 0.03, 0.15], [0, 0.03, 0.15], [0.02, 0.1, 0.5], [0.02, 0.1, 0.5], [0.02, 0.1, 0.5], [0.03, 0.2, 1.2], [0.03, 0.2, 1.2], [0.05, 0.35, 2]],
   stageMultCap: 5,
   // tile weights per mode (9 pay symbols); wild only on reels 2-4 (index 1..3)
-  base: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.008, fsP: 0.01453, astroP: 0.01255, gemP: 0.0038, payScale: 1, gemFree: 0 },
-  luck: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.008, fsP: 0.02117, astroP: 0.01802, gemP: 0.00386, payScale: 1, gemFree: 0.15 },
+  base: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.008, fsP: 0.01453, astroP: 0.01255, gemP: 0.0031, payScale: 1, gemFree: 0 },
+  luck: { symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.008, fsP: 0.02132, astroP: 0.01802, gemP: 0.0031, payScale: 1, gemFree: 0.15 },
   gemW: [[2, 40], [3, 26], [5, 17], [10, 11], [25, 6]],
   maxGems: 4,
   fs: { spins: { 3: 10, 4: 12, 5: 15 }, superFrom: 4, start: 1, cap: 12, superStart: 3, superCap: 15, retrig: { 3: 4, 4: 6 }, maxSpins: 40,
-        symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.03, fsP: 0.01453, gemP: 0.00593, superGemP: 0.0059, payScale: 1, gemW: [[2, 10], [3, 15], [5, 20], [10, 30], [25, 25]] },
+        symW: [11, 11, 11, 10, 10, 10, 9, 9, 8], wildP: 0.03, fsP: 0.01453, gemP: 0.00577, superGemP: 0.0059, payScale: 1, gemW: [[2, 10], [3, 15], [5, 20], [10, 30], [25, 25]] },
   astro: {
     spins: { 3: 4, 4: 6, 5: 8 },
     outer: { v: [1, 2, 1, 3, 2, 5, 1, 4, 2, 10, 3, 40], w: [16, 13, 16, 10, 12, 6, 16, 8, 12, 2.5, 6, 0.4] },
@@ -66,6 +66,10 @@ export const buyCountW = (p, lo) => { const w = []; for (let k = lo; k <= 5; k++
 const pickW = (rng, tbl) => { let t = 0; for (const e of tbl) t += e[1]; let u = rng() * t; for (const e of tbl) { u -= e[1]; if (u < 0) return e[0]; } return tbl[tbl.length - 1][0]; };
 const drawIdx = (rng, w) => { let t = 0; for (const x of w) t += x; let u = rng() * t; for (let i = 0; i < w.length; i++) { u -= w[i]; if (u < 0) return i; } return w.length - 1; };
 const rd = x => Math.round(x * 1e6) / 1e6;     // strip float noise from money (all pays are multiples of 0.01)
+/* Every payout the player sees is a multiple of 0.1x (exact in cents at the $0.10 minimum stake). A stage's exact pay (runs x multiplier) is rounded to the
+ * 0.1 grid with UNBIASED stochastic rounding: pay 0.04 becomes 0.1 with probability 0.4, else 0. The expectation (and so the RTP) is unchanged. */
+const tenth = (rng, x) => { if (x > 0 && x < 0.1) return 0.1;     // a paid stage always shows at least 0.1x
+   const n = Math.round(x * 1e6) / 1e5, lo = Math.floor(n + 1e-9), f = n - lo; return (lo + (f > 1e-9 && rng() < f ? 1 : 0)) / 10; };
 const grid0 = v => Array.from({ length: ROWS }, () => new Array(COLS).fill(v));
 const copy = g => g.map(r => r.slice());
 
@@ -158,8 +162,8 @@ function playChain(rng, o) {
     }
     let sum = 0;
     for (const run of runs) { sum += run.pay; for (const [r, c] of run.cells) seal(r, c); }
-    const payout = rd(sum * m); total = rd(total + payout);
-    stages.push({ stage: k, mult: m, grid: copy(grid), sealed: sealedBefore, runs, payout, newlySealed,
+    const exact = rd(sum * m), payout = tenth(rng, exact); total = rd(total + payout);
+    stages.push({ stage: k, mult: m, grid: copy(grid), sealed: sealedBefore, runs, exactPayout: exact, payout, newlySealed,
       gems: gems.filter(g => g.stage <= k).map(g => ({ r: g.r, c: g.c, value: g.value, isNew: g.stage === k })), chainTotal: total });
     if (!runs.length) break;
     if (mult != null) mult = Math.min(o.cap, mult + 1);

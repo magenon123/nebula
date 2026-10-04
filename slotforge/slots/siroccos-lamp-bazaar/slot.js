@@ -279,7 +279,7 @@ function initAstro(B) {
   const o = B.rings.outer, m = B.rings.middle;
   o.forEach((v, i) => { const t = $('ro' + i); if (t) t.textContent = v + '×'; }); m.forEach((v, i) => { const t = $('rm' + i); if (t) t.textContent = '×' + v; });
   const J = INFO.astro.jackpot; ['grand', 'major', 'minor', 'mini'].forEach(k => { const b = document.querySelector(`#aJ .j.${k} b`); if (b) b.textContent = J[k].toLocaleString('en-US') + '×'; });
-  [0, 1, 2].forEach(k => { const r = ringEl(k); r.classList.remove('go', 'magnet'); r.style.setProperty('--a', 0); ringAng[k] = 0; });
+  [0, 1, 2].forEach(k => { const r = ringEl(k); r.classList.remove('go', 'magnet'); r.style.setProperty('--a', 0); ringAng[k] = 0; magnetFx(k, false); });
   $('astro').classList.remove('tense'); resetTally(); $('aHubT').textContent = 'WISH'; $('aHubS').textContent = '';
 }
 function resetTally() { $('aCash').textContent = '–'; $('aMult').textContent = '–'; $('aWish').textContent = '–'; $('aTotal').textContent = fmt(0); document.querySelectorAll('#aJ .j').forEach(j => j.classList.remove('lit')); }
@@ -290,6 +290,17 @@ function turnRing(k, sector, n, secs, extra) {                   // spin ring k 
   return new Promise(res => { void r.offsetWidth; const an = r.getAnimations().filter(a => a.transitionProperty === 'transform'); let rate = 1; const iv = setInterval(() => { if (S.isTurbo() && rate === 1) { rate = 4; an.forEach(a => a.updatePlaybackRate(4)); } }, 90);
     Promise.all(an.map(a => a.finished.catch(() => {}))).then(() => { clearInterval(iv); res(); }); if (!an.length) { clearInterval(iv); setTimeout(res, secs * 1000 * T()); } });
 }
+const MAGR = [283, 205];                                           // mid radius of the outer / middle ring (700 box)
+const topThird = vals => vals.map((v, i) => i).sort((a, b) => vals[b] - vals[a] || a - b).slice(0, Math.round(vals.length / 3));
+function magnetFx(k, on, vals) {                                   // best-third sectors glow, golden comets are pulled from them to the pointer (12 o'clock)
+  const g = $('aMag' + k); if (!g) return; g.innerHTML = ''; ringEl(k).querySelectorAll('.sec.mag').forEach(x => x.classList.remove('mag'));
+  if (!on || !vals) return;
+  const n = vals.length, step = 360 / n, P = (r, a) => [350 + r * Math.sin(a * Math.PI / 180), 350 - r * Math.cos(a * Math.PI / 180)], p0 = P(MAGR[k], 0); let h = '';
+  topThird(vals).forEach((i, j) => { const sc = secEl(k, i); if (sc) sc.classList.add('mag'); const th = (((ringAng[k] + i * step) % 360) + 360) % 360; if (th < 8 || th > 352) return;
+    const p = P(MAGR[k], th), R = MAGR[k], d = `M${p[0].toFixed(1)},${p[1].toFixed(1)} A${R},${R} 0 0 ${th < 180 ? 0 : 1} ${p0[0].toFixed(1)},${p0[1].toFixed(1)}`, dl = `animation-delay:${(j * .14).toFixed(2)}s`;
+    h += `<path class="mg1" pathLength="1" d="${d}" style="${dl}"/><path class="mg2" pathLength="1" d="${d}" style="${dl}"/><circle class="mgh" r="9" style="offset-path:path('${d}');${dl}"/>`; });
+  h += `<circle class="mgp" cx="${p0[0].toFixed(1)}" cy="${p0[1].toFixed(1)}" r="26"/>`; g.innerHTML = h;
+}
 function ringHit(k, sector) {
   const s = secEl(k, sector); if (s) { s.classList.add('hit'); } const p = document.querySelector('#astro .aPtr'); p.classList.remove('pulse'); void p.getBoundingClientRect(); p.classList.add('pulse'); setTimeout(() => p.classList.remove('pulse'), 520 * T());
   sfx.ringStop(k); shake(.3 + k * .15);
@@ -298,13 +309,13 @@ async function astroSpin(sp, run0, ctx) {
   const stake = ctx.stake, B = bonusR.bonus, top = Math.min(MAXW * stake, run0 + sp.totalPayout * stake), A = $('astro'); let run = run0;
   setFs(sp.spinsLeft, true); resetTally(); $('aHubT').textContent = '...'; $('aHubS').textContent = ''; A.classList.remove('tense');
   document.querySelectorAll('#astro .sec.hit').forEach(s => s.classList.remove('hit'));
-  const mg = sp.magnet || {}; ringEl(0).classList.toggle('magnet', !!mg.outer); ringEl(1).classList.toggle('magnet', !!mg.middle);
+  const mg = sp.magnet || {}; ringEl(0).classList.toggle('magnet', !!mg.outer); ringEl(1).classList.toggle('magnet', !!mg.middle); magnetFx(0, !!mg.outer, B.rings.outer); magnetFx(1, !!mg.middle, B.rings.middle);
   say(mg.outer || mg.middle ? `SPIN ${sp.spinIndex} OF ${B.startSpins} · THE MAGNET PULLS` : `SPIN ${sp.spinIndex} OF ${B.startSpins}`, true); if (mg.outer || mg.middle) sfx.magnet();
   sfx.ringSpin(); S.music.intensity(clamp01(.25 + sp.spinIndex / B.startSpins * .5));
   const coreSector = sp.core.kind ? CORE_ART[sp.core.kind] : 1 + 2 * (sp.core.idx >> 1);
   const pO = turnRing(0, sp.outer.idx, B.rings.outer.length, 2.6, 4), pM = turnRing(1, sp.middle.idx, B.rings.middle.length, 3.5, 4), pC = turnRing(2, coreSector, 8, 5.4, 5);
-  await pO; ringHit(0, sp.outer.idx); $('aCash').textContent = sp.outer.value + '×'; tallyPop(); $('aHubT').textContent = sp.outer.value + '×'; ringEl(0).classList.remove('magnet'); await wait(350);
-  await pM; ringHit(1, sp.middle.idx); $('aMult').textContent = '×' + sp.middle.value; tallyPop(); $('aHubT').textContent = '×' + sp.middle.value; ringEl(1).classList.remove('magnet');
+  await pO; ringHit(0, sp.outer.idx); $('aCash').textContent = sp.outer.value + '×'; tallyPop(); $('aHubT').textContent = sp.outer.value + '×'; ringEl(0).classList.remove('magnet'); magnetFx(0, false); await wait(350);
+  await pM; ringHit(1, sp.middle.idx); $('aMult').textContent = '×' + sp.middle.value; tallyPop(); $('aHubT').textContent = '×' + sp.middle.value; ringEl(1).classList.remove('magnet'); magnetFx(1, false);
   const cashV = sp.outer.value * sp.middle.value; $('aTotal').textContent = fmt(cashV * stake); A.classList.add('tense'); sfx.tense(); say('THE CORE TURNS... HOLD YOUR BREATH', true);
   await pC; A.classList.remove('tense'); ringHit(2, coreSector);
   if (sp.core.jackpot) {

@@ -54,6 +54,7 @@ test('a plus shape pays two runs; only runs with a newly landed tile pay', () =>
 /* ---------- random rounds in every mode ---------- */
 const ROUNDS = Number(process.env.TEST_ROUNDS || 1500);
 const key = (r, c) => r * 10 + c;
+const isTenth = x => Math.abs(x * 10 - Math.round(x * 10)) < 1e-6;
 /* checks one chain (stages[]) and returns { base, gemSum, payout } */
 function checkChain(stages, { persistent = null, cap = 0, scattersAllowed = true } = {}) {
   let mult = persistent, sealed = new Set(), prev = null, base = 0; const gemSeen = [];
@@ -71,7 +72,9 @@ function checkChain(stages, { persistent = null, cap = 0, scattersAllowed = true
     const m = persistent == null ? Math.min(i + 1, S.CFG.stageMultCap) : mult;
     assert.equal(st.mult, m);
     let sum = 0; for (const x of runs) { sum += x.pay; assert.ok(x.cells.some(([r, c]) => isNew[r][c]), 'run contains a new tile'); assert.ok(x.len >= 3 && x.len <= 5); }
-    assert.ok(near(st.payout, sum * m)); base += st.payout;
+    assert.ok(near(st.exactPayout, sum * m)); assert.ok(isTenth(st.payout), 'stage payout is a multiple of 0.1x');
+    if (sum > 0) assert.ok(st.payout >= 0.1 - 1e-9 && st.payout <= Math.max(0.1, st.exactPayout + 0.1 - 1e-9) && st.payout >= st.exactPayout - 0.1 + 1e-9, 'rounded within one 0.1 step'); else assert.equal(st.payout, 0);
+    base += st.payout;
     // scatters on a respin stage may only be the sealed ones from stage 1
     if (i > 0) for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) if ((st.grid[r][c] === FS || st.grid[r][c] === ASTRO)) assert.ok(before.has(key(r, c)), 'scatter on respin stage must be a sealed stage-1 scatter');
     // seal update
@@ -97,6 +100,7 @@ for (const mode of listModes(S)) {
     for (let i = 0; i < ROUNDS; i++) {
       const r = S.playRound(rng, o), errs = checkRound(r, S.CFG, { ante: !!o.ante, buy: o.buy || null });
       assert.deepEqual(errs, [], `round ${i}: ${errs.join('; ')}`);
+      for (const v of [r.totalPayout, r.basePayout, r.bonus ? r.bonus.totalPayout : 0]) assert.ok(isTenth(v), 'payout multiple of 0.1x: ' + v);
       if (o.buy) {
         assert.equal(r.trigger.type, o.buy); assert.equal(r.stages.length, 0); assert.equal(r.cascadeSteps.length, 0); assert.equal(r.basePayout, 0);
         const mark = o.buy === 'astrolabe' ? ASTRO : FS; assert.equal(r.trigger.cells.length, r.trigger.count);
