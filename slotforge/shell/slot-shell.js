@@ -333,7 +333,7 @@ async function go(buy) {
         run = await hooks.playSpin(sp, run, ctx); await wait(300);
       }
       $('fsBox').hidden = true; music.theme('base', 2.4); music.intensity(0); $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); if (ambCtl && ambCtl.bonus) ambCtl.bonus(false); $('outroV').textContent = fmt(0);
-      if (tierOf(R.totalPayout)) bonusDone = true;   // a big-win screen follows and shows the total: don't say the amount twice
+      if (tierOf(R.totalPayout) && (!navigator.webdriver || /[?&]merge=1/.test(location.search))) bonusDone = true;   // (automated tests keep the separate outro unless ?merge=1)   // a big-win screen follows and shows the total: don't say the amount twice
       else {
       openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
       await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);

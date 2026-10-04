@@ -1141,6 +1141,10 @@ select{
   <button class="side-item" data-g="olympian-storm"><span class="ic">⚡</span>Olympian Storm</button>
   <button class="side-item" data-g="lake-legend"><span class="ic">🎣</span>Lake Legend</button>
   <button class="side-item" data-g="emberclaw"><span class="ic">🔥</span>EmberClaw</button>
+  <button class="side-item" data-g="grumble-and-brine"><span class="ic">🦀</span>Grumble & Brine</button>
+  <button class="side-item" data-g="cloudtop-tea-house"><span class="ic">🍵</span>Cloudtop Tea House</button>
+  <button class="side-item" data-g="arctic-aurora-lodge"><span class="ic">🌌</span>Arctic Aurora Lodge</button>
+  <button class="side-item" data-g="siroccos-lamp-bazaar"><span class="ic">🪔</span>Sirocco's Lamp Bazaar</button>
 </aside>
 
 <div class="body">
@@ -1529,6 +1533,18 @@ select{
   </div>
   <div id="slot-emberclaw" hidden style="position:absolute;inset:0;z-index:10;background:#0b0605">
     <iframe id="frame-emberclaw" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay"></iframe>
+  </div>
+  <div id="slot-grumble-and-brine" hidden style="position:absolute;inset:0;z-index:10;background:#06222a">
+    <iframe id="frame-grumble-and-brine" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay;fullscreen"></iframe>
+  </div>
+  <div id="slot-cloudtop-tea-house" hidden style="position:absolute;inset:0;z-index:10;background:#2a1a10">
+    <iframe id="frame-cloudtop-tea-house" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay;fullscreen"></iframe>
+  </div>
+  <div id="slot-arctic-aurora-lodge" hidden style="position:absolute;inset:0;z-index:10;background:#06121e">
+    <iframe id="frame-arctic-aurora-lodge" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay;fullscreen"></iframe>
+  </div>
+  <div id="slot-siroccos-lamp-bazaar" hidden style="position:absolute;inset:0;z-index:10;background:#1a0f2a">
+    <iframe id="frame-siroccos-lamp-bazaar" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay;fullscreen"></iframe>
   </div>
   <div id="slot-lake-legend" hidden style="position:absolute;inset:0;z-index:10;background:#2a6c73">
     <iframe id="frame-lake-legend" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay"></iframe>
@@ -3416,6 +3432,11 @@ const CARD_IMG={
   cases:'https://mediumrare.imgix.net/5da127925ac99a19da0cd888e5436049bc42f8ee4002df80cdc817f0501ab8a7?w=180&h=236&fit=min&auto=format',
   'olympian-storm':'https://mediumrare.imgix.net/73318f9e220e1637c4b11338d10f377cd997d0232636f5f5a1940167ad0451cd?w=180&h=236&fit=min&auto=format',
   'lake-legend':'https://mediumrare.imgix.net/0599c1bc38fca6bf24813cc136a732d888c891393f0c102d6c5ce460c62e52db?w=180&h=236&fit=min&auto=format',
+  emberclaw:'/cards/emberclaw.webp',
+  'grumble-and-brine':'/cards/grumble-and-brine.webp',
+  'cloudtop-tea-house':'/cards/cloudtop-tea-house.webp',
+  'arctic-aurora-lodge':'/cards/arctic-aurora-lodge.webp',
+  'siroccos-lamp-bazaar':'/cards/siroccos-lamp-bazaar.webp',
 };
 const CARD_BG={
   mines:`radial-gradient(at 0% 0%,#5d5bec,transparent 50%),radial-gradient(at 33% 0%,#9e44cc,transparent 50%),radial-gradient(at 67% 0%,#074df0,transparent 50%),radial-gradient(at 100% 0%,#4b47e6,transparent 50%),radial-gradient(at 0% 50%,#6f8cdd,transparent 50%),radial-gradient(at 33% 50%,#8d7dbc,transparent 50%),radial-gradient(at 67% 50%,#5fcaa9,transparent 50%),radial-gradient(at 100% 50%,#47c96b,transparent 50%),radial-gradient(at 0% 100%,#2c89ff,transparent 50%),radial-gradient(at 33% 100%,#8ea3f6,transparent 50%),radial-gradient(at 67% 100%,#84b4fa,transparent 50%),radial-gradient(at 100% 100%,#7cadf1,transparent 50%)`,
@@ -3449,6 +3470,10 @@ const GAMES=[
  ['olympian-storm','Olympian Storm','⚡','#e3b43c','slots'],
  ['lake-legend','Lake Legend','\u{1F3A3}','#46b04a','slots'],
  ['emberclaw','EmberClaw','\u{1F525}','#ff6a1a','slots'],
+ ['grumble-and-brine','Grumble & Brine','🦀','#2fb8c9','slots'],
+ ['cloudtop-tea-house','Cloudtop Tea House','🍵','#ffb04a','slots'],
+ ['arctic-aurora-lodge','Arctic Aurora Lodge','🌌','#4ee0c0','slots'],
+ ['siroccos-lamp-bazaar','Sirocco's Lamp Bazaar','🪔','#ffc83a','slots'],
 ];
 (function(){
   // Playing counts based on real Stake data
@@ -3519,7 +3544,7 @@ function go(key){
   if(key==='wheel')wheelDraw(wheelAngle);
   if(key==='cases')casesIdle();
   // Slot iframe overlays — hide the bet panel so stage fills full width
-  const SLOTS=['olympian-storm','lake-legend','emberclaw'];
+  const SLOTS=['olympian-storm','lake-legend','emberclaw','grumble-and-brine','cloudtop-tea-house','arctic-aurora-lodge','siroccos-lamp-bazaar'];
   const isSlot=SLOTS.includes(key);
   $('panels').style.display=isSlot?'none':'';
   document.querySelector('.frame-body').classList.toggle('slot-active',isSlot);
@@ -3530,6 +3555,10 @@ function go(key){
   if(key==='olympian-storm'){const f=$('frame-olympian-storm');if(!f.src||!f.src.includes('olympian'))f.src='/olympian-storm.html';}
   if(key==='lake-legend'){const f=$('frame-lake-legend');if(!f.src||!f.src.includes('lake'))f.src='/lake-legend.html';}
   if(key==='emberclaw'){const f=$('frame-emberclaw');if(!f.src||!f.src.includes('emberclaw'))f.src='/emberclaw.html';}
+  if(key==='grumble-and-brine'){const f=$('frame-grumble-and-brine');if(!f.src||!f.src.includes('grumble-and-brine'))f.src='/grumble-and-brine.html';}
+  if(key==='cloudtop-tea-house'){const f=$('frame-cloudtop-tea-house');if(!f.src||!f.src.includes('cloudtop-tea-house'))f.src='/cloudtop-tea-house.html';}
+  if(key==='arctic-aurora-lodge'){const f=$('frame-arctic-aurora-lodge');if(!f.src||!f.src.includes('arctic-aurora-lodge'))f.src='/arctic-aurora-lodge.html';}
+  if(key==='siroccos-lamp-bazaar'){const f=$('frame-siroccos-lamp-bazaar');if(!f.src||!f.src.includes('siroccos-lamp-bazaar'))f.src='/siroccos-lamp-bazaar.html';}
   if(isSlot){
     setTimeout(()=>{try{const fr=$('frame-'+key);if(fr.contentWindow&&fr.contentWindow.paintBal)fr.contentWindow.paintBal();}catch(_){}},500);
   }
