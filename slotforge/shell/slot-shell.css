@@ -308,9 +308,10 @@ body.portrait #fsBox{left:20px;top:20px}
 body.portrait #menu{left:30px;top:auto;bottom:392px;width:340px}
 body.portrait #menu button{font-size:22px;padding:14px 14px}
 
-/* ===== backdrop: blurred scene around the stage ===== */
-#backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-#backdrop>*{position:absolute;left:-4%;top:-4%;width:108%;height:108%;object-fit:cover;display:block;filter:blur(16px) saturate(1.1) brightness(.92)}
-#backdrop *{animation:none!important}
-#backdrop::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 55%,rgba(0,0,0,.28) 100%)}
+/* ===== backdrop: soft copy of the scene around the stage (one tiny canvas, stretched) ===== */
+#backdrop{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block;pointer-events:none;image-rendering:auto}
 #shaker{background:transparent}
+/* ===== win screen: no live blur of the game underneath (it re-blurred every frame); a plain dark veil instead ===== */
+#bigBlur{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:radial-gradient(ellipse at 50% 46%,rgba(8,10,22,.55),rgba(2,3,8,.93) 80%)}
+#bigCoins i{box-shadow:none!important;background:radial-gradient(circle at 35% 30%,#fff2a8 0,#ffd23a 40%,#c98208 82%,#8a5206 100%);border:2px solid #8a5206}
+#bigCoins{perspective:none!important}
