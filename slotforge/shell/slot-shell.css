@@ -321,3 +321,9 @@ body.lite #scene *,body.lite #scene{animation-play-state:paused!important}   /* 
 body.lite #backdrop,body.portrait #backdrop{display:none}
 body.lite #bigGlow{animation:none!important;filter:none!important}
 body.lite #grid *,body.lite #frame *{filter:none!important}   /* shadows on every moving symbol are costly on phones */
+
+/* ===== quality levels (see the governor in slot-shell.js) ===== */
+body.lite #grain,body.q2 #grain{display:none!important}                 /* the full-screen film grain is a blend layer over the whole game: very costly on phones */
+body.q2 *:not(#big):not(#big *){filter:none!important;mix-blend-mode:normal!important}
+body.q3 #scene{display:none!important}
+body.q3 #backdrop{display:block!important}                               /* the soft one-bitmap copy of the scene stands in for the artwork */

@@ -101,6 +101,11 @@ def main():
     if legacy or '--server' in flags or '--server-only' in flags: outs.append((f'{slug}.html', False))
     for name, standalone in outs:
         html = assemble(slug, standalone)
+        try:
+            import subprocess, time
+            tag = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], cwd=ROOT, capture_output=True, text=True).stdout.strip() or 'dev'
+            html = html.replace('<meta charset="utf-8">', '<meta charset="utf-8">\n<meta name="sf-build" content="%s %s">' % (tag, time.strftime('%m-%d %H:%M')), 1)
+        except Exception: pass
         open(os.path.join(ROOT, name), 'w', encoding='utf-8').write(html)
         print('built', name, len(html), 'bytes')
 

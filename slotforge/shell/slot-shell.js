@@ -43,6 +43,26 @@ if (LITE) {
   document.querySelectorAll('style').forEach(st => { st.textContent = st.textContent.replace(/url\(#rough\w*\)\s*/g, ''); });
   document.querySelectorAll('[filter*="#rough"]').forEach(e => e.removeAttribute('filter'));
 }
+/* QUALITY GOVERNOR + FPS READOUT. While a spin is running the page times its own frames. If a device keeps missing ~30 fps, quality steps down by itself:
+   level 2 drops every remaining filter and blend, level 3 swaps the scene artwork for its soft one-bitmap copy. The level is remembered on that device (?q=0 resets,
+   ?q=1..3 forces one). ?fps=1 shows a live readout (fps, quality level, phone mode, build) to screenshot. Automated tests are never throttled. */
+const QKEY = P + '_q';
+let QLV = (() => { const m = /[?&]q=(\d)/.exec(location.search); if (m) { store.set(QKEY, +m[1]); return +m[1]; } return Math.max(LITE ? 1 : 0, +store.get(QKEY, 0) || 0); })();
+const applyQ = () => { document.body.classList.toggle('q2', QLV >= 2); document.body.classList.toggle('q3', QLV >= 3); };
+applyQ();
+(function governor() {
+  const show = /[?&]fps=1/.test(location.search); let box = null;
+  if (show) { box = document.createElement('div'); box.style.cssText = 'position:fixed;left:6px;top:6px;z-index:99999;background:rgba(0,0,0,.72);color:#9f9;font:12px/1.35 monospace;padding:4px 7px;border-radius:6px;pointer-events:none;white-space:pre'; document.body.appendChild(box); }
+  const build = (document.querySelector('meta[name="sf-build"]') || {}).content || '?';
+  let last = performance.now(), acc = 0, n = 0, bad = 0, cool = 0, all = 0, allN = 0, lastShow = last, spins = 0, wasBusy = false;   // (the first spin is a warm-up: images and code are still loading)
+  (function f(t) { const d = t - last; last = t;
+    const busy = $('spin').classList.contains('busy'); if (busy && !wasBusy) spins++; wasBusy = busy;
+    if (d < 250) { all += d; allN++; if (busy) { acc += d; n++; } }
+    if (busy && n >= 45) { const avg = acc / n; acc = 0; n = 0;
+      if ((!navigator.webdriver || /[?&]gov=1/.test(location.search)) && spins >= 2 && QLV < 3 && t > cool) { if (avg > 36) bad++; else bad = 0; if (bad >= 2 || avg > 55) { QLV++; bad = 0; cool = t + 3000; store.set(QKEY, QLV); applyQ(); } } }
+    if (box && t - lastShow > 500) { lastShow = t; box.textContent = Math.round(1000 / (all / (allN || 1))) + ' fps (avg) | quality ' + QLV + (LITE ? ' | phone mode' : '') + '\nDPR ' + devicePixelRatio + ' | ' + innerWidth + 'x' + innerHeight + '\nbuild ' + build; all = 0; allN = 0; }
+    requestAnimationFrame(f); })(last);
+})();
 /* Wide or tall windows: a soft copy of the scene fills the space around the 16:9 stage (no black bars). It is drawn ONCE into a tiny canvas that the browser
    stretches up (the stretch is the blur), so it costs nothing per frame; a live CSS blur over the whole window made the game laggy. */
 (function backdrop() {
