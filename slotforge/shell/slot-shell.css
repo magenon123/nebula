@@ -315,3 +315,9 @@ body.portrait #menu button{font-size:22px;padding:14px 14px}
 #bigBlur{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:radial-gradient(ellipse at 50% 46%,rgba(8,10,22,.55),rgba(2,3,8,.93) 80%)}
 #bigCoins i{box-shadow:none!important;background:radial-gradient(circle at 35% 30%,#fff2a8 0,#ffd23a 40%,#c98208 82%,#8a5206 100%);border:2px solid #8a5206}
 #bigCoins{perspective:none!important}
+
+/* ===== phone mode ===== */
+body.lite #scene *,body.lite #scene{animation-play-state:paused!important}   /* the picture stays, the endless background motion stops */
+body.lite #backdrop,body.portrait #backdrop{display:none}
+body.lite #bigGlow{animation:none!important;filter:none!important}
+body.lite #grid *,body.lite #frame *{filter:none!important}   /* shadows on every moving symbol are costly on phones */

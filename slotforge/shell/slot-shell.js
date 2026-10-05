@@ -35,6 +35,14 @@ const wait = ms => new Promise(res => { let prog = 0, last = performance.now(); 
 const GA = (() => { const ga = document.createElement('div'), st = $('stage'); ga.id = 'ga';
   const HUD = new Set(['scene', 'msg', 'fsBox', 'turboBadge', 'feverBadge', 'buyOpen', 'barL', 'barR', 'spin', 'bAuto', 'menu']);
   [...st.children].filter(e => !HUD.has(e.id)).forEach(e => ga.appendChild(e)); st.insertBefore(ga, $('msg')); return ga; })();
+/* PHONE MODE (touch screens, or ?lite=1 to test): phones have weak graphics chips, so the costliest decorations are switched off there: the hand-drawn wobble
+   filters (SVG turbulence, re-computed whenever the filtered art changes), the scene's endless background motion, and most of the ambient sparks. Computers keep everything. */
+const LITE = (() => { try { return /[?&]lite=1/.test(location.search) || (matchMedia('(pointer:coarse)').matches && !/[?&]lite=0/.test(location.search)); } catch { return false; } })();
+if (LITE) {
+  document.body.classList.add('lite');
+  document.querySelectorAll('style').forEach(st => { st.textContent = st.textContent.replace(/url\(#rough\w*\)\s*/g, ''); });
+  document.querySelectorAll('[filter*="#rough"]').forEach(e => e.removeAttribute('filter'));
+}
 /* Wide or tall windows: a soft copy of the scene fills the space around the 16:9 stage (no black bars). It is drawn ONCE into a tiny canvas that the browser
    stretches up (the stretch is the blur), so it costs nothing per frame; a live CSS blur over the whole window made the game laggy. */
 (function backdrop() {
@@ -132,7 +140,7 @@ function embers(n, x = innerWidth / 2, y = innerHeight / 2, gold) {
 }
 function coins(n) { for (let i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, l: 200, s: 6 + Math.random() * 6, g: .05, c: 1 }); }
 function ambient() {
-  if (parts.length > 120) return;
+  if (parts.length > (LITE ? 30 : 120)) return;
   if (Math.random() < .12 + (hooks.ambientBoost ? hooks.ambientBoost() : 0)) parts.push({ x: Math.random() * innerWidth, y: innerHeight + 6, vx: (Math.random() - .5) * .6, vy: -(.5 + Math.random() * 1.1), l: 260 + Math.random() * 160, s: 1.2 + Math.random() * 2, g: -.001, w: Math.random() * 6, c: 0 });
 }
 const defColor = (p, a) => `rgba(255,255,255,${a})`;
@@ -314,7 +322,7 @@ let bigTap = null;
 /* Coins tumble down the win screen, hit the floor, bounce twice (smaller each time), then fall away. Heavier with each level. */
 function coinRain(lv) {
   const box = $('bigCoins'); if (!box) return () => {};
-  const spawn = () => { if (box.childElementCount > 34) return;
+  const spawn = () => { if (box.childElementCount > (LITE ? 18 : 34)) return;
     const c = document.createElement('i'), sz = 22 + Math.random() * 30, dur = (3600 + Math.random() * 1400) * T(), rot = (Math.random() < .5 ? -1 : 1) * (540 + Math.random() * 900), tilt = Math.random() * 40 - 20;
     c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px`; box.appendChild(c);
     const F = 90, f = (y, k) => `translateY(${y}vh) rotateY(${rot * k}deg) rotateZ(${tilt}deg)`;
