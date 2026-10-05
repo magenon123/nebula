@@ -10,8 +10,9 @@
 const SlotShell = (() => {
 const $ = id => document.getElementById(id);
 const store = { get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
-const fmt = n => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const betLbl = n => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2));
+const fmt = n => sfMoney(n);   // converted to the player's display currency (see currencies.js)
+const betLbl = n => sfCur()[0] === 'USD' ? '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2)) : sfMoney(n);
+try { addEventListener('storage', e => { if (e.key === 'stakeCurrency') location.reload(); }); } catch {}   // the lobby changed the currency: reload this game in it
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
 
@@ -40,7 +41,7 @@ const GA = (() => { const ga = document.createElement('div'), st = $('stage'); g
 const LITE = (() => { try { return /[?&]lite=1/.test(location.search) || (matchMedia('(pointer:coarse)').matches && !/[?&]lite=0/.test(location.search)); } catch { return false; } })();
 if (LITE) {
   document.body.classList.add('lite');
-  document.querySelectorAll('style').forEach(st => { st.textContent = st.textContent.replace(/url\(#rough\w*\)\s*/g, ''); });
+  document.querySelectorAll('style').forEach(st => { st.textContent = st.textContent.replace(/url\(#rough\w*\)\s*/g, '').replace(/(-webkit-)?backdrop-filter:[^;}]*;?/g, ''); });
   document.querySelectorAll('[filter*="#rough"]').forEach(e => e.removeAttribute('filter'));
 }
 /* QUALITY GOVERNOR + FPS READOUT. While a spin is running the page times its own frames. If a device keeps missing ~30 fps, quality steps down by itself:
@@ -156,9 +157,10 @@ addEventListener('pointerdown', () => { amb.start(); music.start(); }, { once: t
 const cv = $('fx'), cx = cv.getContext('2d'); let parts = [];
 function size() { cv.width = innerWidth; cv.height = innerHeight; } size(); addEventListener('resize', size);
 function embers(n, x = innerWidth / 2, y = innerHeight / 2, gold) {
+  n = Math.ceil(n * (LITE ? .35 : 1)); if (parts.length > (LITE ? 140 : 600)) return;
   for (let i = 0; i < n; i++) parts.push({ x, y, vx: (Math.random() - .5) * 9, vy: -Math.random() * 8 - 1, l: 60 + Math.random() * 60, s: 2 + Math.random() * 3.5, g: .14, c: gold ? 1 : 0 });
 }
-function coins(n) { for (let i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, l: 200, s: 6 + Math.random() * 6, g: .05, c: 1 }); }
+function coins(n) { n = Math.ceil(n * (LITE ? .35 : 1)); for (let i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, l: 200, s: 6 + Math.random() * 6, g: .05, c: 1 }); }
 function ambient() {
   if (parts.length > (LITE ? 30 : 120)) return;
   if (Math.random() < .12 + (hooks.ambientBoost ? hooks.ambientBoost() : 0)) parts.push({ x: Math.random() * innerWidth, y: innerHeight + 6, vx: (Math.random() - .5) * .6, vy: -(.5 + Math.random() * 1.1), l: 260 + Math.random() * 160, s: 1.2 + Math.random() * 2, g: -.001, w: Math.random() * 6, c: 0 });
@@ -254,7 +256,7 @@ const FX = {
     FX.shards(x, y, o.n || 9, colors, o);
   },
   shards(x, y, n, colors, o = {}) {
-    const pw = o.power || 1, sc = STAGE_S;
+    const pw = o.power || 1, sc = STAGE_S; n = Math.ceil(n * (LITE ? .5 : 1));
     for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = (2 + Math.random() * 6) * pw * sc, tri = Math.random() < .6;
       parts.push({ x: x + Math.cos(a) * 6 * sc, y: y + Math.sin(a) * 6 * sc, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (2.5 + Math.random() * 3) * pw * sc, g: .34 * sc, l: 34 + Math.random() * 30, s: (4 + Math.random() * 6) * sc,
         rot: Math.random() * 6.28, vr: (Math.random() - .5) * .5, col: colors[Math.floor(Math.random() * colors.length)], edge: o.edge || 'rgba(20,10,6,.55)',
@@ -605,7 +607,7 @@ hooks.paintIdle();
       el.addEventListener('pointerdown', go, { once: true }); addEventListener('keydown', go); }, 350);
   });
 })();
-refreshUi();
+refreshUi(); $('win').textContent = fmt(0);
 say(cfg.text.idle + (LOCAL ? ' (Play-money demo)' : ''));
 if (LOCAL) { balance = wallet; $('bal').textContent = fmt(balance); }
 else if (!TOKEN) $('auth').hidden = false;

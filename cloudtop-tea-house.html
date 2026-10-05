@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="sf-build" content="6654d5a 10-05 11:10">
+<meta name="sf-build" content="39f9ddc 10-05 14:37">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Koji's Cloudtop Tea House</title>
 <style>
@@ -333,6 +333,15 @@ body.lite #grain,body.q2 #grain{display:none!important}                 /* the f
 body.q2 *:not(#big):not(#big *){filter:none!important;mix-blend-mode:normal!important}
 body.q3 #scene{display:none!important}
 body.q3 #backdrop{display:block!important}                               /* the soft one-bitmap copy of the scene stands in for the artwork */
+
+/* ===== phone mode, bonuses: no slow cross-fades of full-screen layers ===== */
+body.lite #scene,body.lite #scene *{transition:none!important}
+/* ===== portrait: the Bonus Buy sign becomes a big, easy-to-see plaque just under the board ===== */
+body.portrait #buyOpen{left:30px;top:auto;bottom:468px;width:540px;height:150px;zoom:1;animation:none;transform:none}
+body.portrait #buyOpen .plq{top:0;bottom:0;flex-direction:row;gap:18px;padding:0 24px;border-radius:22px}
+body.portrait #buyOpen svg{width:96px;height:96px}
+body.portrait #buyOpen b{font-size:46px;line-height:.95;text-align:left}
+body.portrait #buyOpen.lit::after{bottom:-26px}
 
 /* Koji's Cloudtop Tea House ART CSS (leo). Layout, scene motion, noren, tansu board + drawer tiles, kite gates, Koji's states.
    Keyframes are prefixed ct* (the shell owns blink/rot/flick/wob/bigin: not redefined here). kai appends slot-specific bits below the marker at the end. */
@@ -1374,6 +1383,23 @@ function cryptoRng() { return crypto.randomBytes(6).readUIntBE(0, 6) / 281474976
 
 return { CFG, LINES, SYMBOLS, bonusOnly, cryptoRng, evaluateLines, evaluateSteep, id, info, name, playRound };
 })();
+/* ---- display currencies ---- */
+/* Display currencies. Balances and bets are stored in USD on the server; every screen converts for display only.
+   [code, symbol, units per 1 USD, decimals, name]. Rates are fixed approximations (update the numbers here to refresh them everywhere). */
+const SF_CURRENCIES = [
+  ['USD', '$', 1, 2, 'US Dollar'], ['EUR', '€', 0.92, 2, 'Euro'], ['GBP', '£', 0.78, 2, 'British Pound'], ['JPY', '¥', 150, 0, 'Japanese Yen'],
+  ['IDR', 'Rp', 16300, 0, 'Indonesian Rupiah'], ['ARS', 'AR$', 1300, 2, 'Argentine Peso'], ['BRL', 'R$', 5.5, 2, 'Brazilian Real'], ['MXN', 'MX$', 19.5, 2, 'Mexican Peso'],
+  ['INR', '₹', 84, 2, 'Indian Rupee'], ['TRY', '₺', 38, 2, 'Turkish Lira'], ['PHP', '₱', 57, 2, 'Philippine Peso'], ['VND', '₫', 25400, 0, 'Vietnamese Dong'],
+  ['KRW', '₩', 1400, 0, 'South Korean Won'], ['CAD', 'C$', 1.38, 2, 'Canadian Dollar'], ['AUD', 'A$', 1.55, 2, 'Australian Dollar'], ['CNY', 'CN¥', 7.25, 2, 'Chinese Yuan'],
+  ['RUB', '₽', 90, 2, 'Russian Ruble'], ['NGN', '₦', 1550, 2, 'Nigerian Naira'], ['ZAR', 'R', 18, 2, 'South African Rand'], ['THB', '฿', 34, 2, 'Thai Baht'],
+  ['PLN', 'zł', 4, 2, 'Polish Zloty'], ['CLP', 'CL$', 960, 0, 'Chilean Peso'], ['COP', 'CO$', 4200, 0, 'Colombian Peso'], ['PEN', 'S/', 3.75, 2, 'Peruvian Sol'],
+  ['EGP', 'E£', 49, 2, 'Egyptian Pound'], ['PKR', 'Rs', 280, 0, 'Pakistani Rupee'], ['BDT', '৳', 120, 2, 'Bangladeshi Taka'], ['UAH', '₴', 41, 2, 'Ukrainian Hryvnia'],
+  ['KZT', '₸', 500, 0, 'Kazakhstani Tenge'], ['CZK', 'Kč', 23, 2, 'Czech Koruna']
+];
+function sfCur() { try { const c = localStorage.getItem('stakeCurrency'); return SF_CURRENCIES.find(x => x[0] === c) || SF_CURRENCIES[0]; } catch { return SF_CURRENCIES[0]; } }
+function sfParts(usd) { const c = sfCur(), d = c[3]; return { sym: c[1] + (c[1].length > 1 ? ' ' : ''), num: (Number(usd) * c[2]).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }) }; }
+function sfMoney(usd) { const p = sfParts(usd); return p.sym + p.num; }
+
 /* ---- shell music engine ---- */
 /* SlotForge music engine: fully synthesised looping soundtracks (Web Audio only, no files).
  *
@@ -1579,8 +1605,9 @@ return { make, mtof };
 const SlotShell = (() => {
 const $ = id => document.getElementById(id);
 const store = { get: (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
-const fmt = n => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const betLbl = n => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2));
+const fmt = n => sfMoney(n);   // converted to the player's display currency (see currencies.js)
+const betLbl = n => sfCur()[0] === 'USD' ? '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toFixed(2)) : sfMoney(n);
+try { addEventListener('storage', e => { if (e.key === 'stakeCurrency') location.reload(); }); } catch {}   // the lobby changed the currency: reload this game in it
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const tpl = (s, o) => String(s).replace(/\{(\w+)\}/g, (_, k) => o[k]);
 
@@ -1609,7 +1636,7 @@ const GA = (() => { const ga = document.createElement('div'), st = $('stage'); g
 const LITE = (() => { try { return /[?&]lite=1/.test(location.search) || (matchMedia('(pointer:coarse)').matches && !/[?&]lite=0/.test(location.search)); } catch { return false; } })();
 if (LITE) {
   document.body.classList.add('lite');
-  document.querySelectorAll('style').forEach(st => { st.textContent = st.textContent.replace(/url\(#rough\w*\)\s*/g, ''); });
+  document.querySelectorAll('style').forEach(st => { st.textContent = st.textContent.replace(/url\(#rough\w*\)\s*/g, '').replace(/(-webkit-)?backdrop-filter:[^;}]*;?/g, ''); });
   document.querySelectorAll('[filter*="#rough"]').forEach(e => e.removeAttribute('filter'));
 }
 /* QUALITY GOVERNOR + FPS READOUT. While a spin is running the page times its own frames. If a device keeps missing ~30 fps, quality steps down by itself:
@@ -1725,9 +1752,10 @@ addEventListener('pointerdown', () => { amb.start(); music.start(); }, { once: t
 const cv = $('fx'), cx = cv.getContext('2d'); let parts = [];
 function size() { cv.width = innerWidth; cv.height = innerHeight; } size(); addEventListener('resize', size);
 function embers(n, x = innerWidth / 2, y = innerHeight / 2, gold) {
+  n = Math.ceil(n * (LITE ? .35 : 1)); if (parts.length > (LITE ? 140 : 600)) return;
   for (let i = 0; i < n; i++) parts.push({ x, y, vx: (Math.random() - .5) * 9, vy: -Math.random() * 8 - 1, l: 60 + Math.random() * 60, s: 2 + Math.random() * 3.5, g: .14, c: gold ? 1 : 0 });
 }
-function coins(n) { for (let i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, l: 200, s: 6 + Math.random() * 6, g: .05, c: 1 }); }
+function coins(n) { n = Math.ceil(n * (LITE ? .35 : 1)); for (let i = 0; i < n; i++) parts.push({ x: Math.random() * innerWidth, y: -20, vx: (Math.random() - .5) * 2, vy: 2 + Math.random() * 4, l: 200, s: 6 + Math.random() * 6, g: .05, c: 1 }); }
 function ambient() {
   if (parts.length > (LITE ? 30 : 120)) return;
   if (Math.random() < .12 + (hooks.ambientBoost ? hooks.ambientBoost() : 0)) parts.push({ x: Math.random() * innerWidth, y: innerHeight + 6, vx: (Math.random() - .5) * .6, vy: -(.5 + Math.random() * 1.1), l: 260 + Math.random() * 160, s: 1.2 + Math.random() * 2, g: -.001, w: Math.random() * 6, c: 0 });
@@ -1823,7 +1851,7 @@ const FX = {
     FX.shards(x, y, o.n || 9, colors, o);
   },
   shards(x, y, n, colors, o = {}) {
-    const pw = o.power || 1, sc = STAGE_S;
+    const pw = o.power || 1, sc = STAGE_S; n = Math.ceil(n * (LITE ? .5 : 1));
     for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = (2 + Math.random() * 6) * pw * sc, tri = Math.random() < .6;
       parts.push({ x: x + Math.cos(a) * 6 * sc, y: y + Math.sin(a) * 6 * sc, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (2.5 + Math.random() * 3) * pw * sc, g: .34 * sc, l: 34 + Math.random() * 30, s: (4 + Math.random() * 6) * sc,
         rot: Math.random() * 6.28, vr: (Math.random() - .5) * .5, col: colors[Math.floor(Math.random() * colors.length)], edge: o.edge || 'rgba(20,10,6,.55)',
@@ -2174,7 +2202,7 @@ hooks.paintIdle();
       el.addEventListener('pointerdown', go, { once: true }); addEventListener('keydown', go); }, 350);
   });
 })();
-refreshUi();
+refreshUi(); $('win').textContent = fmt(0);
 say(cfg.text.idle + (LOCAL ? ' (Play-money demo)' : ''));
 if (LOCAL) { balance = wallet; $('bal').textContent = fmt(balance); }
 else if (!TOKEN) $('auth').hidden = false;

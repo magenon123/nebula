@@ -75,6 +75,7 @@ def assemble(slug, standalone):
     else:
         scripts += ("/* ---- DEMO FALLBACK: opened without a Nebula login, the page plays with play money using this embedded copy of the engine. ---- */\nconst DEMO_ENGINE = "
                     + bundle_engine(engine_path) + ";\n")
+    scripts += '/* ---- display currencies ---- */\n' + read(SF, 'shell', 'currencies.js') + '\n'
     scripts += '/* ---- shell music engine ---- */\n' + read(SF, 'shell', 'slot-music.js') + '\n'
     scripts += '/* ---- shell ---- */\n' + re.sub(r"^'use strict';\n", '', read(SF, 'shell', 'slot-shell.js'), count=1)
     scripts += '\n/* ---- slot: %s ---- */\n' % slug + read(sd, 'slot.js')

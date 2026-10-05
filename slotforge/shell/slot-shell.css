@@ -327,3 +327,12 @@ body.lite #grain,body.q2 #grain{display:none!important}                 /* the f
 body.q2 *:not(#big):not(#big *){filter:none!important;mix-blend-mode:normal!important}
 body.q3 #scene{display:none!important}
 body.q3 #backdrop{display:block!important}                               /* the soft one-bitmap copy of the scene stands in for the artwork */
+
+/* ===== phone mode, bonuses: no slow cross-fades of full-screen layers ===== */
+body.lite #scene,body.lite #scene *{transition:none!important}
+/* ===== portrait: the Bonus Buy sign becomes a big, easy-to-see plaque just under the board ===== */
+body.portrait #buyOpen{left:30px;top:auto;bottom:468px;width:540px;height:150px;zoom:1;animation:none;transform:none}
+body.portrait #buyOpen .plq{top:0;bottom:0;flex-direction:row;gap:18px;padding:0 24px;border-radius:22px}
+body.portrait #buyOpen svg{width:96px;height:96px}
+body.portrait #buyOpen b{font-size:46px;line-height:.95;text-align:left}
+body.portrait #buyOpen.lit::after{bottom:-26px}
