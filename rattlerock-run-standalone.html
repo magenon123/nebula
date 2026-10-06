@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="sf-build" content="0b832f7 10-06 17:03">
+<meta name="sf-build" content="da0d945 10-06 17:16">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Rattlerock Run (offline demo)</title>
 <style>
@@ -802,7 +802,7 @@ body.portrait #stage>#scene{left:0!important;top:calc((var(--H,1950px) - 1950px)
 <script>
 'use strict';
 /* ---- slot config (slots/rattlerock-run/slot.json) ---- */
-const SLOT_CFG = {"id": "rattlerock-run", "title": "Rattlerock Run", "logoText": "RATTLEROCK RUN", "infoTitle": "RATTLEROCK RUN · HOW IT PLAYS", "api": "/api/slot/rattlerock-run/spin", "engineSource": "slotforge/engines/rattlerock-run.js", "storage": "rrr", "walletKey": "rattlerockRunWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 7500, "anteCost": 2.5, "scatterSym": "Lantern", "char": {"el": "char", "states": ["spin", "win", "big"], "bonusClass": "bonusmode"}, "tiers": [{"min": 500, "name": "MOTHERLODE", "lv": 4, "tag": "The whole mountain pays out."}, {"min": 100, "name": "RICH VEIN", "lv": 3, "tag": "Dwarves will sing about this run."}, {"min": 30, "name": "GOLD RUSH", "lv": 2, "tag": "The cart can barely carry it."}, {"min": 8, "name": "NICE HAUL", "lv": 1, "tag": "A good day in the mine."}], "autoBigLv": 3, "text": {"idle": "PLACE YOUR BET", "spin": "THE CART ROLLS...", "win": "THE CART HAULS {amt}", "lose": "THE MINE KEEPS ITS GOLD", "freeSpin": "CART {n}", "freeSpinRetrigger": ""}, "fsLabel": "CARTS LEFT", "ownCounter": true, "buys": [{"key": "deep", "mult": 70, "sym": "Door", "vol": 4, "name": "Deep Shaft", "text": "Ride straight into the Deep Shaft: 3 carts, 3 levels, and the multiplier never resets. Lose a cart to TNT and the next one replays the level.", "confirmTitle": "BUY DEEP SHAFT?", "confirmText": "DEEP SHAFT: 3 carts dive through 3 levels of richer gold. The multiplier and shields carry over; a crashed cart pays only its load and the next cart replays the level."}, {"key": "motherlode", "mult": 140, "sym": "Gem10", "vol": 5, "name": "Motherlode Run", "text": "Skip the first level: start on level 2 with a x10 multiplier and 2 shield hats. Only the richest levels are left.", "confirmTitle": "BUY MOTHERLODE RUN?", "confirmText": "MOTHERLODE RUN: Deep Shaft from level 2, starting with a x10 multiplier and 2 shield hats."}], "intro": {"unit": "CARTS", "ribbon": "DEEP SHAFT", "quote": "\"Hold your hat. It is a long way down.\"", "tap": "TAP ANYWHERE TO DIVE", "chips": ["MULTIPLIER NEVER RESETS", "LOST CART REPLAYS LEVEL", "JACKPOT AT THE BOTTOM"]}, "outro": {"ribbon": "THE SHAFT IS CLEARED", "label": "YOUR HAUL", "quote": "\"Daylight at last. The gold is yours.\"", "tap": "TAP ANYWHERE TO CONTINUE"}, "audio": {"reverb": {"sec": 2.8, "pow": 2.0, "wet": 0.34, "lp": 0.45}}, "fever": {"name": "Twin Carts", "sym": "Cart", "vol": 4, "text": "Pay 2.5x per ride: two carts run side by side on two tracks, both paid. Shields show up more often and Deep Shaft comes about twice as often. Stays on until you switch it off.", "badge": "TWIN CARTS ×2.5", "onMsg": "TWIN CARTS ON. TOTAL BET x2.5", "offMsg": "TWIN CARTS OFF"}, "loading": {"volatility": 4, "features": [{"sym": "Gem5", "title": "GOLD, GEMS AND FORKS", "text": "Gold fills your load. Gems add 2 to 10 to the multiplier. At a fork the lever picks your side: rich or safe."}, {"sym": "Hat", "title": "SHIELD HATS vs TNT", "text": "A shield hat takes one blast. Without one, TNT crashes the cart and you keep only your load."}, {"sym": "Lantern", "title": "DEEP SHAFT", "text": "Light 3 lanterns for 3 carts and 3 levels, a multiplier that never resets and a jackpot door at the bottom."}, {"sym": "Cart", "title": "TWIN CARTS", "text": "Two carts, two tracks, both paid. Shields come more often and the shaft opens twice as often."}]}, "portrait": {"left": 0, "right": -720}, "engineData": {"paytable": null, "payScale": 1, "scatterPay": null, "info": {"symbols": ["gold", "gem", "fork", "shield", "tnt", "lantern", "door"], "payscale": {"gold": [0.05, 0.1, 0.2, 0.5, 1, 2.5], "gem": [2, 3, 5, 10], "forkGoldMult": {"rich": 2.5, "safe": 0.5}, "jackpot": [25, 100, 500, 1000]}, "gem": [2, 3, 5, 10], "maxStops": 12, "carts": 3, "levels": 3, "anteCost": 2.5, "buy": {"deep": {"cost": 70, "name": "Deep Shaft", "startLevel": 1, "startMult": 1, "startShields": 0}, "motherlode": {"cost": 140, "name": "Motherlode Run", "startLevel": 2, "startMult": 10, "startShields": 2}}, "maxWin": 7500}}};
+const SLOT_CFG = {"id": "rattlerock-run", "title": "Rattlerock Run", "logoText": "RATTLEROCK RUN", "infoTitle": "RATTLEROCK RUN · HOW IT PLAYS", "api": "/api/slot/rattlerock-run/spin", "engineSource": "slotforge/engines/rattlerock-run.js", "storage": "rrr", "walletKey": "rattlerockRunWallet", "startBalance": 1000, "bets": [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000, 7500, 10000], "defaultBet": 1, "maxWin": 7500, "anteCost": 2.5, "scatterSym": "Lantern", "char": {"el": "char", "states": ["spin", "win", "big"], "bonusClass": "bonusmode"}, "tiers": [{"min": 500, "name": "MOTHERLODE", "lv": 4, "tag": "The whole mountain pays out."}, {"min": 100, "name": "RICH VEIN", "lv": 3, "tag": "Dwarves will sing about this run."}, {"min": 30, "name": "GOLD RUSH", "lv": 2, "tag": "The cart can barely carry it."}, {"min": 8, "name": "NICE HAUL", "lv": 1, "tag": "A good day in the mine."}], "autoBigLv": 3, "text": {"idle": "PLACE YOUR BET", "spin": "THE CART ROLLS...", "win": "THE CART HAULS {amt}", "lose": "THE MINE KEEPS ITS GOLD", "freeSpin": "CART {n}", "freeSpinRetrigger": ""}, "fsLabel": "CARTS LEFT", "ownCounter": true, "buys": [{"key": "deep", "mult": 70, "sym": "Door", "vol": 4, "name": "Deep Shaft", "text": "Ride straight into the Deep Shaft: 3 carts, 3 levels, and the multiplier never resets. Lose a cart to TNT and the next one replays the level.", "confirmTitle": "BUY DEEP SHAFT?", "confirmText": "DEEP SHAFT: 3 carts dive through 3 levels of richer gold. The multiplier and shields carry over; a crashed cart pays only its load and the next cart replays the level."}, {"key": "motherlode", "mult": 140, "sym": "Gem10", "vol": 5, "name": "Motherlode Run", "text": "Skip the first level: start on level 2 with a x10 multiplier and 2 shield hats. Only the richest levels are left.", "confirmTitle": "BUY MOTHERLODE RUN?", "confirmText": "MOTHERLODE RUN: Deep Shaft from level 2, starting with a x10 multiplier and 2 shield hats."}], "intro": {"unit": "CARTS", "ribbon": "DEEP SHAFT", "quote": "\"Hold your hat. It is a long way down.\"", "tap": "TAP ANYWHERE TO DIVE", "chips": ["MULTIPLIER NEVER RESETS", "LOST CART REPLAYS LEVEL", "JACKPOT AT THE BOTTOM"]}, "outro": {"ribbon": "THE SHAFT IS CLEARED", "label": "YOUR HAUL", "quote": "\"Daylight at last. The gold is yours.\"", "tap": "TAP ANYWHERE TO CONTINUE"}, "audio": {"reverb": {"sec": 2.8, "pow": 2.0, "wet": 0.34, "lp": 0.45}}, "fever": {"name": "Twin Carts", "sym": "Cart", "vol": 4, "text": "Pay 2.5x per ride: two carts run side by side on two tracks, both paid. Shields show up more often and Deep Shaft comes about twice as often. Stays on until you switch it off.", "badge": "TWIN CARTS ×2.5", "onMsg": "TWIN CARTS ON. TOTAL BET x2.5", "offMsg": "TWIN CARTS OFF"}, "loading": {"volatility": 4, "features": [{"sym": "Gem5", "title": "GOLD, GEMS AND FORKS", "text": "Gold fills your load. Gems add 2 to 10 to the multiplier. At a fork the lever picks your side: rich or safe."}, {"sym": "Hat", "title": "SHIELD HATS vs TNT", "text": "A shield hat takes one blast. Without one, TNT crashes the cart and you keep only your load."}, {"sym": "Lantern", "title": "DEEP SHAFT", "text": "Light 3 lanterns for 3 carts and 3 levels, a multiplier that never resets and a jackpot door at the bottom."}, {"sym": "Cart", "title": "TWIN CARTS", "text": "Two carts, two tracks, both paid. Shields come more often and the shaft opens twice as often."}]}, "portrait": {"left": 0, "right": 0}, "engineData": {"paytable": null, "payScale": 1, "scatterPay": null, "info": {"symbols": ["gold", "gem", "fork", "shield", "tnt", "lantern", "door"], "payscale": {"gold": [0.05, 0.1, 0.2, 0.5, 1, 2.5], "gem": [2, 3, 5, 10], "forkGoldMult": {"rich": 2.5, "safe": 0.5}, "jackpot": [25, 100, 500, 1000]}, "gem": [2, 3, 5, 10], "maxStops": 12, "carts": 3, "levels": 3, "anteCost": 2.5, "buy": {"deep": {"cost": 70, "name": "Deep Shaft", "startLevel": 1, "startMult": 1, "startShields": 0}, "motherlode": {"cost": 140, "name": "Motherlode Run", "startLevel": 2, "startMult": 10, "startShields": 2}}, "maxWin": 7500}}};
 /* ---- STANDALONE MODE: the server engine is embedded and runs locally with play money. ---- */
 const SLOT_ENGINE = (() => {
 /* RATTLEROCK RUN: mine-cart ride. Self-contained pure engine (SlotForge ENGINE-API v1). Round JSON: plans/rattlerock-run-round-format.md.
@@ -1843,19 +1843,6 @@ body.lite .rrW.mv .rrCart.bounce{animation-duration:.5s}
 .rrCI{transition:opacity .3s,transform .3s;opacity:.95}
 .rrCI.cur{transform:scale(1.14)}
 .rrCI.lost{opacity:.2;transform:scale(.8)}
-/* portrait phone: the run window is the cart plus the next ~2 pickups (stage x 0..1000, see cfg.portrait); scene and game group share one transform */
-body.portrait #scene{left:calc(var(--gx,0px)*var(--g,1))!important;top:calc(var(--gy,0px)*var(--g,1))!important;width:1600px!important;height:900px!important;transform:scale(var(--g,1))!important;transform-origin:0 0!important}
-/* portrait: the run window is a band; the soft one-bitmap copy of the cavern (shell #backdrop) fills the screen around it instead of plain black */
-body.portrait #backdrop,body.lite #backdrop{display:block!important}
-body.portrait #stage{background:none}
-body.portrait #logo{left:310px;top:-150px;width:380px}
-body.portrait #hud{left:8px;top:10px;width:864px;height:128px}
-body.portrait #hud .hc i{font-size:17px;letter-spacing:2px}
-body.portrait #hud .hc b{font-size:42px}
-body.portrait #hud .hc b.two{font-size:36px}
-body.portrait .rrTag{font-size:44px}
-body.portrait #rrBanner{left:500px}
-body.portrait #rrBanner b{font-size:96px}
 
 /* ---- clarity: callout plates, stop dots, next-stop ring ---- */
 .rrCall{position:absolute;transform:translate(-50%,-50%);padding:6px 22px 8px;border-radius:99px;border:4px solid #1c0f08;background:linear-gradient(#ffe48a,#f0a92a);color:#2a1406;font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:36px;line-height:1;white-space:nowrap;pointer-events:none;box-shadow:0 5px 0 rgba(0,0,0,.45);will-change:transform,opacity;z-index:8}
@@ -1867,7 +1854,6 @@ body.portrait #rrBanner b{font-size:96px}
 #rrRing{display:none;position:absolute;left:0;top:0;width:180px;height:180px;border-radius:50%;border:6px solid rgba(255,230,120,.85);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25);animation:rrRingP .7s ease-in-out infinite alternate;pointer-events:none;will-change:transform}
 @keyframes rrRingP{from{opacity:.35}to{opacity:1}}
 body.lite #rrRing{animation:none;opacity:.8}
-body.portrait .rrCall{font-size:46px}
 
 .rrCall{position:absolute;transform:translate(-50%,-50%);padding:6px 22px 8px;border-radius:99px;border:4px solid #1c0f08;background:linear-gradient(#ffe48a,#f0a92a);color:#2a1406;font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:36px;line-height:1;white-space:nowrap;pointer-events:none;box-shadow:0 5px 0 rgba(0,0,0,.45);will-change:transform,opacity;z-index:8}
 .rrCall.gem{background:linear-gradient(#bff4ff,#45b4f0)}.rrCall.bad{background:linear-gradient(#ffb09a,#e0402a);color:#fff}.rrCall.good{background:linear-gradient(#c8ffb0,#4fc83a)}
@@ -1878,7 +1864,6 @@ body.portrait .rrCall{font-size:46px}
 #rrRing{display:none;position:absolute;left:0;top:0;width:180px;height:180px;border-radius:50%;border:6px solid rgba(255,230,120,.85);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25);animation:rrRingP .7s ease-in-out infinite alternate;pointer-events:none;will-change:transform}
 @keyframes rrRingP{from{opacity:.35}to{opacity:1}}
 body.lite #rrRing{animation:none;opacity:.8}
-body.portrait .rrCall{font-size:46px}
 
 /* ---- vertical ride: procedural rails, tunnel mouths ---- */
 #scene.rrT .ly-track{display:none}
@@ -1891,6 +1876,41 @@ body.portrait .rrCall{font-size:46px}
 .rrW .rrR{position:absolute;left:0;top:0;will-change:transform}
 .rrW .rrCart.bounce{transform-origin:50% 98%}
 .rrTun{position:absolute;left:0;top:0;border-radius:125px 125px 0 0;background:radial-gradient(ellipse at 50% 70%,#000 35%,#150a10 62%,#3a2a20 100%);box-shadow:inset 0 0 0 8px #4a3524;will-change:transform}
+
+/* ---- articulated cart rig (leo's parts; opacity cross-fades, transforms by JS) ---- */
+.rrR .rrSq{position:absolute;left:0;top:0;transform-origin:50% 98%}
+.rrR .rrRig{position:absolute;left:0;top:0;transform-origin:0 0}
+.rrRig .rg{transition:opacity .16s ease}
+.rrRig .rg-scarf,.rrRig .rg-scarf2,.rrRig .rg-scarf3{opacity:0}
+.rrRig.f0 .rg-scarf,.rrRig.f1 .rg-scarf2,.rrRig.f2 .rg-scarf3{opacity:1}
+.rrRig .rg-headSmile,.rrRig .rg-headCheer,.rrRig .rg-headWorry,.rrRig .rg-headDizzy,.rrRig .rg-headDetermined{opacity:0}
+.rrRig.hSmile .rg-headSmile,.rrRig.hCheer .rg-headCheer,.rrRig.hWorry .rg-headWorry,.rrRig.hDizzy .rg-headDizzy,.rrRig.hDetermined .rg-headDetermined{opacity:1}
+.rrRig .rg-armFarUp,.rrRig .rg-armUpL{opacity:0}
+.rrRig.up .rg-armFarUp,.rrRig.up .rg-armUpL{opacity:1}.rrRig.up .rg-armFar,.rrRig.up .rg-armPoint{opacity:0}
+.rrRig .rg-hatGlow{opacity:0}.rrRig.glow .rg-hatGlow{opacity:.9}
+.rrRig .rg-beam{opacity:.5}.rrRig .rg-sparkStreak{opacity:0}
+.rrW.mv .rrRig .rg-sparkStreak{opacity:1;animation:rrFlick .1s steps(2) infinite alternate}
+body.lite .rrW.mv .rrRig .rg-sparkStreak,body.lite .rrRig .rg-beam{display:none}
+
+/* ---- wide windows and phones ---- */
+#frame{overflow:visible}
+#rrTrackB{position:absolute;left:0;top:0;overflow:visible;display:none;pointer-events:none}
+#scene.twin ~ * #rrTrackB,#stage:has(#scene.twin) #rrTrackB{display:block}
+#scene .ly-track2{display:none!important}
+#rrTrackB .rrSlp{stroke-dasharray:10 21;stroke-width:14}
+body.portrait #ga{zoom:1!important;left:0!important;top:calc((var(--H,1950px) - 1950px)/2)!important}
+body.portrait #frame,body.portrait #grid,body.portrait #fxl{width:900px;height:1950px}
+body.portrait #logo{left:260px;top:215px;width:380px}
+body.portrait #hud{left:8px;top:74px;width:884px;height:132px}
+body.portrait #hud .hc i{font-size:17px;letter-spacing:2px}
+body.portrait #hud .hc b{font-size:44px}
+body.portrait #hud .hc b.two{font-size:34px}
+body.portrait .rrCall{font-size:46px}
+body.portrait .rrTag{font-size:44px}
+body.portrait #rrBanner{left:450px;top:520px}
+body.portrait #rrBanner b{font-size:84px}
+
+#rrTrack,#rrTrackB{z-index:0}#grid .rrI.rrBack{z-index:1}.rrW{z-index:3}#grid .rrI{z-index:4}#rrRing{z-index:5}
 `;
 (function () { const st = document.createElement('style'); st.id = 'kaiCss'; st.textContent = KAI_CSS; document.head.appendChild(st); })();
 /*END-KAI-CSS*/
@@ -1899,7 +1919,8 @@ const { $, sfx, wait, T, shake, flash, embers, fmt } = S;
 let hintUntil = 0;
 const say = (t, h) => { if (performance.now() < hintUntil) return; S.say(t, h); };
 const NS = 'http://www.w3.org/2000/svg';
-const SPX = 360, COLLECT = 150, SPAWN_X = 1780, V0 = 330, POOL = 16;
+let SPAWN_X = 1780;
+const SPX = 360, COLLECT = 150, V0 = 330, POOL = 20;
 const ABORT = { abort: 1 };
 let EP = 0, curR = null, lastCart = 0, inBonus = false, twinOn = false, idleOn = true;
 const timers = new Set();
@@ -1923,7 +1944,11 @@ const SPR = {
   lantern: { id: 'rrLantern', w: 100, h: 125, hv: 50 }, fork: { id: 'rrFork', w: 130, h: 163, hv: 0 }, door: { id: 'rrDoor', w: 345, h: 262, hv: 0 },
   g2: { id: 'rrGem2', w: 112, h: 140, hv: 60 }, g3: { id: 'rrGem3', w: 112, h: 140, hv: 60 }, g5: { id: 'rrGem5', w: 112, h: 140, hv: 60 }, g10: { id: 'rrGem10', w: 112, h: 140, hv: 60 }
 };
-const sprFor = (type, v) => type === 'gold' ? (v >= 0.5 ? SPR.pile : SPR.nugget) : type === 'gem' ? (SPR['g' + v] || SPR.g10) : type === 'shield' ? SPR.hat : SPR[type] || SPR.nugget;
+[1, 2, 3, 4, 5].forEach(t => { SPR['gold' + t] = { id: 'rrGold' + t, w: 100, h: 125, hv: 0 }; }); SPR.gold6 = { id: 'rrGold6', w: 220, h: 193, hv: 0 };
+Object.assign(SPR, { tntB: { id: 'rrTntBundle', w: 120, h: 150, hv: 0 }, tntR: { id: 'rrTntBarrel', w: 120, h: 150, hv: 0 }, tunnel: { id: 'rrTunnelMouth', w: 300, h: 254, hv: -8 }, sign: { id: 'rrSignPost', w: 110, h: 138, hv: 0 }, crB: { id: 'rrCrystalB', w: 120, h: 150, hv: 0 }, crG: { id: 'rrCrystalG', w: 110, h: 138, hv: 0 }, crR: { id: 'rrCrystalR', w: 110, h: 138, hv: 0 }, mush: { id: 'rrMushroom', w: 90, h: 112, hv: 0 }, bat: { id: 'rrBat1', w: 90, h: 63, hv: 0 }, bat2: { id: 'rrBat2', w: 90, h: 63, hv: 0 }, bones: { id: 'rrBones', w: 90, h: 112, hv: 0 }, wreck: { id: 'rrMinecartWreck', w: 200, h: 125, hv: 0 } });
+const goldT = v => v < .08 ? 1 : v < .2 ? 2 : v < .5 ? 3 : v < 1 ? 4 : v < 2.5 ? 5 : 6, GOLDSC = [0, .85, .95, 1.05, 1.15, 1.25, 1];
+const tntSpr = i => [SPR.tnt, SPR.tntB, SPR.tntR][i % 3];
+const sprFor = (type, v) => type === 'gold' ? SPR['gold' + goldT(v)] : type === 'tnt' ? SPR.tnt : type === 'gem' ? (SPR['g' + v] || SPR.g10) : type === 'shield' ? SPR.hat : SPR[type] || SPR.nugget;
 
 /* ---------- pooled pickup nodes ---------- */
 const pool = []; let liveN = 0;
@@ -1938,15 +1963,38 @@ function mkLane(id, rail, k, cx) {
   const L = { id, rail, k, cx, dist: 0, v: 0, go: false, target: 0, ease: false, res: null, items: [], live: [], ns: 0, st: { load: 0, mult: 1, shields: 0, lanterns: 0 }, ramp: 1, crashed: false, cartSt: 'Ride', cheerT: 0 };
   const w = document.createElement('div'); w.className = 'rrW'; const cw = 400 * k, ch = 390 * k;
   w.style.cssText = `width:${cw}px;height:${ch}px;left:${cx - 200 * k}px;top:${rail - 387 * k}px`;
-  w.innerHTML = `<div class="rrR" style="width:${cw}px;height:${ch}px;transform-origin:${200 * k}px ${384 * k}px"><svg class="rrs rrCart bounce" style="width:${cw}px;height:${ch}px"><use href="#rrCartRide"/></svg><svg class="rrs rrCart rrDome" style="width:${cw}px;height:${ch}px;display:none"><use href="#rrShieldDome"/></svg><svg class="rrs rrCart rrSpk" style="width:${cw}px;height:${ch}px"><use href="#rrSparks"/></svg></div>`;
-  L.w = w; L.r = w.firstChild; L.cy = rail; L.cam = 0; L.rot = 0; L.cart = L.r.children[0]; L.dome = L.r.children[1]; L.cu = L.cart.firstChild; L.dome.style.opacity = 1; L.boom = document.createElementNS(NS, 'svg'); L.boom.setAttribute('class', 'rrs rrBoom'); L.boom.innerHTML = '<use href="#rrBoom1"/>'; L.boom.style.display = 'none';
+  w.innerHTML = `<div class="rrR" style="width:${cw}px;height:${ch}px;transform-origin:${200 * k}px ${384 * k}px"><div class="rrSq" style="width:${cw}px;height:${ch}px">${rigHTML()}</div><svg class="rrs rrCart rrDome" style="width:${cw}px;height:${ch}px;display:none"><use href="#rrShieldDome"/></svg></div>`;
+  L.w = w; L.r = w.firstChild; L.cy = rail; L.cam = 0; L.rot = 0; L.cart = L.r.children[0]; L.dome = L.r.children[1]; L.rg = rigRefs(L.cart.firstChild, k); L.dome.style.opacity = 1; L.boom = document.createElementNS(NS, 'svg'); L.boom.setAttribute('class', 'rrs rrBoom'); L.boom.innerHTML = '<use href="#rrBoom1"/>'; L.boom.style.display = 'none';
   return L;
 }
-const RAIL0 = 600;
+let RAIL0 = 600, PORT = false;
 const LA = mkLane('A', RAIL0, 1, 340), LB = mkLane('B', 488, .72, 790);
 const LANES = [LA, LB];
+function geom() {
+  PORT = document.body.classList.contains('portrait'); RAIL0 = PORT ? 1210 : 600;
+  LA.rail = RAIL0; LA.cx = PORT ? 250 : 340; LB.rail = PORT ? RAIL0 - 230 : 488; LB.cx = PORT ? 600 : 790; LB.cy = LB.rail;
+  for (const L of LANES) { L.w.style.left = (L.cx - 200 * L.k) + 'px'; L.w.style.top = (L.rail - 387 * L.k) + 'px'; }
+  const vw = PORT ? 900 : Math.max(1600, innerWidth / (S.scale() || 1)); SPAWN_X = Math.round(vw + (PORT ? 120 : (vw - 1600) / 2 + 180)); trk.ox = null; if (lay) bindLayers(); if (trkB.svg) trkB.svg.style.top = (LB.rail + 2) + 'px';
+}
 window.__rr = { LA, LB, ep: () => EP };   // test handle
-function setCart(L, st) { L.cartSt = st; L.cu.setAttribute('href', '#rrCart' + st); }
+function RGS(c, id) { return `<svg class="rg rg-${c}"><use href="#rrRig${id}"/></svg>`; }
+function rigHTML() {
+  return '<div class="rrRig hSmile f0">' + RGS('shadow', 'Shadow') + RGS('wheelB', 'WheelB') + RGS('wheelF', 'WheelF') + RGS('body', 'Body') + RGS('load', 'Load') + '<div class="rg-upper">' + RGS('beam', 'Beam') + RGS('scarf', 'Scarf') + RGS('scarf2', 'Scarf2') + RGS('scarf3', 'Scarf3') + RGS('armFar', 'ArmFar') + RGS('armFarUp', 'ArmFarUp') + RGS('torso', 'Torso') +
+    ['Smile', 'Cheer', 'Worry', 'Dizzy', 'Determined'].map(h => RGS('head' + h, 'Head' + h)).join('') + RGS('armPoint', 'ArmPoint') + RGS('armUpL', 'ArmUpL') + RGS('hatGlow', 'HatGlow') + '</div>' + RGS('rim', 'Rim') + RGS('loadFront', 'LoadFront') + RGS('gloveRim', 'GloveRim') + RGS('sparkStreak', 'SparkStreak') + '</div>';
+}
+function rigRefs(root, k) { const q = c => root.querySelector('.rg-' + c); root.style.transform = `scale(${k})`; return { root, k, wB: q('wheelB'), wF: q('wheelF'), up: q('upper'), shadow: q('shadow'), load: q('load'), ph: 0, wa: -99, lean: 0, fr: 0, bob: 0 }; }
+const HEADS = ['hSmile', 'hCheer', 'hWorry', 'hDizzy', 'hDetermined'], POSE = { Ride: ['hSmile', 0], Shield: ['hDetermined', 0], Cheer: ['hCheer', 1], Win: ['hCheer', 1], Crash: ['hDizzy', 1], Worry: ['hWorry', 0] };
+function setCart(L, st) { L.cartSt = st; const p = POSE[st] || POSE.Ride, c = L.rg.root.classList; HEADS.forEach(h => c.toggle(h, h === p[0])); c.toggle('up', !!p[1]); c.toggle('glow', L.st.shields > 0 && st !== 'Crash'); }
+/* continuous cart motion, per frame: wheels turn with the scroll, suspension bob and pitch tied to speed, torso counter-bob, scarf frames, lean on acceleration */
+function rigMotion(L, dt) {
+  const g = L.rg, mv = L.go || (L.v > 20 && !L.crashed), sp = Math.min(1.4, L.v / 330);
+  const wa = Math.round((L.dist * 360 / 207) % 360 / 3) * 3; if (wa !== g.wa) { g.wa = wa; const t = `rotate(${wa}deg)`; g.wB.style.transform = t; g.wF.style.transform = t; }
+  if (!L.crashed && mv) { g.ph += dt * (7 + 9 * sp); const y = Math.sin(g.ph) * (1 + 2.6 * sp), tl = sp * 2.2 + Math.sin(g.ph * .5) * .5;
+    g.lean += ((L.go && !L.ease ? 1 : 0) * 3.5 * sp - g.lean) * Math.min(1, dt * 4);
+    g.root.style.transform = `translate3d(0,${y.toFixed(2)}px,0) scale(${g.k})`; g.up.style.transform = `translate3d(0,${(-y * .45).toFixed(2)}px,0) rotate(${(g.lean + tl * .3).toFixed(2)}deg)`; g.load.style.transform = `translateY(${(y * .3).toFixed(2)}px)`;
+    const f = Math.floor(g.ph / 1.7) % 3; if (f !== g.fr) { g.fr = f; const c = g.root.classList; c.toggle('f0', f === 0); c.toggle('f1', f === 1); c.toggle('f2', f === 2); } }
+}
+function _unusedSetCart(L, st) { }
 function baseCart(L) { return L.crashed ? 'Crash' : L.st.shields > 0 ? 'Shield' : 'Ride'; }
 function cheer(L, ms = 650) { if (L.crashed) return; setCart(L, 'Cheer'); clearTimeout(L.cheerT); L.cheerT = after(ms, () => { if (!L.crashed && L.cartSt === 'Cheer') setCart(L, baseCart(L)); }); }
 function setDome(L) { L.dome.style.display = L.st.shields > 0 && !L.crashed ? 'block' : 'none'; }
@@ -1995,6 +2043,13 @@ function mkTrack() {
   trk.svg = sv; trk.p = { legs: mk('rrLegs'), alt: mk('rrAlt'), altS: mk('rrSlp', 'translate(0,8)'), slp: mk('rrSlp', 'translate(0,8)'), bar: mk('rrBar', 'translate(0,13)'), rail: mk('rrRail') };
   trk.p.altS.setAttribute('class', 'rrSlp'); trk.p.altS.style.opacity = .85; $('grid').insertBefore(sv, $('grid').firstChild);
 }
+const trkB = { svg: null, p: null };
+function mkTrackB() {
+  const sv = document.createElementNS(NS, 'svg'); sv.setAttribute('id', 'rrTrackB'); sv.setAttribute('width', 10); sv.setAttribute('height', 10);
+  sv.innerHTML = '<path class="rrSlp" d="M-1400 7H3400" transform="translate(0,6) scale(1,.72)"/><path class="rrBar" d="M-1400 9H3400" stroke-width="6"/><path class="rrRail" d="M-1400 0H3400" stroke-width="7"/><path class="rrLegs" d="" />';
+  trkB.svg = sv; trkB.p = sv.firstChild; $('grid').insertBefore(sv, LA.w);
+}
+function paintTrackB() { if (!twinOn || !trkB.svg) return; const o = -(LB.dist * .72 % 31); if (trkB.o !== o) { trkB.o = o; trkB.p.style.strokeDashoffset = o; } }
 function drawTrack(ox) {
   trk.ox = ox; const TW = 3400, st = 30; let d = '', legs = '', prev = false;
   for (let u = ox; u <= ox + TW; u += st) {
@@ -2011,8 +2066,8 @@ function drawTrack(ox) {
 let lay = null, curLv = 1;
 function bindLayers() {
   const q = s => document.querySelector('#scene ' + s);
-  lay = { far: q('.ly-far.L' + curLv), fm: q('.ly-farmid.L' + curLv), mid: q('.ly-mid.L' + curLv), tr: q('.ly-track.L' + curLv), near: q('.ly-near.L' + curLv), t2: q('.ly-track2'), last: [null, null, null, null, null] };
-  document.querySelectorAll('#scene .ly-far,#scene .ly-farmid,#scene .ly-mid,#scene .ly-track,#scene .ly-near,#scene .ly-track2').forEach(e => { e.style.animation = 'none'; });
+  const x = PORT ? '-p' : ''; lay = { far: q('.ly-far' + x + '.L' + curLv), fm: q('.ly-farmid' + x + '.L' + curLv), mid: q('.ly-mid' + x + '.L' + curLv), tr: q('.ly-track' + x + '.L' + curLv), near: q('.ly-near' + x + '.L' + curLv), t2: q('.ly-track2'), last: [null, null, null, null, null] };
+  document.querySelectorAll('#scene .ly-far,#scene .ly-farmid,#scene .ly-mid,#scene .ly-track,#scene .ly-near,#scene .ly-track2,#scene .ly-far-p,#scene .ly-farmid-p,#scene .ly-mid-p,#scene .ly-track-p,#scene .ly-near-p').forEach(e => { e.style.animation = 'none'; });
 }
 function paintLayers(dA, dB) {
   const l = lay, c = LA.cam || 0, v = [(dA * .06) % 1600, (dA * .22) % 1600, dA % 1600, (dA * 1.5) % 1600, (dB * .72) % 1152], cy = Math.round(c * 10) / 10;
@@ -2032,7 +2087,7 @@ function layout(L, it) {      // static vertical placement from the terrain (scr
   if (it.kind === 'div') it.top = L.rail + 14 - it.h - it.h0;
 }
 function spawn(L, it) {
-  if (!it.spr) it.spr = SPR.nugget; const dv = it.kind === 'div', n = dv ? acqDiv() : acquire(); if (!n) return false; it.n = n; const k = L.k * (it.sc || 1);
+  if (!it.spr) it.spr = SPR.nugget; if (it.decor && liveN >= POOL - 6) return false; const dv = it.kind === 'div', n = dv ? acqDiv() : acquire(); if (!n) return false; if (!dv) n.classList.toggle('rrBack', !!it.back); it.n = n; const k = L.k * (it.sc || 1);
   if (!dv) n._u.setAttribute('href', '#' + it.spr.id);
   it.w = it.spr.w * k; it.h = it.spr.h * k; n.style.width = it.w + 'px'; n.style.height = it.h + 'px'; n.style.opacity = it.alpha == null ? '' : it.alpha; it.ox = it.w * .5;
   layout(L, it); it._x = null; it._y = null; it.live = true; L.live.push(it); place(it, L);
@@ -2051,7 +2106,7 @@ function tick(now) {
     while (L.ns < L.items.length) { const it = L.items[L.ns]; if (L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx < SPAWN_X) { if (spawn(L, it)) L.ns++; else break; } else break; }
     if (L.live.length) { let j = 0; for (let i = 0; i < L.live.length; i++) { const it = L.live[i]; if (!it.live) continue; if (it.n && L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx < -420) { it.live = false; release(it.n); it.n = null; continue; } if (it.n && !it.fly) place(it, L); L.live[j++] = it; } L.live.length = j; }
   }
-  const sett = rideCam(dt);
+  const sett = rideCam(dt); paintTrackB(); rigMotion(LA, dt); if (LB.active) rigMotion(LB, dt);
   paintLayers(LA.dist, LB.dist);
   if (ring) { const it = LA.next != null && LA.active ? LA.items[LA.next] : null; if (it && it.live && it.n && !it.fly && it.type !== 'door') { const x = LA.cx + (it.x0 - LA.dist + COLLECT) + it.dx, y = it.y + it.h * .5; ring.style.display = 'block'; ring.style.transform = `translate3d(${x - 90}px,${y - 90}px,0)`; } else if (ring.style.display !== 'none') ring.style.display = 'none'; }
   for (const L of LANES) if (L._mv !== L.go) { L._mv = L.go; L.w.classList.toggle('mv', L.go); }
@@ -2133,12 +2188,16 @@ const goldTier = v => v >= 1.5 ? 4 : v >= .5 ? 3 : v >= .15 ? 2 : v >= .06 ? 1 :
 
 /* ---------- one stop ---------- */
 function mkItem(L, s, x0) {
-  const type = s.type, v = s.value; let spr = type === 'door' ? SPR.door : type === 'fork' ? SPR.fork : sprFor(type, v), sc = 1;
-  if (type === 'gold') { const t = goldTier(v); sc = [.8, 1, .75, .95, 1.2][t]; }
+  const type = s.type, v = s.value; let spr = type === 'door' ? SPR.door : type === 'fork' ? SPR.fork : type === 'tnt' ? tntSpr(s.i + Math.round((s.load || 0) * 100)) : sprFor(type, v), sc = type === 'gold' ? GOLDSC[goldT(v)] : 1;
   const it = { s, type, v, spr, sc, x0, dx: type === 'door' ? 330 * L.k : 0, dy: 0, live: false, n: null, i: s.i, air: type === 'lantern' ? 230 : 0 };
-  if (type === 'gold') { it.deco = []; const t = goldTier(v); [-70, 70].forEach(d => { if (t >= 1 || d < 0) { const x = { type: 'deco', spr: SPR.nugget, sc: .5, x0: x0 + d, dx: 0, dy: 0, live: false, n: null }; it.deco.push(x); L.dq.push(x); } }); }
-  if (type === 'tnt') L.dq.push({ type: 'deco', kind: 'div', spr: { id: 'tun', w: 250, h: 270, hv: 0 }, sc: 1, x0: x0 + 40, dx: 0, dy: 0, live: false, n: null });
+  if (type === 'gold') { it.deco = []; const t = goldT(v); [-70, 70].forEach(d => { if (t >= 2 || d < 0) { const x = { type: 'deco', spr: SPR.gold1, sc: .5, x0: x0 + d, dx: 0, dy: 0, live: false, n: null }; it.deco.push(x); L.dq.push(x); } }); }
+  if (type === 'tnt') L.dq.push({ type: 'deco', spr: SPR.tunnel, sc: 1, x0: x0 + 30, dx: 0, dy: 0, live: false, n: null, back: true });
   return it;
+}
+function decorFor(L, xs, N) {      // scenery along the track: deterministic from the stop index, never collectable
+  const kinds = ['crB', 'mush', 'sign', 'crG', 'bat', 'bones', 'crR', 'wreck', 'mush', 'bat2'];
+  for (let i = 1; i < xs.length; i++) { const x = (xs[i - 1] + xs[i]) / 2 + ((i * 53) % 90) - 45, k = kinds[(i * 7 + N) % kinds.length], air = k === 'bat' || k === 'bat2' ? 300 + (i % 3) * 40 : 0;
+    L.dq.push({ type: 'deco', decor: true, spr: SPR[k], sc: k === 'wreck' ? .9 : .78, x0: x, dx: 0, dy: -6, air, live: false, n: null, back: true, alpha: .92 }); }
 }
 function applyState(L, s) { L.st.load = s.load; L.st.mult = s.mult; L.st.shields = s.shields; L.st.lanterns = s.lanterns; }
 async function doTaken(L, it, t, s, o, W) {      // t = {type, value, shielded, crash}: a plain stop's content, or the side a fork took
@@ -2170,13 +2229,13 @@ const beat = type => ({ gold: 260, gem: 700, shield: 600, lantern: 500, tnt: 900
 async function playTrack(L, tr, o) {
   const ep = EP, W = guardW(ep), stops = tr.stops, L0 = L.dist, base = L0 + 400;
   freeItems(L); L.crashed = false; L.active = true; L.ramp = 1; setCart(L, baseCart(L)); setDome(L); L.w.classList.remove('gone');
-  const xs = buildTerrain(L, stops, base); L.dq = []; L.dns = 0; stops.forEach((s, i) => L.items.push(mkItem(L, s, xs[i]))); L.dq.sort((p, q) => p.x0 - q.x0);
+  const N0 = tr.length || stops.length, xs = buildTerrain(L, stops, base); L.dq = []; L.dns = 0; stops.forEach((s, i) => L.items.push(mkItem(L, s, xs[i]))); decorFor(L, xs, N0); L.dq.sort((p, q) => p.x0 - q.x0);
   const last = L.items[L.items.length - 1]; if (last && last.type === 'door') last.onSpawn = () => $('scene').classList.add('exit');
   setCart(L, baseCart(L)); const sfxLoop = true; let crashed = false, doorHit = null;
   const N = tr.length || stops.length; if (L === LA) hudDots(N);
   for (let n = 0; n < stops.length; n++) {
     const s = stops[n], it = L.items[n]; L.ramp = 1 + Math.min(.45, (L.st.mult - 1) * .012); L.next = n; const hz = s.type === 'tnt' || s.type === 'fork';
-    if (hz) L.ramp *= .6;     // slow-motion approach: the next hazard glows
+    if (hz) { L.ramp *= .6; if (!L.crashed) setCart(L, 'Worry'); }     // slow-motion approach: the next hazard glows
     if (s.type === 'fork') {
       await travel(L, it.x0 - 270, true); await W(0); if (L === LA) hudStop(s.i, N);
       await doFork(L, it, s, o, W);
@@ -2384,7 +2443,7 @@ return {
     $('hGear').insertAdjacentHTML('beforeend', '<div id="rrCarts">' + [1, 2, 3].map(() => '<svg class="rrs rrCI" style="width:50px;height:49px"><use href="#rrCartRide"/></svg>').join('') + '</div>');
     H.dl.textContent = 'STOP'; $('hDepth').insertAdjacentHTML('beforeend', '<div id="rrDots"></div>'); $('hDist').querySelector('i').textContent = 'LOAD x MULTI ='; H.depth.textContent = '0/0';
     $('grid').insertAdjacentHTML('beforeend', '<div id="rrRing"></div>'); ring = $('rrRing');
-    $('scene').classList.add('rrT'); mkTrack(); L_init(); bindLayers(); paintLayers(0, 0);
+    $('scene').classList.add('rrT'); mkTrack(); mkTrackB(); L_init(); geom(); addEventListener('resize', () => { if (document.body.classList.contains('portrait') !== PORT || true) { geom(); } }); bindLayers(); paintLayers(0, 0);
   },
   paintIdle,
   roundStart() { EP++; killTimers(); inBonus = false; lastCart = 0; stakeNow = S.bet(); $('hud').classList.remove('bonus', 'twin'); H.dl.textContent = 'STOP'; curR = null; },

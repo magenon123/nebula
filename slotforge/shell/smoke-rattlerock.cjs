@@ -50,8 +50,8 @@ const P = {
     watch: () => page.evaluate(() => { clearInterval(window.__wi); window.__w = { wins: [], max: 0, msgs: [], seen: {} }; const win = document.getElementById('win'), h = document.getElementById('hud'), sc = document.getElementById('scene');
       window.__wi = setInterval(() => { const v = +win.textContent.replace(/[$,]/g, ''); window.__w.wins.push(v); window.__w.max = Math.max(window.__w.max, v);
         const sn = window.__w.seen; sn.twin = sn.twin || sc.classList.contains('twin'); sn.exit = sn.exit || sc.classList.contains('exit'); sn.lv = sn.lv || {}; ['lv1', 'lv2', 'lv3'].forEach(k => { if (sc.classList.contains(k)) sn.lv[k] = 1; });
-        sn.bonus = sn.bonus || h.classList.contains('bonus'); sn.dome = sn.dome || [...document.querySelectorAll('.rrDome')].some(e => e.style.display === 'block'); sn.crash = sn.crash || [...document.querySelectorAll('.rrCart use')].some(u => u.getAttribute('href') === '#rrCartCrash');
-        sn.win = sn.win || [...document.querySelectorAll('.rrCart use')].some(u => u.getAttribute('href') === '#rrCartWin'); sn.forkL = sn.forkL || !!document.querySelector('#grid use[href="#rrForkL"],#grid use[href="#rrForkR"]');
+        sn.bonus = sn.bonus || h.classList.contains('bonus'); sn.dome = sn.dome || [...document.querySelectorAll('.rrDome')].some(e => e.style.display === 'block'); sn.crash = sn.crash || !!document.querySelector('.rrRig.hDizzy');
+        sn.win = sn.win || !!document.querySelector('.rrRig.hCheer.up'); sn.forkL = sn.forkL || !!document.querySelector('#grid use[href="#rrForkL"],#grid use[href="#rrForkR"]');
         sn.maxLive = Math.max(sn.maxLive || 0, [...document.querySelectorAll('#grid .rrI')].filter(e => e.style.display !== 'none').length); sn.mult = Math.max(sn.mult || 0, +(document.getElementById('hMultV').textContent.replace(/\D/g, '') || 0));
         sn.call = sn.call || !!document.querySelector('.rrCall'); sn.stop = sn.stop || /^[1-9]\d*\/\d+$/.test(document.getElementById('hDepthV').textContent); sn.eqv = sn.eqv || +document.getElementById('hDistV').textContent.replace(/[$,]/g, '') > 0; sn.ring = sn.ring || getComputedStyle(document.getElementById('rrRing')).display === 'block';
         sn.carts = Math.max(sn.carts || 0, document.querySelectorAll('#rrCarts .rrCI.lost').length); }, 40);
@@ -124,7 +124,8 @@ const P = {
     await t.shot('phone-idle');
     const r = await play(t, 'phone-door', P.door, 22, { shots: [2500, 5000] });
     const box = await page.evaluate(() => { const c = document.querySelector('#grid .rrW').getBoundingClientRect(), h = document.getElementById('hud').getBoundingClientRect(); return { cx: c.left + c.width / 2, cw: c.width, hl: h.left, hr: h.right, ht: h.top, w: innerWidth }; });
-    check('phone: cart on screen and big enough', box.cx > 0 && box.cx < box.w && box.cw > 120, JSON.stringify(box)); check('phone: HUD inside the screen', box.hl >= 0 && box.hr <= box.w + 1 && box.ht >= 0, JSON.stringify(box));
+    check('phone: cart on screen and big enough', box.cx > 0 && box.cx < box.w && box.cw > 120, JSON.stringify(box)); const full = await page.evaluate(() => { const r = document.getElementById('scene').getBoundingClientRect(); return r.top <= 1 && r.bottom >= innerHeight - 1 && r.left <= 1 && r.right >= innerWidth - 1; }); check('phone: world fills the whole screen (no band)', full);
+    check('phone: HUD inside the screen', box.hl >= 0 && box.hr <= box.w + 1 && box.ht >= 0, JSON.stringify(box));
     await ctx.close(); }
   { const { ctx, page } = await open(844, 390, true); const t = T(page); console.log('-- phone landscape 844x390'); await t.shot('phone-land-idle'); await play(t, 'phone-land', P.door, 22, { shots: [3000] }); await ctx.close(); }
   await browser.close();

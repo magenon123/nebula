@@ -101,6 +101,8 @@ body.portrait .rrCall{font-size:46px}
 body.portrait .rrTag{font-size:44px}
 body.portrait #rrBanner{left:450px;top:520px}
 body.portrait #rrBanner b{font-size:84px}
+
+#rrTrack,#rrTrackB{z-index:0}#grid .rrI.rrBack{z-index:1}.rrW{z-index:3}#grid .rrI{z-index:4}#rrRing{z-index:5}
 `;
 (function () { const st = document.createElement('style'); st.id = 'kaiCss'; st.textContent = KAI_CSS; document.head.appendChild(st); })();
 /*END-KAI-CSS*/
@@ -110,7 +112,7 @@ let hintUntil = 0;
 const say = (t, h) => { if (performance.now() < hintUntil) return; S.say(t, h); };
 const NS = 'http://www.w3.org/2000/svg';
 let SPAWN_X = 1780;
-const SPX = 360, COLLECT = 150, V0 = 330, POOL = 16;
+const SPX = 360, COLLECT = 150, V0 = 330, POOL = 20;
 const ABORT = { abort: 1 };
 let EP = 0, curR = null, lastCart = 0, inBonus = false, twinOn = false, idleOn = true;
 const timers = new Set();
@@ -134,7 +136,11 @@ const SPR = {
   lantern: { id: 'rrLantern', w: 100, h: 125, hv: 50 }, fork: { id: 'rrFork', w: 130, h: 163, hv: 0 }, door: { id: 'rrDoor', w: 345, h: 262, hv: 0 },
   g2: { id: 'rrGem2', w: 112, h: 140, hv: 60 }, g3: { id: 'rrGem3', w: 112, h: 140, hv: 60 }, g5: { id: 'rrGem5', w: 112, h: 140, hv: 60 }, g10: { id: 'rrGem10', w: 112, h: 140, hv: 60 }
 };
-const sprFor = (type, v) => type === 'gold' ? (v >= 0.5 ? SPR.pile : SPR.nugget) : type === 'gem' ? (SPR['g' + v] || SPR.g10) : type === 'shield' ? SPR.hat : SPR[type] || SPR.nugget;
+[1, 2, 3, 4, 5].forEach(t => { SPR['gold' + t] = { id: 'rrGold' + t, w: 100, h: 125, hv: 0 }; }); SPR.gold6 = { id: 'rrGold6', w: 220, h: 193, hv: 0 };
+Object.assign(SPR, { tntB: { id: 'rrTntBundle', w: 120, h: 150, hv: 0 }, tntR: { id: 'rrTntBarrel', w: 120, h: 150, hv: 0 }, tunnel: { id: 'rrTunnelMouth', w: 300, h: 254, hv: -8 }, sign: { id: 'rrSignPost', w: 110, h: 138, hv: 0 }, crB: { id: 'rrCrystalB', w: 120, h: 150, hv: 0 }, crG: { id: 'rrCrystalG', w: 110, h: 138, hv: 0 }, crR: { id: 'rrCrystalR', w: 110, h: 138, hv: 0 }, mush: { id: 'rrMushroom', w: 90, h: 112, hv: 0 }, bat: { id: 'rrBat1', w: 90, h: 63, hv: 0 }, bat2: { id: 'rrBat2', w: 90, h: 63, hv: 0 }, bones: { id: 'rrBones', w: 90, h: 112, hv: 0 }, wreck: { id: 'rrMinecartWreck', w: 200, h: 125, hv: 0 } });
+const goldT = v => v < .08 ? 1 : v < .2 ? 2 : v < .5 ? 3 : v < 1 ? 4 : v < 2.5 ? 5 : 6, GOLDSC = [0, .85, .95, 1.05, 1.15, 1.25, 1];
+const tntSpr = i => [SPR.tnt, SPR.tntB, SPR.tntR][i % 3];
+const sprFor = (type, v) => type === 'gold' ? SPR['gold' + goldT(v)] : type === 'tnt' ? SPR.tnt : type === 'gem' ? (SPR['g' + v] || SPR.g10) : type === 'shield' ? SPR.hat : SPR[type] || SPR.nugget;
 
 /* ---------- pooled pickup nodes ---------- */
 const pool = []; let liveN = 0;
@@ -273,7 +279,7 @@ function layout(L, it) {      // static vertical placement from the terrain (scr
   if (it.kind === 'div') it.top = L.rail + 14 - it.h - it.h0;
 }
 function spawn(L, it) {
-  if (!it.spr) it.spr = SPR.nugget; const dv = it.kind === 'div', n = dv ? acqDiv() : acquire(); if (!n) return false; it.n = n; const k = L.k * (it.sc || 1);
+  if (!it.spr) it.spr = SPR.nugget; if (it.decor && liveN >= POOL - 6) return false; const dv = it.kind === 'div', n = dv ? acqDiv() : acquire(); if (!n) return false; if (!dv) n.classList.toggle('rrBack', !!it.back); it.n = n; const k = L.k * (it.sc || 1);
   if (!dv) n._u.setAttribute('href', '#' + it.spr.id);
   it.w = it.spr.w * k; it.h = it.spr.h * k; n.style.width = it.w + 'px'; n.style.height = it.h + 'px'; n.style.opacity = it.alpha == null ? '' : it.alpha; it.ox = it.w * .5;
   layout(L, it); it._x = null; it._y = null; it.live = true; L.live.push(it); place(it, L);
@@ -374,12 +380,16 @@ const goldTier = v => v >= 1.5 ? 4 : v >= .5 ? 3 : v >= .15 ? 2 : v >= .06 ? 1 :
 
 /* ---------- one stop ---------- */
 function mkItem(L, s, x0) {
-  const type = s.type, v = s.value; let spr = type === 'door' ? SPR.door : type === 'fork' ? SPR.fork : sprFor(type, v), sc = 1;
-  if (type === 'gold') { const t = goldTier(v); sc = [.8, 1, .75, .95, 1.2][t]; }
+  const type = s.type, v = s.value; let spr = type === 'door' ? SPR.door : type === 'fork' ? SPR.fork : type === 'tnt' ? tntSpr(s.i + Math.round((s.load || 0) * 100)) : sprFor(type, v), sc = type === 'gold' ? GOLDSC[goldT(v)] : 1;
   const it = { s, type, v, spr, sc, x0, dx: type === 'door' ? 330 * L.k : 0, dy: 0, live: false, n: null, i: s.i, air: type === 'lantern' ? 230 : 0 };
-  if (type === 'gold') { it.deco = []; const t = goldTier(v); [-70, 70].forEach(d => { if (t >= 1 || d < 0) { const x = { type: 'deco', spr: SPR.nugget, sc: .5, x0: x0 + d, dx: 0, dy: 0, live: false, n: null }; it.deco.push(x); L.dq.push(x); } }); }
-  if (type === 'tnt') L.dq.push({ type: 'deco', kind: 'div', spr: { id: 'tun', w: 250, h: 270, hv: 0 }, sc: 1, x0: x0 + 40, dx: 0, dy: 0, live: false, n: null });
+  if (type === 'gold') { it.deco = []; const t = goldT(v); [-70, 70].forEach(d => { if (t >= 2 || d < 0) { const x = { type: 'deco', spr: SPR.gold1, sc: .5, x0: x0 + d, dx: 0, dy: 0, live: false, n: null }; it.deco.push(x); L.dq.push(x); } }); }
+  if (type === 'tnt') L.dq.push({ type: 'deco', spr: SPR.tunnel, sc: 1, x0: x0 + 30, dx: 0, dy: 0, live: false, n: null, back: true });
   return it;
+}
+function decorFor(L, xs, N) {      // scenery along the track: deterministic from the stop index, never collectable
+  const kinds = ['crB', 'mush', 'sign', 'crG', 'bat', 'bones', 'crR', 'wreck', 'mush', 'bat2'];
+  for (let i = 1; i < xs.length; i++) { const x = (xs[i - 1] + xs[i]) / 2 + ((i * 53) % 90) - 45, k = kinds[(i * 7 + N) % kinds.length], air = k === 'bat' || k === 'bat2' ? 300 + (i % 3) * 40 : 0;
+    L.dq.push({ type: 'deco', decor: true, spr: SPR[k], sc: k === 'wreck' ? .9 : .78, x0: x, dx: 0, dy: -6, air, live: false, n: null, back: true, alpha: .92 }); }
 }
 function applyState(L, s) { L.st.load = s.load; L.st.mult = s.mult; L.st.shields = s.shields; L.st.lanterns = s.lanterns; }
 async function doTaken(L, it, t, s, o, W) {      // t = {type, value, shielded, crash}: a plain stop's content, or the side a fork took
@@ -411,7 +421,7 @@ const beat = type => ({ gold: 260, gem: 700, shield: 600, lantern: 500, tnt: 900
 async function playTrack(L, tr, o) {
   const ep = EP, W = guardW(ep), stops = tr.stops, L0 = L.dist, base = L0 + 400;
   freeItems(L); L.crashed = false; L.active = true; L.ramp = 1; setCart(L, baseCart(L)); setDome(L); L.w.classList.remove('gone');
-  const xs = buildTerrain(L, stops, base); L.dq = []; L.dns = 0; stops.forEach((s, i) => L.items.push(mkItem(L, s, xs[i]))); L.dq.sort((p, q) => p.x0 - q.x0);
+  const N0 = tr.length || stops.length, xs = buildTerrain(L, stops, base); L.dq = []; L.dns = 0; stops.forEach((s, i) => L.items.push(mkItem(L, s, xs[i]))); decorFor(L, xs, N0); L.dq.sort((p, q) => p.x0 - q.x0);
   const last = L.items[L.items.length - 1]; if (last && last.type === 'door') last.onSpawn = () => $('scene').classList.add('exit');
   setCart(L, baseCart(L)); const sfxLoop = true; let crashed = false, doorHit = null;
   const N = tr.length || stops.length; if (L === LA) hudDots(N);
