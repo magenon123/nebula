@@ -29,7 +29,7 @@ const SPR = {
   lantern: { id: 'rrLantern', w: 100, h: 125, hv: 50 }, fork: { id: 'rrFork', w: 130, h: 163, hv: 0 }, door: { id: 'rrDoor', w: 345, h: 262, hv: 0 },
   g2: { id: 'rrGem2', w: 112, h: 140, hv: 60 }, g3: { id: 'rrGem3', w: 112, h: 140, hv: 60 }, g5: { id: 'rrGem5', w: 112, h: 140, hv: 60 }, g10: { id: 'rrGem10', w: 112, h: 140, hv: 60 }
 };
-const sprFor = (type, v) => type === 'gold' ? (v >= 0.5 ? SPR.pile : SPR.nugget) : type === 'gem' ? (SPR['g' + v] || SPR.g10) : SPR[type] || null;
+const sprFor = (type, v) => type === 'gold' ? (v >= 0.5 ? SPR.pile : SPR.nugget) : type === 'gem' ? (SPR['g' + v] || SPR.g10) : type === 'shield' ? SPR.hat : SPR[type] || SPR.nugget;
 
 /* ---------- pooled pickup nodes ---------- */
 const pool = []; let liveN = 0;
@@ -48,6 +48,7 @@ function mkLane(id, rail, k, cx) {
 }
 const LA = mkLane('A', 718, 1, 340), LB = mkLane('B', 488, .72, 790);
 const LANES = [LA, LB];
+window.__rr = { LA, LB, ep: () => EP };   // test handle
 function setCart(L, st) { L.cartSt = st; L.cu.setAttribute('href', '#rrCart' + st); }
 function baseCart(L) { return L.crashed ? 'Crash' : L.st.shields > 0 ? 'Shield' : 'Ride'; }
 function cheer(L, ms = 650) { if (L.crashed) return; setCart(L, 'Cheer'); clearTimeout(L.cheerT); L.cheerT = after(ms, () => { if (!L.crashed && L.cartSt === 'Cheer') setCart(L, baseCart(L)); }); }
@@ -76,7 +77,7 @@ function kick() { if (!raf) { lastT = performance.now(); raf = requestAnimationF
 function itemPos(L, it) { return [L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx, it.top]; }
 function place(it, L) { const x = L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx - it.ox; if (x !== it._x) { it._x = x; it.n.style.transform = `translate3d(${x}px,${it.top}px,0)`; } }
 function spawn(L, it) {
-  const n = acquire(); if (!n) return false; it.n = n; n._u.setAttribute('href', '#' + it.spr.id); const k = L.k * (it.sc || 1);
+  if (!it.spr) it.spr = SPR.nugget; const n = acquire(); if (!n) return false; it.n = n; n._u.setAttribute('href', '#' + it.spr.id); const k = L.k * (it.sc || 1);
   it.w = it.spr.w * k; it.h = it.spr.h * k; n.style.width = it.w + 'px'; n.style.height = it.h + 'px'; n.style.opacity = it.alpha == null ? '' : it.alpha;
   it.ox = it.w * (it.spr.id === 'rrDoor' ? .5 : it.spr.id === 'rrPile' ? .5 : .5);
   const hv = (it.spr.hv || 0) * L.k, bottom = L.rail + 24 * L.k - hv + (it.dy || 0);
@@ -183,7 +184,7 @@ async function doTaken(L, it, t, s, o, W) {      // t = {type, value, shielded, 
 /* plays one track (a base ride, or one level attempt of the bonus) on lane L. Returns {pay (in bets), crashed} */
 async function playTrack(L, tr, o) {
   const ep = EP, W = guardW(ep), stops = tr.stops, L0 = L.dist, base = L0 + 400;
-  L.crashed = false; L.items = []; L.ns = 0; L.live = []; L.active = true; L.ramp = 1; setCart(L, baseCart(L)); setDome(L); L.w.classList.remove('gone');
+  freeItems(L); L.crashed = false; L.active = true; L.ramp = 1; setCart(L, baseCart(L)); setDome(L); L.w.classList.remove('gone');
   stops.forEach(s => L.items.push(mkItem(L, s, base)));
   const last = L.items[L.items.length - 1]; if (last && last.type === 'door') last.onSpawn = () => $('scene').classList.add('exit');
   setCart(L, baseCart(L)); const sfxLoop = true; let crashed = false, doorHit = null;
@@ -381,15 +382,15 @@ return {
   init() {
     const g = $('grid'); g.appendChild(LA.w); g.appendChild(LB.w); LB.w.style.display = 'none';
     $('fxl').insertAdjacentHTML('beforeend', '<div id="rrBanner"><b></b><small></small></div>');
-    $('hGear').insertAdjacentHTML('beforeend', '<div id="rrCarts">' + [1, 2, 3].map(() => '<svg class="rrs rrCI" style="width:66px;height:64px" viewBox="-400 -530 800 780"><use href="#rrCartRide"/></svg>').join('') + '</div>');
+    $('hGear').insertAdjacentHTML('beforeend', '<div id="rrCarts">' + [1, 2, 3].map(() => '<svg class="rrs rrCI" style="width:50px;height:49px"><use href="#rrCartRide"/></svg>').join('') + '</div>');
     bindLayers(); paintLayers(0, 0);
   },
   paintIdle,
   roundStart() { EP++; killTimers(); inBonus = false; lastCart = 0; stakeNow = S.bet(); $('hud').classList.remove('bonus', 'twin'); H.dl.textContent = 'DEPTH'; curR = null; },
   async clearBoard() {
     if (inBonus) return;
-    LA.items.forEach(it => { if (it.n && idleOn) { const n = it.n; it.fly = true; anim(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 220 * T(), fill: 'forwards' }); } });
-    await wait(240); if (idleOn) { resetLanes(); LA.items = []; }
+    LANES.forEach(L => L.live.forEach(it => { if (it.n && !it.fly) { const n = it.n; it.fly = true; anim(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 220 * T(), fill: 'forwards' }); } }));
+    await wait(240); if (inBonus) return; resetLanes(); idleOn = false; $('scene').classList.remove('twin'); LB.w.style.display = 'none';
   },
   restoreBoard() { EP++; killTimers(); LANES.forEach(L => { L.go = false; L.res = null; }); inBonus = false; $('scene').classList.remove('twin'); paintIdle(); },
   baseSpin: R => { curR = R; return { runs: R.runs, base: true }; },

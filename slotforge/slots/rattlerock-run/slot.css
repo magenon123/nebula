@@ -97,6 +97,7 @@ body.lite .rrW.mv .rrCart.bounce{animation-duration:.5s}
 #rrCarts{display:none;align-items:center;gap:2px;margin-left:6px}
 #hud.bonus #rrCarts{display:flex}
 #hud.bonus .hLans{display:none}
+#hud.bonus #hGear{flex-direction:row;gap:6px}
 #hud.bonus #hShield{margin-left:4px}
 .rrCI{transition:opacity .3s,transform .3s;opacity:.95}
 .rrCI.cur{transform:scale(1.14)}
@@ -104,7 +105,7 @@ body.lite .rrW.mv .rrCart.bounce{animation-duration:.5s}
 /* portrait phone: the run window is the cart plus the next ~2 pickups (stage x 0..1000, see cfg.portrait); scene and game group share one transform */
 body.portrait #scene{left:calc(var(--gx,0px)*var(--g,1))!important;top:calc(var(--gy,0px)*var(--g,1))!important;width:1600px!important;height:900px!important;transform:scale(var(--g,1))!important;transform-origin:0 0!important}
 body.portrait #stage{background:linear-gradient(#0a0618,#06030d 55%,#04020a)}
-body.portrait #logo{display:none}
+body.portrait #logo{left:310px;top:-150px;width:380px}
 body.portrait #hud{left:8px;top:10px;width:984px;height:128px}
 body.portrait #hud .hc i{font-size:20px;letter-spacing:3px}
 body.portrait #hud .hc b{font-size:50px}
