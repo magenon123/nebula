@@ -40,7 +40,7 @@ export const CFG = {
     motherlode: { cost: 140, name: 'Motherlode Run', startLevel: 2, startMult: 10, startShields: 2 }
   },
   spacing: SPACING, carts: 3, levels: 3, lanternsToTrigger: 3,
-  goldScale: 1.095, anteScale: 1.043, bonusScale: 1.008, motherScale: 1.065,      // global RTP knobs (sim --cfg '{"goldScale":1.02}')
+  goldScale: 1.1, anteScale: 1.04, bonusScale: 1.005, motherScale: 1.058,      // global RTP knobs (sim --cfg '{"goldScale":1.02}')
   base: BASE,
   ante: { shieldMult: 1.6, goldScale: 1.2 },
   bonus: { levels: [
