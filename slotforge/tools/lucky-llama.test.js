@@ -13,22 +13,22 @@ const rounds = (opts, n, seed) => { const rng = sfc32(seed), out = []; for (let 
 const SYMS = new Set(C.symbols), cells = (g, s) => { const o = []; g.forEach((col, r) => col.forEach((x, k) => { if (x === s) o.push(`${r},${k}`); })); return o; };
 
 /* independent line evaluator (from the paytable only): returns [{line, symbol, count, pay}] */
-function lineWins(grid, scale) {
+function lineWins(grid, scale, table) {
   const out = [];
   C.lines.forEach((L, li) => {
     const seq = L.map((row, r) => grid[r][row]); let best = null;
-    for (const target of Object.keys(C.paytable)) {
+    for (const target of Object.keys(table)) {
       let n = 0; for (const x of seq) { if (x === target || x === 'WLD') n++; else break; }
-      if (n >= 3) { const p = C.paytable[target][n - 3]; if (!best || p > best.p) best = { symbol: target, count: n, p }; }
+      if (n >= 3) { const p = table[target][n - 3]; if (!best || p > best.p) best = { symbol: target, count: n, p }; }
     }
     if (best) out.push({ line: li + 1, symbol: best.symbol, count: best.count, pay: r4(best.p * scale) });
   });
   return out;
 }
-function checkSpin(sp, scale, sticky) {
+function checkSpin(sp, scale, sticky, table = C.paytable) {
   assert.equal(sp.grid.length, 5); sp.grid.forEach(col => { assert.equal(col.length, 3); col.forEach(x => assert.ok(SYMS.has(x), 'symbol ' + x)); });
   assert.equal(sp.reelStops.length, 5);
-  const exp = lineWins(sp.grid, scale);
+  const exp = lineWins(sp.grid, scale, table);
   assert.equal(sp.wins.length, exp.length, 'win count ' + JSON.stringify(sp.grid));
   sp.wins.forEach((w, i) => {
     assert.equal(w.line, exp[i].line); assert.equal(w.count, exp[i].count); assert.ok(near(w.pay, exp[i].pay), `pay line ${w.line}: ${w.pay} vs ${exp[i].pay}`);
@@ -62,7 +62,8 @@ test('registered, modes, CFG for slot.json, no max luck', () => {
   assert.deepEqual(C.link.jackpots, { MINI: 20, MINOR: 50, MAJOR: 250, GRAND: 2000 });
   assert.deepEqual(C.parade.ladder, [[1, 1], [2, 2], [3, 3], [5, 5], [7, 8], [10, 10]]); assert.deepEqual(C.parade.spins, { 3: 8, 4: 12, 5: 20 });
   assert.ok(C.payscale && C.paytable && C.bets.length > 20);
-  assert.equal(Object.keys(C.paytable).length, 10); for (const p of Object.values(C.paytable)) assert.ok(p[0] < p[1] && p[1] < p[2]);
+  assert.equal(Object.keys(C.paytable).length, 10); for (const t of [C.paytable, C.parade.paytable]) for (const p of Object.values(t)) assert.ok(p[0] < p[1] && p[1] < p[2]);
+  assert.deepEqual(Object.keys(C.parade.paytable), Object.keys(C.paytable)); assert.equal(C.lineScale * C.linkScale * C.paradeScale * C.parade.grabScale, 1, 'shipped with scale knobs at 1'); assert.ok(Math.abs(C.anteScale - 1) <= 0.021);
   const inf = E.info(); for (const prof of ['base', 'ante', 'parade']) { assert.equal(inf.strips[prof].length, 5); inf.strips[prof].forEach(s => { assert.ok(s.length > 60); assert.ok(s.every(x => SYMS.has(x))); }); }
   // no wild on reel 1 of the base/ante strips; at most one drum per window (min distance 3 on the circular strip)
   for (const prof of ['base', 'ante']) assert.ok(!inf.strips[prof][0].includes('WLD'));
@@ -147,7 +148,7 @@ test('PONCHO PARADE rules: sticky wilds, ladder on all line wins, Collector grab
     assert.ok(b.spins.length <= C.parade.maxSpins);
     b.spins.forEach((sp, i) => {
       assert.equal(sp.spinIndex, i + 1); assert.equal(sp.strip, 'parade');
-      checkSpin(sp, C.paradeScale, [...sticky].map(s => ({ reel: +s[0], row: +s[2] })));
+      checkSpin(sp, C.paradeScale, [...sticky].map(s => ({ reel: +s[0], row: +s[2] })), C.parade.paytable);
       // new wilds this spin = wilds not sticky before; all wilds sticky
       const nowW = new Set(sp.wilds.map(w => `${w.reel},${w.row}`)); sp.wilds.forEach(w => { assert.equal(w.sticky, true); assert.equal(w.new, !sticky.has(`${w.reel},${w.row}`)); });
       nowW.forEach(c => sticky.add(c)); wc = sticky.size;

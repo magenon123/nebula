@@ -40,7 +40,7 @@ const REELS = {
     R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 3, 14])],
   ante: [
     R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 0, 5, 17]),
-    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 5, 17]),
+    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 7, 5, 17]),
     R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 5, 17]),
     R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 5, 17]),
     R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 5, 17])],
@@ -57,22 +57,24 @@ export const CFG = {
     party: { cost: 284, name: 'Party Pack', drumsW: [[3, 96], [4, 3.9], [5, 0.1]], sticky: 3 }
   },
   rows: NROW, reelCount: NREEL, lines: LINES, symbols: SYM,
-  /* x TOTAL bet for 3 / 4 / 5 of a kind on a line (WLD pays as LUC) */
-  paytable: { MAR: [0.25, 0.75, 3], MAC: [0.25, 0.9, 3.5], CHI: [0.4, 1.2, 4.5], GUI: [0.4, 1.5, 6], TAC: [0.5, 2, 8],
-    SKU: [0.75, 3, 12], SOM: [1, 4.5, 18], MAS: [1.5, 6, 25], TRU: [2, 8, 35], LUC: [4, 25, 150] },
-  lineScale: 1.544, anteScale: 1.055, linkScale: 0.97, paradeScale: 0.119,
+  /* x TOTAL bet for 3 / 4 / 5 of a kind on a line (WLD pays as LUC). Base and ante use paytable; PONCHO PARADE uses parade.paytable (smaller, the ladder multiplies it) */
+  paytable: { MAR: [0.4, 1.2, 4.5], MAC: [0.4, 1.4, 5.5], CHI: [0.6, 1.8, 7], GUI: [0.6, 2.4, 9], TAC: [0.8, 3, 12],
+    SKU: [1.2, 4.5, 18], SOM: [1.5, 7, 28], MAS: [2.4, 9, 40], TRU: [3, 12, 55], LUC: [6, 40, 200] },
+  lineScale: 1, anteScale: 0.99, linkScale: 1, paradeScale: 1,
   reels: REELS,
-  layout: { base: 44, ante: 369, parade: 1 },   // shuffle seed of the strip layout per profile (the strips are explicit, see info().strips); ANY change of reel counts reshuffles: re-run the sim
+  layout: { base: 44, ante: 315, parade: 1 },   // shuffle seed of the strip layout per profile (the strips are explicit, see info().strips); ANY change of reel counts reshuffles: re-run the sim
   link: { p: 0.065, respins: 3, trigger: 6,
-    values: [[1, 26], [2, 22], [3, 16], [5, 12], [8, 8], [10, 6], [15, 4], [25, 2]],
+    values: [[1, 27], [2, 23], [3, 16], [5, 12], [8, 8], [10, 6], [15, 3.5], [25, 1.8]],
     jackpots: { MINI: 20, MINOR: 50, MAJOR: 250, GRAND: 2000 },
-    jackpotP: { MINI: 0.012, MINOR: 0.004, MAJOR: 0.0006, GRAND: 0.00004 } },
-  parade: { spins: { 3: 8, 4: 12, 5: 20 }, retrigger: 3, maxSpins: 60, grabScale: 0.594,
+    jackpotP: { MINI: 0.0138, MINOR: 0.004, MAJOR: 0.0006, GRAND: 0.00004 } },
+  parade: { spins: { 3: 8, 4: 12, 5: 20 }, retrigger: 3, maxSpins: 60, grabScale: 1,
+    paytable: { MAR: [0.03, 0.09, 0.36], MAC: [0.03, 0.11, 0.42], CHI: [0.05, 0.14, 0.54], GUI: [0.05, 0.18, 0.71], TAC: [0.06, 0.24, 0.95],
+      SKU: [0.09, 0.36, 1.43], SOM: [0.12, 0.54, 2.14], MAS: [0.18, 0.71, 2.98], TRU: [0.24, 0.95, 4.2], LUC: [0.48, 2.98, 17.85] },
     ladder: [[1, 1], [2, 2], [3, 3], [5, 5], [7, 8], [10, 10]],
-    values: [[1, 30], [2, 25], [3, 16], [5, 11], [8, 8], [10, 5], [15, 3], [25, 2]],
-    jackpotP: { MINI: 0.01, MINOR: 0.003, MAJOR: 0.0004, GRAND: 0.00002 } }
+    values: [[1, 45], [2, 28], [3, 14], [5, 7], [8, 3.5], [10, 1.8], [15, 0.5], [25, 0.2]],
+    jackpotP: { MINI: 0.008, MINOR: 0.003, MAJOR: 0.0004, GRAND: 0.00002 } }
 };
-CFG.payscale = { paytable: CFG.paytable, linkValues: CFG.link.values.map(v => v[0]), jackpots: CFG.link.jackpots, ladder: CFG.parade.ladder, drums: CFG.parade.spins };
+CFG.payscale = { paytable: CFG.paytable, paradePaytable: CFG.parade.paytable, linkValues: CFG.link.values.map(v => v[0]), jackpots: CFG.link.jackpots, ladder: CFG.parade.ladder, drums: CFG.parade.spins };
 
 /* ---------- strips (explicit, deterministic) ---------- */
 function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
@@ -121,8 +123,8 @@ function drawValue(rng, T, scale) {
 }
 
 /* line evaluation on a flat grid g[reel*3+row] */
-function evalLines(g, scale) {
-  const wins = []; let sum = 0; const P = CFG.paytable;
+function evalLines(g, scale, P) {
+  const wins = []; let sum = 0;
   for (let li = 0; li < LINES.length; li++) {
     const L = LINES[li]; let sym = -1, n = 0, wp = 0, lead = true;
     for (let r = 0; r < NREEL; r++) {
@@ -159,8 +161,8 @@ function tease(g) {
 const gridOf = g => { const out = []; for (let r = 0; r < NREEL; r++) out.push([SYM[g[r * NROW]], SYM[g[r * NROW + 1]], SYM[g[r * NROW + 2]]]); return out; };
 
 /* a full Spin object from stops/grid. valT/valScale = how piñata values are drawn */
-function makeSpin(rng, stopsG, stripName, valT, valScale, prevSticky, lineScale) {
-  const { stops, g } = stopsG, ev = evalLines(g, lineScale), wilds = [], scat = [], money = [];
+function makeSpin(rng, stopsG, stripName, valT, valScale, prevSticky, lineScale, lineTable) {
+  const { stops, g } = stopsG, ev = evalLines(g, lineScale, lineTable), wilds = [], scat = [], money = [];
   for (let i = 0; i < NCELL; i++) {
     const c = g[i];
     if (c === WLD) { const o = cellOf(i); o.sticky = !!prevSticky; o.new = prevSticky ? !prevSticky[i] : false; wilds.push(o); }
@@ -182,7 +184,7 @@ function triggerParade(rng, nDrums) {
       const st = pickIdx(rng, has.has(r) ? prof.pools[r].sca1 : prof.pools[r].sca0), s = prof.strips[r]; stops.push(st);
       for (let k = 0; k < NROW; k++) { const c = s[(st + k) % s.length]; g[r * NROW + k] = c; if (c === MON) mon++; }
     }
-    if (mon >= CFG.link.trigger || evalLines(g, 1).wins.length) continue;
+    if (mon >= CFG.link.trigger || evalLines(g, 1, CFG.paytable).wins.length) continue;
     return { stops, g };
   }
   throw new Error('trigger spin generation failed (strips too dense?)');
@@ -193,7 +195,7 @@ function triggerLink(rng) {
     const x = rng() * prof.comboTotal; let c = prof.combos[prof.combos.length - 1]; for (const e of prof.combos) if (x < e.cum) { c = e; break; }
     const stops = [], g = new Int8Array(NCELL);
     for (let r = 0; r < NREEL; r++) { const st = pickIdx(rng, prof.pools[r].mon[c.m[r]]), s = prof.strips[r]; stops.push(st); for (let k = 0; k < NROW; k++) g[r * NROW + k] = s[(st + k) % s.length]; }
-    if (evalLines(g, 1).wins.length) continue;
+    if (evalLines(g, 1, CFG.paytable).wins.length) continue;
     return { stops, g };
   }
   throw new Error('link trigger spin generation failed');
@@ -228,7 +230,7 @@ function playParade(rng, drums, startStickyN, trigger, capLeft) {
   while (i < total && i < P.maxSpins) {
     const prev = sticky.slice(), d = draw(rng, prof, sticky);
     for (let c = 0; c < NCELL; c++) if (d.g[c] === WLD && !sticky[c]) { sticky[c] = 1; wc++; }
-    const sp = makeSpin(rng, d, 'parade', P, P.grabScale, prev, CFG.paradeScale), lad = ladderOf(wc);
+    const sp = makeSpin(rng, d, 'parade', P, P.grabScale, prev, CFG.paradeScale, P.paytable), lad = ladderOf(wc);
     const stickyWilds = []; for (let c = 0; c < NCELL; c++) if (sticky[c]) stickyWilds.push(cellOf(c));
     let g = 0; for (const m of sp.money) g += m.value;
     const grab = { values: sp.money.map(m => ({ reel: m.reel, row: m.row, value: m.value, jackpot: m.jackpot })), total: r4(g) };
@@ -252,14 +254,14 @@ export function playRound(rng, { ante = false, buy = null, luck = false } = {}) 
   if (buy) {
     const B = CFG.buy[buy]; if (!B) throw new Error('unknown buy ' + buy); bought = buy;
     if (buy === 'link') {
-      const d = triggerLink(rng); spin = makeSpin(rng, d, 'base', CFG.link, CFG.linkScale, null, CFG.lineScale);
+      const d = triggerLink(rng); spin = makeSpin(rng, d, 'base', CFG.link, CFG.linkScale, null, CFG.lineScale, CFG.paytable);
       bonus = playLink(rng, spin.money, 'buy');
     } else {
-      const drums = pickW(rng, B.drumsW), d = triggerParade(rng, drums); spin = makeSpin(rng, d, 'base', CFG.link, CFG.linkScale, null, CFG.lineScale);
+      const drums = pickW(rng, B.drumsW), d = triggerParade(rng, drums); spin = makeSpin(rng, d, 'base', CFG.link, CFG.linkScale, null, CFG.lineScale, CFG.paytable);
       bonus = playParade(rng, drums, B.sticky, 'buy', cap);
     }
   } else {
-    const d = draw(rng, profile(ante ? 'ante' : 'base'), null); spin = makeSpin(rng, d, ante ? 'ante' : 'base', CFG.link, CFG.linkScale, null, ante ? CFG.lineScale * CFG.anteScale : CFG.lineScale);
+    const d = draw(rng, profile(ante ? 'ante' : 'base'), null); spin = makeSpin(rng, d, ante ? 'ante' : 'base', CFG.link, CFG.linkScale, null, ante ? CFG.lineScale * CFG.anteScale : CFG.lineScale, CFG.paytable);
     basePayout = spin.linePayout;
     if (spin.scatters.length >= 3) bonus = playParade(rng, Math.min(5, spin.scatters.length), 0, 'spin', cap - basePayout);
     else if (spin.money.length >= T) bonus = playLink(rng, spin.money, 'spin');
