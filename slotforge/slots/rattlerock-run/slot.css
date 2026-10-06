@@ -10,6 +10,10 @@
 #scene .ly-far{width:2000px;height:900px;animation:rrDrift 140s ease-in-out infinite alternate}
 #scene .ly-farmid,#scene .ly-mid,#scene .ly-near{width:3200px;height:900px;background-repeat:repeat-x;background-size:1600px 900px;background-position:0 0}
 #scene .ly-track,#scene .ly-track2 .t2{top:670px;width:3200px;height:230px;background-repeat:repeat-x;background-size:1600px 230px}
+#scene .ly-track::after{content:'';position:absolute;left:0;right:0;top:70px;bottom:0}
+#scene .ly-track.L1::after{background:linear-gradient(rgba(5,8,30,0),rgba(5,8,30,.85) 40%,rgba(5,8,30,.95))}
+#scene .ly-track.L2::after{background:linear-gradient(rgba(20,4,4,0),rgba(20,4,4,.85) 40%,rgba(20,4,4,.95))}
+#scene .ly-track.L3::after{background:linear-gradient(rgba(8,3,26,0),rgba(8,3,26,.85) 40%,rgba(8,3,26,.95))}
 #scene .ly-track2{top:0;width:3200px;height:900px;display:none;transform-origin:0 718px}
 #scene.twin .ly-track2{display:block}
 #scene .ly-track2 .t2{position:absolute;left:0}

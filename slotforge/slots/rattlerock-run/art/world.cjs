@@ -245,7 +245,7 @@ function midLayer(P, lv) {
 // ------------------------------------------------------------------ TRACK (transparent, tile 1600, baked 1600x230 at y 670)
 function trackLayer(P, lv) {
   setSeed(400 + lv);
-  let o = `<rect y="740" width="1600" height="160" fill="url(#void)"/>`;
+  let o = '';
   for (const bx of [200, 600, 1000, 1400]) {
     o += `<rect x="${bx - 46}" y="${RAIL + 36}" width="16" height="170" fill="url(#woodD)" stroke="${OUT}" stroke-width="3"/><rect x="${bx + 30}" y="${RAIL + 36}" width="16" height="170" fill="url(#woodD)" stroke="${OUT}" stroke-width="3"/>`;
     o += `<path d="M${bx - 30},${RAIL + 44} L${bx + 30},${RAIL + 130} M${bx + 30},${RAIL + 44} L${bx - 30},${RAIL + 130}" stroke="${OUT}" stroke-width="10" stroke-linecap="round"/><path d="M${bx - 30},${RAIL + 44} L${bx + 30},${RAIL + 130} M${bx + 30},${RAIL + 44} L${bx - 30},${RAIL + 130}" stroke="#9a5a28" stroke-width="5" stroke-linecap="round" opacity="${lv === 1 ? 1 : .8}"/>`;
