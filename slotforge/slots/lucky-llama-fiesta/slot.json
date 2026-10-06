@@ -209,17 +209,17 @@
    {
     "sym": 12,
     "title": "PIÑATA LINK",
-    "text": "6 or more money piñatas lock and respin. Every new one resets the respins. Crack them all for cash and jackpots up to 2,000x."
+    "text": "6+ money piñatas lock and respin. New ones reset the respins. Crack them for cash and jackpots up to 2,000x."
    },
    {
     "sym": 11,
     "title": "PONCHO PARADE",
-    "text": "3 or more Fiesta Drums give 8 to 20 free spins. Every wild poncho sticks and the multiplier climbs up to x10."
+    "text": "3+ Fiesta Drums give 8 to 20 free spins. Every wild poncho sticks and the multiplier climbs to x10."
    },
    {
     "sym": 10,
     "title": "STICKY PONCHOS",
-    "text": "In the parade each poncho adds a stripe to the ladder: x1, x2, x3, x5, x8, x10. Don Lucho collects every piñata on screen."
+    "text": "Each poncho adds a ladder stripe: x1, x2, x3, x5, x8, x10. Don Lucho collects every piñata."
    }
   ]
  }

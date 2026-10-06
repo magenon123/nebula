@@ -194,6 +194,7 @@ function landFx(sp, c, ctxInfo) {
     else if (e._code === 'WLD') { if (!e.classList.contains('top')) popCell(e, 1.18); }
   }
   let sca = 0, mon = 0; for (let cc = 0; cc <= c; cc++) for (let row = 0; row < 3; row++) { const x = cellOf(cc, row)._code; if (x === 'SCA') sca++; if (x === 'MON') mon++; }
+  if (sca >= 2 || (!ctxInfo.parade && !ctxInfo.link && mon >= 4)) for (let cc = 0; cc <= c; cc++) for (let row = 0; row < 3; row++) { const e = cellOf(cc, row); if ((sca >= 2 && e._code === 'SCA') || (mon >= 4 && !ctxInfo.parade && e._code === 'MON')) e.classList.add('scat'); }
   if (sca >= 2) callout(sca >= 3 ? `${sca} FIESTA DRUMS! PONCHO PARADE!` : '2 FIESTA DRUMS... ONE MORE?');
   else if (!ctxInfo.parade && !ctxInfo.link && mon >= 4) callout(mon >= 6 ? `${mon} PIÑATAS! PIÑATA LINK!` : `${mon} PIÑATAS... ${mon === 5 ? 'ONE' : 'TWO'} MORE?`);
 }
@@ -244,7 +245,7 @@ async function baseSpinPlay(sp, run, ctx) {
   stakeNow = ctx.stake; const info = { mon: 0, sca: 0 };
   if (!spinning()) { startReels([1, 1, 1, 1, 1]); await wait(260); }
   await spinReels(sp, { mask: [1, 1, 1, 1, 1], first: 900, gap: 220, final: finalFrom(sp), onTouch: c => landFx(sp, c, info) });
-  baseSnap = snapBoard();
+  cells.forEach(e => e.classList.remove('scat')); baseSnap = snapBoard();
   const mult = 1; if (sp.wins.length) run = await showWins(sp, run, ctx, mult);
   else if (!curR.bonusTriggered) hideCallout();
   return run;
@@ -332,7 +333,7 @@ async function paradeSpin(sp, run, ctx) {
     final: (c, row) => { const e = cellOf(c, row); if (e.classList.contains('sticky')) return { code: 'WLD', mon: null, blank: false }; return { code: sp.grid[c][row], mon: mm[c * 3 + row] || null, blank: false }; },
     onTouch: c => { landFx(sp, c, info); for (let row = 0; row < 3; row++) if (newW[c * 3 + row]) { const e = cellOf(c, row); e.classList.add('sticky', 'top'); popCell(e, 1.4); sfx.poncho(nNew++); } }
   });
-  hideCallout();
+  hideCallout(); cells.forEach(e => e.classList.remove('scat'));
   if (sp.ladderStep !== lastStep) { const up = sp.multiplier > lastMult; lastStep = sp.ladderStep; setLadder(sp.ladderStep, true); sfx.ladder(sp.ladderStep); if (up) { flashPlate('pdCallMult', 'pdCallMultN', 'x' + sp.multiplier, 1500); lastMult = sp.multiplier; } }
   if (sp.retrigger) { flashPlate('pdCallSpins', 'pdCallSpinsN', '+' + sp.retrigger, 1700); sfx.spinsAdd(); cells.forEach(e => { if (e._code === 'SCA') FX.act(e, 0, 1); }); $('pdSpinsN').textContent = sp.spinsLeft; bump($('pdSpins')); await wait(1000); cells.forEach(e => { if (e._code === 'SCA') FX.rest(e); }); }
   if (sp.wins.length) run = await showWins(sp, run, ctx, sp.multiplier);
@@ -369,7 +370,7 @@ function prepIntro(R) {
     if (Q) Q.textContent = '"Every poncho sticks. Every stripe pays more."'; if (tap) tap.textContent = 'TAP ANYWHERE TO START THE PARADE'; $('introArt').innerHTML = splash('llSplashParade');
   }
 }
-function resetCells() { cells.forEach(e => { e.classList.remove('top', 'sticky', 'locked', 'blank', 'cracked', 'sp', 'win', 'wl', 'hit'); const l = e.querySelector('.lkr'); if (l) l.remove(); e.getAnimations().forEach(a => a.cancel()); e.querySelectorAll('svg.g,.m').forEach(x => x.getAnimations().forEach(a => a.cancel())); e.style.cssText = `grid-column:${e._c + 1};grid-row:${e._r + 1}`; }); }
+function resetCells() { cells.forEach(e => { e.classList.remove('top', 'sticky', 'locked', 'blank', 'cracked', 'sp', 'win', 'wl', 'hit', 'scat'); const l = e.querySelector('.lkr'); if (l) l.remove(); e.getAnimations().forEach(a => a.cancel()); e.querySelectorAll('svg.g,.m').forEach(x => x.getAnimations().forEach(a => a.cancel())); e.style.cssText = `grid-column:${e._c + 1};grid-row:${e._r + 1}`; }); }
 function overlaysOff() {
   hideCallout(); clearLines(); GRID.classList.remove('focus', 'link'); ['lkRespins', 'lkTotal', 'pdSpins', 'pdCallSpins', 'pdCallMult', 'grandPlate'].forEach(id => plate(id, false));
   Object.keys(JPV).forEach(k => jpEl(k).classList.remove('lit', 'hit'));
