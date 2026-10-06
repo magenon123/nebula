@@ -1,5 +1,6 @@
 // RATTLEROCK RUN look-test generator (leo). Output: look.html (self-contained 1600x900 SVG scene)
 const fs = require('fs');
+const FONT2 = fs.readFileSync(__dirname + '/../../cloudtop-tea-house/art/fonts/LilitaOne.sub.woff2').toString('base64');
 const FONT = fs.readFileSync(__dirname + '/../../siroccos-lamp-bazaar/art/fonts/cinzel-decorative-latin-900-normal.woff2').toString('base64');
 let seed = 7;
 const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -9,7 +10,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const OUT = '#1c0f08';
 
 // ---------- track centreline (door -> viewer) ----------
-const P0 = [1090, 352], P1 = [1105, 490], P2 = [960, 680], P3 = [230, 800];
+const P0 = [1090, 352], P1 = [1170, 440], P2 = [830, 560], P3 = [330, 800];
 const bez = t => { const u = 1 - t; return [0, 1].map(i => u*u*u*P0[i] + 3*u*u*t*P1[i] + 3*u*t*t*P2[i] + t*t*t*P3[i]); };
 const sc = t => 0.10 + 0.90 * Math.pow(t, 1.4);
 const rw = t => 3 + 62 * Math.pow(t, 1.3);
@@ -104,7 +105,7 @@ bg += `<path d="M${DX - 62},${DY + 20} L${DX - 62},${DY - 62} C${DX - 62},${DY -
 
 // ---------- 4. timber frames ----------
 const frame = (t) => {
-  const p = bez(t), s = sc(t), W = 300 * s, H = 330 * s + 20, pw = 30 * s + 5;
+  const p = bez(t), s = sc(t), W = 400 * s, H = 340 * s + 20, pw = 30 * s + 5;
   let o = '';
   const x0 = p[0] - W, x1 = p[0] + W, yb = p[1] + 24 * s + rw(t) * .9, yt = p[1] - H;
   const post = x => `<rect x="${f(x - pw / 2)}" y="${f(yt)}" width="${f(pw)}" height="${f(yb - yt)}" fill="url(#woodD)" stroke="${OUT}" stroke-width="${f(Math.max(1.5, 3 * s))}"/><rect x="${f(x - pw / 2 + pw * .15)}" y="${f(yt)}" width="${f(pw * .22)}" height="${f(yb - yt)}" fill="#c98a4a" opacity=".45"/>`;
@@ -219,7 +220,7 @@ const heap = (cx, cy, wd, ht, n, ns) => {
   return o;
 };
 mid += `<ellipse cx="1330" cy="800" rx="330" ry="90" fill="url(#warmWash)" opacity=".7"/>`;
-mid += heap(1330, 810, 440, 190, 150, 25);
+mid += heap(1290, 800, 440, 190, 150, 25);
 mid += heap(1160, 780, 190, 80, 40, 17);
 // sparkles on the pile
 const spark = (x, y, r, o = 1) => `<path d="M${x},${y - r} Q${x + r * .12},${y - r * .12} ${x + r},${y} Q${x + r * .12},${y + r * .12} ${x},${y + r} Q${x - r * .12},${y + r * .12} ${x - r},${y} Q${x - r * .12},${y - r * .12} ${x},${y - r} Z" fill="#fff8d0" opacity="${o}"/>`;
@@ -230,7 +231,7 @@ mid += `<g transform="translate(1520 700) rotate(14)"><rect x="-6" y="-150" widt
 // ---------- 8. floating pickups ----------
 const tag = (txt, col, s) => {
   const w = 44 * s, h = 24 * s;
-  return `<g><rect x="${f(-w / 2)}" y="${f(-h / 2)}" width="${f(w)}" height="${f(h)}" rx="${f(h / 2)}" fill="#160c24" stroke="${col}" stroke-width="${f(2.2 * s)}"/><text x="0" y="${f(h * .3)}" text-anchor="middle" font-family="RR" font-weight="900" font-size="${f(h * .72)}" fill="#fff6d0">${txt}</text></g>`;
+  return `<g><rect x="${f(-w / 2)}" y="${f(-h / 2)}" width="${f(w)}" height="${f(h)}" rx="${f(h / 2)}" fill="#160c24" stroke="${col}" stroke-width="${f(2.2 * s)}"/><text x="0" y="${f(h * .3)}" text-anchor="middle" font-family="RN" font-size="${f(h * .8)}" fill="#fff6d0">${txt}</text></g>`;
 };
 const gem = (col, lite, dark, txt, glow) => `
   <circle r="62" fill="${glow}" opacity=".28"/><circle r="38" fill="${glow}" opacity=".3"/>
@@ -250,18 +251,18 @@ const items = {
     <path d="M-8,-44 L8,-44 L10,10 L-10,10 Z" fill="#e89a10" stroke="${OUT}" stroke-width="2.5"/>
     <path d="M-60,10 Q0,2 60,10 Q62,24 50,24 L-50,24 Q-62,24 -60,10 Z" fill="#e08a14" stroke="${OUT}" stroke-width="3.5" stroke-linejoin="round"/>
     <circle cx="0" cy="-18" r="9" fill="#fff6c0" stroke="${OUT}" stroke-width="2.5"/><circle cx="0" cy="-18" r="4" fill="#fff"/>
-    <g transform="translate(0 52)">${tag('SHIELD', '#7ee4ff', 1.45)}</g>`,
+    <g transform="translate(0 52)">${tag('SHIELD', '#7ee4ff', 1.3)}</g>`,
   tnt: () => `<ellipse cx="0" cy="0" rx="66" ry="52" fill="#ff5030" opacity=".18"/>
     <rect x="-40" y="-26" width="80" height="58" rx="4" fill="#c42a1c" stroke="${OUT}" stroke-width="3.5"/>
     <rect x="-40" y="-26" width="80" height="14" fill="#e85a40" opacity=".7"/>
     <g stroke="#6a1008" stroke-width="2.5"><path d="M-14,-26 V32 M14,-26 V32"/></g>
     <rect x="-40" y="-6" width="80" height="22" fill="#f6e2b0" stroke="${OUT}" stroke-width="3"/>
-    <text x="0" y="12" text-anchor="middle" font-family="RR" font-weight="900" font-size="20" fill="#2a0a06">TNT</text>
+    <text x="0" y="12" text-anchor="middle" font-family="RN" font-size="21" fill="#2a0a06">TNT</text>
     <path d="M0,-26 C-4,-44 14,-46 16,-60" fill="none" stroke="${OUT}" stroke-width="5" stroke-linecap="round"/><path d="M0,-26 C-4,-44 14,-46 16,-60" fill="none" stroke="#d9c08a" stroke-width="2" stroke-linecap="round"/>
     <circle cx="16" cy="-64" r="16" fill="#ff9a20" opacity=".7"/><path d="M16,-82 L20,-68 L33,-64 L20,-60 L16,-46 L12,-60 L-1,-64 L12,-68 Z" fill="#fff2a0" stroke="#ff7a10" stroke-width="2"/>
-    <g transform="translate(0 56)">${tag('DANGER', '#ff6a50', 1.4)}</g>`,
+    <g transform="translate(0 56)">${tag('TNT', '#ff6a50', 1.1)}</g>`,
 };
-const places = [['nugget', .70, 0], ['green', .60, -4], ['blue', .50, 6], ['hat', .41, -4], ['red', .33, 4], ['tnt', .255, 0]];
+const places = [['nugget', .67, 0], ['green', .585, -6], ['blue', .50, 8], ['hat', .425, -12], ['red', .355, 10], ['tnt', .29, -4]];
 let pick = '';
 const picks = [];
 for (const [k, t, dy] of places) {
@@ -272,12 +273,13 @@ for (const [k, x, y, s, ty] of picks) {
   pick += `<ellipse cx="${f(x)}" cy="${f(ty + 4)}" rx="${f(42 * s)}" ry="${f(10 * s)}" fill="url(#shadow)"/><ellipse cx="${f(x)}" cy="${f(ty + 2)}" rx="${f(38 * s)}" ry="${f(8 * s)}" fill="#ffd060" opacity=".25"/>`;
   pick += `<g transform="translate(${f(x)} ${f(y)}) scale(${f(s)})">${items[k]()}</g>`;
 }
+console.log(picks.map(p=>p[0]+":"+p.slice(1,4).map(Math.round)).join(" "));
 mid += pick;
 
 // ---------- 9. the cart + dwarf ----------
 const cp = bez(.83), cp2 = bez(.78);
 const cartAng = Math.atan2(cp2[1] - cp[1], cp2[0] - cp[0]) * 180 / Math.PI;
-const CX = 560, CY = 650; // rim centre of the cart on screen
+const CX = 440, CY = 636; // rim centre of the cart on screen
 const dwarf = () => {
   let o = '';
   const ol = (w = 3) => `stroke="${OUT}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
@@ -304,11 +306,11 @@ const dwarf = () => {
   o += `<path d="M-226,-92 L-170,-70" stroke="url(#gold)" stroke-width="16" stroke-linecap="round"/>`;
   o += fist(-196, -14, -8);
   // pickaxe (raised in the right hand)
-  o += `<g transform="rotate(10 220 -300)"><rect x="210" y="-470" width="20" height="300" rx="9" fill="url(#wood)" ${ol(3.5)}/><path d="M212,-460 V-180" stroke="#e0a560" stroke-width="3" opacity=".6"/><path d="M110,-420 C160,-480 280,-480 330,-420 C290,-446 250,-448 220,-444 C190,-448 150,-446 110,-420 Z" fill="url(#steel)" ${ol(4)}/><path d="M130,-424 C170,-458 270,-460 316,-428" stroke="#fff" stroke-width="3.5" fill="none" opacity=".7"/><rect x="204" y="-466" width="32" height="30" rx="6" fill="url(#gold)" ${ol(3)}/></g>`;
+  o += `<g transform="rotate(8 232 -240)"><rect x="222" y="-400" width="20" height="250" rx="9" fill="url(#wood)" ${ol(3.5)}/><path d="M226,-392 V-170" stroke="#e0a560" stroke-width="3" opacity=".6"/><path d="M122,-370 C172,-430 292,-430 342,-370 C302,-396 262,-398 232,-394 C202,-398 162,-396 122,-370 Z" fill="url(#steel)" ${ol(4)}/><path d="M142,-374 C182,-408 282,-410 328,-378" stroke="#fff" stroke-width="3.5" fill="none" opacity=".7"/><rect x="216" y="-416" width="32" height="30" rx="6" fill="url(#gold)" ${ol(3)}/></g>`;
   // right arm raised
-  o += limb('M146,-196 C206,-210 250,-190 246,-130 C244,-100 238,-88 232,-72', 54, 'url(#steel)');
-  o += `<path d="M212,-98 L262,-92" stroke="url(#gold)" stroke-width="16" stroke-linecap="round"/>`;
-  o += fist(234, -62, 6);
+  o += limb('M150,-204 L270,-178 L252,-236', 54, 'url(#steel)');
+  o += `<path d="M226,-206 L284,-196" stroke="url(#gold)" stroke-width="16" stroke-linecap="round"/>`;
+  o += fist(250, -214, 0);
   return o;
 };
 const dwarfHead = () => {
@@ -320,7 +322,7 @@ const dwarfHead = () => {
   o += `<g fill="none" stroke="#7a88a4" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M-20,${hy + 80} C-34,${hy + 150} -30,${hy + 220} -8,${hy + 280}"/><path d="M16,${hy + 80} C30,${hy + 150} 28,${hy + 220} 8,${hy + 280}"/><path d="M-62,${hy + 70} C-84,${hy + 130} -80,${hy + 200} -54,${hy + 244}"/><path d="M62,${hy + 70} C84,${hy + 130} 80,${hy + 200} 54,${hy + 244}"/><path d="M-92,${hy + 60} C-110,${hy + 110} -104,${hy + 160} -92,${hy + 190}"/><path d="M92,${hy + 60} C110,${hy + 110} 104,${hy + 160} 92,${hy + 190}"/></g>`;
   o += `<path d="M-44,${hy + 60} C-52,${hy + 130} -44,${hy + 190} -30,${hy + 250} M30,${hy + 70} C40,${hy + 130} 38,${hy + 180} 24,${hy + 240}" stroke="#fff" stroke-width="5" fill="none" opacity=".75" stroke-linecap="round"/>`;
   // beard rings
-  o += `<g transform="translate(0 ${hy + 196})"><ellipse rx="40" ry="12" fill="url(#gold)" ${ol(3)}/><ellipse rx="32" ry="7" fill="#9aa6bc" opacity=".6"/></g><g transform="translate(-64 ${hy + 150}) rotate(-12)"><ellipse rx="18" ry="9" fill="url(#gold)" ${ol(2.5)}/></g><g transform="translate(64 ${hy + 150}) rotate(12)"><ellipse rx="18" ry="9" fill="url(#gold)" ${ol(2.5)}/></g>`;
+  o += `<g transform="translate(0 ${hy + 196})"><ellipse rx="40" ry="12" fill="url(#gold)" ${ol(3)}/><ellipse rx="32" ry="7" fill="#9aa6bc" opacity=".6"/></g>`;
   // ears
   for (const sx of [-1, 1]) o += `<ellipse cx="${sx * 74}" cy="${hy + 6}" rx="13" ry="20" fill="#d9825a" ${ol(3)}/>`;
   // face
@@ -349,7 +351,7 @@ const dwarfHead = () => {
   o += `<path d="M-88,${hy - 56} C-40,${hy - 70} 40,${hy - 70} 88,${hy - 56} L90,${hy - 38} C40,${hy - 50} -40,${hy - 50} -90,${hy - 38} Z" fill="url(#goldH)" ${ol(3.6)}/>`;
   for (const x of [-64, -34, 34, 64]) o += `<circle cx="${x}" cy="${hy - 54}" r="4.2" fill="#fff4b8" ${ol(1.6)}/>`;
   // lamp
-  o += `<g transform="translate(0 ${hy - 104})"><circle r="62" fill="url(#lampGlow)"/><circle r="26" fill="url(#steelD)" ${ol(3.6)}/><circle r="19" fill="url(#gold)" ${ol(3)}/><circle r="13" fill="#fffbe6"/>${spark(0, 0, 40, .9)}</g>`;
+  o += `<g transform="translate(0 ${hy - 104})"><circle r="62" fill="url(#lampGlow)"/><circle r="26" fill="url(#steelD)" ${ol(3.6)}/><circle r="19" fill="url(#gold)" ${ol(3)}/><circle r="13" fill="#fffbe6"/>${spark(0, 0, 30, .8)}</g>`;
   return o;
 };
 
@@ -368,7 +370,7 @@ const cart = () => {
   // iron bands
   for (const x of [-210, 0, 210]) { const k = x * .12; o += `<path d="M${x - 24 - k * .1},-4 L${x + 24 - k * .1},-4 L${x + 20 - k * .35},176 L${x - 20 - k * .35},176 Z" fill="url(#steelD)" ${ol(3.2)}/>`; for (const y of [24, 90, 150]) o += `<circle cx="${x - k * (.1 + y / 500)}" cy="${y}" r="5.5" fill="url(#steel)" ${ol(1.8)}/>`; }
   // gold stripe emblem plate
-  o += `<g transform="translate(0 94)"><path d="M-70,-24 L70,-24 L78,0 L70,24 L-70,24 L-78,0 Z" fill="url(#steelD)" ${ol(3.4)}/><path d="M-58,-16 L58,-16 L64,0 L58,16 L-58,16 L-64,0 Z" fill="#2a1630" ${ol(2)}/><text x="0" y="9" text-anchor="middle" font-family="RR" font-weight="900" font-size="23" fill="url(#gold)" stroke="${OUT}" stroke-width="1" letter-spacing="2">RR</text></g>`;
+  o += `<g transform="translate(0 94)"><path d="M-70,-24 L70,-24 L78,0 L70,24 L-70,24 L-78,0 Z" fill="url(#steelD)" ${ol(3.4)}/><path d="M-58,-16 L58,-16 L64,0 L58,16 L-58,16 L-64,0 Z" fill="#2a1630" ${ol(2)}/><text x="0" y="9" text-anchor="middle" font-family="RN" font-size="25" fill="url(#gold)" stroke="${OUT}" stroke-width="1" letter-spacing="2">RR</text></g>`;
   // base rail
   o += `<rect x="-290" y="166" width="580" height="22" rx="6" fill="url(#steelD)" ${ol(3.5)}/><path d="M-260,168 H260" stroke="#c0cce0" stroke-width="2.4" opacity=".5"/>`;
   // coupling
@@ -391,7 +393,7 @@ const smallGem = (x, y, col, lite, s) => `<g transform="translate(${x} ${y}) sca
 load += smallGem(150, -92, '#2fcf5a', '#9bffb0', .5) + smallGem(-250, -40, '#e0283a', '#ff9aa0', .42) + smallGem(246, -82, '#2f8cf0', '#a8dcff', .46);
 load += spark(-210, -86, 14) + spark(230, -126, 18) + spark(-120, -40, 10);
 
-const rig = `<g transform="translate(${CX} ${CY}) rotate(${f(cartAng * .7)})">
+const rig = `<g transform="translate(${CX} ${CY}) rotate(${f(cartAng * .16)}) scale(.9)">
   <g>${cart()}</g>
   <g transform="scale(1.02) translate(0 6)">${dwarf()}</g>
   <g transform="scale(1.02) translate(0 6)">${dwarfHead()}</g>
@@ -401,6 +403,8 @@ const rig = `<g transform="translate(${CX} ${CY}) rotate(${f(cartAng * .7)})">
 // rim sits on top of dwarf arms; but hands must grip rim -> re-draw left fist after rim
 fg += rig;
 
+// big foreground hanging lanterns
+for (const [lx, ly, ls] of [[1385, 120, 1.6], [150, 60, 1.35]]) { fg += `<path d="M${lx},-10 V${ly - 40 * ls}" stroke="${OUT}" stroke-width="7"/><path d="M${lx},-10 V${ly - 40 * ls}" stroke="#7a8498" stroke-width="3.4"/>` + lantern(lx, ly, ls, 170 * ls / 1.5); }
 // speed streaks + dust sparks near cart
 for (let i = 0; i < 30; i++) {
   const x = R(60, 1000), y = R(560, 860);
@@ -432,7 +436,6 @@ const logo = () => {
   // crossed picks left/right of ribbon
   for (const sx of [-1, 1]) o += `<g transform="translate(${sx * 270} 146) scale(${sx} 1)"><rect x="-4" y="-34" width="8" height="70" rx="3" fill="url(#wood)" stroke="${OUT}" stroke-width="2.4" transform="rotate(-30)"/><rect x="-4" y="-34" width="8" height="70" rx="3" fill="url(#wood)" stroke="${OUT}" stroke-width="2.4" transform="rotate(30)"/><path d="M-26,-30 Q0,-44 26,-30 Q10,-34 0,-34 Q-10,-34 -26,-30Z" fill="url(#steel)" stroke="${OUT}" stroke-width="2.4"/></g>`;
   // gems on the ribbon ends
-  o += `<g transform="translate(-318 98) scale(.5)">${gem('#2f8cf0', '#a8dcff', '#123c9a', '', '#6ac8ff').replace(/<g transform="translate\(0 52\)">[\s\S]*<\/g>$/, '')}</g><g transform="translate(318 98) scale(.5)">${gem('#e0283a', '#ff9aa0', '#7a0c1c', '', '#ff6070').replace(/<g transform="translate\(0 52\)">[\s\S]*<\/g>$/, '')}</g>`;
   o += spark(-420, 40, 14, .85) + spark(430, 56, 11, .8) + spark(-300, 30, 8, .7) + spark(350, 28, 10, .75);
   o += `</g>`;
   return o;
@@ -451,7 +454,7 @@ const gauge = () => {
   const ang = v => (-215 + v * 250) * Math.PI / 180; // 250 deg sweep
   const marks = [['x1', 0, '#ffe9a0'], ['x2', .25, '#5dff8a'], ['x3', .5, '#6ac8ff'], ['x5', .75, '#ff7080'], ['x10', 1, '#ffd040']];
   for (let i = 0; i <= 20; i++) { const a = ang(i / 20), big = i % 5 === 0; o += `<path d="M${f(cx + Math.cos(a) * (Rr - 12))},${f(cy + Math.sin(a) * (Rr - 12))} L${f(cx + Math.cos(a) * (Rr - (big ? 28 : 21)))},${f(cy + Math.sin(a) * (Rr - (big ? 28 : 21)))}" stroke="${big ? '#ffe9a0' : '#8a7aa8'}" stroke-width="${big ? 3.4 : 1.8}" stroke-linecap="round"/>`; }
-  for (const [lab, v, col] of marks) { const a = ang(v); o += `<text x="${f(cx + Math.cos(a) * (Rr - 44))}" y="${f(cy + Math.sin(a) * (Rr - 44) + 6)}" text-anchor="middle" font-family="RR" font-weight="900" font-size="${lab.length > 2 ? 14 : 16}" fill="${col}" stroke="${OUT}" stroke-width="2.6" paint-order="stroke">${lab}</text>`; }
+  for (const [lab, v, col] of marks) { const a = ang(v); o += `<text x="${f(cx + Math.cos(a) * (Rr - 44))}" y="${f(cy + Math.sin(a) * (Rr - 44) + 6)}" text-anchor="middle" font-family="RN" font-size="${lab.length > 2 ? 16 : 18}" fill="${col}" stroke="${OUT}" stroke-width="2.6" paint-order="stroke">${lab}</text>`; }
   // arc glow zone
   const a0 = ang(0), a1 = ang(.04);
   o += `<path d="M${f(cx + Math.cos(a0) * (Rr - 14))},${f(cy + Math.sin(a0) * (Rr - 14))} A${Rr - 14},${Rr - 14} 0 0 1 ${f(cx + Math.cos(a1) * (Rr - 14))},${f(cy + Math.sin(a1) * (Rr - 14))}" stroke="#ffd25a" stroke-width="6" fill="none"/>`;
@@ -462,19 +465,19 @@ const gauge = () => {
   // glass shine
   o += `<path d="M${cx - 70},${cy - 40} A80,80 0 0 1 ${cx + 10},${cy - 80}" stroke="#fff" stroke-width="5" opacity=".28" fill="none" stroke-linecap="round"/>`;
   // plaque
-  o += `<g transform="translate(${cx} ${cy + 86})"><path d="M-82,-18 L82,-18 L92,0 L82,22 L-82,22 L-92,0 Z" fill="url(#lgRib)" stroke="${OUT}" stroke-width="4" stroke-linejoin="round" fill-opacity=".0"/><path d="M-82,-18 L82,-18 L92,2 L82,22 L-82,22 L-92,2 Z" fill="#1c0e2c" stroke="url(#gold)" stroke-width="4" stroke-linejoin="round"/><text x="-40" y="9" text-anchor="middle" font-family="RR" font-weight="900" font-size="15" fill="#ffd9a0" letter-spacing="1">MULTI</text><text x="40" y="12" text-anchor="middle" font-family="RR" font-weight="900" font-size="30" fill="url(#lgFill)" stroke="${OUT}" stroke-width="4" paint-order="stroke">x1</text></g>`;
+  o += `<g transform="translate(${cx} ${cy + 86})"><path d="M-82,-18 L82,-18 L92,0 L82,22 L-82,22 L-92,0 Z" fill="url(#lgRib)" stroke="${OUT}" stroke-width="4" stroke-linejoin="round" fill-opacity=".0"/><path d="M-82,-18 L82,-18 L92,2 L82,22 L-82,22 L-92,2 Z" fill="#1c0e2c" stroke="url(#gold)" stroke-width="4" stroke-linejoin="round"/><text x="-40" y="9" text-anchor="middle" font-family="RR" font-weight="900" font-size="15" fill="#ffd9a0" letter-spacing="1">MULTI</text><text x="40" y="12" text-anchor="middle" font-family="RN" font-size="36" fill="url(#lgFill)" stroke="${OUT}" stroke-width="4" paint-order="stroke">x1</text></g>`;
   o += `</g>`;
   return o;
 };
 const loadCounter = () => {
-  const x = 1300, y = 780;
+  const x = 1306, y = 796;
   let o = `<g transform="translate(${x} ${y})">`;
   o += `<ellipse cx="130" cy="52" rx="160" ry="30" fill="#000" opacity=".45"/>`;
   o += `<path d="M0,10 L20,-10 L240,-10 L262,10 L262,70 L240,90 L20,90 L0,70 Z" fill="url(#wood)" stroke="${OUT}" stroke-width="4" stroke-linejoin="round"/>`;
   o += `<path d="M10,16 L24,2 L236,2 L252,16 L252,64 L236,80 L24,80 L10,64 Z" fill="#1a0e22" stroke="url(#gold)" stroke-width="5" stroke-linejoin="round"/>`;
   o += `<text x="132" y="28" text-anchor="middle" font-family="RR" font-weight="900" font-size="16" fill="#ffd9a0" letter-spacing="6">LOAD</text>`;
   o += `<g transform="translate(46 54) scale(.9)">${nugget(0, 0, 20, -10)}${nugget(14, 8, 12, 20)}</g>`;
-  o += `<text x="158" y="68" text-anchor="middle" font-family="RR" font-weight="900" font-size="38" fill="url(#lgFill)" stroke="${OUT}" stroke-width="5" paint-order="stroke" stroke-linejoin="round">12.50</text>`;
+  o += `<text x="158" y="68" text-anchor="middle" font-family="RN" font-size="42" fill="url(#lgFill)" stroke="${OUT}" stroke-width="5" paint-order="stroke" stroke-linejoin="round">12.50</text>`;
   o += `<circle cx="-4" cy="40" r="6" fill="url(#steel)" stroke="${OUT}" stroke-width="2"/><circle cx="266" cy="40" r="6" fill="url(#steel)" stroke="${OUT}" stroke-width="2"/>`;
   o += `</g>`;
   return o;
@@ -482,7 +485,7 @@ const loadCounter = () => {
 ui += gauge() + loadCounter();
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><title>Rattlerock Run - look test</title>
-<style>@font-face{font-family:RR;font-weight:900;src:url(data:font/woff2;base64,${FONT}) format('woff2')}
+<style>@font-face{font-family:RN;src:url(data:font/woff2;base64,${FONT2}) format('woff2')}@font-face{font-family:RR;font-weight:900;src:url(data:font/woff2;base64,${FONT}) format('woff2')}
 html,body{margin:0;background:#07040f}body{width:1600px;height:900px;overflow:hidden}svg{display:block}</style></head><body>
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900"><defs>${defs}</defs>
 <g id="bg">${bg}</g><g id="mid">${mid}</g><g id="fg">${fg}</g><g id="ui">${ui}</g></svg></body></html>`;
