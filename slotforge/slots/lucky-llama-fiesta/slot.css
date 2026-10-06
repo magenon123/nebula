@@ -71,4 +71,37 @@
 
 /* KAI */
 
-
+/* ---------- KAI: client css (Lucky Llama Fiesta). Source: kai.css; `python3 embed-kai.py` splices it after the marker (art builds keep it) ---------- */
+#fsBox{display:none!important}
+body.co #msg{opacity:0}
+#frame{overflow:visible}
+#reels{position:absolute;left:0;top:0;width:750px;height:450px;z-index:2;pointer-events:none}
+.reel{position:absolute;top:0;width:150px;height:450px;overflow:hidden;visibility:hidden}
+.reel.on{visibility:visible}
+.strip{position:absolute;left:0;top:0;width:150px;display:flex;flex-direction:column;will-change:transform}
+.strip .cell{flex:none;width:146px;height:146px;margin:2px}
+.cell.sp{visibility:hidden}
+.cell.top{z-index:3}
+.cell .m{position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);z-index:3;font-family:var(--toon);font-weight:400;font-style:normal;color:#fff8e0;pointer-events:none;white-space:nowrap;line-height:1;
+ text-shadow:0 3px 0 #2a1209,3px 0 0 #2a1209,-3px 0 0 #2a1209,0 -3px 0 #2a1209,2px 2px 0 #2a1209,-2px 2px 0 #2a1209,2px -2px 0 #2a1209,-2px -2px 0 #2a1209}
+.m.a{font-size:36px}.m.b{font-size:31px}.m.c{font-size:27px}.m.d{font-size:23px}.m.e{font-size:19px}
+.cell.blank svg.g,.cell.blank .m{opacity:0}
+.cell svg.g{transition:opacity .3s}
+.cell.blank::before,.reel.lk .cell::before,.cell.cracked::before{content:"";position:absolute;inset:0;border-radius:20px;background:rgba(30,12,6,.62);box-shadow:inset 0 0 0 3px rgba(255,210,122,.22),inset 0 6px 14px rgba(0,0,0,.5);z-index:0}
+.reel.lk .cell svg.g{opacity:.3}
+.cell.cracked .lkr{display:none}
+.cell .lkr{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
+#grid.focus .cell:not(.hit):not(.win){opacity:.58;filter:none;transition:opacity .25s}
+.cell.wl::before{content:"";position:absolute;inset:-3px;border-radius:22px;z-index:0;box-shadow:0 0 0 4px #ff5ac0,0 0 0 7px rgba(255,255,255,.75)}
+.reel.tease::after{content:"";position:absolute;inset:0;border-radius:16px;box-shadow:inset 0 0 0 4px #ffd23f,inset 0 0 30px 8px rgba(255,210,63,.6);animation:llBeat .52s ease-in-out infinite;pointer-events:none}
+@keyframes llBeat{0%,100%{opacity:.3}30%{opacity:1}}
+.crackFx{width:230px;height:230px;display:none;z-index:6}
+.crackFx svg{position:absolute;inset:0;width:100%;height:100%;opacity:0}
+#side .plate.bump,#side .jp.bump{animation:llPlatePop .28s ease-out}
+#ladder.bump{animation:llPop .5s ease-out}
+#lkRespins.reset{animation:llPlatePop .4s ease-out}
+#lkRespins.reset #lkRespinsN{color:#fff}
+#pdSpins{left:24px;top:30px}
+#coLine.on{display:block}
+.ptsub{font-family:var(--toon);font-weight:400;color:var(--rim);margin:18px 0 6px;font-size:17px;letter-spacing:1px}
+.ptnote{font-size:13px;margin:8px 0}

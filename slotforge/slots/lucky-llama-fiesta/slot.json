@@ -1,0 +1,226 @@
+{
+ "id": "lucky-llama-fiesta",
+ "title": "Lucky Llama Fiesta",
+ "logoText": "LUCKY LLAMA FIESTA",
+ "infoTitle": "LUCKY LLAMA FIESTA · HOW IT PLAYS",
+ "api": "/api/slot/lucky-llama-fiesta/spin",
+ "engineSource": "slotforge/engines/lucky-llama-fiesta.js",
+ "storage": "llf",
+ "walletKey": "luckyLlamaFiestaWallet",
+ "startBalance": 1000,
+ "bets": [
+  0.1,
+  0.2,
+  0.3,
+  0.4,
+  0.5,
+  0.6,
+  0.8,
+  1,
+  1.5,
+  2,
+  2.5,
+  3,
+  4,
+  5,
+  6,
+  8,
+  10,
+  12,
+  15,
+  20,
+  25,
+  30,
+  40,
+  50,
+  60,
+  80,
+  100,
+  150,
+  200,
+  250,
+  300,
+  400,
+  500,
+  750,
+  1000,
+  1500,
+  2000,
+  3000,
+  4000,
+  5000,
+  7500,
+  10000
+ ],
+ "defaultBet": 1,
+ "maxWin": 7500,
+ "anteCost": 2,
+ "scatterSym": 11,
+ "char": {
+  "el": "char",
+  "states": [
+   "spin",
+   "win",
+   "big"
+  ],
+  "bonusClass": "bonusmode"
+ },
+ "portrait": {
+  "left": 40,
+  "right": 40
+ },
+ "winLevels": [
+  {
+   "min": 20,
+   "name": "FIESTA WIN",
+   "lv": 1
+  },
+  {
+   "min": 50,
+   "name": "MEGA FIESTA",
+   "lv": 2
+  },
+  {
+   "min": 100,
+   "name": "EPIC FIESTA",
+   "lv": 3
+  },
+  {
+   "min": 250,
+   "name": "LEGENDARY FIESTA",
+   "lv": 4
+  }
+ ],
+ "tiers": [
+  {
+   "min": 250,
+   "name": "LEGENDARY FIESTA",
+   "lv": 4,
+   "tag": "Don Lucho dances on the table. The whole plaza cheers."
+  },
+  {
+   "min": 100,
+   "name": "EPIC FIESTA",
+   "lv": 3,
+   "tag": "Confetti, trumpets and a very proud llama."
+  },
+  {
+   "min": 50,
+   "name": "MEGA FIESTA",
+   "lv": 2,
+   "tag": "The band plays your song."
+  },
+  {
+   "min": 20,
+   "name": "FIESTA WIN",
+   "lv": 1,
+   "tag": "Lucky llama, lucky you."
+  }
+ ],
+ "autoBigLv": 3,
+ "text": {
+  "idle": "PLACE YOUR BET AND JOIN THE FIESTA",
+  "spin": "THE REELS ARE ROLLING...",
+  "win": "THE FIESTA PAYS {amt}",
+  "lose": "NO WIN THIS TIME. SPIN AGAIN, AMIGO!",
+  "freeSpin": "PONCHO PARADE, SPIN {n}",
+  "freeSpinRetrigger": ""
+ },
+ "fsLabel": "SPINS LEFT",
+ "ownCounter": true,
+ "buys": [
+  {
+   "key": "parade",
+   "mult": 80,
+   "sym": 11,
+   "vol": 4,
+   "name": "Poncho Parade",
+   "text": "The Fiesta Drums roll in and the parade starts: 8 or more free spins. Every poncho wild sticks and the multiplier ladder climbs up to x10.",
+   "confirmTitle": "BUY PONCHO PARADE?",
+   "confirmText": "PONCHO PARADE: 3 or more drums land, then 8+ free spins with sticky ponchos and a multiplier ladder up to x10."
+  },
+  {
+   "key": "link",
+   "mult": 60,
+   "sym": 12,
+   "vol": 4,
+   "name": "Piñata Link",
+   "text": "Start with 6 money piñatas locked in place. Land more to reset the respins, crack them all for cash and win MINI, MINOR, MAJOR or GRAND.",
+   "confirmTitle": "BUY PIÑATA LINK?",
+   "confirmText": "PIÑATA LINK: 6 piñatas land, 3 respins that reset with every new piñata, then every piñata is cracked for its prize. Jackpots up to 2,000x."
+  },
+  {
+   "key": "party",
+   "mult": 284,
+   "sym": 10,
+   "vol": 5,
+   "name": "Party Pack",
+   "text": "The big one: Poncho Parade that starts with 3 sticky ponchos already on the board, so the x3 multiplier is live from the first spin.",
+   "confirmTitle": "BUY PARTY PACK?",
+   "confirmText": "PARTY PACK: Poncho Parade that starts with 3 sticky ponchos (multiplier x3 from the first free spin)."
+  }
+ ],
+ "intro": {
+  "unit": "FREE SPINS",
+  "ribbon": "PONCHO PARADE",
+  "quote": "\"Every poncho sticks. Every stripe pays more.\"",
+  "tap": "TAP ANYWHERE TO START THE PARADE",
+  "chips": [
+   "EVERY WILD PONCHO STICKS",
+   "MORE PONCHOS, BIGGER MULTIPLIER",
+   "DON LUCHO COLLECTS THE PIÑATAS"
+  ]
+ },
+ "outro": {
+  "ribbon": "THE PARADE IS OVER",
+  "label": "PARADE TOTAL",
+  "quote": "\"What a party! Come back tomorrow, amigo.\"",
+  "tap": "TAP ANYWHERE TO CONTINUE"
+ },
+ "audio": {
+  "reverb": {
+   "sec": 1.9,
+   "pow": 2.4,
+   "wet": 0.26,
+   "lp": 0.6
+  },
+  "recipes": [
+   "cumbia/mariachi loop (accordion, guitarrón, güiro, trumpets)",
+   "reel stop thud",
+   "piñata pop",
+   "piñata crack",
+   "jackpot fanfare",
+   "ladder step chimes",
+   "Lucho cheer stinger"
+  ]
+ },
+ "fever": {
+  "name": "Fiesta Luck",
+  "sym": 9,
+  "vol": 4,
+  "text": "Pay 2x per spin: Fiesta Drums and money piñatas land about three times as often, so Poncho Parade and Piñata Link come much more often. Stays on until you switch it off.",
+  "badge": "FIESTA LUCK ×2",
+  "onMsg": "FIESTA LUCK ON. TOTAL BET x2",
+  "offMsg": "FIESTA LUCK OFF"
+ },
+ "loading": {
+  "volatility": 4,
+  "features": [
+   {
+    "sym": 12,
+    "title": "PIÑATA LINK",
+    "text": "6 or more money piñatas lock and respin. Every new one resets the respins. Crack them all for cash and jackpots up to 2,000x."
+   },
+   {
+    "sym": 11,
+    "title": "PONCHO PARADE",
+    "text": "3 or more Fiesta Drums give 8 to 20 free spins. Every wild poncho sticks and the multiplier climbs up to x10."
+   },
+   {
+    "sym": 10,
+    "title": "STICKY PONCHOS",
+    "text": "In the parade each poncho adds a stripe to the ladder: x1, x2, x3, x5, x8, x10. Don Lucho collects every piñata on screen."
+   }
+  ]
+ }
+}
