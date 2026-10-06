@@ -16,7 +16,8 @@ function eye(cx, cy, flip) {
   </g>`;
 }
 
-function lucho() {
+function lucho(dy = 0) {
+  const parts = [];
   const FUR = grad([[0, '#fffbf1'], [.45, '#f9e5c0'], [1, '#e4b684']], 0, 0, 1, 1);
   const FURH = grad([[0, '#fffbf1'], [.5, '#f6dcb2'], [1, '#d9a56e']], 0, 0, 1, 0);
   const MUZ = grad([[0, '#fdeed8'], [1, '#e2b48a']], .2, 0, .8, 1);
@@ -31,8 +32,12 @@ function lucho() {
   // neck
   s += p(NECK, FURH, 3.5);
   s += np(NECK, SHADE);
+  { const rr=L.rng(5); const nc=clip(`<path d="${NECK}"/>`); let u='';
+    for(let i=0;i<70;i++){const x=110+rr()*180,y=240+rr()*130,l=8+rr()*12,lean=(x-200)*.1; const col=x<190?'rgba(255,255,255,.7)':'rgba(140,85,45,.5)'; u+=`<path d="M${x.toFixed(1)},${y.toFixed(1)} q${(lean+3).toFixed(1)},${(l*.5).toFixed(1)} ${(lean*1.6).toFixed(1)},${l.toFixed(1)}" stroke="${col}" stroke-width="2" fill="none" stroke-linecap="round"/>`;}
+    s += `<g clip-path="${nc}">${u}</g>`; }
   s += ln('M150,262 C140,290 130,320 112,350 M160,270 q-6,16 -8,30 M170,320 q-8,14 -14,24 M240,290 q4,14 2,28 M252,300 q6,14 4,26', '#c79760', 2.2);
   s += `<ellipse cx="200" cy="304" rx="64" ry="30" fill="${rgrad([[0,'rgba(100,50,20,.5)'],[1,'rgba(100,50,20,0)']])}"/>`;
+  parts.push(s); s = '';
   // ears (behind head)
   const ear = `${p('M146,134 C114,106 102,58 124,14 C142,48 164,86 184,124Z', FUR, 3.8)}
     ${np('M152,124 C130,98 120,62 126,38 C142,62 158,92 172,118Z', '#e8998a')}
@@ -43,6 +48,7 @@ function lucho() {
   s += `<g transform="translate(400 0) scale(-1 1)">${ear.replace(/#fff7d2/g, '#f0d29c')}</g>`;
   s += `<g transform="translate(400 0) scale(-1 1)">${np('M146,134 C114,106 102,58 124,14 C142,48 164,86 184,124Z', 'rgba(110,55,20,.28)')}</g>`;
 
+  parts.push(s); s = '';
   // poncho
   s += p(POP, '#d92b78', 4);
   s += `<g clip-path="${pc}">`;
@@ -68,14 +74,20 @@ function lucho() {
   s += p('M156,342 Q200,432 244,342 Q200,330 156,342Z', '#fbe7c3', 3.5);
   s += np('M170,346 Q200,402 230,346 Q200,338 170,346Z', 'rgba(110,55,20,.35)');
   s += ln('M150,342 Q200,444 250,342', '#f4b82a', 6) + ln('M150,342 Q200,444 250,342', O, 1.4, 'stroke-dasharray="5 4"');
-  s += fluff([[160, 350, 13], [182, 360, 13], [200, 366, 13], [218, 360, 13], [240, 350, 13]], '#f6dcb2');
+  { const pts=[]; const N=9; for(let i=0;i<=N;i++){const t=i/N; const x=148+104*t; const y=340+4*45*t*(1-t)+ (i%2?14:3); pts.push([x,y]);}
+    s += p('M146,338 L'+pts.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' L')+' L254,338Z', '#f6dcb2', 3);
+    s += ln('M160,352 q6,8 10,16 M186,368 q4,8 6,14 M214,366 q2,8 0,14 M240,352 q-4,8 -8,16', '#c79760', 2); }
 
+  parts.push(s); s = '';
   // head
   const ck=(pts)=>p('M'+pts.map(q=>q.join(',')).join(' L')+'Z', FUR, 3.4);
   s += ck([[130,190],[110,206],[124,210],[108,228],[128,228],[120,248],[146,238],[156,200]]);
   s += p('M'+[[270,190],[290,206],[276,210],[292,228],[272,228],[280,248],[254,238],[244,200]].map(q=>q.join(',')).join(' L')+'Z', '#e4b684', 3.4);
   s += p(HEAD, FUR, 4.2);
   s += np(HEAD, SHADE);
+  { const rr=L.rng(11); const hc=clip(`<path d="${HEAD}"/>`); let t='';
+    for(let i=0;i<50;i++){const x=128+rr()*144,y=130+rr()*130,l=6+rr()*9,lean=(x-200)*.08; const col=x<190?'rgba(255,255,255,.75)':'rgba(150,95,50,.45)'; t+=`<path d="M${x.toFixed(1)},${y.toFixed(1)} q${(lean+2).toFixed(1)},${(l*.6).toFixed(1)} ${(lean*2).toFixed(1)},${l.toFixed(1)}" stroke="${col}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;}
+    s += `<g clip-path="${hc}">${t}</g>`; }
   // cheek wool tufts
   // muzzle
   const MZ = 'M162,230 C162,212 182,206 200,206 C218,206 238,212 238,230 L243,262 C243,286 224,303 200,303 C176,303 157,286 157,262Z';
@@ -124,6 +136,8 @@ function lucho() {
   s += `<circle cx="193" cy="79" r="3.2" fill="#fff" opacity=".6"/>`;
   // rim light on left edges
   s += ln('M123,166 C120,186 124,204 132,220', '#fff6c8', 3.6, 'opacity=".9"');
-  return `<g>${s}</g>`;
+  parts.push(s);
+  const T = `translate(0 ${dy})`;
+  return `<g>${parts[0]}<g transform="${T}">${parts[1]}</g>${parts[2]}<g transform="${T}">${parts[3]}</g></g>`;
 }
 module.exports = { lucho };

@@ -139,7 +139,7 @@ function strand(a, c, b, n, off = 0) {
   return s;
 }
 S += strand([-10, 26], [800, 120], [1610, 40], 34, 0);
-S += strand([-10, 118], [170, 206], [346, 196], 8, 2);
+S += strand([-10, 300], [150, 360], [330, 330], 8, 2);
 S += strand([1610, 118], [1440, 214], [1180, 178], 10, 4);
 
 // ---------- BIG LUCHO (cameo right) ----------
@@ -198,7 +198,8 @@ for (let r = 0; r < 3; r++) for (let c = 0; c < 5; c++) {
   const rim = TIER[tier];
   if (name === 'LUCHO') {
     const fill = grad([[0, '#fff8d0'], [.5, '#ffe28a'], [1, '#f2b73a']], 0, 0, 0, 1);
-    const sym = `<g transform="translate(60 5) scale(.285) translate(-200 -6)">${lucho()}</g>`;
+    const lc = clip('<rect x="-30" y="-60" width="180" height="180" rx="14"/>');
+    const sym = `<g clip-path="${lc}"><g transform="translate(60 -32) scale(.38) translate(-200 0)">${lucho(60)}</g></g>`;
     S += tile(c, r, rim, sym, { fill, big: true });
   } else if (name === 'wild') {
     S += tile(c, r, rim, SYM.wild(), { fill: grad([[0, '#fff0f8'], [1, '#f6b0d8']], 0, 0, 0, 1) });
@@ -211,7 +212,7 @@ for (let r = 0; r < 3; r++) for (let c = 0; c < 5; c++) {
 // window inner shadow top
 S += `<rect x="${WX}" y="${WY}" width="${WW}" height="22" fill="${grad([[0, 'rgba(20,6,2,.55)'], [1, 'rgba(20,6,2,0)']])}"/>`;
 // win line (row 1, three cells)
-const wy = WY + 64;
+const wy = WY + 4 + 106;
 S += ln(`M${WX + 64},${wy} L${WX + 64 + 256},${wy}`, 'rgba(255,230,120,.45)', 20) + ln(`M${WX + 64},${wy} L${WX + 320},${wy}`, O, 11) + ln(`M${WX + 64},${wy} L${WX + 320},${wy}`, '#ffd23f', 6.5) + ln(`M${WX + 64},${wy - 1.5} L${WX + 320},${wy - 1.5}`, '#fff8c0', 2, 'opacity=".9"');
 for (const c of [0, 1, 2]) { const x = WX + c * 128 + 64; S += `<circle cx="${x}" cy="${wy}" r="7" fill="#fff0a0" stroke="${O}" stroke-width="2.4"/>`; S += rc(WX + c * 128 + 4, WY + 4, 120, 120, 15, 'none', 4, `style="stroke:#fff2a0"`); }
 // sparkle burst around win
@@ -231,10 +232,10 @@ function garland(a, c, b, n, r0 = 10) {
   }
   return s;
 }
-S += garland([FX - 8, FY + 120], [FX - 24, FY + 40], [FX + 150, FY + 12], 12, 11);
-S += garland([FX + FW + 8, FY + 120], [FX + FW + 24, FY + 40], [FX + FW - 150, FY + 12], 12, 11);
-S += garland([FX - 8, FY + 120], [FX + 10, FY + 190], [FX - 6, FY + 250], 6, 10);
-S += garland([FX + FW + 8, FY + 120], [FX + FW - 10, FY + 190], [FX + FW + 6, FY + 250], 6, 10);
+S += garland([FX - 8, FY + 120], [FX - 24, FY + 40], [FX + 110, FY + 12], 9, 11);
+S += garland([FX + FW + 8, FY + 120], [FX + FW + 24, FY + 40], [FX + FW - 110, FY + 12], 9, 11);
+S += garland([FX - 8, FY + 120], [FX + 10, FY + 190], [FX - 6, FY + 230], 4, 10);
+S += garland([FX + FW + 8, FY + 120], [FX + FW - 10, FY + 190], [FX + FW + 6, FY + 230], 4, 10);
 S += flower(FX + 20, FY + 24, 20, 12, '#f58a1f', '#b8430c', 0, 2, '#ffb347') + flower(FX + FW - 20, FY + 24, 20, 12, '#f58a1f', '#b8430c', 20, 2, '#ffb347');
 
 // ---------- PONCHO LADDER (left) ----------
@@ -309,7 +310,7 @@ S += flower(FX + 20, FY + 24, 20, 12, '#f58a1f', '#b8430c', 0, 2, '#ffb347') + f
   s += slot(56, 280, 'BALANCE', '$1,000.00', '#fff0cf');
   // bet with pills
   s += slot(372, 250, 'BET', '$1.00', '#fff0cf');
-  for (const [x, sg] of [[396, '-'], [600, '+']]) s += `<circle cx="${x}" cy="838" r="21" fill="${brass()}" stroke="${O}" stroke-width="3.4"/>` + `<path d="M${x - 9},838 h18${sg === '+' ? `M${x},829 v18` : ''}" stroke="${O}" stroke-width="5.4" stroke-linecap="round"/>`;
+  for (const [x, sg] of [[404, '-'], [590, '+']]) s += `<circle cx="${x}" cy="838" r="21" fill="${brass()}" stroke="${O}" stroke-width="3.4"/>` + `<path d="M${x - 9},838 h18${sg === '+' ? `M${x},829 v18` : ''}" stroke="${O}" stroke-width="5.4" stroke-linecap="round"/>`;
   s += slot(978, 280, 'WIN', '$2.50', '#ffd23f');
   // pill buttons right
   const pill = (x, icon) => `<rect x="${x - 40}" y="800" width="80" height="54" rx="27" fill="${brass()}" stroke="${O}" stroke-width="3.6"/><rect x="${x - 34}" y="806" width="68" height="42" rx="21" fill="${grad([[0, '#2fd0c8'], [1, '#0a6a78']])}" stroke="${O}" stroke-width="2"/>${icon}`;
@@ -351,7 +352,8 @@ S += flower(FX + 20, FY + 24, 20, 12, '#f58a1f', '#b8430c', 0, 2, '#ffb347') + f
   const earP = (dx, flip) => `<g transform="translate(${dx} 54) scale(${flip ? -.46 : .46} .46) translate(${flip ? -200 : -164} -134)">${p('M146,134 C114,106 102,58 124,14 C142,48 164,86 184,124Z', grad([[0, '#fffbf1'], [1, '#e4b684']], 0, 0, 1, 1), 5.5)}${np('M152,124 C130,98 120,62 126,38 C142,62 158,92 172,118Z', '#e8998a')}</g>`;
   // paper banner behind
   s += `<path d="M452,98 C560,70 1040,70 1148,98 L1160,134 L1148,170 C1040,198 560,198 452,170 L440,134Z" fill="${grad([[0, '#8a2a7a'], [1, '#4a1450']])}" stroke="${O}" stroke-width="4.4" opacity="0"/>`;
-  s += `<g transform="translate(800 0)">${[-1, 1].map(sg => `<g transform="translate(${sg * 40} 58) rotate(${sg * 16}) scale(${sg * .5} .5) translate(${sg > 0 ? -164 : -236} -134)">${p('M146,134 C114,106 102,58 124,14 C142,48 164,86 184,124Z', grad([[0, '#fffbf1'], [1, '#e4b684']], 0, 0, 1, 1), 5.5)}${np('M152,124 C130,98 120,62 126,38 C142,62 158,92 172,118Z', '#e8998a')}</g>`).join('')}</g>`;
+  s += `<g transform="translate(800 0)">${[-1, 1].map(sg => `<g transform="translate(${sg * 66} 104) rotate(${sg * 22}) scale(${sg * .86} .86) translate(${sg > 0 ? -164 : -236} -134)">${p('M146,134 C114,106 102,58 124,14 C142,48 164,86 184,124Z', grad([[0, '#fffbf1'], [1, '#e4b684']], 0, 0, 1, 1), 5.5)}${np('M152,124 C130,98 120,62 126,38 C142,62 158,92 172,118Z', '#e8998a')}</g>`).join('')}</g>`;
+  s += fluff([[786, 82, 13], [814, 82, 13], [800, 72, 15]], '#fbe9cc') + flower(800, 60, 15, 10, '#f58a1f', '#b8430c', 0, 1.8, '#ffb347') + flower(780, 68, 10, 7, '#ee3d8f', '#ffd23f', 0, 1.6) + flower(820, 68, 10, 7, '#1cb8bd', '#ffd23f', 0, 1.6);
   const cl = ['#ee3d8f', '#1cb8bd', '#ffd23f', '#f58a2e', '#7a3fd0'];
   const word = (t, size, y, off, ls) => {
     const tsp = t.split('').map((ch, i) => `<tspan fill="${cl[(i + off) % 5]}">${ch}</tspan>`).join('');
@@ -363,10 +365,10 @@ S += flower(FX + 20, FY + 24, 20, 12, '#f58a1f', '#b8430c', 0, 2, '#ffb347') + f
       `<text ${base} fill="${grad([[0, 'rgba(255,255,255,.65)'], [.5, 'rgba(255,255,255,0)'], [1, 'rgba(60,10,40,.35)']])}">${t}</text>` +
       `<text ${base} fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="2 5" stroke-linecap="round" opacity=".8" transform="translate(0 -1)">${t}</text>`;
   };
-  s += word('LUCKY LLAMA', 82, 126, 0, 3);
-  s += word('FIESTA', 66, 190, 2, 6);
+  s += word('LUCKY LLAMA', 80, 134, 0, 3);
+  s += word('FIESTA', 60, 194, 2, 6);
   // marigolds flanking FIESTA
-  for (const sg of [-1, 1]) { s += flower(800 + sg * 218, 168, 22, 12, '#f58a1f', '#b8430c', 0, 2, '#ffb347') + flower(800 + sg * 252, 178, 15, 9, '#ffd23f', '#b8430c', 10, 1.8) + flower(800 + sg * 190, 186, 12, 8, '#ee3d8f', '#ffd23f', 0, 1.6); }
+  for (const sg of [-1, 1]) { s += flower(800 + sg * 218, 172, 22, 12, '#f58a1f', '#b8430c', 0, 2, '#ffb347') + flower(800 + sg * 252, 182, 15, 9, '#ffd23f', '#b8430c', 10, 1.8) + flower(800 + sg * 190, 190, 12, 8, '#ee3d8f', '#ffd23f', 0, 1.6); }
   S += s;
 }
 

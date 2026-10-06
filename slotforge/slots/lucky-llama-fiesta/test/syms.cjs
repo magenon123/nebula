@@ -59,7 +59,7 @@ function guitar() {
   return `<g transform="translate(60 70) rotate(34) scale(.86) translate(0 -8)">${s}</g>`;
 }
 function taco() {
-  let s = '<g transform="rotate(-8 64 64)">';
+  let s = '<g transform="translate(7 8) scale(.9) rotate(-8 64 64)">';
   s += p('M12,70 C16,40 40,28 64,28 C88,28 112,40 116,70Z', grad([[0, '#c9781f'], [1, '#8f4a10']], 0, 0, 0, 1), 3.6);
   // filling heap
   s += fluff([[22, 58, 11], [34, 46, 12], [48, 38, 12], [64, 34, 12], [80, 38, 12], [94, 46, 12], [106, 58, 11]], '#3fb54a', 2.4);
@@ -175,7 +175,7 @@ function trumpet() {
 }
 function wild() {
   let s = '';
-  const P = 'M64,12 C46,12 28,28 20,50 L6,98 L122,98 L108,50 C100,28 82,12 64,12Z';
+  const P = 'M34,22 Q64,10 94,22 C108,36 118,60 124,86 L112,98 L16,98 L4,86 C10,60 20,36 34,22Z';
   s += p(P, '#d92b78', 4);
   const pc = clip(`<path d="${P}"/>`);
   s += `<g clip-path="${pc}">`;
@@ -184,7 +184,7 @@ function wild() {
   s += `<rect x="0" y="0" width="128" height="128" fill="${grad([[0, 'rgba(255,240,170,.35)'], [.45, 'rgba(0,0,0,0)'], [1, 'rgba(60,10,40,.4)']], 0, 0, 1, 1)}"/>`;
   s += `</g>` + ln(P, O, 4);
   // neck hole
-  s += `<ellipse cx="64" cy="19" rx="17" ry="7" fill="#fbe7c3" stroke="${O}" stroke-width="3"/><ellipse cx="64" cy="21" rx="12" ry="4" fill="#5b2e22"/>`;
+  s += `<path d="M42,21 Q64,10 86,21 L64,50Z" fill="#fbe7c3" stroke="${O}" stroke-width="3" stroke-linejoin="round"/><path d="M50,22 Q64,15 78,22 L64,42Z" fill="#7a3a2a"/><path d="M42,21 L64,50 L86,21" fill="none" stroke="#ffd23f" stroke-width="2.4"/>`;
   // fringe
   const fc = ['#d92b78', '#f4b82a', '#0f9ba0', '#f58a2e'];
   for (let i = 0; i < 9; i++) s += p(`M${9 + i * 12.5},97 l11,0 l-1.6,13 q-3.9,2 -7.8,0z`, fc[i % 4], 1.8);
