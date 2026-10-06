@@ -1,0 +1,79 @@
+
+
+/* ===== KAI: client styles (only transform/opacity animation; no filters on moving parts) ===== */
+#fsBox{display:none!important}
+#grid .rrW{position:absolute;left:0;top:0;will-change:transform}
+.rrW .rrCart{left:0;top:0}
+.rrW .rrSpk{display:none;animation:rrFlick .1s steps(2) infinite alternate}
+.rrW.mv .rrSpk{display:block}
+body.lite .rrW .rrSpk{display:none!important}
+.rrW .rrCart.bounce{animation:none}
+.rrW.mv .rrCart.bounce{animation:rrBounce .34s ease-in-out infinite alternate}
+body.lite .rrW.mv .rrCart.bounce{animation-duration:.5s}
+#grid .rrI{position:absolute;left:0;top:0;will-change:transform}
+.rrBoom{position:absolute;left:0;top:0;overflow:visible;will-change:transform}
+#hud .hc.rrBump b{animation:rrPop .45s ease-out}
+#hud .hc b.two{font-size:25px}
+#hMult.rrWin b{color:#fff6c0}
+.rrTag{position:absolute;transform:translate(-50%,-50%);font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:34px;line-height:1;color:#ffe08a;white-space:nowrap;pointer-events:none;text-shadow:2px 3px 0 #1c0f08,-2px -2px 0 #1c0f08,2px -2px 0 #1c0f08,-2px 2px 0 #1c0f08;will-change:transform,opacity}
+.rrTag.gem{color:#9fe8ff}.rrTag.crash{color:#ff8a6a;font-size:42px}.rrTag.big{font-size:56px;color:#fff1a8}
+#rrBanner{position:absolute;left:800px;top:330px;transform:translate(-50%,-50%);opacity:0;text-align:center;pointer-events:none;font-family:var(--toon,RRNum),RRNum,sans-serif;z-index:7}
+#rrBanner b{display:block;font-weight:400;font-size:84px;line-height:1;letter-spacing:3px;color:#ffe08a;text-shadow:4px 5px 0 #1c0f08,-3px -3px 0 #1c0f08,3px -3px 0 #1c0f08,-3px 3px 0 #1c0f08}
+#rrBanner.big b{font-size:112px;color:#fff1a8}
+#rrBanner small{display:block;margin-top:6px;font-size:34px;letter-spacing:2px;color:#fff;text-shadow:3px 3px 0 #1c0f08,-2px -2px 0 #1c0f08,2px -2px 0 #1c0f08,-2px 2px 0 #1c0f08}
+#rrCarts{display:none;align-items:center;gap:2px;margin-left:6px}
+#hud.bonus #rrCarts{display:flex}
+#hud.bonus .hLans{display:none}
+#hud.bonus #hGear{flex-direction:row;gap:6px}
+#hud.bonus #hShield{margin-left:4px}
+.rrCI{transition:opacity .3s,transform .3s;opacity:.95}
+.rrCI.cur{transform:scale(1.14)}
+.rrCI.lost{opacity:.2;transform:scale(.8)}
+/* portrait phone: the run window is the cart plus the next ~2 pickups (stage x 0..1000, see cfg.portrait); scene and game group share one transform */
+body.portrait #scene{left:calc(var(--gx,0px)*var(--g,1))!important;top:calc(var(--gy,0px)*var(--g,1))!important;width:1600px!important;height:900px!important;transform:scale(var(--g,1))!important;transform-origin:0 0!important}
+/* portrait: the run window is a band; the soft one-bitmap copy of the cavern (shell #backdrop) fills the screen around it instead of plain black */
+body.portrait #backdrop,body.lite #backdrop{display:block!important}
+body.portrait #stage{background:none}
+body.portrait #logo{left:310px;top:-150px;width:380px}
+body.portrait #hud{left:8px;top:10px;width:864px;height:128px}
+body.portrait #hud .hc i{font-size:17px;letter-spacing:2px}
+body.portrait #hud .hc b{font-size:42px}
+body.portrait #hud .hc b.two{font-size:36px}
+body.portrait .rrTag{font-size:44px}
+body.portrait #rrBanner{left:500px}
+body.portrait #rrBanner b{font-size:96px}
+
+/* ---- clarity: callout plates, stop dots, next-stop ring ---- */
+.rrCall{position:absolute;transform:translate(-50%,-50%);padding:6px 22px 8px;border-radius:99px;border:4px solid #1c0f08;background:linear-gradient(#ffe48a,#f0a92a);color:#2a1406;font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:36px;line-height:1;white-space:nowrap;pointer-events:none;box-shadow:0 5px 0 rgba(0,0,0,.45);will-change:transform,opacity;z-index:8}
+.rrCall.gem{background:linear-gradient(#bff4ff,#45b4f0)}.rrCall.bad{background:linear-gradient(#ffb09a,#e0402a);color:#fff}.rrCall.good{background:linear-gradient(#c8ffb0,#4fc83a)}
+#rrDots{display:flex;gap:4px;margin-top:4px}
+#rrDots i{width:11px;height:11px;border-radius:50%;background:#3a2438;border:2px solid #6a3c1c}
+#rrDots i.on{background:#ffcf5a;border-color:#ffcf5a}#rrDots i.cur{background:#fff;border-color:#ffd24a;transform:scale(1.35)}
+#hud .hc b{white-space:nowrap}
+#rrRing{display:none;position:absolute;left:0;top:0;width:180px;height:180px;border-radius:50%;border:6px solid rgba(255,230,120,.85);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25);animation:rrRingP .7s ease-in-out infinite alternate;pointer-events:none;will-change:transform}
+@keyframes rrRingP{from{opacity:.35}to{opacity:1}}
+body.lite #rrRing{animation:none;opacity:.8}
+body.portrait .rrCall{font-size:46px}
+
+.rrCall{position:absolute;transform:translate(-50%,-50%);padding:6px 22px 8px;border-radius:99px;border:4px solid #1c0f08;background:linear-gradient(#ffe48a,#f0a92a);color:#2a1406;font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:36px;line-height:1;white-space:nowrap;pointer-events:none;box-shadow:0 5px 0 rgba(0,0,0,.45);will-change:transform,opacity;z-index:8}
+.rrCall.gem{background:linear-gradient(#bff4ff,#45b4f0)}.rrCall.bad{background:linear-gradient(#ffb09a,#e0402a);color:#fff}.rrCall.good{background:linear-gradient(#c8ffb0,#4fc83a)}
+#rrDots{display:flex;gap:4px;margin-top:4px}
+#rrDots i{width:11px;height:11px;border-radius:50%;background:#3a2438;border:2px solid #6a3c1c}
+#rrDots i.on{background:#ffcf5a;border-color:#ffcf5a}#rrDots i.cur{background:#fff;border-color:#ffd24a;transform:scale(1.35)}
+#hud .hc b{white-space:nowrap}
+#rrRing{display:none;position:absolute;left:0;top:0;width:180px;height:180px;border-radius:50%;border:6px solid rgba(255,230,120,.85);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25);animation:rrRingP .7s ease-in-out infinite alternate;pointer-events:none;will-change:transform}
+@keyframes rrRingP{from{opacity:.35}to{opacity:1}}
+body.lite #rrRing{animation:none;opacity:.8}
+body.portrait .rrCall{font-size:46px}
+
+/* ---- vertical ride: procedural rails, tunnel mouths ---- */
+#scene.rrT .ly-track{display:none}
+#rrTrack{position:absolute;left:0;top:0;overflow:visible;will-change:transform;pointer-events:none}
+#rrTrack path{fill:none;stroke-linejoin:round}
+#rrTrack .rrRail{stroke:#cfd6e6;stroke-width:7}#rrTrack .rrAlt{stroke:#cfd6e6;stroke-width:7}
+#rrTrack .rrBar{stroke:#4e5468;stroke-width:6}
+#rrTrack .rrSlp{stroke:#6e4a2a;stroke-width:16;stroke-dasharray:12 30}
+#rrTrack .rrLegs{stroke:#2e2018;stroke-width:9}
+.rrW .rrR{position:absolute;left:0;top:0;will-change:transform}
+.rrW .rrCart.bounce{transform-origin:50% 98%}
+.rrTun{position:absolute;left:0;top:0;border-radius:125px 125px 0 0;background:radial-gradient(ellipse at 50% 70%,#000 35%,#150a10 62%,#3a2a20 100%);box-shadow:inset 0 0 0 8px #4a3524;will-change:transform}

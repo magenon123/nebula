@@ -45,7 +45,7 @@ const parts = [
   ['ArmPoint', T(dR.nearArm + glovePoint(186, -156)), [-44, -196], 'near arm pointing ahead + glove (front of the torso, below the rim). Pivot = shoulder'],
   ['ArmUpL', T(dUp.nearArm), [-44, -196], 'near arm raised (cheer, left side) + fist. Pivot = shoulder'],
   ['Rim', rim, [0, -10], 'steel rim of the cart (above the dwarf and the front heap line)'],
-  ['GloveRim', T(glove3(198, -34, true)), [140, -34], 'dark glove of the far arm resting on the rim (above the rim)'],
+  ['GloveRim', T(glove3(198, -34, true)) + `<path d="M-300,-10 L300,-10" stroke="#ffe8a0" stroke-width="3" opacity=".55"/>`, [140, -34], 'dark glove of the far arm on the rim + the rim highlight line (topmost cart layer)'],
   ['ArmRim', T(dGrip.nearArm + glove3(66, -34, false)), [-44, -196], 'near arm gripping the rim, glove on the rim (topmost layer). Pivot = shoulder'],
   ['Beam', `<polygon points="141,-345 780,-500 780,-120" fill="url(#rigBeam)"/>`, [141, -345], 'headlamp cone (soft gradient, no filter). Pivot = the lamp'],
   ['HatGlow', `<ellipse cx="68" cy="-366" rx="169" ry="125" fill="#fff0a0" opacity=".5"/>` + spark(0, -420, 22, .95) + spark(120, -440, 16, .9) + spark(170, -380, 14, .85), [68, -366], 'warm glow behind the helmet (shield on). Pulse its opacity'],
@@ -63,7 +63,7 @@ const parts = [
   const PAD = 10, json = {}; let syms = '', css = '';
   parts.forEach((q, i) => {
     const [name, svg, piv, note] = q, [x, y, w, h] = boxes[i];
-    const vb = [Math.floor(x - PAD), Math.floor(y - PAD), Math.ceil(w + PAD * 2), Math.ceil(h + PAD * 2)];
+    const x0 = Math.floor((x - PAD) / 2) * 2, y0 = Math.floor((y - PAD) / 2) * 2, vb = [x0, y0, Math.ceil((x + w + PAD) / 2) * 2 - x0, Math.ceil((y + h + PAD) / 2) * 2 - y0];
     syms += `<symbol id="rrRig${name}" viewBox="${vb.join(' ')}" overflow="visible">${svg}</symbol>\n`;
     const cl = name[0].toLowerCase() + name.slice(1);
     const c = { left: (vb[0] + 400) / 2, top: (vb[1] + 530) / 2, width: vb[2] / 2, height: vb[3] / 2, ox: (piv[0] - vb[0]) / 2, oy: (piv[1] - vb[1]) / 2 };

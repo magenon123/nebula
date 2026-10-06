@@ -94,4 +94,34 @@ body.portrait #stage>#scene{left:0!important;top:calc((var(--H,1950px) - 1950px)
 .rrDome{animation:rrPulse 1.1s ease-in-out infinite alternate}
 @keyframes rrPulse{from{opacity:.7;transform:scale(.99)}to{opacity:1;transform:scale(1.02)}}
 @keyframes rrFlick{from{opacity:.55}to{opacity:1}}
+.rrRig{position:relative;width:400px;height:390px;overflow:visible}
+.rrRig .rg,.rrRig .rg-upper{position:absolute;display:block;overflow:visible}
+.rrRig .rg-upper{left:0;top:0;width:400px;height:390px;transform-origin:175.5px 240px}
+.rrRig .rg-shadow{left:15px;top:368px;width:370px;height:32px;transform-origin:185px 16px}
+.rrRig .rg-wheelB{left:72px;top:326px;width:66px;height:66px;transform-origin:33px 33px}
+.rrRig .rg-wheelF{left:262px;top:326px;width:66px;height:66px;transform-origin:33px 33px}
+.rrRig .rg-body{left:13px;top:258px;width:348px;height:106px;transform-origin:187px 95px}
+.rrRig .rg-load{left:15px;top:186px;width:372px;height:99px;transform-origin:185px 77px}
+.rrRig .rg-loadFront{left:96px;top:230px;width:148px;height:48px;transform-origin:74px 34px}
+.rrRig .rg-scarf{left:63px;top:141px;width:112px;height:43px;transform-origin:105px 21px}
+.rrRig .rg-scarf2{left:63px;top:146px;width:112px;height:40px;transform-origin:105px 16px}
+.rrRig .rg-scarf3{left:63px;top:136px;width:112px;height:47px;transform-origin:105px 26px}
+.rrRig .rg-armFar{left:203px;top:162px;width:71px;height:77px;transform-origin:5px 5px}
+.rrRig .rg-armFarUp{left:203px;top:72px;width:123px;height:100px;transform-origin:5px 95px}
+.rrRig .rg-torso{left:119px;top:140px;width:144px;height:111px;transform-origin:56.5px 100px}
+.rrRig .rg-headSmile{left:169px;top:45px;width:154px;height:201px;transform-origin:55px 124px}
+.rrRig .rg-headCheer{left:169px;top:45px;width:154px;height:201px;transform-origin:55px 124px}
+.rrRig .rg-headWorry{left:169px;top:45px;width:154px;height:201px;transform-origin:55px 124px}
+.rrRig .rg-headDizzy{left:169px;top:45px;width:154px;height:201px;transform-origin:55px 124px}
+.rrRig .rg-headDetermined{left:169px;top:45px;width:154px;height:201px;transform-origin:55px 124px}
+.rrRig .rg-armPoint{left:173px;top:155px;width:124px;height:59px;transform-origin:5px 12px}
+.rrRig .rg-armUpL{left:127px;top:56px;width:57px;height:116px;transform-origin:51px 111px}
+.rrRig .rg-rim{left:34px;top:250px;width:332px;height:25px;transform-origin:166px 10px}
+.rrRig .rg-gloveRim{left:45px;top:227px;width:310px;height:43px;transform-origin:225px 21px}
+.rrRig .rg-armRim{left:173px;top:155px;width:53px;height:115px;transform-origin:5px 12px}
+.rrRig .rg-beam{left:265px;top:10px;width:330px;height:200px;transform-origin:5.5px 82.5px}
+.rrRig .rg-hatGlow{left:144px;top:14px;width:180px;height:136px;transform-origin:90px 68px}
+.rrRig .rg-dust1{left:174px;top:243px;width:52px;height:43px;transform-origin:26px 22px}
+.rrRig .rg-dust2{left:181px;top:249px;width:41px;height:31px;transform-origin:19px 16px}
+.rrRig .rg-sparkStreak{left:179px;top:253px;width:33px;height:28px;transform-origin:21px 12px}
 /* KAI */

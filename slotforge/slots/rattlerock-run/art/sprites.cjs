@@ -174,6 +174,8 @@ sym('rrPlate', '-60 -16 120 32', `<ellipse cx="0" cy="0" rx="52" ry="8" fill="#0
   sym('rrSplashOutro', '0 0 600 520', s);
 }
 
+if (fs.existsSync(path.join(__dirname, 'rig-symbols.txt'))) { LOCAL += `<linearGradient id="rigBeam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff0b0" stop-opacity=".5"/><stop offset="1" stop-color="#fff0b0" stop-opacity="0"/></linearGradient>`; syms += fs.readFileSync(path.join(__dirname, 'rig-symbols.txt'), 'utf8'); }
+require('./more.cjs')({ sym, lg, rg });
 // ---------- assemble symbols.svg with unique ids ----------
 let defs = B.defs + LOCAL;
 const ids = [...defs.matchAll(/id="([^"]+)"/g)].map(m => m[1]).filter(x => !x.startsWith('rr'));
@@ -182,7 +184,7 @@ for (const id of ids.sort((a, b) => b.length - a.length)) {
   const nid = 'rg' + id[0].toUpperCase() + id.slice(1);
   all = all.split(`url(#${id})`).join(`url(#${nid})`).split(`id="${id}"`).join(`id="${nid}"`).split(`href="#${id}"`).join(`href="#${nid}"`).split(`clip-path="url(#${id})"`).join(`clip-path="url(#${nid})"`);
 }
-all = all.replace(/font-family="RN"/g, 'font-family="RRNum"');
+all = all.replace(/font-family="RN"/g, 'font-family="RRNum"').replace(/<!--MK:\w+-->/g, '');
 const out = `<!-- Rattlerock Run sprites (leo). Own ids: all gradients rr*, all symbols rr*. Fonts RRNum (Lilita One) in slot.css. See ART-NOTES.md. -->\n` + all;
 fs.writeFileSync(path.join(__dirname, '..', 'symbols.svg'), out);
 fs.writeFileSync(path.join(__dirname, 'symbol-ids.json'), JSON.stringify([...syms.matchAll(/<symbol id="([^"]+)" viewBox="([^"]+)"/g)].map(m => [m[1], m[2]])));

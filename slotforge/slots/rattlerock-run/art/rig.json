@@ -1,0 +1,596 @@
+{
+ "rrRigShadow": {
+  "class": "rg-shadow",
+  "viewBox": [
+   -370,
+   206,
+   740,
+   64
+  ],
+  "pivotCartUnits": [
+   0,
+   238
+  ],
+  "css": {
+   "left": 15,
+   "top": 368,
+   "width": 370,
+   "height": 32,
+   "ox": 185,
+   "oy": 16
+  },
+  "note": "soft ground shadow under the cart (scale X when the cart bounces)"
+ },
+ "rrRigWheelB": {
+  "class": "rg-wheelB",
+  "viewBox": [
+   -256,
+   122,
+   132,
+   132
+  ],
+  "pivotCartUnits": [
+   -190,
+   188
+  ],
+  "css": {
+   "left": 72,
+   "top": 326,
+   "width": 66,
+   "height": 66,
+   "ox": 33,
+   "oy": 33
+  },
+  "note": "rear wheel: rotate about its centre"
+ },
+ "rrRigWheelF": {
+  "class": "rg-wheelF",
+  "viewBox": [
+   124,
+   122,
+   132,
+   132
+  ],
+  "pivotCartUnits": [
+   190,
+   188
+  ],
+  "css": {
+   "left": 262,
+   "top": 326,
+   "width": 66,
+   "height": 66,
+   "ox": 33,
+   "oy": 33
+  },
+  "note": "front wheel: rotate about its centre"
+ },
+ "rrRigBody": {
+  "class": "rg-body",
+  "viewBox": [
+   -374,
+   -14,
+   696,
+   212
+  ],
+  "pivotCartUnits": [
+   0,
+   176
+  ],
+  "css": {
+   "left": 13,
+   "top": 258,
+   "width": 348,
+   "height": 106,
+   "ox": 187,
+   "oy": 95
+  },
+  "note": "wooden cart box + iron bands + RR plate + base rail + coupling (pivot = bottom centre; tilt/bob)"
+ },
+ "rrRigLoad": {
+  "class": "rg-load",
+  "viewBox": [
+   -370,
+   -158,
+   744,
+   198
+  ],
+  "pivotCartUnits": [
+   0,
+   -4
+  ],
+  "css": {
+   "left": 15,
+   "top": 186,
+   "width": 372,
+   "height": 99,
+   "ox": 185,
+   "oy": 77
+  },
+  "note": "gold heaps behind the dwarf (back left + back right)"
+ },
+ "rrRigLoadFront": {
+  "class": "rg-loadFront",
+  "viewBox": [
+   -208,
+   -70,
+   296,
+   96
+  ],
+  "pivotCartUnits": [
+   -60,
+   -2
+  ],
+  "css": {
+   "left": 96,
+   "top": 230,
+   "width": 148,
+   "height": 48,
+   "ox": 74,
+   "oy": 34
+  },
+  "note": "gold heap in front of the dwarf, above the rim line"
+ },
+ "rrRigScarf": {
+  "class": "rg-scarf",
+  "viewBox": [
+   -274,
+   -248,
+   224,
+   86
+  ],
+  "pivotCartUnits": [
+   -64,
+   -206
+  ],
+  "css": {
+   "left": 63,
+   "top": 141,
+   "width": 112,
+   "height": 43,
+   "ox": 105,
+   "oy": 21
+  },
+  "note": "scarf tail, wave frame 1 (neutral). Pivot = neck knot"
+ },
+ "rrRigScarf2": {
+  "class": "rg-scarf2",
+  "viewBox": [
+   -274,
+   -238,
+   224,
+   80
+  ],
+  "pivotCartUnits": [
+   -64,
+   -206
+  ],
+  "css": {
+   "left": 63,
+   "top": 146,
+   "width": 112,
+   "height": 40,
+   "ox": 105,
+   "oy": 16
+  },
+  "note": "scarf tail, wave frame 2 (tip down)"
+ },
+ "rrRigScarf3": {
+  "class": "rg-scarf3",
+  "viewBox": [
+   -274,
+   -258,
+   224,
+   94
+  ],
+  "pivotCartUnits": [
+   -64,
+   -206
+  ],
+  "css": {
+   "left": 63,
+   "top": 136,
+   "width": 112,
+   "height": 47,
+   "ox": 105,
+   "oy": 26
+  },
+  "note": "scarf tail, wave frame 3 (tip up)"
+ },
+ "rrRigArmFar": {
+  "class": "rg-armFar",
+  "viewBox": [
+   6,
+   -206,
+   142,
+   154
+  ],
+  "pivotCartUnits": [
+   16,
+   -196
+  ],
+  "css": {
+   "left": 203,
+   "top": 162,
+   "width": 71,
+   "height": 77,
+   "ox": 5,
+   "oy": 5
+  },
+  "note": "far (back) arm reaching to the rim; pivot = shoulder; drawn BEHIND the torso"
+ },
+ "rrRigArmFarUp": {
+  "class": "rg-armFarUp",
+  "viewBox": [
+   6,
+   -386,
+   246,
+   200
+  ],
+  "pivotCartUnits": [
+   16,
+   -196
+  ],
+  "css": {
+   "left": 203,
+   "top": 72,
+   "width": 123,
+   "height": 100,
+   "ox": 5,
+   "oy": 95
+  },
+  "note": "far arm raised (cheer, right side); pivot = shoulder; behind the torso"
+ },
+ "rrRigTorso": {
+  "class": "rg-torso",
+  "viewBox": [
+   -162,
+   -250,
+   288,
+   222
+  ],
+  "pivotCartUnits": [
+   -49,
+   -50
+  ],
+  "css": {
+   "left": 119,
+   "top": 140,
+   "width": 144,
+   "height": 111,
+   "ox": 56.5,
+   "oy": 100
+  },
+  "note": "jacket, strap, belt, pocket, neck scarf wrap, rim lights (no head, no arms). Pivot = hips"
+ },
+ "rrRigHeadSmile": {
+  "class": "rg-headSmile",
+  "viewBox": [
+   -62,
+   -440,
+   308,
+   402
+  ],
+  "pivotCartUnits": [
+   48,
+   -192
+  ],
+  "css": {
+   "left": 169,
+   "top": 45,
+   "width": 154,
+   "height": 201,
+   "ox": 55,
+   "oy": 124
+  },
+  "note": "head: grin (default). Pivot = neck"
+ },
+ "rrRigHeadCheer": {
+  "class": "rg-headCheer",
+  "viewBox": [
+   -62,
+   -440,
+   308,
+   402
+  ],
+  "pivotCartUnits": [
+   48,
+   -192
+  ],
+  "css": {
+   "left": 169,
+   "top": 45,
+   "width": 154,
+   "height": 201,
+   "ox": 55,
+   "oy": 124
+  },
+  "note": "head: eyes shut, laughing"
+ },
+ "rrRigHeadWorry": {
+  "class": "rg-headWorry",
+  "viewBox": [
+   -62,
+   -440,
+   308,
+   402
+  ],
+  "pivotCartUnits": [
+   48,
+   -192
+  ],
+  "css": {
+   "left": 169,
+   "top": 45,
+   "width": 154,
+   "height": 201,
+   "ox": 55,
+   "oy": 124
+  },
+  "note": "head: worried (brows up, small mouth)"
+ },
+ "rrRigHeadDizzy": {
+  "class": "rg-headDizzy",
+  "viewBox": [
+   -62,
+   -440,
+   308,
+   402
+  ],
+  "pivotCartUnits": [
+   48,
+   -192
+  ],
+  "css": {
+   "left": 169,
+   "top": 45,
+   "width": 154,
+   "height": 201,
+   "ox": 55,
+   "oy": 124
+  },
+  "note": "head: dizzy spiral eyes (after TNT)"
+ },
+ "rrRigHeadDetermined": {
+  "class": "rg-headDetermined",
+  "viewBox": [
+   -62,
+   -440,
+   308,
+   402
+  ],
+  "pivotCartUnits": [
+   48,
+   -192
+  ],
+  "css": {
+   "left": 169,
+   "top": 45,
+   "width": 154,
+   "height": 201,
+   "ox": 55,
+   "oy": 124
+  },
+  "note": "head: smirk (shield on)"
+ },
+ "rrRigArmPoint": {
+  "class": "rg-armPoint",
+  "viewBox": [
+   -54,
+   -220,
+   248,
+   118
+  ],
+  "pivotCartUnits": [
+   -44,
+   -196
+  ],
+  "css": {
+   "left": 173,
+   "top": 155,
+   "width": 124,
+   "height": 59,
+   "ox": 5,
+   "oy": 12
+  },
+  "note": "near arm pointing ahead + glove (front of the torso, below the rim). Pivot = shoulder"
+ },
+ "rrRigArmUpL": {
+  "class": "rg-armUpL",
+  "viewBox": [
+   -146,
+   -418,
+   114,
+   232
+  ],
+  "pivotCartUnits": [
+   -44,
+   -196
+  ],
+  "css": {
+   "left": 127,
+   "top": 56,
+   "width": 57,
+   "height": 116,
+   "ox": 51,
+   "oy": 111
+  },
+  "note": "near arm raised (cheer, left side) + fist. Pivot = shoulder"
+ },
+ "rrRigRim": {
+  "class": "rg-rim",
+  "viewBox": [
+   -332,
+   -30,
+   664,
+   50
+  ],
+  "pivotCartUnits": [
+   0,
+   -10
+  ],
+  "css": {
+   "left": 34,
+   "top": 250,
+   "width": 332,
+   "height": 25,
+   "ox": 166,
+   "oy": 10
+  },
+  "note": "steel rim of the cart (above the dwarf and the front heap line)"
+ },
+ "rrRigGloveRim": {
+  "class": "rg-gloveRim",
+  "viewBox": [
+   -310,
+   -76,
+   620,
+   86
+  ],
+  "pivotCartUnits": [
+   140,
+   -34
+  ],
+  "css": {
+   "left": 45,
+   "top": 227,
+   "width": 310,
+   "height": 43,
+   "ox": 225,
+   "oy": 21
+  },
+  "note": "dark glove of the far arm on the rim + the rim highlight line (topmost cart layer)"
+ },
+ "rrRigArmRim": {
+  "class": "rg-armRim",
+  "viewBox": [
+   -54,
+   -220,
+   106,
+   230
+  ],
+  "pivotCartUnits": [
+   -44,
+   -196
+  ],
+  "css": {
+   "left": 173,
+   "top": 155,
+   "width": 53,
+   "height": 115,
+   "ox": 5,
+   "oy": 12
+  },
+  "note": "near arm gripping the rim, glove on the rim (topmost layer). Pivot = shoulder"
+ },
+ "rrRigBeam": {
+  "class": "rg-beam",
+  "viewBox": [
+   130,
+   -510,
+   660,
+   400
+  ],
+  "pivotCartUnits": [
+   141,
+   -345
+  ],
+  "css": {
+   "left": 265,
+   "top": 10,
+   "width": 330,
+   "height": 200,
+   "ox": 5.5,
+   "oy": 82.5
+  },
+  "note": "headlamp cone (soft gradient, no filter). Pivot = the lamp"
+ },
+ "rrRigHatGlow": {
+  "class": "rg-hatGlow",
+  "viewBox": [
+   -112,
+   -502,
+   360,
+   272
+  ],
+  "pivotCartUnits": [
+   68,
+   -366
+  ],
+  "css": {
+   "left": 144,
+   "top": 14,
+   "width": 180,
+   "height": 136,
+   "ox": 90,
+   "oy": 68
+  },
+  "note": "warm glow behind the helmet (shield on). Pulse its opacity"
+ },
+ "rrRigDust1": {
+  "class": "rg-dust1",
+  "viewBox": [
+   -52,
+   -44,
+   104,
+   86
+  ],
+  "pivotCartUnits": [
+   0,
+   0
+  ],
+  "css": {
+   "left": 174,
+   "top": 243,
+   "width": 52,
+   "height": 43,
+   "ox": 26,
+   "oy": 22
+  },
+  "note": "dust puff A (scale up + fade, 0.5 s)"
+ },
+ "rrRigDust2": {
+  "class": "rg-dust2",
+  "viewBox": [
+   -38,
+   -32,
+   82,
+   62
+  ],
+  "pivotCartUnits": [
+   0,
+   0
+  ],
+  "css": {
+   "left": 181,
+   "top": 249,
+   "width": 41,
+   "height": 31,
+   "ox": 19,
+   "oy": 16
+  },
+  "note": "dust puff B"
+ },
+ "rrRigSparkStreak": {
+  "class": "rg-sparkStreak",
+  "viewBox": [
+   -42,
+   -24,
+   66,
+   56
+  ],
+  "pivotCartUnits": [
+   0,
+   0
+  ],
+  "css": {
+   "left": 179,
+   "top": 253,
+   "width": 33,
+   "height": 28,
+   "ox": 21,
+   "oy": 12
+  },
+  "note": "rail spark burst at a wheel contact point (place at wheel bottom: (-190,244) / (190,244))"
+ }
+}

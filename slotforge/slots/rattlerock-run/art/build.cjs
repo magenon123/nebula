@@ -189,7 +189,7 @@ body.portrait #stage>#scene{left:0!important;top:calc((var(--H,1950px) - 1950px)
 .rrDome{animation:rrPulse 1.1s ease-in-out infinite alternate}
 @keyframes rrPulse{from{opacity:.7;transform:scale(.99)}to{opacity:1;transform:scale(1.02)}}
 @keyframes rrFlick{from{opacity:.55}to{opacity:1}}
-/* KAI */
+`+fs.readFileSync(path.join(__dirname,'rig.css'),'utf8')+`/* KAI */
 `;
 fs.writeFileSync(path.join(D, 'slot.css'), css2);
 console.log('built', fs.statSync(path.join(D, 'scene.html')).size / 1024 | 0, 'KB scene.html');
