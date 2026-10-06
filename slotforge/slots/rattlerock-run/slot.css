@@ -72,3 +72,43 @@
 @keyframes rrPulse{from{opacity:.7;transform:scale(.99)}to{opacity:1;transform:scale(1.02)}}
 @keyframes rrFlick{from{opacity:.55}to{opacity:1}}
 /* KAI */
+
+/* ===== KAI: client styles (only transform/opacity animation; no filters on moving parts) ===== */
+#fsBox{display:none!important}
+#grid .rrW{position:absolute;left:0;top:0;will-change:transform}
+.rrW .rrCart{left:0;top:0}
+.rrW .rrSpk{display:none;animation:rrFlick .1s steps(2) infinite alternate}
+.rrW.mv .rrSpk{display:block}
+body.lite .rrW .rrSpk{display:none!important}
+.rrW .rrCart.bounce{animation:none}
+.rrW.mv .rrCart.bounce{animation:rrBounce .34s ease-in-out infinite alternate}
+body.lite .rrW.mv .rrCart.bounce{animation-duration:.5s}
+#grid .rrI{position:absolute;left:0;top:0;will-change:transform}
+.rrBoom{position:absolute;left:0;top:0;overflow:visible;will-change:transform}
+#hud .hc.rrBump b{animation:rrPop .45s ease-out}
+#hud .hc b.two{font-size:25px}
+#hMult.rrWin b{color:#fff6c0}
+.rrTag{position:absolute;transform:translate(-50%,-50%);font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:34px;line-height:1;color:#ffe08a;white-space:nowrap;pointer-events:none;text-shadow:2px 3px 0 #1c0f08,-2px -2px 0 #1c0f08,2px -2px 0 #1c0f08,-2px 2px 0 #1c0f08;will-change:transform,opacity}
+.rrTag.gem{color:#9fe8ff}.rrTag.crash{color:#ff8a6a;font-size:42px}.rrTag.big{font-size:56px;color:#fff1a8}
+#rrBanner{position:absolute;left:800px;top:330px;transform:translate(-50%,-50%);opacity:0;text-align:center;pointer-events:none;font-family:var(--toon,RRNum),RRNum,sans-serif;z-index:7}
+#rrBanner b{display:block;font-weight:400;font-size:84px;line-height:1;letter-spacing:3px;color:#ffe08a;text-shadow:4px 5px 0 #1c0f08,-3px -3px 0 #1c0f08,3px -3px 0 #1c0f08,-3px 3px 0 #1c0f08}
+#rrBanner.big b{font-size:112px;color:#fff1a8}
+#rrBanner small{display:block;margin-top:6px;font-size:34px;letter-spacing:2px;color:#fff;text-shadow:3px 3px 0 #1c0f08,-2px -2px 0 #1c0f08,2px -2px 0 #1c0f08,-2px 2px 0 #1c0f08}
+#rrCarts{display:none;align-items:center;gap:2px;margin-left:6px}
+#hud.bonus #rrCarts{display:flex}
+#hud.bonus .hLans{display:none}
+#hud.bonus #hShield{margin-left:4px}
+.rrCI{transition:opacity .3s,transform .3s;opacity:.95}
+.rrCI.cur{transform:scale(1.14)}
+.rrCI.lost{opacity:.2;transform:scale(.8)}
+/* portrait phone: the run window is the cart plus the next ~2 pickups (stage x 0..1000, see cfg.portrait); scene and game group share one transform */
+body.portrait #scene{left:calc(var(--gx,0px)*var(--g,1))!important;top:calc(var(--gy,0px)*var(--g,1))!important;width:1600px!important;height:900px!important;transform:scale(var(--g,1))!important;transform-origin:0 0!important}
+body.portrait #stage{background:linear-gradient(#0a0618,#06030d 55%,#04020a)}
+body.portrait #logo{display:none}
+body.portrait #hud{left:8px;top:10px;width:984px;height:128px}
+body.portrait #hud .hc i{font-size:20px;letter-spacing:3px}
+body.portrait #hud .hc b{font-size:50px}
+body.portrait #hud .hc b.two{font-size:36px}
+body.portrait .rrTag{font-size:44px}
+body.portrait #rrBanner{left:500px}
+body.portrait #rrBanner b{font-size:96px}
