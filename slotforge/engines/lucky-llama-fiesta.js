@@ -15,7 +15,7 @@
  *  - FIESTA LUCK (ante, CFG.anteCost 2): the base spin uses CFG.reels.ante (more drums and piñatas). NO MAX LUCK: `luck` throws.
  *  - BUYS: parade (3/4/5 drums), link (6 piñatas), party (parade with 3 sticky ponchos). The trigger spin pays 0.
  *  - Cap CFG.maxWin: totals are clipped, capped=true when reached; the bonus stops at the spin that reaches the remaining cap.
- *  - Scale knobs (sim --cfg '{"lineScale":1.02}'): lineScale (base/ante line pays), linkScale (ordinary piñata values in the base game and Link), paradeScale (Parade line pays), parade.grabScale (Parade piñata grabs).
+ *  - Scale knobs (sim --cfg '{"lineScale":1.02}'): lineScale (base line pays), anteScale (extra factor on ante line pays), linkScale (ordinary piñata values in the base game and Link), paradeScale (Parade line pays), parade.grabScale (Parade piñata grabs).
  */
 import crypto from 'crypto';
 
@@ -39,12 +39,12 @@ const REELS = {
     R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 4, 14]),
     R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 3, 14])],
   ante: [
-    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 0, 3, 14]),
-    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 4, 14]),
-    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 3, 14]),
-    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 4, 14]),
-    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 3, 14])],
-  parade: [0, 1, 2, 3, 4].map(() => R([12, 12, 11, 10, 9, 8, 7, 6, 6, 6, 2, 1, 10]))
+    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 0, 5, 17]),
+    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 5, 17]),
+    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 5, 17]),
+    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 5, 17]),
+    R([20, 20, 16, 14, 13, 8, 7, 5, 4, 4, 6, 5, 17])],
+  parade: [0, 1, 2, 3, 4].map(() => R([12, 12, 11, 10, 9, 8, 7, 6, 6, 6, 4, 3, 10]))
 };
 
 export const CFG = {
@@ -54,20 +54,20 @@ export const CFG = {
   buy: {
     parade: { cost: 80, name: 'Poncho Parade', drumsW: [[3, 96], [4, 3.9], [5, 0.1]], sticky: 0 },
     link: { cost: 60, name: 'Piñata Link', pinatas: 6 },
-    party: { cost: 180, name: 'Party Pack', drumsW: [[3, 96], [4, 3.9], [5, 0.1]], sticky: 3 }
+    party: { cost: 284, name: 'Party Pack', drumsW: [[3, 96], [4, 3.9], [5, 0.1]], sticky: 3 }
   },
   rows: NROW, reelCount: NREEL, lines: LINES, symbols: SYM,
   /* x TOTAL bet for 3 / 4 / 5 of a kind on a line (WLD pays as LUC) */
   paytable: { MAR: [0.25, 0.75, 3], MAC: [0.25, 0.9, 3.5], CHI: [0.4, 1.2, 4.5], GUI: [0.4, 1.5, 6], TAC: [0.5, 2, 8],
-    SKU: [0.75, 3, 12], SOM: [1, 4.5, 18], MAS: [1.5, 6, 25], TRU: [2, 8, 35], LUC: [3, 12, 50] },
-  lineScale: 1, linkScale: 1, paradeScale: 0.45,
+    SKU: [0.75, 3, 12], SOM: [1, 4.5, 18], MAS: [1.5, 6, 25], TRU: [2, 8, 35], LUC: [4, 25, 150] },
+  lineScale: 1.544, anteScale: 1.055, linkScale: 0.97, paradeScale: 0.119,
   reels: REELS,
-  layout: { base: 44, ante: 44, parade: 1 },   // shuffle seed of the strip layout per profile (the strips are explicit, see info().strips); ANY change of reel counts reshuffles: re-run the sim
-  link: { p: 0.06, respins: 3, trigger: 6,
+  layout: { base: 44, ante: 369, parade: 1 },   // shuffle seed of the strip layout per profile (the strips are explicit, see info().strips); ANY change of reel counts reshuffles: re-run the sim
+  link: { p: 0.065, respins: 3, trigger: 6,
     values: [[1, 26], [2, 22], [3, 16], [5, 12], [8, 8], [10, 6], [15, 4], [25, 2]],
     jackpots: { MINI: 20, MINOR: 50, MAJOR: 250, GRAND: 2000 },
     jackpotP: { MINI: 0.012, MINOR: 0.004, MAJOR: 0.0006, GRAND: 0.00004 } },
-  parade: { spins: { 3: 8, 4: 12, 5: 20 }, retrigger: 3, maxSpins: 60, grabScale: 0.7,
+  parade: { spins: { 3: 8, 4: 12, 5: 20 }, retrigger: 3, maxSpins: 60, grabScale: 0.594,
     ladder: [[1, 1], [2, 2], [3, 3], [5, 5], [7, 8], [10, 10]],
     values: [[1, 30], [2, 25], [3, 16], [5, 11], [8, 8], [10, 5], [15, 3], [25, 2]],
     jackpotP: { MINI: 0.01, MINOR: 0.003, MAJOR: 0.0004, GRAND: 0.00002 } }
@@ -259,7 +259,7 @@ export function playRound(rng, { ante = false, buy = null, luck = false } = {}) 
       bonus = playParade(rng, drums, B.sticky, 'buy', cap);
     }
   } else {
-    const d = draw(rng, profile(ante ? 'ante' : 'base'), null); spin = makeSpin(rng, d, ante ? 'ante' : 'base', CFG.link, CFG.linkScale, null, CFG.lineScale);
+    const d = draw(rng, profile(ante ? 'ante' : 'base'), null); spin = makeSpin(rng, d, ante ? 'ante' : 'base', CFG.link, CFG.linkScale, null, ante ? CFG.lineScale * CFG.anteScale : CFG.lineScale);
     basePayout = spin.linePayout;
     if (spin.scatters.length >= 3) bonus = playParade(rng, Math.min(5, spin.scatters.length), 0, 'spin', cap - basePayout);
     else if (spin.money.length >= T) bonus = playLink(rng, spin.money, 'spin');
