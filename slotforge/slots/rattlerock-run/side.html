@@ -1,0 +1,8 @@
+<!-- Rattlerock Run HUD strip (leo). #hud at stage (410,12) 1170x84 (TOP, because the shell bottom bar owns y 782-874). Drive: text of #hDepthV #hDistV #hMultV #hLoadV; class "pop" for 0.45 s on the cell that changed (remove after); #hMult style --p (0..1) moves the gem on the multiplier bar; lanterns: add "on" to #hl1..#hl3; shield: "on" on #hShield and text in #hShieldN. #hud.twin = two-cart mode (shows L / R load pair if you use #hLoadV2). -->
+<div id="hud">
+ <div class="hc" id="hDepth"><i>DEPTH</i><b id="hDepthV">0 m</b></div>
+ <div class="hc" id="hDist"><i>DISTANCE</i><b id="hDistV">0 m</b></div>
+ <div class="hc" id="hMult" style="--p:0"><i>MULTIPLIER</i><b id="hMultV">x1</b><div class="mBar"><span class="mFill"></span><span class="mGem"><svg class="rrs " style="width:34px;height:38px"><use href="#rrGaugeGem"/></svg></span></div></div>
+ <div class="hc" id="hLoad"><i>LOAD</i><b id="hLoadV">0.00</b></div>
+ <div class="hc" id="hGear"><div class="hLans"><span id="hl1" class="hl"><svg class="rrs " style="width:40px;height:50px"><use href="#rrLantern"/></svg></span><span id="hl2" class="hl"><svg class="rrs " style="width:40px;height:50px"><use href="#rrLantern"/></svg></span><span id="hl3" class="hl"><svg class="rrs " style="width:40px;height:50px"><use href="#rrLantern"/></svg></span></div><span id="hShield" class="hsh"><svg class="rrs " style="width:56px;height:40px"><use href="#rrHatIcon"/></svg><em id="hShieldN">0</em></span></div>
+</div>

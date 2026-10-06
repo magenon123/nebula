@@ -85,6 +85,7 @@ sym('rrNugget', PVB, `<ellipse cx="0" cy="26" rx="46" ry="9" fill="#000" opacity
 setSeed(32);
 sym('rrPile', '-120 -110 240 200', `<ellipse cx="0" cy="22" rx="100" ry="14" fill="#000" opacity=".3"/><ellipse cx="0" cy="-10" rx="100" ry="70" fill="#ffc83a" opacity=".22"/>${heap2(0, 22, 190, 84, 46, 22)}${nugget(-30, -40, 26, 10)}${nugget(34, -36, 24, -20)}${spark(60, -60, 15)}${spark(-64, -44, 11)}`);
 sym('rrHat', PVB, fontFix(items.hat()));
+sym('rrHatIcon', '-70 -60 140 100', items.hat().replace(/<g transform="translate\(0 \$\{globalThis.TY \|\| 74\}\)">[\s\S]*$/, ''));
 sym('rrTnt', PVB, items.tnt().replace(/font-family="RN"/g, 'font-family="RRNum"') + `<g id="rrFuse"><circle cx="16" cy="-64" r="22" fill="#ffd060" opacity=".35"/></g>`);
 // lantern pickup
 {
@@ -161,6 +162,16 @@ sym('rrPlate', '-60 -16 120 32', `<ellipse cx="0" cy="0" rx="52" ry="8" fill="#0
   [[300, 340, .36, 0], [130, 250, .27, 1], [470, 250, .27, 2]].forEach(([x, y, k, i]) => { s += `<g transform="translate(${x} ${y}) scale(${k})"><use href="#rrCart${i === 0 ? 'Cheer' : 'Ride'}" x="-400" y="-530" width="800" height="780"/></g>`; });
   [[60, 120, 1], [540, 130, .8], [90, 370, .7], [520, 360, 1]].forEach(([x, y, k], i) => { s += `<g transform="translate(${x} ${y}) scale(${k * .8})"><use href="#rrGem${[2, 3, 5, 10][i]}" x="-80" y="-110" width="160" height="200"/></g>`; });
   sym('rrSplashDeep', '0 0 600 520', s);
+}
+
+
+{
+  setSeed(52);
+  let s = `<ellipse cx="300" cy="230" rx="300" ry="250" fill="url(#doorGlowW)"/>`;
+  for (let i = 0; i < 14; i++) { const a = -Math.PI + i * Math.PI / 13; s += `<polygon points="300,250 ${f(300 + Math.cos(a - .045) * 380)},${f(250 + Math.sin(a - .045) * 380)} ${f(300 + Math.cos(a + .045) * 380)},${f(250 + Math.sin(a + .045) * 380)}" fill="#fff6c0" opacity=".28"/>`; }
+  s += `<g transform="translate(300 310) scale(.62)"><use href="#rrCartWin" x="-400" y="-530" width="800" height="780"/></g>`;
+  [[70, 130, 1.0, 5], [530, 140, .9, 10], [80, 330, .8, 3], [520, 340, 1, 2]].forEach(([x, y, k, v]) => { s += `<g transform="translate(${x} ${y}) scale(${k})"><use href="#rrGem${v}" x="-80" y="-110" width="160" height="200"/></g>`; });
+  sym('rrSplashOutro', '0 0 600 520', s);
 }
 
 // ---------- assemble symbols.svg with unique ids ----------

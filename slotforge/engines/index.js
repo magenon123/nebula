@@ -4,8 +4,9 @@ import * as grumbleAndBrine from './grumble-and-brine.js';
 import * as cloudtopTeaHouse from './cloudtop-tea-house.js';
 import * as arcticAuroraLodge from './arctic-aurora-lodge.js';
 import * as siroccosLampBazaar from './siroccos-lamp-bazaar.js';
+import * as rattlerockRun from './rattlerock-run.js';
 
-const ENGINES = { emberclaw, 'grumble-and-brine': grumbleAndBrine, 'cloudtop-tea-house': cloudtopTeaHouse, 'arctic-aurora-lodge': arcticAuroraLodge, 'siroccos-lamp-bazaar': siroccosLampBazaar };
+const ENGINES = { emberclaw, 'grumble-and-brine': grumbleAndBrine, 'cloudtop-tea-house': cloudtopTeaHouse, 'arctic-aurora-lodge': arcticAuroraLodge, 'siroccos-lamp-bazaar': siroccosLampBazaar, 'rattlerock-run': rattlerockRun };
 
 const REQUIRED = ['CFG', 'playRound', 'cryptoRng'];
 for (const [id, e] of Object.entries(ENGINES)) {

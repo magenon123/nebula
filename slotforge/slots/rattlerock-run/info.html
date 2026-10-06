@@ -1,0 +1,24 @@
+  <p>One spin is one ride. Your cart rolls down the mine track past a row of stops; the result is already decided, you watch the dwarf collect it. Pay = <b>LOAD x MULTIPLIER</b> when the cart bursts through the golden door. Max win [[maxWin]]x your bet.</p>
+  <table class="pt"><tr><th>PICKUP</th><th>WHAT IT DOES</th></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrNugget"/></svg><span>Gold nugget</span></div></td><td>Adds its value (in bets) to the LOAD.</td></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrPile"/></svg><span>Gold pile</span></div></td><td>A big handful: adds a larger value to the LOAD.</td></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrGem2"/></svg><span>Green gem x2</span></div></td><td>Adds 2 to the MULTIPLIER (it starts at x1).</td></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrGem3"/></svg><span>Blue gem x3</span></div></td><td>Adds 3 to the MULTIPLIER.</td></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrGem5"/></svg><span>Red gem x5</span></div></td><td>Adds 5 to the MULTIPLIER.</td></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrGem10"/></svg><span>Gold gem x10</span></div></td><td>Rare: adds 10 to the MULTIPLIER.</td></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrHat"/></svg><span>Hard hat</span></div></td><td>A SHIELD. It absorbs the next TNT. Shields are kept until used.</td></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrTnt"/></svg><span>TNT crate</span></div></td><td>Blows the cart up. The run ends and pays only the LOAD, no multiplier. A shield cancels it.</td></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrLantern"/></svg><span>Lantern</span></div></td><td>Collect 3 on one run to trigger the DEEP SHAFT bonus.</td></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrFork"/></svg><span>Lever fork</span></div></td><td>The track splits. The lever flips and the cart takes the left or the right track: one side is richer, the other safer.</td></tr>
+  <tr><td><div class="nm"><svg class="rrs " style="width:38px;height:38px"><use href="#rrDoor"/></svg><span>Golden door</span></div></td><td>The end of the run. The cart bursts into daylight and pays LOAD x MULTIPLIER. A rare door adds a fixed jackpot step.</td></tr>
+  </table>
+  <div class="rules">
+    <div><b>THE RIDE</b><span>The cart carries a LOAD (gold, in multiples of your bet) and a MULTIPLIER gauge that starts at x1. Gold raises the load, gems raise the multiplier. The HUD on top shows DEPTH, DISTANCE, MULTIPLIER and LOAD live.</span></div>
+    <div><b>SHIELD AND TNT</b><span>TNT ends the run and pays only the gold in the load. A hard hat pickup is a shield that cancels one TNT, the cart then rolls on. Unused shields do not pay.</span></div>
+    <div><b>LEVER FORKS</b><span>At a fork the lever flips by itself. You see what waits on each side before it flips: the rich side holds bigger gold and gems but more TNT, the safe side small gold, hats or nothing.</span></div>
+    <div><b>LANTERNS</b><span>Three lanterns collected on one run (they still count if the run ends later) start the DEEP SHAFT bonus after the run has paid.</span></div>
+    <div><b>DEEP SHAFT (BONUS)</b><span>You get 3 carts and ride down 3 levels: the blue crystal cavern, the forge depths and the vault of gold. Each level is a short track with richer gems and gold. The multiplier and your shields carry down from cart to cart and from level to level, the load does not. A TNT without shield costs one cart, not the bonus. Reaching the bottom door ends the bonus with a jackpot step. When all carts are gone the bonus ends.</span></div>
+    <div><b>TWIN CARTS (BET UP)</b><span>Pays [[anteCost]]x your bet per spin. Two carts run side by side on two tracks and both pay. Hard hats appear more often. Lantern chance is the same per cart.</span></div>
+    <div><b>BONUS BUY</b><span>DEEP SHAFT for [[buy:deep]]x your bet, MOTHERLODE RUN for [[buy:motherlode]]x your bet (starts on the second level with extra shields). The round never pays more than [[maxWin]]x.</span></div>
+    <div><b>TIP</b><span>Tap during a run to speed it up. Turbo is in the menu.</span></div>
+  </div>
