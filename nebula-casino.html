@@ -1145,6 +1145,7 @@ select{
   <button class="side-item" data-g="cloudtop-tea-house"><span class="ic">🍵</span>Cloudtop Tea House</button>
   <button class="side-item" data-g="arctic-aurora-lodge"><span class="ic">🌌</span>Arctic Aurora Lodge</button>
   <button class="side-item" data-g="siroccos-lamp-bazaar"><span class="ic">🪔</span>Sirocco's Lamp Bazaar</button>
+  <button class="side-item" data-g="rattlerock-run"><span class="ic">⛏️</span>Rattlerock Run</button>
 </aside>
 
 <div class="body">
@@ -1558,6 +1559,14 @@ select{
           <div style="font-size:12px;font-weight:700;color:var(--txt)">Sirocco's Lamp Bazaar</div>
           <div style="font-size:11px;color:var(--muted)">SlotForge</div>
         </div>
+        <div class="tile-wrap">
+          <button class="tile-g" onclick="go('rattlerock-run')" style="background:radial-gradient(at 0 0,#2e7bff,#00000000 50%),radial-gradient(at 100% 0,#ffb02e,#00000000 50%),radial-gradient(at 0 100%,#162a6b,#00000000 50%),radial-gradient(at 100% 100%,#2e7bff,#00000000 50%)">
+            <span class="em">⛏️</span>
+          </button>
+          <div class="tile-playing"><i></i>163 playing</div>
+          <div style="font-size:12px;font-weight:700;color:var(--txt)">Rattlerock Run</div>
+          <div style="font-size:11px;color:var(--muted)">SlotForge</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1585,6 +1594,9 @@ select{
   </div>
   <div id="slot-siroccos-lamp-bazaar" hidden style="position:absolute;inset:0;z-index:10;background:#1a0f2a">
     <iframe id="frame-siroccos-lamp-bazaar" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay;fullscreen"></iframe>
+  </div>
+  <div id="slot-rattlerock-run" hidden style="position:absolute;inset:0;z-index:10;background:#1a0f2a">
+    <iframe id="frame-rattlerock-run" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay;fullscreen"></iframe>
   </div>
   <div id="slot-lake-legend" hidden style="position:absolute;inset:0;z-index:10;background:#2a6c73">
     <iframe id="frame-lake-legend" src="" style="width:100%;height:100%;border:none;display:block" allow="autoplay"></iframe>
@@ -3495,6 +3507,7 @@ const CARD_IMG={
   'cloudtop-tea-house':'/cards/cloudtop-tea-house.webp',
   'arctic-aurora-lodge':'/cards/arctic-aurora-lodge.webp',
   'siroccos-lamp-bazaar':'/cards/siroccos-lamp-bazaar.webp',
+  'rattlerock-run':'/cards/rattlerock-run.webp',
 };
 const CARD_BG={
   mines:`radial-gradient(at 0% 0%,#5d5bec,transparent 50%),radial-gradient(at 33% 0%,#9e44cc,transparent 50%),radial-gradient(at 67% 0%,#074df0,transparent 50%),radial-gradient(at 100% 0%,#4b47e6,transparent 50%),radial-gradient(at 0% 50%,#6f8cdd,transparent 50%),radial-gradient(at 33% 50%,#8d7dbc,transparent 50%),radial-gradient(at 67% 50%,#5fcaa9,transparent 50%),radial-gradient(at 100% 50%,#47c96b,transparent 50%),radial-gradient(at 0% 100%,#2c89ff,transparent 50%),radial-gradient(at 33% 100%,#8ea3f6,transparent 50%),radial-gradient(at 67% 100%,#84b4fa,transparent 50%),radial-gradient(at 100% 100%,#7cadf1,transparent 50%)`,
@@ -3532,12 +3545,13 @@ const GAMES=[
  ['cloudtop-tea-house','Cloudtop Tea House','🍵','#ffb04a','slots'],
  ['arctic-aurora-lodge','Arctic Aurora Lodge','🌌','#4ee0c0','slots'],
  ['siroccos-lamp-bazaar','Sirocco\'s Lamp Bazaar','🪔','#ffc83a','slots'],
+ ['rattlerock-run','Rattlerock Run','⛏️','#ffb02e','slots'],
 ];
 (function(){
   // Playing counts based on real Stake data
   const REAL_COUNTS={mines:2229,dice:1942,limbo:1578,plinko:1034,keno:1344,
     wheel:160,flip:197,hilo:465,tower:339,chicken:353,baccarat:66,blackjack:1184,pump:127,
-    rps:66,cases:30,snakes:155,moles:310,'olympian-storm':359,emberclaw:214,'grumble-and-brine':187,'cloudtop-tea-house':143,'arctic-aurora-lodge':298,'siroccos-lamp-bazaar':176};
+    rps:66,cases:30,snakes:155,moles:310,'olympian-storm':359,emberclaw:214,'grumble-and-brine':187,'cloudtop-tea-house':143,'arctic-aurora-lodge':298,'siroccos-lamp-bazaar':176,'rattlerock-run':163};
   const seedCount=k=>REAL_COUNTS[k]||(120+((k.split('').reduce((s,c)=>s*31+c.charCodeAt(0),0))%800));
   const counts=Object.fromEntries(GAMES.map(g=>[g[0],seedCount(g[0])]));
   const total=Object.values(counts).reduce((a,b)=>a+b,0);
@@ -3602,7 +3616,7 @@ function go(key){
   if(key==='wheel')wheelDraw(wheelAngle);
   if(key==='cases')casesIdle();
   // Slot iframe overlays — hide the bet panel so stage fills full width
-  const SLOTS=['olympian-storm','lake-legend','emberclaw','grumble-and-brine','cloudtop-tea-house','arctic-aurora-lodge','siroccos-lamp-bazaar'];
+  const SLOTS=['olympian-storm','lake-legend','emberclaw','grumble-and-brine','cloudtop-tea-house','arctic-aurora-lodge','siroccos-lamp-bazaar','rattlerock-run'];
   const isSlot=SLOTS.includes(key);
   $('panels').style.display=isSlot?'none':'';
   document.querySelector('.frame-body').classList.toggle('slot-active',isSlot);
@@ -3617,6 +3631,7 @@ function go(key){
   if(key==='cloudtop-tea-house'){const f=$('frame-cloudtop-tea-house');if(!f.src||!f.src.includes('cloudtop-tea-house'))f.src='/cloudtop-tea-house.html';}
   if(key==='arctic-aurora-lodge'){const f=$('frame-arctic-aurora-lodge');if(!f.src||!f.src.includes('arctic-aurora-lodge'))f.src='/arctic-aurora-lodge.html';}
   if(key==='siroccos-lamp-bazaar'){const f=$('frame-siroccos-lamp-bazaar');if(!f.src||!f.src.includes('siroccos-lamp-bazaar'))f.src='/siroccos-lamp-bazaar.html';}
+  if(key==='rattlerock-run'){const f=$('frame-rattlerock-run');if(!f.src||!f.src.includes('rattlerock-run'))f.src='/rattlerock-run.html';}
   if(isSlot){
     setTimeout(()=>{try{const fr=$('frame-'+key);if(fr.contentWindow&&fr.contentWindow.paintBal)fr.contentWindow.paintBal();}catch(_){}},500);
   }

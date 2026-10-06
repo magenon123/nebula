@@ -104,11 +104,13 @@ body.lite .rrW.mv .rrCart.bounce{animation-duration:.5s}
 .rrCI.lost{opacity:.2;transform:scale(.8)}
 /* portrait phone: the run window is the cart plus the next ~2 pickups (stage x 0..1000, see cfg.portrait); scene and game group share one transform */
 body.portrait #scene{left:calc(var(--gx,0px)*var(--g,1))!important;top:calc(var(--gy,0px)*var(--g,1))!important;width:1600px!important;height:900px!important;transform:scale(var(--g,1))!important;transform-origin:0 0!important}
-body.portrait #stage{background:linear-gradient(#0a0618,#06030d 55%,#04020a)}
+/* portrait: the run window is a band; the soft one-bitmap copy of the cavern (shell #backdrop) fills the screen around it instead of plain black */
+body.portrait #backdrop,body.lite #backdrop{display:block!important}
+body.portrait #stage{background:none}
 body.portrait #logo{left:310px;top:-150px;width:380px}
-body.portrait #hud{left:8px;top:10px;width:984px;height:128px}
-body.portrait #hud .hc i{font-size:20px;letter-spacing:3px}
-body.portrait #hud .hc b{font-size:50px}
+body.portrait #hud{left:8px;top:10px;width:864px;height:128px}
+body.portrait #hud .hc i{font-size:17px;letter-spacing:2px}
+body.portrait #hud .hc b{font-size:42px}
 body.portrait #hud .hc b.two{font-size:36px}
 body.portrait .rrTag{font-size:44px}
 body.portrait #rrBanner{left:500px}
