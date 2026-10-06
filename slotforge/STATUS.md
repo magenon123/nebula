@@ -46,3 +46,5 @@ State: slot #3 Tea House revision. DONE and committed: engine (rin) with Tin Rus
 
 ## How to resume after an interruption
 Read: README.md, OWNER-PREFS.md, this file, the last ~30 chat messages (`./chat.sh read <you> all 30`), then your files. Pick up your own step; do not redo finished work. Update the "Status:" line of your step here when you finish or stop.
+
+## SLOT #6 (started): Mine Cart Run, working title Rattlerock Run (`rattlerock-run`). Owner chose the idea; concept doc plans/mine-cart-run-concept.md is awaiting APPROVE/REVISE. Then ONE look-test picture (slots/rattlerock-run/test/), then rin engine (path/run format, sim EARLY, 96.0-96.5% every mode), leo art (baked track), kai client. Owner is watching the weekly limit: keep it lean, no idle agents, no repeated full smoke runs (batch changes). Not doing: slot factory, local art generation (owner decided to continue the current way).
