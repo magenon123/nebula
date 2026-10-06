@@ -112,11 +112,11 @@ test('twin carts: two independent runs, both paid, one bonus at most, more shiel
   let both = 0, diff = 0, same = 0;
   for (const r of tw) {
     assert.equal(r.cost, 2.5); assert.equal(r.cascadeSteps.length, 2); assert.ok(near(r.basePayout, r.runs[0].pay + r.runs[1].pay));
-    same += JSON.stringify(r.runs[0].stops) === JSON.stringify(r.runs[1].stops) ? 1 : 0;
+    same += r.runs[0].stops.length >= 4 && JSON.stringify(r.runs[0].stops) === JSON.stringify(r.runs[1].stops) ? 1 : 0;
     if (r.runs[0].bonusAt !== null && r.runs[1].bonusAt !== null) { both++; assert.deepEqual(r.bonus.triggeredBy, [0, 1]); }
     if (r.runs[0].pay !== r.runs[1].pay) diff++;
   }
-  assert.ok(diff > 1000); assert.ok(same < 60000 * 0.05, 'runs are independent');
+  assert.ok(diff > 1000); assert.ok(same < 60, 'runs are independent');
   const lantern = rs => { let l = 0, st = 0; for (const r of rs) for (const run of r.runs) for (const s of run.stops) { st++; if (s.type === 'lantern' || s.taken?.type === 'lantern') l++; } return l / st; };
   assert.ok(Math.abs(lantern(tw) / lantern(bs) - 1) < 0.1, 'per-stop lantern chance is the same');
 });

@@ -29,13 +29,13 @@ Run = { run:0, kind:"ride"|"trigger", length:N,        // N = number of stops in
 ```
 Every Stop carries the state AFTER it: `{ i, at, type, ..., load, mult, shields, lanterns }`.
 - `gold`:    `{value}`  load += value.
-- `gem`:     `{value}` in 2|3|5|10 (colour green/blue/red/gold). mult += value (gauge starts at 1, so one x5 gem = x6).
+- `gem`:     `{value}` in 2|3|5|10 (colour green/blue/red/gold); deeper bonus levels also use 25 and 50 (level 3). mult += value (gauge starts at 1, so one x5 gem = x6).
 - `shield`:  shields += 1.
 - `lantern`: lanterns += 1. The 3rd one sets `bonusAt`; the run still finishes normally and pays; the bonus follows.
 - `tnt`:     if shields > 0: `{shielded:true, crash:false}`, shields -= 1 (hat pops, stop is harmless). Else `{shielded:false, crash:true}`: run ends, pay = load (NO multiplier), `crashAt = i`.
 - `fork`:    `{left:Preview, right:Preview, side:"left"|"right", pick:"rich"|"safe", taken:{type:"gold"|"gem"|"shield"|"tnt"|"lantern"|"none", value?, shielded?, crash?}}`.
-  Preview = `{type, value?}` shown on each side before the lever flips (what you would get there). The server's side is `side`; `taken` equals the preview of that side and is applied exactly like a normal stop of that type (so a TNT can sit on either side). The rich side holds bigger gold/gems and a higher TNT chance, the safe side small gold/shield/none.
-- `door`:    last stop, `{kind:"normal"|"jackpot", jackpot:0|50|100|250|1000..., pay}`. pay = load * mult + jackpot. run.pay = door.pay.
+  Preview = `{type, value?}` (type may also be `none`: an empty side) shown on each side before the lever flips (what you would get there). The server's side is `side`; `taken` equals the preview of that side and is applied exactly like a normal stop of that type (so a TNT can sit on either side). The rich side holds bigger gold/gems and a higher TNT chance, the safe side small gold/shield/none.
+- `door`:    last stop, `{kind:"normal"|"jackpot", jackpot:0|25|100|500|1000 (base) or 50|250|1000|2500|7500 (bottom door), pay}`. pay = load * mult + jackpot. run.pay = door.pay.
 No stop follows a crash. Money invariants: `pay = exit==="door" ? load*mult + door.jackpot : exit==="crash" ? load : 0`.
 
 ## 3. Bonus: DEEP SHAFT (3 carts, 3 levels)
@@ -55,7 +55,7 @@ Segment = { spinIndex (1-based), spinsLeft (= carts still alive AFTER this segme
 ```
 Rules:
 1. A level is one short track (deeper level = richer gold/gems). Stops are as in the base run, but each stop's `load`/`mult`/`shields` start from the segment's `load=0`, `multIn`, `shieldsIn`. In the bonus a `lantern` stop is not generated.
-2. Reaching the level door (`exit:"level"`) banks `pay = load * mult + jackpot` (jackpot only at the bottom), the cart goes on to the NEXT level (next segment, same cart number, `level+1`, `multIn = multOut`, `load` starts at 0). The 3rd-level door is the BOTTOM door (`exit:"bottom"`, `bottomReached:true`): the bonus ends there.
+2. Reaching the level door (`exit:"level"`) banks `pay = load * mult + jackpot` (jackpot only at the bottom), the cart goes on to the NEXT level (next segment, same cart number, `level+1`, `multIn = multOut`, `load` starts at 0). The 3rd-level door is the BOTTOM door (the only door with a real jackpot chance in the bonus) (`exit:"bottom"`, `bottomReached:true`): the bonus ends there.
 3. TNT with a shield: shield consumed, nothing else. TNT without shield: the cart is lost (`exit:"crash"`, `cartLost:true`), the level pays `pay = load` only (no multiplier), `spinsLeft` decreases by 1. If carts remain, the NEXT segment is the SAME level again with a freshly generated track, the next cart number, `multIn = multOut` (the multiplier carries, shields carry). If no carts remain the bonus ends.
 4. The multiplier gauge never resets inside the bonus (`multOut` of one segment = `multIn` of the next). Gems add exactly as in the base game.
 5. Bounds: at most 3 crashes + 3 level exits = 6 segments. If a running total reaches the cap, the segment is truncated and the bonus stops (`capped`).
@@ -65,40 +65,64 @@ Trigger run of a bought round: `kind:"trigger"`, 3 `lantern` stops, `exit:"bonus
 ## 4. Twin Carts (ante, cost 2.5x)
 `runs` has TWO independent base runs (own stops, own lantern count, own shield state), both paid (`basePayout` = pay0 + pay1). Shields appear more often (`CFG.ante` weight table), per-stop lantern chance is the same as in base. If either (or both) run collects 3 lanterns, ONE bonus plays after both runs (`triggeredBy` lists the run indexes). Buys never combine with ante.
 
-## 5. Worked examples (schematic, same shape as engine output; load/mult after each stop)
-### A. Crash run (base): gold 1, gem x2, tnt crash
-```
-{v:1,mode:"base",bought:null,ante:false,cost:1,initialGrid:[["gold","gem","tnt"]],cascadeSteps:[{run:0,payout:1}],basePayout:1,
- runs:[{run:0,kind:"ride",length:9,spacing:100,exit:"crash",crash:true,crashAt:3,lanterns:0,bonusAt:null,load:1,mult:3,shields:0,pay:1,
-  stops:[{i:1,at:100,type:"gold",value:1,load:1,mult:1,shields:0,lanterns:0},
-         {i:2,at:200,type:"gem",value:2,load:1,mult:3,shields:0,lanterns:0},
-         {i:3,at:300,type:"tnt",shielded:false,crash:true,load:1,mult:3,shields:0,lanterns:0}]}],
- bonusTriggered:false,bonus:null,totalPayout:1,capped:false}
-```
-Pays 1 (load only), NOT 1 x 3.
-### B. Clean door run: gold 2, fork(rich, gem x5), shield, tnt (shielded), door
-```
-stops:[{i:1,at:100,type:"gold",value:2,load:2,mult:1,shields:0,lanterns:0},
- {i:2,at:200,type:"fork",left:{type:"gold",value:0.5},right:{type:"gem",value:5},side:"right",pick:"rich",taken:{type:"gem",value:5},load:2,mult:6,shields:0,lanterns:0},
- {i:3,at:300,type:"shield",load:2,mult:6,shields:1,lanterns:0},
- {i:4,at:400,type:"tnt",shielded:true,crash:false,load:2,mult:6,shields:0,lanterns:0},
- {i:5,at:500,type:"door",kind:"normal",jackpot:0,pay:12,load:2,mult:6,shields:0,lanterns:0}]
-run: exit:"door", crash:false, load:2, mult:6, pay:12 (= 2*6). totalPayout 12.
-```
-### C. Bonus-trigger run (base, 3 lanterns, then a Deep Shaft of 2 segments)
-```
-run.stops contain lantern at i=2,4,7 (lanterns 1,2,3), bonusAt:7, run exits at the door with pay 3 -> basePayout 3, bonusTriggered:true
-bonus:{type:"deepShaft",startSpins:3,carts:3,levels:3,startLevel:1,startMult:1,startShields:0,triggeredBy:[0],bottomReached:false,cartsLost:3,totalPayout:9,
- spins:[
-  {spinIndex:1,spinsLeft:3,cart:1,level:1,exit:"level",multIn:1,multOut:3,shieldsIn:0,shieldsOut:0,load:2,pay:6,totalPayout:6,cartLost:false,bonusPayoutSoFar:6,stops:[..gold 2, gem 2.., door]},
-  {spinIndex:2,spinsLeft:2,cart:1,level:2,exit:"crash",multIn:3,multOut:3,shieldsIn:0,shieldsOut:0,load:3,pay:3,totalPayout:3,cartLost:true,bonusPayoutSoFar:9,stops:[..tnt crash]},
-  ... (spinsLeft 1 and 0 for the remaining carts, each cart replays level 2)]}
-totalPayout = 3 + 9 = 12
-```
-(Segment 2 "spinsLeft:2": one cart died, 2 carts remain; the engine output continues until carts are gone or the bottom door is reached.)
+## 5. Worked examples (REAL engine output, seed 5; every stop is one JSON line)
+### A. Crash run (base). Two forks: the second one's rich side is a TNT and the cart takes it. Pays the load only.
+stops (one per line; `load/mult/shields/lanterns` are AFTER the stop):
+{"i":1,"at":100,"type":"gold","value":0.04,"load":0.04,"mult":1,"shields":0,"lanterns":0}
+{"i":2,"at":200,"type":"gold","value":0.35,"load":0.39,"mult":1,"shields":0,"lanterns":0}
+{"i":3,"at":300,"type":"fork","left":{"type":"none"},"right":{"type":"gold","value":0.11},"side":"left","pick":"safe","taken":{"type":"none"},"load":0.39,"mult":1,"shields":0,"lanterns":0}
+{"i":4,"at":400,"type":"fork","left":{"type":"tnt"},"right":{"type":"gold","value":0.02},"side":"left","pick":"rich","taken":{"type":"tnt","shielded":false,"crash":true},"load":0.39,"mult":1,"shields":0,"lanterns":0}
+run: {"exit":"crash","crash":true,"crashAt":4,"lanterns":0,"bonusAt":null,"load":0.39,"mult":1,"shields":0,"pay":0.39}
+round: {"basePayout":0.39,"bonusTriggered":false,"totalPayout":0.39,"capped":false,"cost":1}
+### B. Clean door run (base). Fork takes the rich gold side, two shields, gem x5, the TNT is eaten by a shield, door pays 0.88 x 6.
+stops (one per line; `load/mult/shields/lanterns` are AFTER the stop):
+{"i":1,"at":100,"type":"fork","left":{"type":"none"},"right":{"type":"gold","value":0.88},"side":"right","pick":"rich","taken":{"type":"gold","value":0.88},"load":0.88,"mult":1,"shields":0,"lanterns":0}
+{"i":2,"at":200,"type":"shield","load":0.88,"mult":1,"shields":1,"lanterns":0}
+{"i":3,"at":300,"type":"shield","load":0.88,"mult":1,"shields":2,"lanterns":0}
+{"i":4,"at":400,"type":"gem","value":5,"load":0.88,"mult":6,"shields":2,"lanterns":0}
+{"i":5,"at":500,"type":"tnt","shielded":true,"crash":false,"load":0.88,"mult":6,"shields":1,"lanterns":0}
+{"i":6,"at":600,"type":"door","kind":"normal","jackpot":0,"pay":5.28,"load":0.88,"mult":6,"shields":1,"lanterns":0}
+run: {"exit":"door","crash":false,"crashAt":null,"lanterns":0,"bonusAt":null,"load":0.88,"mult":6,"shields":1,"pay":5.28}
+round: {"basePayout":5.28,"bonusTriggered":false,"totalPayout":5.28,"capped":false,"cost":1}
+### C. Bonus-trigger run (base) with its Deep Shaft
+base run (3 lanterns at stops 1-3, `bonusAt:3`, the run still finishes and pays 0.13):
+{"i":1,"at":100,"type":"lantern","load":0,"mult":1,"shields":0,"lanterns":1}
+{"i":2,"at":200,"type":"lantern","load":0,"mult":1,"shields":0,"lanterns":2}
+{"i":3,"at":300,"type":"lantern","load":0,"mult":1,"shields":0,"lanterns":3}
+{"i":4,"at":400,"type":"gold","value":0.09,"load":0.09,"mult":1,"shields":0,"lanterns":3}
+{"i":5,"at":500,"type":"gold","value":0.04,"load":0.13,"mult":1,"shields":0,"lanterns":3}
+{"i":6,"at":600,"type":"door","kind":"normal","jackpot":0,"pay":0.13,"load":0.13,"mult":1,"shields":0,"lanterns":3}
+bonus header: {"type":"deepShaft","startSpins":3,"carts":3,"levels":3,"startLevel":1,"startMult":1,"startShields":0,"triggeredBy":[0],"bottomReached":false,"cartsLost":3,"totalPayout":3.64}
+segment: {"spinIndex":1,"spinsLeft":2,"cart":1,"level":1,"length":6,"spacing":100,"multIn":1,"multOut":1,"shieldsIn":0,"shieldsOut":0,"exit":"crash","load":0.98,"pay":0.98,"totalPayout":0.98,"cartLost":true,"bonusPayoutSoFar":0.98}
+  {"i":1,"at":100,"type":"gold","value":0.7,"load":0.7,"mult":1,"shields":0,"lanterns":0}
+  {"i":2,"at":200,"type":"gold","value":0.28,"load":0.98,"mult":1,"shields":0,"lanterns":0}
+  {"i":3,"at":300,"type":"fork","left":{"type":"shield"},"right":{"type":"tnt"},"side":"right","pick":"rich","taken":{"type":"tnt","shielded":false,"crash":true},"load":0.98,"mult":1,"shields":0,"lanterns":0}
+segment: {"spinIndex":2,"spinsLeft":1,"cart":2,"level":1,"length":6,"spacing":100,"multIn":1,"multOut":1,"shieldsIn":0,"shieldsOut":0,"exit":"crash","load":1.68,"pay":1.68,"totalPayout":1.68,"cartLost":true,"bonusPayoutSoFar":2.66}
+  {"i":1,"at":100,"type":"gold","value":0.14,"load":0.14,"mult":1,"shields":0,"lanterns":0}
+  {"i":2,"at":200,"type":"gold","value":0.7,"load":0.84,"mult":1,"shields":0,"lanterns":0}
+  {"i":3,"at":300,"type":"gold","value":0.14,"load":0.98,"mult":1,"shields":0,"lanterns":0}
+  {"i":4,"at":400,"type":"gold","value":0.7,"load":1.68,"mult":1,"shields":0,"lanterns":0}
+  {"i":5,"at":500,"type":"tnt","shielded":false,"crash":true,"load":1.68,"mult":1,"shields":0,"lanterns":0}
+segment: {"spinIndex":3,"spinsLeft":0,"cart":3,"level":1,"length":6,"spacing":100,"multIn":1,"multOut":1,"shieldsIn":0,"shieldsOut":0,"exit":"crash","load":0.98,"pay":0.98,"totalPayout":0.98,"cartLost":true,"bonusPayoutSoFar":3.64}
+  {"i":1,"at":100,"type":"gold","value":0.7,"load":0.7,"mult":1,"shields":0,"lanterns":0}
+  {"i":2,"at":200,"type":"gold","value":0.28,"load":0.98,"mult":1,"shields":0,"lanterns":0}
+  {"i":3,"at":300,"type":"tnt","shielded":false,"crash":true,"load":0.98,"mult":1,"shields":0,"lanterns":0}
+round: basePayout 0.13 + bonus 3.64 = totalPayout 3.77 (this is a poor bonus: all 3 carts crashed on level 1 and paid only their load)
+
+Note: a segment's `stops` end at the crash stop or at the door (`exit:"level"` / `"bottom"`).
 
 ## 6. CFG for slot.json (`slot.json` may equal `CFG`)
 `bets`, `maxWin:7500`, `anteCost:2.5`, `buy:{deep:{cost,name},motherlode:{cost,name,...}}`, `payscale`, tables; no `luckCost` (no MAX LUCK).
 
+## 7. Measured math (tools/sim.js, 36M rounds per mode = 6 seeds x 6M; sample SE = 95% CI)
+| mode | cost | RTP | +-95% | any-win freq | 1 in N hit >=100x | max-win (7,500x) 1 in | notes |
+|---|---|---|---|---|---|---|---|
+| base | 1 | 96.21% | 0.36 | 62.6% | 915 | 3.6M | Deep Shaft 1 in 207, avg bonus 66.9x, sd 10.2x, p99 11.1x, p99.9 103x |
+| ante (Twin Carts) | 2.5 | 96.19% | 0.21 | 86.8% | 438 | 2.4M | Deep Shaft 1 in 101, sd 16.3x, p99 25.5x, p99.9 169x |
+| buy deep | 70 | 96.35% | 0.06 | n/a | 5 | 19k | avg bonus 67.4x, sd 134x, p99 514x, p99.9 1220x |
+| buy motherlode | 140 | 96.30% | 0.04 | n/a | 2 | 12k | avg bonus 134.8x, sd 171x, p99 788x, p99.9 1629x |
+Retune knobs (top level of CFG): `goldScale` (base ride), `anteScale`, `bonusScale`, `motherScale`; tables in `CFG.base`, `CFG.bonus.levels[]`, `CFG.ante`, `CFG.buy.*`. Regenerate meta: `node tools/rattlerock-meta.js`.
+
 ## RESUME NOTE
-- [start] Format doc written. Next: engines/rattlerock-run.js + meta + registry + tests/rattlerock.test.js, then sim/tune each mode to 96.0-96.5% (5M rounds per mode).
+- DONE: format doc, engine `engines/rattlerock-run.js` + meta + registry, `tools/rattlerock.test.js`, every mode tuned into 96.0-96.5% (section 7).
+- Left: only if the owner asks for a retune. `slot.json` may equal CFG (+ meta). Client reads everything from `round.runs` / `round.bonus.spins`.

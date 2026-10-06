@@ -29,7 +29,7 @@ const FORK = { richP: 0.5, goldMult: { rich: 2.5, safe: 0.5 },
   rich: { gold: 40, gem: 30, shield: 5, tnt: 22, lantern: 3 }, safe: { gold: 55, shield: 20, none: 22, tnt: 3 } };
 const BASE = { lenW: [[6, 6], [7, 10], [8, 14], [9, 18], [10, 20], [11, 18], [12, 14]],
   w: { gold: 32, gem: 5, fork: 10, shield: 5, tnt: 23, lantern: 5.2 }, goldV: GOLDB, gemV: GEM, fork: FORK,
-  jackpotP: 0.003, jackpot: [[25, 72], [100, 24], [500, 3.8], [1000, 0.2]] };
+  jackpotP: 0.00285, jackpot: [[25, 72], [100, 24], [500, 3.8], [1000, 0.2]] };
 
 export const CFG = {
   bets: [0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25,30,40,50,60,80,100,150,200,250,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000],
@@ -40,13 +40,13 @@ export const CFG = {
     motherlode: { cost: 140, name: 'Motherlode Run', startLevel: 2, startMult: 10, startShields: 2 }
   },
   spacing: SPACING, carts: 3, levels: 3, lanternsToTrigger: 3,
-  goldScale: 1.1, anteScale: 1.04, bonusScale: 1.005, motherScale: 1.058,      // global RTP knobs (sim --cfg '{"goldScale":1.02}')
+  goldScale: 1.1, anteScale: 1.034, bonusScale: 1.0035, motherScale: 1.062,      // global RTP knobs (sim --cfg '{"goldScale":1.02}')
   base: BASE,
   ante: { shieldMult: 1.6, goldScale: 1.2 },
   bonus: { levels: [
     { len: 6, w: { gold: 44, gem: 7, fork: 10, shield: 6, tnt: 10, lantern: 0 }, goldV: GOLD, gemV: GEM, fork: FORK, goldScale: 1.4, jackpotP: 0, jackpot: [] },
     { len: 7, w: { gold: 42, gem: 9, fork: 10, shield: 6, tnt: 11, lantern: 0 }, goldV: GOLD, gemV: [[2, 30], [3, 30], [5, 25], [10, 15]], fork: FORK, goldScale: 2.2, jackpotP: 0, jackpot: [] },
-    { len: 8, w: { gold: 40, gem: 11, fork: 10, shield: 6, tnt: 12, lantern: 0 }, goldV: GOLD, gemV: [[3, 20], [5, 30], [10, 30], [25, 18], [50, 2]], fork: FORK, goldScale: 3.4, jackpotP: 0.06, jackpot: [[50, 60], [250, 28], [1000, 10.5], [2500, 1.35], [7500, 0.15]] }
+    { len: 8, w: { gold: 40, gem: 11, fork: 10, shield: 6, tnt: 12, lantern: 0 }, goldV: GOLD, gemV: [[3, 20], [5, 30], [10, 30], [25, 18], [50, 2]], fork: FORK, goldScale: 3.4, jackpotP: 0.0595, jackpot: [[50, 60], [250, 28], [1000, 10.5], [2500, 1.35], [7500, 0.15]] }
   ] }
 };
 CFG.payscale = { gold: GOLD.map(g => g[0]), gem: GEM.map(g => g[0]), forkGoldMult: FORK.goldMult, jackpot: BASE.jackpot.map(j => j[0]) };
