@@ -56,6 +56,9 @@ const crystal = (x, y, h, w, ang, hue) => {
     cyan: ['#e8fff8', '#6af0d8', '#20a8b8', '#0e4a6a', '#6af0d8'],
     violet: ['#f6e8ff', '#c08aff', '#7a3ad0', '#3a1478', '#b890ff'],
     amber: ['#fff4d0', '#ffc860', '#e0801a', '#6a3008', '#ffd070'],
+    red: ['#ffe0d0', '#ff7a60', '#c8281e', '#4a0a0c', '#ff8a70'],
+    gold: ['#fffbe0', '#ffe070', '#d89a20', '#5a3408', '#ffd860'],
+    plum: ['#f0d8ff', '#a868e0', '#5a2aa0', '#1e0a4a', '#c090ff'],
     night: ['#7aa0e8', '#2a46a0', '#162468', '#060a28', '#4a6ad0'],
   }[hue];
   const a = ang * Math.PI / 180, ux = Math.sin(a), uy = -Math.cos(a), vx = Math.cos(a), vy = Math.sin(a);
@@ -339,5 +342,6 @@ const glovePoint = (x, y) => `<g transform="translate(${x} ${y})"><path d="M-30,
 
 
 
+const mush = (x, y, s, col) => `<g transform="translate(${x} ${y}) scale(${s})"><circle cy="-10" r="26" fill="${col}" opacity=".28"/><rect x="-3" y="-12" width="6" height="14" rx="2" fill="#d8f0e0" stroke="${OUT}" stroke-width="2"/><path d="M-13,-10 C-12,-26 12,-26 13,-10 Z" fill="${col}" stroke="${OUT}" stroke-width="2.4"/><circle cx="-4" cy="-17" r="2" fill="#fff" opacity=".8"/><circle cx="5" cy="-14" r="1.6" fill="#fff" opacity=".8"/></g>`;
 const heap2 = (cx, cy, wd, ht, n, ns) => `<path d="M${cx - wd / 2},${cy + 6} Q${cx - wd * .3},${cy - ht * 1.1} ${cx},${cy - ht} Q${cx + wd * .3},${cy - ht * 1.1} ${cx + wd / 2},${cy + 6} Z" fill="#b8681a" stroke="${OUT}" stroke-width="3"/>` + heap(cx, cy, wd, ht, n, ns);
 module.exports={heap2,fs,FONT,FONT2,R,rnd,f,lerp,OUT,grad,rad,get defs(){return defs},lantern,crystal,cluster,nugget,coin,heap,spark,tag,gem,items,dw3,glove3,glovePoint,cart,cartRim,mush,flat,RAIL,setSeed:n=>{seed=n}};
