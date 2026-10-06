@@ -1,0 +1,7 @@
+// node bd.cjs : 320x180 backdrop (shell blurs the first <img> of #scene into the page background)
+const { chromium } = require('/home/user/nebula/node_modules/playwright'); const fs = require('fs'), path = require('path');
+(async () => { const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--no-sandbox'] });
+  fs.writeFileSync(path.join(__dirname, 'bake', 'bd.html'), `<body style="margin:0;width:1600px;height:900px;overflow:hidden;position:relative;background:#000"><div style="position:absolute;left:0;top:-492px"><img src="far-t-lv1.png" style="position:absolute"><img src="farmid-t-lv1.png" style="position:absolute"><img src="mid-t-lv1.png" style="position:absolute"><img src="near-t-lv1.png" style="position:absolute"></div></body>`);
+  const p = await b.newPage({ viewport: { width: 1600, height: 900 } }); await p.goto('file://' + path.join(__dirname, 'bake', 'bd.html')); await p.waitForTimeout(500);
+  const png = await p.screenshot(); const w = await p.evaluate(async d => { const i = new Image(); i.src = 'data:image/png;base64,' + d; await i.decode(); const c = document.createElement('canvas'); c.width = 320; c.height = 180; c.getContext('2d').drawImage(i, 0, 0, 320, 180); return c.toDataURL('image/webp', .6); }, png.toString('base64'));
+  fs.writeFileSync(path.join(__dirname, 'bake', 'bd.webp'), Buffer.from(w.split(',')[1], 'base64')); await b.close(); })();

@@ -10,27 +10,16 @@ const FONT_NUM = B.FONT2;
 const OUT = '#1c0f08';
 
 // ---------------- scene.html ----------------
-let css = '';
-let scene = `<!-- Rattlerock Run world (leo). 1600x900 stage. 5 baked WebP parallax layers x 3 depth palettes (#scene.lv1 / .lv2 / .lv3), plus the daylight exit burst. Only transforms/opacity ever change. See ART-NOTES.md. -->\n<div id="scene" class="lv1">`;
-for (const lv of [1, 2, 3]) scene += `<img class="ly ly-far L${lv}" alt="" width="2000" height="900" src="${uri(`far-lv${lv}.webp`)}">`;
-for (const l of ['farmid', 'mid', 'track', 'near']) for (const lv of [1, 2, 3]) {
-  scene += `<div class="ly ly-${l} L${lv}"></div>`;
-  css += `.ly-${l}.L${lv}{background-image:url(${uri(`${l}-lv${lv}.webp`)})}\n`;
-}
-scene += `<div class="ly ly-track2"></div><div class="ly ly-exit"></div></div>\n<style id="rrWorldCss">${css}</style>\n`;
-// track2 reuses the active track bitmap through CSS vars is not possible for url(); use one rule per level
-let t2 = ''; for (const lv of [1, 2, 3]) t2 += `#scene.lv${lv} .ly-track2{background-image:var(--tr${lv})}\n`;
-// (the track bitmaps are already in CSS above; copy them by selector grouping instead of repeating the data)
-scene = scene.replace('</style>', `</style>`);
+// Bitmaps live ONCE in CSS custom properties on #scene; every layer (landscape + portrait) references them with var().
+let vars = '';
+for (const lv of [1, 2, 3]) for (const [k, n] of [['far', 'far-t'], ['farmid', 'farmid-t'], ['mid', 'mid-t'], ['near', 'near-t'], ['track', 'track']]) vars += `--${k}${lv}:url(${uri(`${n}-lv${lv}.webp`)});`;
+let scene = `<!-- Rattlerock Run world (leo). 1600x900 stage. TALL baked WebP parallax layers (1600 x 1950, tile horizontally, rail at y 1210 of the image) x 3 depth palettes (#scene.lv1 / .lv2 / .lv3). Landscape shows the window y 492..1392 of them (camera headroom +-350 px); portrait (.ly-*-p, body.portrait) shows the full 900x1950 design stage. Layers are 6400 wide so wide windows never show an edge. Only transforms/opacity change. See ART-NOTES.md. -->\n<div id="scene" class="lv1" style="${vars}"><img class="bdp" alt="" src="${uri('bd.webp')}">`;
+const mk = (cls, pc) => [1, 2, 3].map(lv => `<div class="ly ${cls}${pc ? '-p' : ''} L${lv}"></div>`).join('');
+for (const l of ['far', 'farmid', 'mid']) scene += mk('ly-' + l, false);
+scene += mk('ly-track', false) + `<div class="ly ly-track2">${[1, 2, 3].map(lv => `<div class="t2 L${lv}"></div>`).join('')}</div>` + mk('ly-near', false) + `<div class="ly ly-exit"></div>`;
+for (const l of ['far', 'farmid', 'mid']) scene += mk('ly-' + l, true);
+scene += mk('ly-track', true) + mk('ly-near', true) + `<div class="ly ly-exit-p"></div></div>\n`;
 fs.writeFileSync(path.join(D, 'scene.html'), scene);
-const exitData = uri('exit.webp');
-// the exit overlay and the track2 lane need the bitmap too: add tiny rules that reference the existing selectors via CSS @import-free trick -> use <img> clones instead
-let scene2 = fs.readFileSync(path.join(D, 'scene.html'), 'utf8');
-scene2 = scene2.replace('<div class="ly ly-track2"></div><div class="ly ly-exit"></div>', `<div class="ly ly-track2"><div class="t2 L1"></div><div class="t2 L2"></div><div class="t2 L3"></div></div><div class="ly ly-exit"></div>`);
-// track2 children share the track images: selector groups in the same rules
-scene2 = scene2.replace(/\.ly-track\.L(\d)\{/g, (m, n) => `.ly-track.L${n},.ly-track2 .t2.L${n}{`);
-scene2 = scene2.replace('</style>', `.ly-exit{background-image:url(${exitData})}\n</style>`);
-fs.writeFileSync(path.join(D, 'scene.html'), scene2);
 
 // ---------------- frame.html ----------------
 fs.writeFileSync(path.join(D, 'frame.html'), `<!-- Rattlerock Run track window (leo). No board art. #frame = clipping + positioning window 1600x820 at stage (0,0) (the shell bottom bar starts at y 782). #grid = the lane where kai puts the cart and the pickups (position:absolute children, stage coordinates), #fxl = overlay for sparks, bursts, win pops (z6). -->\n<div id="frame"><div id="grid"></div><div id="fxl"></div></div>\n`);
@@ -103,37 +92,61 @@ fs.writeFileSync(path.join(D, 'info.html'), `  <p>One spin is one ride. Your car
   </div>\n`);
 
 // ---------------- slot.css ----------------
+const EXIT = uri('exit.webp');
 const css2 = `/* ---------- ART-GEN fonts ---------- */
 @font-face{font-family:RRTitle;font-weight:900;src:url(data:font/woff2;base64,${FONT_TITLE}) format('woff2')}
 @font-face{font-family:RRNum;src:url(data:font/woff2;base64,${FONT_NUM}) format('woff2')}
 /* ART-GEN fonts end */
 /* ---------- world (see ART-NOTES.md) ---------- */
-#scene{width:1600px;height:900px;overflow:hidden;background:#07040f}
-#scene .ly{position:absolute;left:0;top:0;pointer-events:none;will-change:transform}
-#scene .L1,#scene .L2,#scene .L3,#scene .t2.L1,#scene .t2.L2,#scene .t2.L3{opacity:0;visibility:hidden;transition:opacity .9s ease,visibility 0s .9s}
+#scene{width:1600px;height:900px;overflow:visible;background:transparent}
+#scene .bdp{display:none}
+#scene .ly{position:absolute;pointer-events:none;will-change:transform;left:-1600px;width:6400px;top:-492px;height:1950px;background-repeat:repeat-x;background-size:1600px 1950px;background-position:0 0}
+#scene .ly-far.L1,#scene .ly-far-p.L1{background-image:var(--far1)}#scene .ly-far.L2,#scene .ly-far-p.L2{background-image:var(--far2)}#scene .ly-far.L3,#scene .ly-far-p.L3{background-image:var(--far3)}
+#scene .ly-farmid.L1,#scene .ly-farmid-p.L1{background-image:var(--farmid1)}#scene .ly-farmid.L2,#scene .ly-farmid-p.L2{background-image:var(--farmid2)}#scene .ly-farmid.L3,#scene .ly-farmid-p.L3{background-image:var(--farmid3)}
+#scene .ly-mid.L1,#scene .ly-mid-p.L1{background-image:var(--mid1)}#scene .ly-mid.L2,#scene .ly-mid-p.L2{background-image:var(--mid2)}#scene .ly-mid.L3,#scene .ly-mid-p.L3{background-image:var(--mid3)}
+#scene .ly-near.L1,#scene .ly-near-p.L1{background-image:var(--near1)}#scene .ly-near.L2,#scene .ly-near-p.L2{background-image:var(--near2)}#scene .ly-near.L3,#scene .ly-near-p.L3{background-image:var(--near3)}
+#scene .ly-track.L1,#scene .ly-track-p.L1,#scene .t2.L1{background-image:var(--track1)}#scene .ly-track.L2,#scene .ly-track-p.L2,#scene .t2.L2{background-image:var(--track2)}#scene .ly-track.L3,#scene .ly-track-p.L3,#scene .t2.L3{background-image:var(--track3)}
+#scene .L1,#scene .L2,#scene .L3{opacity:0;visibility:hidden;transition:opacity .9s ease,visibility 0s .9s}
 #scene.lv1 .L1,#scene.lv2 .L2,#scene.lv3 .L3{opacity:1;visibility:visible;transition:opacity .9s ease,visibility 0s}
-#scene .ly-far{width:2000px;height:900px;animation:rrDrift 140s ease-in-out infinite alternate}
-#scene .ly-farmid,#scene .ly-mid,#scene .ly-near{width:3200px;height:900px;background-repeat:repeat-x;background-size:1600px 900px;background-position:0 0}
-#scene .ly-track,#scene .ly-track2 .t2{top:670px;width:3200px;height:230px;background-repeat:repeat-x;background-size:1600px 230px}
+#scene .ly-track,#scene .t2{top:670px;height:230px;background-size:1600px 230px}
 #scene .ly-track::after{content:'';position:absolute;left:0;right:0;top:70px;bottom:0}
 #scene .ly-track.L1::after{background:linear-gradient(rgba(5,8,30,0),rgba(5,8,30,.85) 40%,rgba(5,8,30,.95))}
 #scene .ly-track.L2::after{background:linear-gradient(rgba(20,4,4,0),rgba(20,4,4,.85) 40%,rgba(20,4,4,.95))}
 #scene .ly-track.L3::after{background:linear-gradient(rgba(8,3,26,0),rgba(8,3,26,.85) 40%,rgba(8,3,26,.95))}
-#scene .ly-track2{top:0;width:3200px;height:900px;display:none;transform-origin:0 718px}
+#scene .ly-track2{top:0;height:900px;display:none;transform-origin:0 718px;background:none}
 #scene.twin .ly-track2{display:block}
-#scene .ly-track2 .t2{position:absolute;left:0}
+#scene .ly-track2 .t2{position:absolute;left:0;width:6400px}
+#scene .ly-far{animation:rrDrift 140s ease-in-out infinite alternate}
 #scene .ly-farmid{animation:rrScroll 44.4s linear infinite;animation-play-state:paused}
 #scene .ly-mid{animation:rrScroll 12.1s linear infinite;animation-play-state:paused}
 #scene .ly-track{animation:rrScroll 2.67s linear infinite;animation-play-state:paused}
-#scene .ly-track2{animation:rrScroll2 3.7s linear infinite;animation-play-state:paused}
+#scene .ly-track2{animation:rrScroll2 3.7s linear infinite;animation-play-state:paused;transform:translate3d(0,-230px,0) scale(.72)}
 #scene .ly-near{animation:rrScroll 1.78s linear infinite;animation-play-state:paused}
 #scene.go .ly-farmid,#scene.go .ly-mid,#scene.go .ly-track,#scene.go .ly-track2,#scene.go .ly-near{animation-play-state:running}
-#scene .ly-track2{transform:translate3d(0,-230px,0) scale(.72)}
-#scene .ly-exit{width:1600px;height:900px;opacity:0;transition:opacity .7s ease;background-size:1600px 900px;background-repeat:no-repeat;mix-blend-mode:normal}
+#scene .ly-exit{left:0;top:0;width:1600px;height:900px;opacity:0;transition:opacity .7s ease;background:url(${EXIT}) 0 0/1600px 900px no-repeat}
 #scene.exit .ly-exit{opacity:1}
-@keyframes rrDrift{from{transform:translate3d(0,0,0)}to{transform:translate3d(-400px,0,0)}}
-@keyframes rrScroll{from{transform:translate3d(0,0,0)}to{transform:translate3d(-1600px,0,0)}}
+/* camera: set --cy (px, e.g. camY*ratio) on a layer to move it vertically (keyframes read it) */
+@keyframes rrDrift{from{transform:translate3d(0,var(--cy,0px),0)}to{transform:translate3d(-400px,var(--cy,0px),0)}}
+@keyframes rrScroll{from{transform:translate3d(0,var(--cy,0px),0)}to{transform:translate3d(-1600px,var(--cy,0px),0)}}
 @keyframes rrScroll2{from{transform:translate3d(0,-230px,0) scale(.72)}to{transform:translate3d(-1152px,-230px,0) scale(.72)}}
+/* portrait: design stage 900 x 1950, rail at y 1210 (62%). Layers show the whole tall art; landscape ones are hidden. */
+#scene .ly-far-p,#scene .ly-farmid-p,#scene .ly-mid-p,#scene .ly-near-p,#scene .ly-track-p,#scene .ly-exit-p{display:none}
+body.portrait #scene .ly-far,body.portrait #scene .ly-farmid,body.portrait #scene .ly-mid,body.portrait #scene .ly-near,body.portrait #scene .ly-track,body.portrait #scene .ly-track2,body.portrait #scene .ly-exit{display:none!important}
+body.portrait #scene .ly-far-p,body.portrait #scene .ly-farmid-p,body.portrait #scene .ly-mid-p,body.portrait #scene .ly-near-p,body.portrait #scene .ly-track-p{display:block;top:0}
+body.portrait #scene .ly-track-p{top:1162px;height:230px;background-size:1600px 230px}
+body.portrait #scene .ly-track-p::after{content:'';position:absolute;left:0;right:0;top:70px;bottom:0}
+body.portrait #scene .ly-track-p.L1::after{background:linear-gradient(rgba(5,8,30,0),rgba(5,8,30,.85) 40%,rgba(5,8,30,.95))}
+body.portrait #scene .ly-track-p.L2::after{background:linear-gradient(rgba(20,4,4,0),rgba(20,4,4,.85) 40%,rgba(20,4,4,.95))}
+body.portrait #scene .ly-track-p.L3::after{background:linear-gradient(rgba(8,3,26,0),rgba(8,3,26,.85) 40%,rgba(8,3,26,.95))}
+body.portrait #scene .ly-far-p{animation:rrDrift 140s ease-in-out infinite alternate}
+body.portrait #scene .ly-farmid-p{animation:rrScroll 44.4s linear infinite;animation-play-state:paused}
+body.portrait #scene .ly-mid-p{animation:rrScroll 12.1s linear infinite;animation-play-state:paused}
+body.portrait #scene .ly-track-p{animation:rrScroll 2.67s linear infinite;animation-play-state:paused}
+body.portrait #scene .ly-near-p{animation:rrScroll 1.78s linear infinite;animation-play-state:paused}
+body.portrait #scene.go .ly-farmid-p,body.portrait #scene.go .ly-mid-p,body.portrait #scene.go .ly-track-p,body.portrait #scene.go .ly-near-p{animation-play-state:running}
+body.portrait #scene .ly-exit-p{display:block;left:0;top:0;width:900px;height:1950px;opacity:0;transition:opacity .7s;background:radial-gradient(circle at var(--exx,740px) var(--exy,1160px),#fff 0,rgba(255,246,200,.95) 90px,rgba(255,224,138,.55) 330px,rgba(255,176,64,.18) 700px,rgba(255,154,32,0) 1100px)}
+body.portrait #scene.exit .ly-exit-p{opacity:1}
+body.portrait #stage>#scene{left:0!important;top:calc((var(--H,1950px) - 1950px)/2)!important;width:900px!important;height:1950px!important;transform:none!important}
 /* ---------- track window ---------- */
 #frame{left:0;top:0;width:1600px;height:820px;overflow:hidden}
 #grid{position:absolute;left:0;top:0;width:1600px;height:820px}

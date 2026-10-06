@@ -203,7 +203,7 @@ function lavafall(P, cx, lv, gold) {
 
 // ------------------------------------------------------------------ FARMID (transparent, tile 1600)
 function bridge(x1, y1, x2, y2, sag, P) { const mx = (x1 + x2) / 2, my = (y1 + y2) / 2 + sag; let o = `<path d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" fill="none" stroke="#0a0a1c" stroke-width="3.4" opacity=".8"/><path d="M${x1},${y1 - 14} Q${mx},${my - 14} ${x2},${y2 - 14}" fill="none" stroke="#0a0a1c" stroke-width="1.8" opacity=".8"/>`; for (let i = 0; i <= 14; i++) { const t = i / 14, x = lerp(x1, x2, t), y = (1 - t) * (1 - t) * y1 + 2 * t * (1 - t) * my + t * t * y2; o += `<path d="M${f(x)},${f(y)} v-14" stroke="#0a0a1c" stroke-width="1.4" opacity=".8"/>`; if (i % 3 === 1) o += `<circle cx="${f(x)}" cy="${f(y - 18)}" r="3" fill="${P.sparkle}"/><circle cx="${f(x)}" cy="${f(y - 18)}" r="12" fill="url(#lampGlow)" opacity=".5"/>`; } return o; }
-function farmidLayer(P, lv) {
+function farmidLayer(P, lv, inner) {
   setSeed(200 + lv);
   let o = '';
   const H = P.hues;
@@ -217,11 +217,11 @@ function farmidLayer(P, lv) {
   o += W(560, x => bridge(x, 400, x + 400, 380, 46, P), 700) + W(1180, x => bridge(x, 360, x + 380, 392, 40, P), 700);
   for (const [x, y] of [[760, 394], [820, 400], [1340, 392]]) o += `<rect x="${x - 2}" y="${y - 12}" width="4" height="11" fill="#0a0a1c" opacity=".8"/><circle cx="${x}" cy="${y - 15}" r="2.6" fill="#0a0a1c" opacity=".8"/><circle cx="${x + 3}" cy="${y - 8}" r="1.6" fill="${P.sparkle}"/>`;
   for (const fx of P.fallX) o += W(fx, x => lavafall(P, x, lv, lv === 3), 330);
-  return svgPage(P, o);
+  return inner ? o : svgPage(P, o);
 }
 
 // ------------------------------------------------------------------ MID (transparent, tile 1600)
-function midLayer(P, lv) {
+function midLayer(P, lv, inner) {
   setSeed(300 + lv);
   let o = '';
   const pillar = (cx, w, top) => {
@@ -239,11 +239,11 @@ function midLayer(P, lv) {
   const Hm = P.hueMid;
   o += `<g opacity=".62">` + W(1480, x => cluster(x, 712, .62, Hm[0], false) + cluster(x - 120, 712, .34, Hm[1], false), 360) + W(120, x => cluster(x, 712, .66, Hm[0], false) + cluster(x + 130, 712, .3, Hm[2], false), 360) + W(1180, x => cluster(x, 712, .4, Hm[2], false), 300) + `</g>`;
   if (lv === 3) o += W(800, x => { let t = `<ellipse cx="${x}" cy="840" rx="220" ry="40" fill="#ffd060" opacity=".14"/>`; t += B.heap2(x, 840, 300, 90, 60, 20); return t; }, 300);
-  return svgPage(P, o);
+  return inner ? o : svgPage(P, o);
 }
 
 // ------------------------------------------------------------------ TRACK (transparent, tile 1600, baked 1600x230 at y 670)
-function trackLayer(P, lv) {
+function trackLayer(P, lv, inner) {
   setSeed(400 + lv);
   let o = '';
   for (const bx of [200, 600, 1000, 1400]) {
@@ -259,11 +259,11 @@ function trackLayer(P, lv) {
   if (lv === 2) { for (const x of [100, 520, 940, 1340]) o += `<ellipse cx="${x}" cy="${RAIL + 40}" rx="130" ry="22" fill="#ff7a20" opacity=".35"/><path d="M${x - 60},${RAIL + 40} q20,-10 40,0 t40,0 t40,0" fill="none" stroke="#fff0a0" stroke-width="3" opacity=".8"/>`; for (let i = 0; i < 20; i++) o += `<circle cx="${f(R(0, 1600))}" cy="${f(RAIL + R(30, 100))}" r="${f(R(1.2, 3))}" fill="#ffd070" opacity="${f(R(.4, .9))}"/>`; }
   if (lv === 3) { for (const [x, w] of [[180, 160], [640, 190], [1120, 170], [1470, 140]]) o += B.heap2(x, RAIL + 42, w, 30, 26, 11); for (let i = 0; i < 10; i++) o += spark(R(20, 1580), RAIL + R(24, 80), R(5, 10), .85); }
   for (let i = 0; i < 26; i++) { const x = R(0, 1600); o += `<ellipse cx="${f(x)}" cy="${RAIL + 40}" rx="${f(R(6, 18))}" ry="3.4" fill="${P.under}" opacity="${f(R(.35, .75))}"/>`; }
-  return svgPage(P, o);
+  return inner ? o : svgPage(P, o);
 }
 
 // ------------------------------------------------------------------ NEAR (transparent, tile 1600)
-function nearLayer(P, lv) {
+function nearLayer(P, lv, inner) {
   setSeed(500 + lv);
   let o = '';
   const wrapRow = (y0, amp, col, edge) => { const n = 20, ys = []; for (let i = 0; i < n; i++) ys.push(y0 - R(0, amp)); ys.push(ys[0]); let d = `M-20,910 L-20,${f(ys[0])}`; ys.forEach((y, i) => d += ` L${i * 80},${f(y)}`); d += ` L1620,${f(ys[0])} L1620,910 Z`; return `<path d="${d}" fill="${col}" stroke="${edge}" stroke-width="3" stroke-linejoin="round"/>`; };
@@ -275,7 +275,7 @@ function nearLayer(P, lv) {
   [[560, 60, 90], [800, 80, 130], [1180, 60, 100], [1540, 70, 110]].forEach(([x, w, h], i) => o += W(x, xx => stal(xx, w, h, P.stal[i]), 120));
   for (const [x, w, h] of [[520, 110, 60], [1010, 90, 46], [1250, 70, 36]]) o += `<path d="M${x - w},910 L${x - w * .8},${900 - h * .5} L${x - w * .2},${900 - h} L${x + w * .5},${900 - h * .7} L${x + w},910 Z" fill="${P.nearRock}" stroke="${P.nearEdge}" stroke-width="3" stroke-linejoin="round"/>`;
   for (let i = 0; i < 40; i++) { const x = R(24, 1576), y = R(60, 800), r = R(1.4, 3.4), c = P.motes[i % 2]; o += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(r * 4)}" fill="${c}" opacity=".12"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="${c}" opacity="${f(R(.4, .9))}"/>`; }
-  return svgPage(P, o);
+  return inner ? o : svgPage(P, o);
 }
 
 // ------------------------------------------------------------------ exit burst overlay (daylight)
@@ -287,6 +287,102 @@ function exitLayer() {
   for (let i = 0; i < 18; i++) { const a = Math.PI + (i / 17) * Math.PI * .95 - .1 + R(-.05, .05), w = R(.03, .07), L = 1600; const x1 = cx + Math.cos(a - w) * L, y1 = cy + Math.sin(a - w) * L, x2 = cx + Math.cos(a + w) * L, y2 = cy + Math.sin(a + w) * L; o += `<polygon points="${cx},${cy} ${f(x1)},${f(y1)} ${f(x2)},${f(y2)}" fill="#fff8d0" opacity="${f(R(.12, .3))}"/>`; }
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">${o}</svg>`;
 }
+
+
+// ======================= TALL layers: 1600 wide (tileable) x 1950 tall, rail at y 1210 (= landscape y 718 + 492) =======================
+const DY = 492, HT = 1950;
+const hsh = (a, b, c = 0) => { const v = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return v - Math.floor(v); };
+function farTall(P, lv) {
+  setSeed(100 + lv); const FW = 1600, N = 16, S2 = FW / N;
+  let o = `<rect width="${FW}" height="${HT}" fill="url(#sky4)"/>`;
+  const rc = (x, y, j) => { const dx = Math.min(Math.abs(x - P.warmC[0]), Math.abs(x - P.warmC[0] + FW), Math.abs(x - P.warmC[0] - FW)); const warm = Math.max(0, 1 - Math.hypot(dx * .8, (y - P.warmC[1] - DY) * 1.2) / 760), base = Math.max(0, Math.min(1, (y - DY * .4) / 700)); const c = mix(P.rockA, P.rockB, base).map((v, i) => v + P.rockJ[i] * j + P.rockW[i] * warm); return `rgb(${c.map(v => Math.max(0, Math.min(255, v | 0))).join(',')})`; };
+  const gs = Math.ceil(HT / S2) + 1;
+  for (let gy = -1; gy < gs; gy++) for (let gx = 0; gx < N; gx++) {
+    const pt = (i, j) => { const m = ((gx + i) % N + N) % N; return [(gx + i) * S2 + (hsh(m, gy + j, 1) - .5) * 32, (gy + j) * S2 + (hsh(m, gy + j, 2) - .5) * 32]; };
+    const a = pt(0, 0), b = pt(1, 0), c = pt(1, 1), d = pt(0, 1), tr = hsh(gx, gy, 3) < .5 ? [[a, b, c], [a, c, d]] : [[a, b, d], [b, c, d]];
+    tr.forEach((t, k) => { const col = rc((t[0][0] + t[1][0] + t[2][0]) / 3, (t[0][1] + t[1][1] + t[2][1]) / 3, hsh(gx, gy, 4 + k) * hsh(gx, gy, 6 + k)); o += `<polygon points="${t.map(p => f(p[0]) + ',' + f(p[1])).join(' ')}" fill="${col}" stroke="${col}" stroke-width=".8"/>`; });
+  }
+  // the skylight shaft: opening (kept at landscape position) + a bright chimney going up to the top
+  o += `<polygon points="910,${DY - 10} 1250,${DY - 10} 1330,0 830,0" fill="${P.roof[0]}" opacity="${P.roofA * .55}"/><polygon points="960,${DY - 10} 1200,${DY - 10} 1260,0 900,0" fill="${P.roof[1]}" opacity="${P.roofA * .6}"/>`;
+  o += `<ellipse cx="1080" cy="${DY - 10}" rx="260" ry="130" fill="${P.roof[0]}" opacity="${P.roofA}"/><ellipse cx="1080" cy="${DY - 10}" rx="170" ry="80" fill="${P.roof[1]}" opacity="${P.roofA + .1}"/><ellipse cx="1080" cy="${DY + 30}" rx="420" ry="220" fill="${P.roof[2]}" opacity=".16"/>`;
+  // big soft stalactites hanging from the ceiling (far, low contrast)
+  [[120, 120, 380], [340, 90, 260], [560, 130, 420], [760, 70, 220], [1400, 120, 360], [1560, 80, 280], [1230, 60, 200]].forEach(([x, w, h]) => { o += W(x, xx => `<path d="M${xx - w},-10 L${xx - w * .3},${h * .6} L${xx},${h} L${xx + w * .35},${h * .55} L${xx + w},-10 Z" fill="${P.cliff}" stroke="${P.cliffHi}" stroke-width="3" stroke-linejoin="round" opacity=".7"/>`, 200); });
+  o += `<rect y="0" width="${FW}" height="${DY + 100}" fill="url(#hazeUp)" opacity="${P.hazeA * .35}"/>`;
+  // band content (unchanged from the landscape art), shifted into place
+  let g = '';
+  const hz = P.hazeA;
+  g += `<g opacity=".8">` + [[20, 120, 3], [210, 96, 3], [640, 130, 4], [1000, 120, 3], [1420, 130, 4]].map(([x, w, fl]) => W(x, xx => facade(P, xx, 640, w, fl, .62, 1), 260)).join('') + `</g>`;
+  g += `<rect y="380" width="${FW}" height="320" fill="url(#hazeUp)" opacity=".5"/>`;
+  g += W(380, x => garch(P, x, 700, 540, 540, 34), 340) + W(1090, x => garch(P, x, 700, 380, 440, 28), 340) + W(1560, x => garch(P, x, 700, 440, 480, 30), 340);
+  g += [[120, 200, 5], [360, 160, 4], [590, 240, 6], [890, 130, 3], [1250, 190, 4], [1520, 210, 5]].map(([x, w, fl]) => W(x, xx => facade(P, xx, 700, w, fl, 1), 300)).join('');
+  for (const [x1, y1, x2, y2] of [[330, 640, 392, 600], [840, 560, 892, 520], [1450, 640, 1500, 590]]) { for (let i = 0; i <= 8; i++) { const t = i / 8; g += `<rect x="${f(lerp(x1, x2, t))}" y="${f(lerp(y1, y2, t))}" width="12" height="4" fill="${P.edge}" opacity=".5"/>`; } }
+  for (const [x1, x2, y] of [[130, 620, 560], [830, 1230, 520], [1300, 1580, 540]]) for (let x = x1; x < x2; x += 24) g += `<circle cx="${x}" cy="${f(y + Math.sin((x - x1) / (x2 - x1) * Math.PI) * 24)}" r="2.2" fill="${P.sparkle}" opacity=".8"/>`;
+  if (P.fauna === 'bats') for (const [x, y, s] of [[640, 150, 1], [700, 190, .8], [1210, 250, .9], [380, 220, .7], [1450, 160, 1], [1500, 210, .7], [820, 330, .6]]) g += `<path transform="translate(${x} ${y}) scale(${s})" d="M0,0 q-8,-10 -22,-6 q6,2 8,8 q4,-6 10,-2 q4,-4 8,2 q2,-6 8,-2 q2,-6 8,-2 q-6,0 -8,6 q-8,-8 -22,-4 Z" fill="#0a0a30" opacity=".6"/>`;
+  else for (let i = 0; i < 40; i++) g += `<circle cx="${f(R(0, FW))}" cy="${f(R(60, 640))}" r="${f(R(1.2, 3))}" fill="${P.sparkle}" opacity="${f(R(.25, .7))}"/>`;
+  if (lv === 3) for (let i = 0; i < 12; i++) g += `<path d="M${f(R(40, FW - 40))},${f(R(40, 560))} l5,-12 l5,12 l-5,12 Z" fill="#fff0b0" opacity="${f(R(.3, .7))}"/>`;
+  g += `<rect y="250" width="${FW}" height="470" fill="url(#hazeUp)" opacity="${P.hazeA}"/>`;
+  o += `<g transform="translate(0 ${DY})">${g}</g>`;
+  // ceiling haze + deep lake / chasm below the rail
+  const ly = DY + 715;
+  o += `<rect y="${ly}" width="${FW}" height="${HT - ly}" fill="url(#lakeFar)"/><rect y="${ly - 6}" width="${FW}" height="10" fill="${P.lakeLine[0]}" opacity=".35"/>`;
+  for (let i = 0; i < 70; i++) { const y = R(ly + 8, ly + 130); o += `<ellipse cx="${f(R(0, FW))}" cy="${f(y)}" rx="${f(R(30, 150))}" ry="${f(R(1.2, 3))}" fill="${rnd() < .6 ? P.lakeLine[0] : P.lakeLine[1]}" opacity="${f(R(.12, .4))}"/>`; }
+  for (const x of [320, 1200]) o += `<ellipse cx="${x}" cy="${ly + 45}" rx="150" ry="34" fill="${P.lakeGlow}" opacity=".16"/>`;
+  // depth: dark spires rising from the abyss with a glowing rim, soft glow patches, drifting glints
+  for (let i = 0; i < 9; i++) { const x = R(0, FW), w = R(40, 120), h = R(160, 420), y0 = HT + 10; o += W(x, xx => `<path d="M${f(xx - w)},${y0} L${f(xx - w * .3)},${f(y0 - h * .7)} L${f(xx)},${f(y0 - h)} L${f(xx + w * .4)},${f(y0 - h * .6)} L${f(xx + w)},${y0} Z" fill="${P.void}" opacity=".78" stroke="${P.lakeGlow}" stroke-width="2.4" stroke-opacity=".28"/>`, 150); }
+  for (let i = 0; i < 6; i++) o += `<ellipse cx="${f(R(100, 1500))}" cy="${f(R(ly + 160, HT - 80))}" rx="${f(R(120, 260))}" ry="${f(R(26, 60))}" fill="${P.lakeGlow}" opacity="${f(R(.05, .12))}"/>`;
+  for (let i = 0; i < 40; i++) o += `<circle cx="${f(R(0, FW))}" cy="${f(R(ly + 40, HT - 20))}" r="${f(R(1.2, 3.2))}" fill="${P.lakeLine[0]}" opacity="${f(R(.2, .6))}"/>`;
+  o += `<rect y="${ly + 120}" width="${FW}" height="${HT - ly - 120}" fill="${P.void}" opacity=".35"/>`;
+  return svgPage(P, o, FW, HT);
+}
+function farmidTall(P, lv) {
+  const inner = farmidLayer(P, lv, true); setSeed(250 + lv);
+  let o = '';
+  o += `<polygon points="860,0 1300,0 1130,${DY} 740,${DY}" fill="#fff4c0" opacity=".05"/>`;
+  // hanging crystals from the ceiling (hazy)
+  [[200, 1.3, 0], [640, .9, 1], [980, 1.5, 2], [1330, 1.1, 3], [1520, .8, 4]].forEach(([x, s, i]) => { o += `<g opacity=".4">` + W(x, xx => `<g transform="translate(${xx} 0) scale(1 -1)">${cluster(0, -20, s, P.hues[i % P.hues.length], false)}</g>`, 300) + `</g>`; });
+  // the rock the lavafall pours out of: a cliff mass from the ceiling down to the ledge
+  for (const fx of P.fallX) o += W(fx, x => `<path d="M${x - 330},-10 L${x + 330},-10 L${x + 260},200 L${x + 236},${DY + 40} L${x - 224},${DY + 36} L${x - 250},230 Z" fill="${P.void}" stroke="${P.fall[1][1]}" stroke-width="3" stroke-opacity=".55" stroke-linejoin="round"/><path d="M${x - 250},230 L${x - 150},120 L${x - 60},260 L${x + 20},140 L${x + 120},280 L${x + 260},200" fill="none" stroke="${P.cliffHi}" stroke-width="3" opacity=".45"/><ellipse cx="${x}" cy="${DY - 20}" rx="150" ry="90" fill="url(#fallGlow)" opacity=".5"/>`, 360);
+  o += `<g transform="translate(0 ${DY})">${inner}</g>`;
+  // depth below: hazy crystal spires climbing out of the abyss
+  [[100, 2.4, 0], [520, 1.8, 1], [900, 2.6, 2], [1280, 1.9, 3], [1500, 2.2, 4]].forEach(([x, s, i]) => { o += `<g opacity=".3">` + W(x, xx => cluster(xx, HT + 10, s, P.hues[i % P.hues.length], false), 420) + `</g>`; });
+  o += `<rect y="${DY + 740}" width="1600" height="${HT - DY - 740}" fill="url(#hazeUp)" opacity=".25"/>`;
+  return svgPage(P, o, 1600, HT);
+}
+function midTall(P, lv) {
+  const inner = midLayer(P, lv, true); setSeed(350 + lv);
+  let o = '';
+  // continuation of pillars and frame posts up to the ceiling
+  const col = (cx, w) => `<rect x="${cx - w / 2 + 3}" y="-10" width="${w - 8}" height="${DY + 60}" fill="url(#pillar)"/><path d="M${cx - w / 2 + 3},-10 V${DY + 60} M${cx + w / 2 - 5},-10 V${DY + 60}" stroke="${P.pillarEdge}" stroke-width="3"/><path d="M${cx + w / 2 - 14},-10 V${DY + 60} " stroke="${P.rimW}" stroke-width="6" opacity=".4"/>` + Array.from({ length: 9 }, () => { const y = R(20, DY), x = cx + R(-w * .4, w * .3); return `<path d="M${f(x)},${f(y)} l${f(R(10, 36))},${f(R(-14, 22))}" stroke="${P.vein}" stroke-width="2.6" opacity=".5"/>`; }).join('');
+  o += W(300, x => col(x, 110), 200) + W(1030, x => col(x, 70), 200);
+  o += `<rect x="463" y="-10" width="14" height="${DY + 30}" fill="url(#woodD)" stroke="${OUT}" stroke-width="2.6"/><rect x="583" y="-10" width="14" height="${DY + 30}" fill="url(#woodD)" stroke="${OUT}" stroke-width="2.6"/>`;
+  for (const y of [110, 300]) o += `<rect x="458" y="${y}" width="144" height="14" fill="url(#wood)" stroke="${OUT}" stroke-width="2.6"/>`;
+  // chains: the old ones go up to the top; plus new ceiling lanterns at different heights
+  for (const lx of [690, 1120, 1330, 230, 900, 1500]) o += `<path d="M${lx},-10 V${DY}" stroke="${OUT}" stroke-width="4.4"/><path d="M${lx},-10 V${DY}" stroke="#8a94a8" stroke-width="1.8" stroke-dasharray="5 3"/>`;
+  for (const [lx, ly, ls] of [[160, 150, .7], [560, 80, .6], [800, 250, .75], [1250, 120, .65], [1430, 320, .7], [400, 330, .6]]) o += `<path d="M${lx},-10 V${ly}" stroke="${OUT}" stroke-width="4.4"/><path d="M${lx},-10 V${ly}" stroke="#8a94a8" stroke-width="1.8" stroke-dasharray="5 3"/>` + lantern(lx, ly + 40 * ls, ls, 120 * ls);
+  o += `<g transform="translate(0 ${DY})">${inner}</g>`;
+  // below: the pillars keep falling into the dark
+  const colb = (cx, w) => `<rect x="${cx - w / 2 + 3}" y="${DY + 880}" width="${w - 8}" height="${HT - DY - 870}" fill="url(#pillar)"/><path d="M${cx - w / 2 + 3},${DY + 880} V${HT} M${cx + w / 2 - 5},${DY + 880} V${HT}" stroke="${P.pillarEdge}" stroke-width="3"/>`;
+  o += W(300, x => colb(x, 110), 200) + W(1030, x => colb(x, 70), 200);
+  o += `<defs><linearGradient id="fadeDn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.void}" stop-opacity="0"/><stop offset="1" stop-color="${P.void}" stop-opacity=".9"/></linearGradient></defs><rect y="${DY + 900}" width="1600" height="${HT - DY - 900}" fill="url(#fadeDn)"/>`;
+  return svgPage(P, o, 1600, HT);
+}
+function nearTall(P, lv) {
+  const inner = nearLayer(P, lv, true); setSeed(550 + lv);
+  let o = '';
+  // ceiling rows hanging above the old band
+  const row = (base, amp, fill, edge) => { const n = 20, ys = []; for (let i = 0; i < n; i++) ys.push(base + R(0, amp)); ys.push(ys[0]); let d = `M-20,-10 L-20,${f(ys[0])}`; ys.forEach((y, i) => d += ` L${i * 80},${f(y)}`); d += ` L1620,${f(ys[0])} L1620,-10 Z`; return `<path d="${d}" fill="${fill}" stroke="${edge}" stroke-width="3" stroke-linejoin="round"/>`; };
+  o += row(20, 50, P.nearRock2, P.nearEdge2) + row(0, 34, P.nearRock, P.nearEdge);
+  [[560, 60, 0], [800, 80, 1], [1180, 60, 2], [1540, 70, 3]].forEach(([x, w, i]) => o += W(x, xx => `<path d="M${xx - w * .4},-10 L${xx - w * .9},${DY + 2} L${xx + w * .9},${DY + 2} L${xx + w * .4},-10 Z" fill="#070a24" stroke="${P.stalEdge}" stroke-width="3" stroke-linejoin="round"/><path d="M${xx + w * .5},0 L${xx + w * .6},${DY}" stroke="${P.stal[i]}" stroke-width="3" opacity=".5"/>`, 120));
+  [[250, 40, 150], [680, 50, 190], [1000, 36, 120], [1400, 44, 170]].forEach(([x, w, h]) => o += W(x, xx => `<path d="M${xx - w},30 L${xx - w * .3},${30 + h * .6} L${xx},${30 + h} L${xx + w * .4},${30 + h * .55} L${xx + w},30 Z" fill="#070a24" stroke="${P.stalEdge}" stroke-width="3" stroke-linejoin="round"/>`, 120));
+  o += `<g transform="translate(0 ${DY})">${inner}</g>`;
+  // below the old floor rows: the foreground rock mass keeps going, with crystals
+  const nh = P.nearHues;
+  [[140, .9, 0], [560, .6, 2], [900, .8, 1], [1300, 1, 3], [1530, .6, 4]].forEach(([x, s, i]) => o += W(x, xx => cluster(xx, HT + 20, s, nh[i], false), 300));
+  for (let i = 0; i < 40; i++) { const x = R(24, 1576), y = R(60, HT - 60), r = R(1.4, 3.4), c = P.motes[i % 2]; o += `<circle cx="${f(x)}" cy="${f(y)}" r="${f(r * 4)}" fill="${c}" opacity=".1"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="${c}" opacity="${f(R(.4, .9))}"/>`; }
+  return svgPage(P, o, 1600, HT);
+}
+const T_ = { 'far-t': farTall, 'farmid-t': farmidTall, 'mid-t': midTall, 'near-t': nearTall };
+for (const lv of [1, 2, 3]) for (const [n, fn] of Object.entries(T_)) fs.writeFileSync(path.join(__dirname, 'bake', `${n}-lv${lv}.svg`), fn(PAL[lv], lv));
 
 const W_ = { far: farLayer, farmid: farmidLayer, mid: midLayer, track: trackLayer, near: nearLayer };
 for (const lv of [1, 2, 3]) for (const [n, fn] of Object.entries(W_)) fs.writeFileSync(path.join(__dirname, 'bake', `${n}-lv${lv}.svg`), fn(PAL[lv], lv));
