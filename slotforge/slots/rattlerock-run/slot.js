@@ -18,9 +18,10 @@ const anim = (el, kf, o) => { try { return el.animate(kf, o); } catch { return {
 
 /* ---------- aliases so the shell's `#s<id>` buy-sign / card icons can show the rr* art ---------- */
 (function () {
-  const A = { Gem10: ['rrGem10', '-80 -110 160 200'], Gem5: ['rrGem5', '-80 -110 160 200'], Hat: ['rrHat', '-80 -110 160 200'], Lantern: ['rrLantern', '-80 -110 160 200'], Door: ['rrDoor', '-230 -330 460 350'], Cart: ['rrCartRide', '-400 -530 800 780'] };
+  const IT = [-80, -110, 160, 200, '-75 -95 150 150'];
+  const A = { Gem10: ['rrGem10', ...IT], Gem5: ['rrGem5', ...IT], Hat: ['rrHat', ...IT], Lantern: ['rrLantern', ...IT], Door: ['rrDoor', -230, -330, 460, 350, '-230 -340 460 460'], Cart: ['rrCartRide', -400, -530, 800, 780, '-340 -440 680 680'] };
   const sv = document.createElementNS(NS, 'svg'); sv.setAttribute('width', 0); sv.setAttribute('height', 0); sv.style.cssText = 'position:absolute;width:0;height:0';
-  sv.innerHTML = Object.entries(A).map(([k, [id, vb]]) => `<symbol id="s${k}" viewBox="${vb}"><use href="#${id}"/></symbol>`).join(''); document.body.appendChild(sv);
+  sv.innerHTML = Object.entries(A).map(([k, [id, x, y, w, h, vb]]) => `<symbol id="s${k}" viewBox="${vb}"><use href="#${id}" x="${x}" y="${y}" width="${w}" height="${h}"/></symbol>`).join(''); document.body.appendChild(sv);
 })();
 
 /* ---------- sprites ---------- */
@@ -216,8 +217,8 @@ async function playTrack(L, tr, o) {
 }
 async function doFork(L, it, s, o, W) {
   const sg = sfx; say('A FORK. WHICH WAY?', false); const px = L.cx + L.k * COLLECT, ground = L.rail - 8 * L.k;
-  const mk = (p, dx) => { const spr = p.type === 'none' ? SPR.pile : sprFor(p.type, p.value); const b = { s: it.s, type: p.type, spr, sc: p.type === 'none' ? .22 : .5, alpha: p.type === 'none' ? .35 : 1, x0: it.x0, dx: it.dx + dx * L.k, dy: -(SPR.fork.h + 8) * L.k * .9, live: false, n: null, pv: p }; b.fromBub = 1; spawn(L, b); return b; };
-  const bl = mk(s.left, -70), br = mk(s.right, 70);
+  const mk = (p, dx) => { const spr = p.type === 'none' ? SPR.pile : sprFor(p.type, p.value); const b = { s: it.s, type: p.type, spr, sc: p.type === 'none' ? .3 : .8, alpha: p.type === 'none' ? .4 : 1, x0: it.x0, dx: it.dx + dx * L.k, dy: -(SPR.fork.h + 4) * L.k * 1.02, live: false, n: null, pv: p }; b.fromBub = 1; spawn(L, b); return b; };
+  const bl = mk(s.left, -85), br = mk(s.right, 85);
   sg.fork(); await W(750); sfx.lever(); if (it.n) it.n._u.setAttribute('href', s.side === 'left' ? '#rrForkL' : '#rrForkR');
   await W(420); const lose = s.side === 'left' ? br : bl, win = s.side === 'left' ? bl : br;
   if (lose.n) anim(lose.n, [{ opacity: lose.alpha }, { opacity: .12 }], { duration: 300 * T(), fill: 'forwards' });
@@ -244,6 +245,7 @@ async function doDoor(L, d, tr, o, W) {
   setCart(L, 'Win'); L.dome.style.display = 'none'; L.w.classList.remove('mv'); L.v = 0; sfx.door(); flash(.7); const [sx, sy] = scr(L.cx + 300, L.rail - 150 * L.k); embers(40, sx, sy, true); S.music.stinger('win');
   const pay$ = o.stake * tr.pay, x = L.cx + 120 * L.k, y = L.rail - 300 * L.k;
   banner(o.bonus && tr.exit === 'bottom' ? 'BOTTOM DOOR!' : o.bonus ? 'LEVEL CLEARED' : 'DAYLIGHT!', `LOAD ${fmt(o.stake * d.load)} x ${d.mult}` + (d.jackpot ? `  +  JACKPOT x${d.jackpot}` : ''), 1700, !!d.jackpot);
+  say(d.jackpot ? 'JACKPOT DOOR! x' + d.jackpot : o.bonus ? 'LEVEL CLEARED' : 'DAYLIGHT! THE DOOR OPENS', true);
   if (d.jackpot) { sfx.jackpot(); shake(true); }
   H.mc.classList.add('rrWin'); setTimeout(() => H.mc.classList.remove('rrWin'), 1200 * T());
   await W(700); const ld = LANES.filter(l => l.active).length > 1 ? 0 : 1; if (ld) { cnt(H.load, hudShown.load, d.load * d.mult + d.jackpot, 800, mon); hudShown.load = d.load * d.mult + d.jackpot; }

@@ -127,12 +127,12 @@
  "intro": {
   "unit": "CARTS",
   "ribbon": "DEEP SHAFT",
-  "quote": "\"Three carts, three levels. Hold on to your hat.\"",
+  "quote": "\"Hold your hat. It is a long way down.\"",
   "tap": "TAP ANYWHERE TO DIVE",
   "chips": [
-   "THE MULTIPLIER NEVER RESETS",
-   "A CRASHED CART REPLAYS THE LEVEL",
-   "THE BOTTOM DOOR HIDES THE JACKPOT"
+   "MULTIPLIER NEVER RESETS",
+   "LOST CART REPLAYS LEVEL",
+   "JACKPOT AT THE BOTTOM"
   ]
  },
  "outro": {
