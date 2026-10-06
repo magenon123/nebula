@@ -78,7 +78,8 @@ body.co #msg{opacity:0}
 #reels{position:absolute;left:0;top:0;width:750px;height:450px;z-index:2;pointer-events:none}
 .reel{position:absolute;top:0;width:150px;height:450px;overflow:hidden;visibility:hidden}
 .reel.on{visibility:visible}
-.strip{position:absolute;left:0;top:0;width:150px;display:flex;flex-direction:column;will-change:transform}
+.strip{position:absolute;left:0;top:0;width:150px;display:flex;flex-direction:column}
+.reel.on .strip{will-change:transform}
 .strip .cell{flex:none;width:146px;height:146px;margin:2px}
 .cell.sp{visibility:hidden}
 .cell.top{z-index:3}
@@ -102,6 +103,39 @@ body.co #msg{opacity:0}
 #lkRespins.reset{animation:llPlatePop .4s ease-out}
 #lkRespins.reset #lkRespinsN{color:#fff}
 #pdSpins{left:24px;top:30px}
+#lkTotal{left:1237px;top:100px;zoom:.8;transform:none}
+body.llb #msg{opacity:0}
 #coLine.on{display:block}
 .ptsub{font-family:var(--toon);font-weight:400;color:var(--rim);margin:18px 0 6px;font-size:17px;letter-spacing:1px}
 .ptnote{font-size:13px;margin:8px 0}
+
+/* ---------- portrait (phone upright): the board fills the width; logo, ladder bar and jackpot row stack above it. zoom'd plates: left/top = target / zoom ---------- */
+body.portrait #ga{top:calc(var(--gy) + 165px)}
+body.portrait #logo{left:400px;top:-330px;width:800px;height:263px}
+body.portrait #ladder .sb{display:none}
+body.portrait #ladderW{left:519px;top:-62px;transform-origin:0 0;transform:translate(563px,0) rotate(90deg) scale(1.15)}
+body.portrait #ladder text{transform-box:fill-box;transform-origin:50% 50%;transform:rotate(-90deg)}
+body.portrait #jps{left:395px;top:58px;width:810px;height:80px;display:flex;justify-content:space-between}
+body.portrait #jps .jp{margin:0;width:198px;height:76px;position:relative}
+body.portrait #jps .jp svg{width:198px;height:76px}
+body.portrait .jv{zoom:.9}
+body.portrait #lkRespins{left:507px;top:-237px;zoom:1.2}
+body.portrait #pdSpins{left:517px;top:-237px;zoom:1.2}
+body.portrait #lkTotal{left:600px;top:-189px;zoom:.9;transform:none}
+body.portrait #pdCallMult{left:420px;top:-120px;zoom:1.25}
+body.portrait #pdCallSpins{left:475px;top:-120px;zoom:1.25}
+body.portrait #coLine{left:288px;top:470px;zoom:1.46}
+body.portrait #pdCollector{left:1421px;top:-443px;zoom:.7}
+
+/* ---------- bonus intro / outro splash: compact so the whole splash fits a 16:9 window ---------- */
+.llSplash{width:300px;height:260px;margin:0 auto -30px;position:relative;z-index:1;filter:drop-shadow(0 8px 0 rgba(0,0,0,.4))}
+symbol#llSplashLink,symbol#llSplashParade,symbol#llSplashOutro{overflow:visible}
+#introM .gems{display:none}
+#introM .medal{width:250px;height:250px;border-width:10px}
+#introM .medal .mnum{font-size:130px}
+#introM .medal .mlbl{font-size:34px}
+#introM .sp,#outroM .sp{transform:scale(.9);transform-origin:50% 44%}
+#introM .quote{max-width:760px;font-size:22px}
+#outroM .medal.wide{height:210px}
+@media (max-height:700px) and (orientation:landscape){#introM .sp,#outroM .sp{transform:scale(.72)}}
+#introM .quote,#outroM .quote{margin-top:40px}

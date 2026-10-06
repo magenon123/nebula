@@ -22,7 +22,7 @@ function musicDefs() {
   const ROOT = [48, 48, 53, 53, 55, 53, 48, 55], CH = [[60, 64, 67], [60, 64, 67], [65, 69, 72], [65, 69, 72], [67, 71, 74], [65, 69, 72], [60, 64, 67], [67, 71, 74]];
   const MOT = [[[0, 4, 1], [4, 2, 1], [6, 4, 1]], [[0, 2, 2], [4, 0, 1], [6, 1, 1]], [[0, 5, 1], [2, 4, 1], [4, 2, 2]], [[0, 4, 2], [3, 2, 1], [5, 1, 1], [6, 0, 1]]];
   const base = {
-    tempo: 98, barBeats: 4, spb: 8, swing: .1, bars: 8, key: 60, scale: MAJ, seed: 23, gain: .9, phrase: 4,
+    tempo: 98, barBeats: 4, spb: 8, swing: .1, bars: 8, key: 60, scale: MAJ, seed: 23, gain: .78, phrase: 4,
     layers: { bass: { gain: 1, wet: .08 }, gui: { gain: 1, wet: .2 }, guiro: { gain: 1, wet: .1 }, perc: { enter: 1, gain: 1, wet: .1 }, acc: { enter: 2, gain: 1, wet: .35 }, trp: { int: .35, gain: 1, wet: .3 } },
     bar(M) {
       const k = M.i & 7, rt = ROOT[k], ch = CH[k], mot = MOT[(k >> 1) & 3];
@@ -35,7 +35,7 @@ function musicDefs() {
     }
   };
   const bonus = {
-    tempo: 120, barBeats: 4, spb: 8, swing: .06, bars: 8, key: 62, scale: MAJ, seed: 77, gain: .9, phrase: 4,
+    tempo: 120, barBeats: 4, spb: 8, swing: .06, bars: 8, key: 62, scale: MAJ, seed: 77, gain: .85, phrase: 4,
     layers: { bass: { gain: 1, wet: .08 }, gui: { gain: 1, wet: .2 }, guiro: { gain: 1, wet: .1 }, perc: { gain: 1, wet: .1 }, acc: { gain: 1, wet: .3 }, trp: { gain: 1, wet: .3 }, hi: { int: .5, gain: 1, wet: .4 } },
     bar(M) {
       const k = M.i & 7, rt = ROOT[k] + 2, ch = CH[k].map(n => n + 2), mot = MOT[(k + 1) & 3], I = M.int;
@@ -134,7 +134,7 @@ const spinning = () => reels.some(r => r.mode === 'spin');
 function abortReels() { reels.forEach(r => { r.mode = 'idle'; r.fn = null; r.el.classList.remove('on', 'tease'); }); cells.forEach(e => e.classList.remove('sp')); }
 function ensureLoop() { if (!rafId) { lastF = performance.now(); rafId = requestAnimationFrame(frame); } }
 function frame(now) {
-  rafId = 0; const dt = Math.min(50, now - lastF); lastF = now; simT += dt / T(); let live = false;
+  rafId = 0; const dt = Math.max(0, Math.min(50, now - lastF)); lastF = now; simT += dt / T(); let live = false;
   for (const r of reels) {
     if (r.mode === 'idle') continue; live = true;
     if (!r.fn) { const tt = simT - r.t0; setD(r, wrapD(analytic(r, simT)) + (tt < 120 ? 12 * Math.sin(Math.PI * tt / 120) : 0)); continue; }
@@ -150,8 +150,8 @@ function planNormal(r, Ts) {
   r.fn = t => t < tl ? wrapD(dA - v * (t - tA)) : sl * Math.pow(Math.max(0, 1 - (t - tl) / LAND), 2);
 }
 function planTease(r, Tp) {
-  const RAMP = 320, vs = 1.35, sl = 525, dp = analytic(r, Tp), d1 = dp - RAMP * (V0 + vs) / 2, t1 = Tp + RAMP, Dl = 2 * sl / vs;
-  let x = (wrapD(d1) - sl) % P; if (x < 0) x += P; let tl = t1 + x / vs; while (tl < t1 + 260) tl += P / vs;
+  const RAMP = 260, vs = 1.6, sl = 450, dp = analytic(r, Tp), d1 = dp - RAMP * (V0 + vs) / 2, t1 = Tp + RAMP, Dl = 2 * sl / vs;
+  let x = (wrapD(d1) - sl) % P; if (x < 0) x += P; let tl = t1 + x / vs; while (tl < t1 + 200) tl += P / vs;
   r.Ts = tl + Dl; r.tease = { Tp, beat: Tp };
   r.fn = t => t < Tp ? wrapD(analytic(r, t)) : t < t1 ? wrapD(dp - (V0 * (t - Tp) - (V0 - vs) * (t - Tp) * (t - Tp) / (2 * RAMP))) : t < tl ? wrapD(d1 - vs * (t - t1)) : sl * Math.pow(Math.max(0, 1 - (t - tl) / Dl), 2);
 }
@@ -169,7 +169,7 @@ function spinReels(sp, o) {
     if (!idx.every(c => reels[c].mode === 'spin')) startReels(o.mask);
     let pending = idx.length; const t0 = Math.min(...idx.map(c => reels[c].t0)); let prev = -1;
     touchHook = c => { if (o.onTouch) o.onTouch(c); if (--pending === 0) { touchHook = null; res(); } };
-    const base = Math.max(t0 + o.first, simT + 480);
+    const base = Math.max(t0 + o.first, simT + 520);
     idx.forEach((c, k) => {
       const r = reels[c];
       for (let row = 0; row < 3; row++) { const f = o.final(c, row), e = cellOf(c, row); setEl(r.cs[1 + row], f.code, f.mon, f.blank); setEl(e, f.code, f.mon, f.blank); }
@@ -288,7 +288,7 @@ function crackFx(c, r) {
 }
 async function linkCracks(B, sp, run, ctx) {
   const stake = ctx.stake, order = B.cracks, fast = order.length > 9 ? .72 : 1, t0 = run; let shown = 0;
-  hideCallout(); plate('lkTotal', true); $('lkTotalV').textContent = money(0); bump($('lkTotal')); callout('CRACK THEM OPEN!', 900); sfx.cheer(); await wait(700);
+  hideCallout(); plate('lkTotal', true); $('lkTotalV').textContent = money(0); bump($('lkTotal')); callout('CRACK THEM OPEN!', 900); sfx.cheer(); S.music.stinger('cheer'); await wait(700);
   for (const cr of order) {
     const e = cellOf(cr.reel, cr.row), [sx, sy] = ctr(e), g = e.querySelector('svg.g'), m = e.querySelector('.m');
     sfx.crack(Math.min(8, shown)); crackFx(cr.reel, cr.row);
@@ -297,12 +297,12 @@ async function linkCracks(B, sp, run, ctx) {
     const from = shown ? r2(t0 + stake * order[shown - 1].running) : t0, to = r2(t0 + stake * cr.running); shown++;
     S.pop(sx, sy - 30, '+' + money(stake * cr.value));
     $('lkTotalV').textContent = money(stake * cr.running); bump($('lkTotal'));
-    if (cr.jackpot) { litJackpot(cr.jackpot); sfx.jackpot(cr.jackpot.toLowerCase()); callout(`${cr.jackpot} JACKPOT! ${money(cr.value * stake)}`, 1300); shake(2); flash(1); }
+    if (cr.jackpot) { litJackpot(cr.jackpot); sfx.jackpot(cr.jackpot.toLowerCase()); if (cr.jackpot !== 'MINI') S.music.stinger('jackpot'); callout(`${cr.jackpot} JACKPOT! ${money(cr.value * stake)}`, 1300); shake(2); flash(1); }
     await Promise.all([countTo(ctx, from, to, 260 * fast), wait((cr.jackpot ? 1000 : 360) * fast)]);
   }
   let cur = r2(t0 + stake * (order.length ? order[order.length - 1].running : 0));
   if (B.fullBoard) {
-    sfx.jackpot('grand'); sfx.cheer(); shake(3); flash(3); embers(120, innerWidth / 2, innerHeight / 2, true); $('grandV').textContent = money(JPV.GRAND * stake); plate('grandPlate', true); bump($('grandPlate')); litJackpot('GRAND');
+    sfx.jackpot('grand'); sfx.cheer(); S.music.stinger('jackpot'); shake(3); flash(3); embers(120, innerWidth / 2, innerHeight / 2, true); $('grandV').textContent = money(JPV.GRAND * stake); plate('grandPlate', true); bump($('grandPlate')); litJackpot('GRAND');
     callout('FULL BOARD! GRAND JACKPOT!'); const nxt = r2(cur + stake * JPV.GRAND); $('lkTotalV').textContent = money(stake * B.total); await Promise.all([countTo(ctx, cur, nxt, 900), wait(2200)]); cur = nxt; plate('grandPlate', false);
   }
   const fin = r2(t0 + stake * sp.totalPayout); if (fin !== cur) { ctx.onWin(cur, fin); cur = fin; }
@@ -314,7 +314,7 @@ async function linkCracks(B, sp, run, ctx) {
 async function paradeIntro(B, ctx) {
   pdReady = true; plate('pdSpins', true); $('pdSpinsN').textContent = B.startSpins;
   if (B.startSticky && B.startSticky.length) {
-    callout('3 STICKY PONCHOS TO START!', 1400); B.startSticky.forEach((s, i) => { const e = cellOf(s.reel, s.row); setEl(e, 'WLD', null); e.classList.add('sticky', 'top'); popCell(e, 1.35); });
+    callout('3 STICKY PONCHOS TO START!', 1400); B.startSticky.forEach((s, i) => { const e = cellOf(s.reel, s.row); setEl(e, 'WLD', null); e.classList.add('sticky', 'top'); e.classList.remove('sp'); popCell(e, 1.35); });
     sfx.ladder(3); lastStep = 3; lastMult = 3; setLadder(3, true); await wait(1000);
   }
 }
@@ -412,7 +412,7 @@ return {
       tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .08, .001); bell(1500 + k * 1200, t, .025, .3); },
       feverOn: () => { const t = T0(); noise(t, .6, .1, 'bandpass', 500, 1900, 1.4, .25); [0, 2, 4, 7].forEach((d, i) => tr(N(9 + d), t + .3 + i * .08, .04, .4)); }
     };
-    return R;
+    window.__llR = R; return R;
   },
   particleColor: (p, a) => p.c ? `rgba(255,${200 + (p.l % 40)},90,${a})` : `rgba(255,${150 + (p.l % 60)},${150 + (p.l % 80)},${a})`,
   splashArt: kind => splash(kind === 'outro' ? 'llSplashOutro' : 'llSplashParade'),
@@ -428,7 +428,7 @@ return {
     paint([['SKU', 'TAC', 'GUI'], ['SKU', 'MON', 'SOM'], ['WLD', 'LUC', 'SCA'], ['TRU', 'MAC', 'MON'], ['CHI', 'MAS', 'MAR']], [{ reel: 1, row: 1, value: 5, jackpot: null }, { reel: 3, row: 2, value: 50, jackpot: 'MINOR' }]);
     Object.keys(JPV).forEach(k => jpEl(k).classList.add('on')); refreshJackpots(); setLadder(0); lastSnap = snapBoard();
   },
-  roundStart() { gen++; clearTimers(); stakeNow = S.bet(); overlaysOff(); abortReels(); resetCells(); setBlurMode(false); inBonus = false; bType = null; linkReady = false; pdReady = false; lastStep = 0; lastMult = 1; setLadder(0); $('pdCollector').classList.remove('on', 'swing'); Object.keys(JPV).forEach(k => jpEl(k).classList.add('on')); refreshJackpots(); lastSnap = snapBoard(); },
+  roundStart() { document.body.classList.remove('llb'); gen++; clearTimers(); stakeNow = S.bet(); overlaysOff(); abortReels(); resetCells(); setBlurMode(false); inBonus = false; bType = null; linkReady = false; pdReady = false; lastStep = 0; lastMult = 1; setLadder(0); $('pdCollector').classList.remove('on', 'swing'); Object.keys(JPV).forEach(k => jpEl(k).classList.add('on')); refreshJackpots(); lastSnap = snapBoard(); },
   async clearBoard() { if (bType === 'link') return; startReels([1, 1, 1, 1, 1]); await wait(260); },
   restoreBoard() { clearTimers(); abortReels(); overlaysOff(); resetCells(); setBlurMode(false); if (lastSnap) paint(lastSnap.grid, lastSnap.money); },
   baseSpin: R => { curR = R; return Object.assign({}, R.spin, { __base: true }); },
@@ -442,10 +442,10 @@ return {
   bonusMode(on) {
     const sc = $('scene'), lg = $('logo'), R = curR; if (!R || !R.bonus) return;
     if (on) {
-      inBonus = true; bType = R.bonus.type; sc.classList.add('bonus'); lg.classList.add('off'); S.music.intensity(.35); linkReady = false; pdReady = false; hideCallout();
+      inBonus = true; bType = R.bonus.type; document.body.classList.add('llb'); sc.classList.add('bonus'); lg.classList.add('off'); S.music.intensity(.35); linkReady = false; pdReady = false; hideCallout();
       if (bType === 'parade') { Object.keys(JPV).forEach(k => jpEl(k).classList.remove('on')); $('pdCollector').classList.add('on'); plate('pdSpins', true); $('pdSpinsN').textContent = R.bonus.startSpins; }
     } else {
-      inBonus = false; sc.classList.remove('bonus'); lg.classList.remove('off'); S.music.intensity(0); overlaysOff(); abortReels(); resetCells(); setBlurMode(false); setLadder(0);
+      inBonus = false; document.body.classList.remove('llb'); sc.classList.remove('bonus'); lg.classList.remove('off'); S.music.intensity(0); overlaysOff(); abortReels(); resetCells(); setBlurMode(false); setLadder(0);
       $('pdCollector').classList.remove('on', 'swing'); Object.keys(JPV).forEach(k => jpEl(k).classList.add('on')); refreshJackpots();
       if (baseSnap) paint(baseSnap.grid, baseSnap.money); bType = null;
       const link = R.bonus.type === 'link'; $('outroRibbon').textContent = link ? 'THE LINK IS COMPLETE' : R.bought === 'party' ? 'THE PARTY IS OVER' : 'THE PARADE IS OVER';
