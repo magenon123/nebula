@@ -83,6 +83,21 @@ body.portrait .rrCall{font-size:46px}
 .rrW .rrR{position:absolute;left:0;top:0;will-change:transform}
 .rrW .rrCart.bounce{transform-origin:50% 98%}
 .rrTun{position:absolute;left:0;top:0;border-radius:125px 125px 0 0;background:radial-gradient(ellipse at 50% 70%,#000 35%,#150a10 62%,#3a2a20 100%);box-shadow:inset 0 0 0 8px #4a3524;will-change:transform}
+
+/* ---- articulated cart rig (leo's parts; opacity cross-fades, transforms by JS) ---- */
+.rrR .rrSq{position:absolute;left:0;top:0;transform-origin:50% 98%}
+.rrR .rrRig{position:absolute;left:0;top:0;transform-origin:0 0}
+.rrRig .rg{transition:opacity .16s ease}
+.rrRig .rg-scarf,.rrRig .rg-scarf2,.rrRig .rg-scarf3{opacity:0}
+.rrRig.f0 .rg-scarf,.rrRig.f1 .rg-scarf2,.rrRig.f2 .rg-scarf3{opacity:1}
+.rrRig .rg-headSmile,.rrRig .rg-headCheer,.rrRig .rg-headWorry,.rrRig .rg-headDizzy,.rrRig .rg-headDetermined{opacity:0}
+.rrRig.hSmile .rg-headSmile,.rrRig.hCheer .rg-headCheer,.rrRig.hWorry .rg-headWorry,.rrRig.hDizzy .rg-headDizzy,.rrRig.hDetermined .rg-headDetermined{opacity:1}
+.rrRig .rg-armFarUp,.rrRig .rg-armUpL{opacity:0}
+.rrRig.up .rg-armFarUp,.rrRig.up .rg-armUpL{opacity:1}.rrRig.up .rg-armFar,.rrRig.up .rg-armPoint{opacity:0}
+.rrRig .rg-hatGlow{opacity:0}.rrRig.glow .rg-hatGlow{opacity:.9}
+.rrRig .rg-beam{opacity:.5}.rrRig .rg-sparkStreak{opacity:0}
+.rrW.mv .rrRig .rg-sparkStreak{opacity:1;animation:rrFlick .1s steps(2) infinite alternate}
+body.lite .rrW.mv .rrRig .rg-sparkStreak,body.lite .rrRig .rg-beam{display:none}
 `;
 (function () { const st = document.createElement('style'); st.id = 'kaiCss'; st.textContent = KAI_CSS; document.head.appendChild(st); })();
 /*END-KAI-CSS*/
@@ -130,15 +145,32 @@ function mkLane(id, rail, k, cx) {
   const L = { id, rail, k, cx, dist: 0, v: 0, go: false, target: 0, ease: false, res: null, items: [], live: [], ns: 0, st: { load: 0, mult: 1, shields: 0, lanterns: 0 }, ramp: 1, crashed: false, cartSt: 'Ride', cheerT: 0 };
   const w = document.createElement('div'); w.className = 'rrW'; const cw = 400 * k, ch = 390 * k;
   w.style.cssText = `width:${cw}px;height:${ch}px;left:${cx - 200 * k}px;top:${rail - 387 * k}px`;
-  w.innerHTML = `<div class="rrR" style="width:${cw}px;height:${ch}px;transform-origin:${200 * k}px ${384 * k}px"><svg class="rrs rrCart bounce" style="width:${cw}px;height:${ch}px"><use href="#rrCartRide"/></svg><svg class="rrs rrCart rrDome" style="width:${cw}px;height:${ch}px;display:none"><use href="#rrShieldDome"/></svg><svg class="rrs rrCart rrSpk" style="width:${cw}px;height:${ch}px"><use href="#rrSparks"/></svg></div>`;
-  L.w = w; L.r = w.firstChild; L.cy = rail; L.cam = 0; L.rot = 0; L.cart = L.r.children[0]; L.dome = L.r.children[1]; L.cu = L.cart.firstChild; L.dome.style.opacity = 1; L.boom = document.createElementNS(NS, 'svg'); L.boom.setAttribute('class', 'rrs rrBoom'); L.boom.innerHTML = '<use href="#rrBoom1"/>'; L.boom.style.display = 'none';
+  w.innerHTML = `<div class="rrR" style="width:${cw}px;height:${ch}px;transform-origin:${200 * k}px ${384 * k}px"><div class="rrSq" style="width:${cw}px;height:${ch}px">${rigHTML()}</div><svg class="rrs rrCart rrDome" style="width:${cw}px;height:${ch}px;display:none"><use href="#rrShieldDome"/></svg></div>`;
+  L.w = w; L.r = w.firstChild; L.cy = rail; L.cam = 0; L.rot = 0; L.cart = L.r.children[0]; L.dome = L.r.children[1]; L.rg = rigRefs(L.cart.firstChild, k); L.dome.style.opacity = 1; L.boom = document.createElementNS(NS, 'svg'); L.boom.setAttribute('class', 'rrs rrBoom'); L.boom.innerHTML = '<use href="#rrBoom1"/>'; L.boom.style.display = 'none';
   return L;
 }
 const RAIL0 = 600;
 const LA = mkLane('A', RAIL0, 1, 340), LB = mkLane('B', 488, .72, 790);
 const LANES = [LA, LB];
 window.__rr = { LA, LB, ep: () => EP };   // test handle
-function setCart(L, st) { L.cartSt = st; L.cu.setAttribute('href', '#rrCart' + st); }
+function RGS(c, id) { return `<svg class="rg rg-${c}"><use href="#rrRig${id}"/></svg>`; }
+function rigHTML() {
+  return '<div class="rrRig hSmile f0">' + RGS('shadow', 'Shadow') + RGS('wheelB', 'WheelB') + RGS('wheelF', 'WheelF') + RGS('body', 'Body') + RGS('load', 'Load') + '<div class="rg-upper">' + RGS('beam', 'Beam') + RGS('scarf', 'Scarf') + RGS('scarf2', 'Scarf2') + RGS('scarf3', 'Scarf3') + RGS('armFar', 'ArmFar') + RGS('armFarUp', 'ArmFarUp') + RGS('torso', 'Torso') +
+    ['Smile', 'Cheer', 'Worry', 'Dizzy', 'Determined'].map(h => RGS('head' + h, 'Head' + h)).join('') + RGS('armPoint', 'ArmPoint') + RGS('armUpL', 'ArmUpL') + RGS('hatGlow', 'HatGlow') + '</div>' + RGS('rim', 'Rim') + RGS('loadFront', 'LoadFront') + RGS('gloveRim', 'GloveRim') + RGS('sparkStreak', 'SparkStreak') + '</div>';
+}
+function rigRefs(root, k) { const q = c => root.querySelector('.rg-' + c); root.style.transform = `scale(${k})`; return { root, k, wB: q('wheelB'), wF: q('wheelF'), up: q('upper'), shadow: q('shadow'), load: q('load'), ph: 0, wa: -99, lean: 0, fr: 0, bob: 0 }; }
+const HEADS = ['hSmile', 'hCheer', 'hWorry', 'hDizzy', 'hDetermined'], POSE = { Ride: ['hSmile', 0], Shield: ['hDetermined', 0], Cheer: ['hCheer', 1], Win: ['hCheer', 1], Crash: ['hDizzy', 1], Worry: ['hWorry', 0] };
+function setCart(L, st) { L.cartSt = st; const p = POSE[st] || POSE.Ride, c = L.rg.root.classList; HEADS.forEach(h => c.toggle(h, h === p[0])); c.toggle('up', !!p[1]); c.toggle('glow', L.st.shields > 0 && st !== 'Crash'); }
+/* continuous cart motion, per frame: wheels turn with the scroll, suspension bob and pitch tied to speed, torso counter-bob, scarf frames, lean on acceleration */
+function rigMotion(L, dt) {
+  const g = L.rg, mv = L.go || (L.v > 20 && !L.crashed), sp = Math.min(1.4, L.v / 330);
+  const wa = Math.round((L.dist * 360 / 207) % 360 / 3) * 3; if (wa !== g.wa) { g.wa = wa; const t = `rotate(${wa}deg)`; g.wB.style.transform = t; g.wF.style.transform = t; }
+  if (!L.crashed && mv) { g.ph += dt * (7 + 9 * sp); const y = Math.sin(g.ph) * (1 + 2.6 * sp), tl = sp * 2.2 + Math.sin(g.ph * .5) * .5;
+    g.lean += ((L.go && !L.ease ? 1 : 0) * 3.5 * sp - g.lean) * Math.min(1, dt * 4);
+    g.root.style.transform = `translate3d(0,${y.toFixed(2)}px,0) scale(${g.k})`; g.up.style.transform = `translate3d(0,${(-y * .45).toFixed(2)}px,0) rotate(${(g.lean + tl * .3).toFixed(2)}deg)`; g.load.style.transform = `translateY(${(y * .3).toFixed(2)}px)`;
+    const f = Math.floor(g.ph / 1.7) % 3; if (f !== g.fr) { g.fr = f; const c = g.root.classList; c.toggle('f0', f === 0); c.toggle('f1', f === 1); c.toggle('f2', f === 2); } }
+}
+function _unusedSetCart(L, st) { }
 function baseCart(L) { return L.crashed ? 'Crash' : L.st.shields > 0 ? 'Shield' : 'Ride'; }
 function cheer(L, ms = 650) { if (L.crashed) return; setCart(L, 'Cheer'); clearTimeout(L.cheerT); L.cheerT = after(ms, () => { if (!L.crashed && L.cartSt === 'Cheer') setCart(L, baseCart(L)); }); }
 function setDome(L) { L.dome.style.display = L.st.shields > 0 && !L.crashed ? 'block' : 'none'; }
@@ -243,7 +275,7 @@ function tick(now) {
     while (L.ns < L.items.length) { const it = L.items[L.ns]; if (L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx < SPAWN_X) { if (spawn(L, it)) L.ns++; else break; } else break; }
     if (L.live.length) { let j = 0; for (let i = 0; i < L.live.length; i++) { const it = L.live[i]; if (!it.live) continue; if (it.n && L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx < -420) { it.live = false; release(it.n); it.n = null; continue; } if (it.n && !it.fly) place(it, L); L.live[j++] = it; } L.live.length = j; }
   }
-  const sett = rideCam(dt);
+  const sett = rideCam(dt); rigMotion(LA, dt); if (LB.active) rigMotion(LB, dt);
   paintLayers(LA.dist, LB.dist);
   if (ring) { const it = LA.next != null && LA.active ? LA.items[LA.next] : null; if (it && it.live && it.n && !it.fly && it.type !== 'door') { const x = LA.cx + (it.x0 - LA.dist + COLLECT) + it.dx, y = it.y + it.h * .5; ring.style.display = 'block'; ring.style.transform = `translate3d(${x - 90}px,${y - 90}px,0)`; } else if (ring.style.display !== 'none') ring.style.display = 'none'; }
   for (const L of LANES) if (L._mv !== L.go) { L._mv = L.go; L.w.classList.toggle('mv', L.go); }
@@ -368,7 +400,7 @@ async function playTrack(L, tr, o) {
   const N = tr.length || stops.length; if (L === LA) hudDots(N);
   for (let n = 0; n < stops.length; n++) {
     const s = stops[n], it = L.items[n]; L.ramp = 1 + Math.min(.45, (L.st.mult - 1) * .012); L.next = n; const hz = s.type === 'tnt' || s.type === 'fork';
-    if (hz) L.ramp *= .6;     // slow-motion approach: the next hazard glows
+    if (hz) { L.ramp *= .6; if (!L.crashed) setCart(L, 'Worry'); }     // slow-motion approach: the next hazard glows
     if (s.type === 'fork') {
       await travel(L, it.x0 - 270, true); await W(0); if (L === LA) hudStop(s.i, N);
       await doFork(L, it, s, o, W);

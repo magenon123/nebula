@@ -77,3 +77,18 @@ body.portrait .rrCall{font-size:46px}
 .rrW .rrR{position:absolute;left:0;top:0;will-change:transform}
 .rrW .rrCart.bounce{transform-origin:50% 98%}
 .rrTun{position:absolute;left:0;top:0;border-radius:125px 125px 0 0;background:radial-gradient(ellipse at 50% 70%,#000 35%,#150a10 62%,#3a2a20 100%);box-shadow:inset 0 0 0 8px #4a3524;will-change:transform}
+
+/* ---- articulated cart rig (leo's parts; opacity cross-fades, transforms by JS) ---- */
+.rrR .rrSq{position:absolute;left:0;top:0;transform-origin:50% 98%}
+.rrR .rrRig{position:absolute;left:0;top:0;transform-origin:0 0}
+.rrRig .rg{transition:opacity .16s ease}
+.rrRig .rg-scarf,.rrRig .rg-scarf2,.rrRig .rg-scarf3{opacity:0}
+.rrRig.f0 .rg-scarf,.rrRig.f1 .rg-scarf2,.rrRig.f2 .rg-scarf3{opacity:1}
+.rrRig .rg-headSmile,.rrRig .rg-headCheer,.rrRig .rg-headWorry,.rrRig .rg-headDizzy,.rrRig .rg-headDetermined{opacity:0}
+.rrRig.hSmile .rg-headSmile,.rrRig.hCheer .rg-headCheer,.rrRig.hWorry .rg-headWorry,.rrRig.hDizzy .rg-headDizzy,.rrRig.hDetermined .rg-headDetermined{opacity:1}
+.rrRig .rg-armFarUp,.rrRig .rg-armUpL{opacity:0}
+.rrRig.up .rg-armFarUp,.rrRig.up .rg-armUpL{opacity:1}.rrRig.up .rg-armFar,.rrRig.up .rg-armPoint{opacity:0}
+.rrRig .rg-hatGlow{opacity:0}.rrRig.glow .rg-hatGlow{opacity:.9}
+.rrRig .rg-beam{opacity:.5}.rrRig .rg-sparkStreak{opacity:0}
+.rrW.mv .rrRig .rg-sparkStreak{opacity:1;animation:rrFlick .1s steps(2) infinite alternate}
+body.lite .rrW.mv .rrRig .rg-sparkStreak,body.lite .rrRig .rg-beam{display:none}
