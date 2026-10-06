@@ -208,9 +208,10 @@ const cart = () => {
   let o = '';
   const ol = (w = 3.5) => `stroke="${OUT}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
   o += `<ellipse cx="0" cy="238" rx="360" ry="22" fill="#000" opacity=".5"/>`;
+  o += '<!--MK:wheelB-->';
   // wheels (behind body)
   const wheel = x => `<g transform="translate(${x} 188)"><circle r="56" fill="#1a1420" ${ol(4)}/><circle r="48" fill="url(#steelD)" ${ol(3)}/><circle r="38" fill="none" stroke="#9aa6bc" stroke-width="3" opacity=".6"/>${[0, 45, 90, 135].map(a => `<rect x="-5" y="-40" width="10" height="80" fill="#2a3244" ${ol(2)} transform="rotate(${a})"/>`).join('')}<circle r="17" fill="url(#gold)" ${ol(3)}/><circle r="7" fill="#7a3e10"/><path d="M-36,-26 A44,44 0 0 1 -6,-44" stroke="#fff" stroke-width="4" fill="none" opacity=".6" stroke-linecap="round"/></g>`;
-  o += wheel(-190) + wheel(190);
+  o += wheel(-190) + '<!--MK:wheelF-->' + wheel(190) + '<!--MK:body-->';
   // body
   o += `<path d="M-312,-4 L312,-4 L270,176 L-270,176 Z" fill="url(#wood)" ${ol(4)}/>`;
   for (const y of [40, 80, 120]) o += `<path d="M${-312 + (y + 4) * .233},${y} L${312 - (y + 4) * .233},${y}" stroke="#2e170a" stroke-width="3" opacity=".75"/>`;
@@ -267,6 +268,7 @@ const FACE = {
     const teeth = `<path d="M22,33 C36,38 54,37 63,31 L61,40 C50,46 34,44 24,39 Z" fill="#fffdf2"/><path d="M36,36 v6 M46,37 v6" stroke="#c8b8a0" stroke-width="1.6"/>`;
     if (k === 'cheer' || k === 'win') return `<path d="M14,28 C16,76 66,80 70,26 C54,38 30,38 14,28 Z" fill="#3a0a10" ${ol(2.8)}/><path d="M18,30 C34,41 54,40 67,28 L65,41 C52,50 32,48 20,41 Z" fill="#fffdf2"/><path d="M30,36 v8 M42,38 v8 M54,36 v8" stroke="#c8b8a0" stroke-width="1.6"/><path d="M26,58 C34,48 52,48 60,58 C54,72 32,72 26,58 Z" fill="#e0506a"/><path d="M43,52 v14" stroke="#a02a40" stroke-width="2"/><path d="M68,26 l5,-8" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>`;
     if (k === 'crash') return `<path d="M16,40 C22,28 34,48 44,36 C52,28 62,40 70,30 C68,56 52,68 38,62 C26,58 18,50 16,40 Z" fill="#3a0a10" ${ol(2.8)}/><path d="M22,38 C30,34 36,44 44,38 L42,46 C34,50 26,46 22,38 Z" fill="#fffdf2"/><path d="M48,38 C54,34 60,40 66,34 L64,42 C58,46 52,44 48,38 Z" fill="#fffdf2"/><path d="M30,56 C38,50 50,52 56,58 C50,66 36,66 30,56 Z" fill="#e0506a"/>`;
+    if (k === 'worry') return `<path d="M24,46 C30,32 52,30 62,42 C54,56 34,58 24,46 Z" fill="#3a0a10" ${ol(2.6)}/><path d="M30,40 C38,36 50,36 56,41 L54,45 C48,42 38,42 32,45 Z" fill="#fffdf2"/>`;
     if (k === 'shield') return `<path d="M20,32 C30,50 56,52 67,26 C56,34 34,36 20,32 Z" fill="#3a0a10" ${ol(2.6)}/><path d="M24,33 C36,38 54,37 64,29 L62,36 C50,43 36,41 26,37 Z" fill="#fffdf2"/><path d="M67,26 l5,-8" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>`;
     return `<path d="M18,32 C28,56 58,56 66,28 C54,36 34,36 18,32 Z" fill="#3a0a10" ${ol(2.6)}/>${teeth}<path d="M62,30 l5,-6" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>`;
   },
@@ -278,6 +280,7 @@ const FACE = {
   },
   brows(k, ol) {
     const b = `<path d="M-6,-26 C6,-44 32,-44 44,-28 L42,-20 C30,-32 12,-30 -4,-18 Z" fill="#3a1a0e" ${ol(2.8)}/><path d="M2,-30 C12,-38 28,-38 38,-28" stroke="#7a4a30" stroke-width="2" fill="none" opacity=".8"/><path d="M46,-30 C54,-40 68,-36 72,-24 L68,-18 C62,-28 54,-28 46,-22 Z" fill="#3a1a0e" ${ol(2.6)}/>`;
+    if (k === 'worry') { const i1 = b.indexOf('<path d="M46,-30'); return `<g transform="translate(0 -6) rotate(-12 25 -28)">${b.slice(0, i1)}</g><g transform="translate(0 -6) rotate(14 59 -26)">${b.slice(i1)}</g>`; }
     if (k === 'cheer' || k === 'win') return `<g transform="translate(0 -9) rotate(-5 30 -30)">${b}</g>`;
     if (k === 'crash') return `<g transform="translate(0 -12) rotate(6 30 -30)">${b}</g>`;
     return b;
@@ -306,7 +309,9 @@ const dw3 = (st = {}) => {
   o += `<path d="M-6,-206 C-44,-224 -92,-214 -134,-232 C-160,-242 -184,-236 -206,-222 L-190,-212 L-200,-203 L-182,-198 C-150,-196 -128,-190 -108,-176 C-70,-168 -36,-174 -2,-186 Z" fill="url(#scarf)" ${ol()}/><path d="M-30,-206 C-70,-206 -110,-212 -156,-226 M-24,-190 C-60,-188 -100,-190 -140,-202" stroke="#a83a10" stroke-width="3" fill="none" opacity=".6"/><path d="M-20,-214 C-60,-224 -100,-220 -140,-234" stroke="#ffd890" stroke-width="3" fill="none" opacity=".75"/>`;
   // far arm (darker)
   const limb = (d, w, col) => `<path d="${d}" fill="none" stroke="${OUT}" stroke-width="${w + 7}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+o += '<!--MK:farArm-->';
   o += FARARM(st, limb, ol);
+o += '<!--MK:torso-->';
   o += `<path d="M146,-142 L172,-114" stroke="#0a3844" stroke-width="12" stroke-linecap="round"/>`;
   // torso: teal work jacket, leaning
   o += `<path d="M-74,-44 C-98,-110 -88,-176 -44,-210 C-8,-234 44,-238 76,-218 C106,-198 118,-156 104,-104 L92,-44 Z" fill="url(#tealJ)" ${ol(3.8)}/>`;
@@ -324,6 +329,7 @@ const dw3 = (st = {}) => {
   // scarf wrap at neck
   o += `<path d="M10,-214 C40,-190 90,-186 118,-210 L124,-188 C92,-166 40,-168 6,-190 Z" fill="url(#scarf)" ${ol(3.4)}/><path d="M26,-196 C56,-182 90,-182 112,-196" stroke="#ffd080" stroke-width="3" fill="none" opacity=".7"/><path d="M80,-180 C84,-160 78,-146 86,-132 L102,-134 C96,-150 102,-166 100,-184 Z" fill="url(#scarf)" ${ol(3)}/>`;
   // ---------- head (3/4 right) ----------
+o += '<!--MK:head-->';
   o += `<g transform="translate(100 -270) scale(${st.hs || 1.12})">`;
   // ear + neck
   o += `<path d="M-30,30 L44,40 L54,96 L-40,96 Z" fill="#c8764c" ${ol(3.2)}/>`;
@@ -364,7 +370,9 @@ const dw3 = (st = {}) => {
   o += `<g transform="translate(76 -58)"><circle r="46" fill="url(#lampGlow)"/><rect x="-12" y="-14" width="24" height="28" rx="7" fill="url(#gold)" ${ol(3)}/><circle cx="6" cy="0" r="10" fill="#fffbe6" ${ol(2.4)}/><circle cx="6" cy="0" r="5" fill="#fff"/></g>`;
   o += `</g>`;
   // near arm (front): pointing ahead
+o += '<!--MK:nearArm-->';
   o += NEARARM(st, limb, ol);
+o += '<!--MK:rim-->';
   // rim lights: cool crystal blue on the back, warm lantern gold on the front
   o += `<path d="M-92,-120 C-98,-166 -78,-206 -40,-224" stroke="#8ae8ff" stroke-width="4" fill="none" opacity=".6" stroke-linecap="round"/><path d="M104,-190 C116,-170 114,-140 104,-110" stroke="#ffd070" stroke-width="3.4" fill="none" opacity=".55" stroke-linecap="round"/>`;
   return o;

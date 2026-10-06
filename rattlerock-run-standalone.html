@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="sf-build" content="e6e4d47 10-06 16:18">
+<meta name="sf-build" content="f1fa1c2 10-06 16:51">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Rattlerock Run (offline demo)</title>
 <style>
@@ -460,6 +460,18 @@ body.portrait #hud .hc b.two{font-size:36px}
 body.portrait .rrTag{font-size:44px}
 body.portrait #rrBanner{left:500px}
 body.portrait #rrBanner b{font-size:96px}
+
+/* ---- clarity: callout plates, stop dots, next-stop ring ---- */
+.rrCall{position:absolute;transform:translate(-50%,-50%);padding:6px 22px 8px;border-radius:99px;border:4px solid #1c0f08;background:linear-gradient(#ffe48a,#f0a92a);color:#2a1406;font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:36px;line-height:1;white-space:nowrap;pointer-events:none;box-shadow:0 5px 0 rgba(0,0,0,.45);will-change:transform,opacity;z-index:8}
+.rrCall.gem{background:linear-gradient(#bff4ff,#45b4f0)}.rrCall.bad{background:linear-gradient(#ffb09a,#e0402a);color:#fff}.rrCall.good{background:linear-gradient(#c8ffb0,#4fc83a)}
+#rrDots{display:flex;gap:4px;margin-top:4px}
+#rrDots i{width:11px;height:11px;border-radius:50%;background:#3a2438;border:2px solid #6a3c1c}
+#rrDots i.on{background:#ffcf5a;border-color:#ffcf5a}#rrDots i.cur{background:#fff;border-color:#ffd24a;transform:scale(1.35)}
+#hud .hc b{white-space:nowrap}
+#rrRing{display:none;position:absolute;left:0;top:0;width:180px;height:180px;border-radius:50%;border:6px solid rgba(255,230,120,.85);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25);animation:rrRingP .7s ease-in-out infinite alternate;pointer-events:none;will-change:transform}
+@keyframes rrRingP{from{opacity:.35}to{opacity:1}}
+body.lite #rrRing{animation:none;opacity:.8}
+body.portrait .rrCall{font-size:46px}
 
 </style></head><body>
 <div id="loadM"><div class="lmLogo" id="lmLogo"></div><div class="lmVol" id="lmVol"></div><div class="lmCards" id="lmCards"></div><div class="lmBar"><i id="lmFill"></i></div><div class="lmTxt" id="lmTxt">LOADING</div><div class="lmTap" id="lmTap">CLICK TO CONTINUE</div><div class="lmWarn">Stuck here? Open this file in Chrome or Safari. File viewers and chat apps cannot run the game.</div></div><noscript><div style="position:fixed;inset:0;z-index:999;background:#111;color:#fff;padding:40px;font:20px/1.4 sans-serif">JavaScript is turned off or blocked here. Open this file in Chrome or Safari.</div></noscript>
@@ -1707,9 +1719,11 @@ return shellApi;
  * Motion: ONE requestAnimationFrame loop advances a "distance" per lane; the parallax layers and every pickup are placed from that distance
  * with translate3d only (the stops timeline and the scenery can never drift apart). Pickup nodes come from a pool of 16. */
 SlotShell.boot(SLOT_CFG, S => {
-const { $, sfx, wait, T, say, shake, flash, embers, fmt } = S;
+const { $, sfx, wait, T, shake, flash, embers, fmt } = S;
+let hintUntil = 0;
+const say = (t, h) => { if (performance.now() < hintUntil) return; S.say(t, h); };
 const NS = 'http://www.w3.org/2000/svg';
-const SPX = 470, COLLECT = 150, SPAWN_X = 1780, V0 = 560, POOL = 16;
+const SPX = 360, COLLECT = 150, SPAWN_X = 1780, V0 = 330, POOL = 16;
 const ABORT = { abort: 1 };
 let EP = 0, curR = null, lastCart = 0, inBonus = false, twinOn = false, idleOn = true;
 const timers = new Set();
@@ -1776,7 +1790,7 @@ function paintLayers(dA, dB) {
 function setLevel(n) { curLv = n; const sc = $('scene'); sc.classList.remove('lv1', 'lv2', 'lv3'); sc.classList.add('lv' + n); bindLayers(); paintLayers(LA.dist, LB.dist); }
 
 /* ---------- the loop ---------- */
-let raf = 0, lastT = 0;
+let raf = 0, lastT = 0, ring = null;
 function kick() { if (!raf) { lastT = performance.now(); raf = requestAnimationFrame(tick); } }
 function itemPos(L, it) { return [L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx, it.top]; }
 function place(it, L) { const x = L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx - it.ox; if (x !== it._x) { it._x = x; it.n.style.transform = `translate3d(${x}px,${it.top}px,0)`; } }
@@ -1801,6 +1815,7 @@ function tick(now) {
     if (L.live.length) { let j = 0; for (let i = 0; i < L.live.length; i++) { const it = L.live[i]; if (!it.live) continue; if (it.n && L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx < -420) { it.live = false; release(it.n); it.n = null; continue; } if (it.n && !it.fly) place(it, L); L.live[j++] = it; } L.live.length = j; }
   }
   paintLayers(LA.dist, LB.dist);
+  if (ring) { const it = LA.next != null && LA.active ? LA.items[LA.next] : null; if (it && it.live && it.n && !it.fly && it.type !== 'door') { const x = LA.cx + (it.x0 - LA.dist + COLLECT) + it.dx, y = it.top + it.h * .5; ring.style.display = 'block'; ring.style.transform = `translate3d(${x - 90}px,${y - 90}px,0)`; } else if (ring.style.display !== 'none') ring.style.display = 'none'; }
   for (const L of LANES) if (L._mv !== L.go) { L._mv = L.go; L.w.classList.toggle('mv', L.go); }
   if (any) raf = requestAnimationFrame(tick);
 }
@@ -1815,7 +1830,7 @@ function cnt(el, from, to, ms, f) {
   const id = (tw.get(el) || 0) + 1; tw.set(el, id); if (from === to || ms <= 0) { el.textContent = f(to); return Promise.resolve(); }
   return new Promise(res => { const t0 = performance.now(); (function s(t) { if (tw.get(el) !== id) return res(); const k = Math.min(1, (t - t0) / (ms * T())); el.textContent = f(from + (to - from) * (1 - Math.pow(1 - k, 3))); k < 1 ? requestAnimationFrame(s) : res(); })(t0); });
 }
-let stakeNow = 1; const hudShown = { load: 0, mult: 1 };
+let stakeNow = 1; const hudShown = { load: 0, mult: 1, eq: 0 };
 const mon = x => fmt(stakeNow * x), xs = x => 'x' + Math.round(x);
 const laneSum = (key) => LANES.reduce((a, L) => a + (L.active ? L.st[key] : 0), 0);
 function hudAll(snapNow) {   // writes the HUD from the lane states (twin: sums / pair)
@@ -1824,13 +1839,16 @@ function hudAll(snapNow) {   // writes the HUD from the lane states (twin: sums 
   if (load !== hudShown.load) { cnt(H.load, hudShown.load, load, snapNow ? 0 : 420, mon); hudShown.load = load; bump('hLoad'); }
   if (act.length > 1) { H.mult.textContent = act.map(L => xs(L.st.mult)).join(' | '); hudShown.mult = mult; H.mult.classList.add('two'); }
   else { H.mult.classList.remove('two'); if (mult !== hudShown.mult) { cnt(H.mult, hudShown.mult, mult, snapNow ? 0 : 520, xs); hudShown.mult = mult; bump('hMult'); } }
+  const eq = act.reduce((a, L) => a + L.st.load * L.st.mult, 0); if (eq !== hudShown.eq) { cnt(H.dist, Math.max(0, hudShown.eq), eq, snapNow ? 0 : 520, mon); hudShown.eq = eq; bump('hDist'); }
   H.mc.style.setProperty('--p', Math.min(1, (mult - 1) / 60)); H.shN.textContent = sh; H.sh.classList.toggle('on', sh > 0);
   for (let i = 1; i <= 3; i++) $('hl' + i).classList.toggle('on', i <= lan);
 }
-function hudPos(depth, dist) { H.depth.textContent = depth + ' m'; H.dist.textContent = dist + ' m'; }
+function hudDots(n) { const d = $('rrDots'); d.innerHTML = '<i></i>'.repeat(n); d._n = n; d._c = 0; }
+function hudStop(i, n) { H.depth.textContent = i + '/' + n; const d = $('rrDots'); if (d._n !== n) hudDots(n); const k = d.children; for (let j = 0; j < k.length; j++) k[j].className = j < i - 1 ? 'on' : j === i - 1 ? 'cur' : ''; }
+function hudPos() {}
 function hudReset(start) {
   const o = start || {}; LA.st = { load: 0, mult: o.mult || 1, shields: o.shields || 0, lanterns: 0 }; LB.st = { load: 0, mult: 1, shields: 0, lanterns: 0 }; LA.active = true; LB.active = false;
-  hudShown.load = -1; hudShown.mult = -1; hudAll(true); hudPos(inBonus ? 100 * (o.level || 1) : 30, 0);
+  hudShown.load = -1; hudShown.mult = -1; hudShown.eq = -1; hudShown.eq = -1; hudAll(true); hudStop(0, 0);
 }
 function setCarts(cur, lost) { document.querySelectorAll('#rrCarts .rrCI').forEach((e, i) => { e.classList.toggle('lost', i + 1 < cur || (lost && i + 1 === cur)); e.classList.toggle('cur', i + 1 === cur && !lost); }); }
 
@@ -1838,6 +1856,12 @@ function setCarts(cur, lost) { document.querySelectorAll('#rrCarts .rrCI').forEa
 function tag(x, y, text, cls = '', ms = 1100) {
   const e = document.createElement('div'); e.className = 'rrTag ' + cls; e.textContent = text; e.style.left = x + 'px'; e.style.top = y + 'px'; $('fxl').appendChild(e);
   const a = anim(e, [{ transform: 'translate(-50%,-50%) scale(.6)', opacity: 0 }, { transform: 'translate(-50%,-90%) scale(1.1)', opacity: 1, offset: .2 }, { transform: 'translate(-50%,-190%) scale(1)', opacity: 0 }], { duration: ms * T(), easing: 'ease-out' });
+  a.finished.then(() => e.remove(), () => e.remove());
+}
+function callout(L, text, cls = '', ms = 1400) {
+  const e = document.createElement('div'); e.className = 'rrCall ' + cls; e.textContent = text; L._cn = ((L._cn || 0) + 1) % 2;
+  e.style.left = (L.cx + 30 * L.k) + 'px'; e.style.top = (L.rail - (430 + L._cn * 62) * L.k) + 'px'; $('fxl').appendChild(e);
+  const a = anim(e, [{ transform: 'translate(-50%,-30%) scale(.5)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 1, offset: .14 }, { transform: 'translate(-50%,-55%) scale(1)', opacity: 1, offset: .7 }, { transform: 'translate(-50%,-110%) scale(1)', opacity: 0 }], { duration: ms * T(), easing: 'ease-out' });
   a.finished.then(() => e.remove(), () => e.remove());
 }
 function banner(title, sub, ms = 1500, big) {
@@ -1868,23 +1892,24 @@ async function doTaken(L, it, t, s, o, W) {      // t = {type, value, shielded, 
   const [px, py] = [L.cx + L.k * COLLECT, L.rail - 150 * L.k], st = o.stake, type = t.type;
   if (type === 'none') { if (it.n) { it.fly = true; const n = it.n; anim(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 260 * T(), fill: 'forwards' }).finished.then(() => { it.live = false; it.n = null; release(n); }, () => {}); } return; }
   if (type === 'gold') {
-    sfx.pick(goldTier(t.value)); flyTo(it, px, py, 300); applyState(L, s); hudAll(); cheer(L); tag(px + 20, py - 40, '+' + fmt(st * t.value), 'gold'); return;
+    sfx.pick(goldTier(t.value)); flyTo(it, px, py, 300); applyState(L, s); hudAll(); cheer(L); callout(L, '+GOLD ' + fmt(st * t.value), 'gold'); return;
   }
   if (type === 'gem') {
     const g = stageP($('hMult').querySelector('.mGem')); sfx.gemPick(t.value, s.mult); const n0 = L.st.mult; flyTo(it, g[0], g[1], 520, .5); applyState(L, s); after(380, () => { sfx.gemAdd(s.mult); hudAll(); });
-    cheer(L, 900); tag(px, py - 70, '+' + t.value, 'gem'); S.music.intensity(Math.min(1, (o.bonus ? .3 : .1) + s.mult / 40)); return;
+    cheer(L, 900); callout(L, 'x' + t.value + ' MULTIPLIER', 'gem'); S.music.intensity(Math.min(1, (o.bonus ? .3 : .1) + s.mult / 40)); return;
   }
-  if (type === 'shield') { sfx.hatOn(); flyTo(it, px, py - 60, 380, .5, () => {}); applyState(L, s); setDome(L); setCart(L, 'Shield'); anim(L.dome, [{ opacity: 0, transform: 'scale(.8)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 300 * T() }); hudAll(); tag(px, py - 80, 'SHIELD', 'gold'); return; }
-  if (type === 'lantern') { const g = stageP($('hl' + Math.min(3, s.lanterns))); sfx.lantern(s.lanterns); flyTo(it, g[0], g[1], 520, .45); applyState(L, s); after(400, () => hudAll()); if (s.lanterns === 3) { say('THREE LANTERNS! THE SHAFT OPENS', true); tag(px, py - 60, 'DEEP SHAFT!', 'gem'); } return; }
+  if (type === 'shield') { sfx.hatOn(); flyTo(it, px, py - 60, 380, .5, () => {}); applyState(L, s); setDome(L); setCart(L, 'Shield'); anim(L.dome, [{ opacity: 0, transform: 'scale(.8)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 300 * T() }); hudAll(); callout(L, 'SHIELD!', 'gold'); return; }
+  if (type === 'lantern') { const g = stageP($('hl' + Math.min(3, s.lanterns))); sfx.lantern(s.lanterns); flyTo(it, g[0], g[1], 520, .45); applyState(L, s); after(400, () => hudAll()); callout(L, 'LANTERN ' + s.lanterns + '/3', 'gem'); if (s.lanterns === 3) say('THREE LANTERNS! THE SHAFT OPENS', true); return; }
   if (type === 'tnt') {
     if (t.shielded) {   // the hat takes the blast
       sfx.tntBlock(); const x = px + 30, y = py + 40; boom(L, x, y, 240); shake(.5); flyTo(it, x, y, 10); applyState(L, s);
       { const a = anim(L.dome, [{ opacity: 1, transform: 'scale(1)' }, { opacity: 1, transform: 'scale(1.25)', offset: .4 }, { opacity: 0, transform: 'scale(1.5)' }], { duration: 420 * T(), fill: 'forwards' }); a.finished.then(() => { a.cancel(); setDome(L); }, () => {}); }
-      after(420, () => { if (!L.crashed) setCart(L, baseCart(L)); }); hudAll(); tag(px, py - 70, 'SHIELD POPS', 'gold'); return;
+      after(420, () => { if (!L.crashed) setCart(L, baseCart(L)); }); hudAll(); callout(L, 'BOOM!', 'bad'); after(650, () => callout(L, 'SAVED!', 'good')); return;
     }
     return 'crash';
   }
 }
+const beat = type => ({ gold: 260, gem: 700, shield: 600, lantern: 500, tnt: 900, none: 150 })[type] || 200;
 /* plays one track (a base ride, or one level attempt of the bonus) on lane L. Returns {pay (in bets), crashed} */
 async function playTrack(L, tr, o) {
   const ep = EP, W = guardW(ep), stops = tr.stops, L0 = L.dist, base = L0 + 400;
@@ -1892,26 +1917,29 @@ async function playTrack(L, tr, o) {
   stops.forEach(s => L.items.push(mkItem(L, s, base)));
   const last = L.items[L.items.length - 1]; if (last && last.type === 'door') last.onSpawn = () => $('scene').classList.add('exit');
   setCart(L, baseCart(L)); const sfxLoop = true; let crashed = false, doorHit = null;
+  const N = tr.length || stops.length; if (L === LA) hudDots(N);
   for (let n = 0; n < stops.length; n++) {
-    const s = stops[n], it = L.items[n]; L.ramp = 1 + Math.min(.45, (L.st.mult - 1) * .012);
+    const s = stops[n], it = L.items[n]; L.ramp = 1 + Math.min(.45, (L.st.mult - 1) * .012); L.next = n; const hz = s.type === 'tnt' || s.type === 'fork';
+    if (hz) L.ramp *= .6;     // slow-motion approach: the next hazard glows
     if (s.type === 'fork') {
-      await travel(L, it.x0 - 270, true); await W(0);
+      await travel(L, it.x0 - 270, true); await W(0); if (L === LA) hudStop(s.i, N);
       await doFork(L, it, s, o, W);
       const t = s.taken, crash = t.type === 'tnt' && !t.shielded;
-      await travel(L, it.x0 - (crash ? 50 : 0), crash); await W(0); hudPos(o.depth(s.i), Math.round(s.at / 100 * 38));
+      await travel(L, it.x0 - (crash ? 50 : 0), crash || t.type === 'tnt'); await W(0);
       const r = await doTaken(L, it, t, s, o, W); if (r === 'crash') { crashed = true; await doCrash(L, it, s, o, W); break; }
-      if (t.type !== 'none') await W(t.type === 'tnt' ? 380 : 0); else applyState(L, s), hudAll();
+      if (t.type !== 'none') await W(beat(t.type)); else applyState(L, s), hudAll();
       continue;
     }
     if (s.type === 'door') {
-      await travel(L, it.x0, true); await W(0); hudPos(o.depth(s.i), Math.round(s.at / 100 * 38)); doorHit = s; applyState(L, s); break;
+      await travel(L, it.x0, true); await W(0); if (L === LA) hudStop(s.i, N); doorHit = s; applyState(L, s); break;
     }
     const crash = s.type === 'tnt' && !s.shielded;
-    await travel(L, it.x0 - (crash ? 50 : 0), crash); await W(0); hudPos(o.depth(s.i), Math.round(s.at / 100 * 38));
+    await travel(L, it.x0 - (crash ? 50 : 0), hz); await W(0); if (L === LA) hudStop(s.i, N);
     const r = await doTaken(L, it, s, s, o, W);
     if (r === 'crash') { crashed = true; await doCrash(L, it, s, o, W); break; }
-    if (s.type === 'tnt') await W(380);
+    await W(beat(s.type));
   }
+  L.next = null;
   const pay$ = o.stake * tr.pay;
   if (crashed) { await payOut(L, tr, o, W, 'crash'); }
   else if (doorHit) { await doDoor(L, doorHit, tr, o, W); }
@@ -1922,22 +1950,23 @@ async function doFork(L, it, s, o, W) {
   const sg = sfx; say('A FORK. WHICH WAY?', false); const px = L.cx + L.k * COLLECT, ground = L.rail - 8 * L.k;
   const mk = (p, dx) => { const spr = p.type === 'none' ? SPR.pile : sprFor(p.type, p.value); const b = { s: it.s, type: p.type, spr, sc: p.type === 'none' ? .3 : .8, alpha: p.type === 'none' ? .4 : 1, x0: it.x0, dx: it.dx + dx * L.k, dy: -(SPR.fork.h + 4) * L.k * 1.02, live: false, n: null, pv: p }; b.fromBub = 1; spawn(L, b); return b; };
   const bl = mk(s.left, -85), br = mk(s.right, 85);
-  sg.fork(); await W(750); sfx.lever(); if (it.n) it.n._u.setAttribute('href', s.side === 'left' ? '#rrForkL' : '#rrForkR');
-  await W(420); const lose = s.side === 'left' ? br : bl, win = s.side === 'left' ? bl : br;
+  sg.fork(); await W(1000); sfx.lever(); if (it.n) it.n._u.setAttribute('href', s.side === 'left' ? '#rrForkL' : '#rrForkR');
+  await W(520); const lose = s.side === 'left' ? br : bl, win = s.side === 'left' ? bl : br;
   if (lose.n) anim(lose.n, [{ opacity: lose.alpha }, { opacity: .12 }], { duration: 300 * T(), fill: 'forwards' });
   if (win.n) anim(win.n, [{ transform: win.n.style.transform + ' scale(1)' }, { transform: win.n.style.transform + ' scale(1.25)' }], { duration: 300 * T(), fill: 'forwards' });
   say(s.side === 'left' ? 'THE LEVER SNAPS LEFT' : 'THE LEVER SNAPS RIGHT', true);
   const dy = s.side === 'left' ? -26 : 14; anim(L.w, [{ transform: 'translateY(0)' }, { transform: `translateY(${dy}px)`, offset: .25 }, { transform: `translateY(${dy}px)`, offset: .75 }, { transform: 'translateY(0)' }], { duration: 1500 * T(), easing: 'ease-in-out' });
-  await W(620);
+  await W(800);
   for (const b of [bl, br]) { b.live = false; if (b.n) { const n = b.n; b.n = null; release(n); } }
   L.live = L.live.filter(b => !b.fromBub);
   const t = s.taken, nspr = t.type === 'none' ? null : sprFor(t.type, t.value);
   if (it.n && nspr) { it.spr = nspr; it.type = t.type; it.n._u.setAttribute('href', '#' + nspr.id); const k = L.k; it.w = nspr.w * k; it.h = nspr.h * k; it.n.style.width = it.w + 'px'; it.n.style.height = it.h + 'px'; it.ox = it.w * .5; const hv = (nspr.hv || 0) * k; it.top = L.rail + 24 * k - hv - it.h; it._x = null; place(it, L); }
 }
 async function doCrash(L, it, s, o, W) {
+  say('OH NO... TNT!', true); callout(L, 'TNT!', 'bad', 900); await W(700);
   L.crashed = true; L.go = false; L.v = 0; const x = L.cx + L.k * (COLLECT + 40), y = L.rail - 70 * L.k; sfx.crash(); S.music.duck && S.music.duck(.25, 1, 1.2);
   if (it.n) { const n = it.n; it.live = false; it.n = null; release(n); } boom(L, x, y, 340); shake(true); flash(); setCart(L, 'Crash'); setDome(L); L.w.classList.remove('mv'); applyState(L, s); hudAll();
-  say('BOOM! THE CART CRASHES', true); await W(1100);
+  callout(L, 'BOOM!', 'bad', 1500); banner('CRASH!', 'YOU KEEP THE LOAD ONLY', 1900); say('CRASH! YOU KEEP THE LOAD ONLY', true); await W(1400);
 }
 async function payOut(L, tr, o, W, why) {
   const pay$ = o.stake * tr.pay; const x = L.cx, y = L.rail - 250 * L.k;
@@ -1947,13 +1976,13 @@ async function payOut(L, tr, o, W, why) {
 async function doDoor(L, d, tr, o, W) {
   setCart(L, 'Win'); L.dome.style.display = 'none'; L.w.classList.remove('mv'); L.v = 0; sfx.door(); flash(.7); const [sx, sy] = scr(L.cx + 300, L.rail - 150 * L.k); embers(40, sx, sy, true); S.music.stinger('win');
   const pay$ = o.stake * tr.pay, x = L.cx + 120 * L.k, y = L.rail - 300 * L.k;
-  banner(o.bonus && tr.exit === 'bottom' ? 'BOTTOM DOOR!' : o.bonus ? 'LEVEL CLEARED' : 'DAYLIGHT!', `LOAD ${fmt(o.stake * d.load)} x ${d.mult}` + (d.jackpot ? `  +  JACKPOT x${d.jackpot}` : ''), 1700, !!d.jackpot);
+  banner(o.bonus && tr.exit === 'bottom' ? 'BOTTOM DOOR!' : o.bonus ? 'LEVEL CLEARED' : 'DAYLIGHT!', `${fmt(o.stake * d.load)} x ${d.mult} = ${fmt(o.stake * (d.load * d.mult))}` + (d.jackpot ? `  +  JACKPOT x${d.jackpot}` : ''), 1700, !!d.jackpot);
   say(d.jackpot ? 'JACKPOT DOOR! x' + d.jackpot : o.bonus ? 'LEVEL CLEARED' : 'DAYLIGHT! THE DOOR OPENS', true);
   if (d.jackpot) { sfx.jackpot(); shake(true); }
   H.mc.classList.add('rrWin'); setTimeout(() => H.mc.classList.remove('rrWin'), 1200 * T());
-  await W(700); const ld = LANES.filter(l => l.active).length > 1 ? 0 : 1; if (ld) { cnt(H.load, hudShown.load, d.load * d.mult + d.jackpot, 800, mon); hudShown.load = d.load * d.mult + d.jackpot; }
-  tag(x, y, '+' + fmt(pay$), 'big', 1700); await o.land(pay$, W);
-  await W(500); $('scene').classList.remove('exit');
+  await W(1100); const ld = LANES.filter(l => l.active).length > 1 ? 0 : 1; if (ld) { cnt(H.load, hudShown.load, d.load * d.mult + d.jackpot, 800, mon); hudShown.load = d.load * d.mult + d.jackpot; }
+  tag(x, y, '+' + fmt(pay$), 'big', 1900); await o.land(pay$, W);
+  await W(900); $('scene').classList.remove('exit');
 }
 
 /* ---------- play a round ---------- */
@@ -1970,7 +1999,8 @@ async function baseSpin(sp, run, ctx) {
   const ep = EP, W = guardW(ep); stakeNow = ctx.stake; idleOn = false; const acc = { v: run }, land = mkLand(ctx, acc), runs = sp.runs, twin = runs.length > 1;
   try {
     twinOn = twin; $('scene').classList.toggle('twin', twin); $('hud').classList.toggle('twin', twin); LB.w.style.display = twin ? 'block' : 'none';
-    LA.st = { load: 0, mult: 1, shields: 0, lanterns: 0 }; LB.st = { load: 0, mult: 1, shields: 0, lanterns: 0 }; LA.active = true; LB.active = twin; hudShown.load = -1; hudShown.mult = -1; hudAll(true); hudPos(30, 0);
+    LA.st = { load: 0, mult: 1, shields: 0, lanterns: 0 }; LB.st = { load: 0, mult: 1, shields: 0, lanterns: 0 }; LA.active = true; LB.active = twin; hudShown.load = -1; hudShown.mult = -1; hudShown.eq = -1; hudAll(true); hudStop(0, 0);
+    try { const k = +(localStorage.getItem('rrr_hint') || 0); if (k < 3) { localStorage.setItem('rrr_hint', k + 1); S.say('COLLECT GOLD. GEMS MULTIPLY. AVOID TNT. HATS ARE SHIELDS.', true); hintUntil = performance.now() + 5200; } } catch {}
     if (twin) say('TWO CARTS, TWO TRACKS', true); S.music.intensity(.15);
     const mkO = () => ({ stake: ctx.stake, bonus: false, land, depth: i => 30 + i * 4 });
     const res = await Promise.all(runs.map((r, i) => playTrack(LANES[i], r, mkO())));
@@ -1986,12 +2016,12 @@ async function segSpin(sp, run, ctx) {
     const newLevel = sp.level !== curLv, newCart = sp.cart !== lastCart;
     if (newLevel) { sfx.descend(); setLevel(sp.level); }
     freeItems(L); $('scene').classList.remove('exit'); L.st = { load: 0, mult: sp.multIn, shields: sp.shieldsIn, lanterns: 0 }; L.crashed = false; setCart(L, baseCart(L)); setDome(L);
-    H.dl.textContent = 'LEVEL ' + sp.level; hudShown.load = -1; hudShown.mult = -1; hudAll(true); hudPos(100 * sp.level, 0); setCarts(sp.cart, false);
+    H.dl.textContent = 'LVL ' + sp.level + ' STOP'; hudShown.load = -1; hudShown.mult = -1; hudShown.eq = -1; hudAll(true); hudPos(100 * sp.level, 0); setCarts(sp.cart, false);
     if (newCart) { lastCart = sp.cart; L.w.style.display = 'block'; anim(L.w, [{ transform: 'translateX(-620px)' }, { transform: 'translateX(0)' }], { duration: 750 * T(), easing: 'cubic-bezier(.2,.7,.3,1)' }); }
     banner(sp.cart > 1 && !newLevel ? `CART ${sp.cart}` : `LEVEL ${sp.level}`, sp.cart > 1 && !newLevel ? `LEVEL ${sp.level} AGAIN` : `CART ${sp.cart} OF 3`, 1400);
     S.music.intensity(Math.min(1, .35 + sp.level * .15 + sp.multIn / 60)); say(`LEVEL ${sp.level} · CART ${sp.cart}`, true); await W(newLevel ? 1200 : 700);
     const o = { stake: ctx.stake, bonus: true, land, depth: i => 100 * sp.level + i * 6 };
-    const tr = { stops: sp.stops, pay: sp.pay, exit: sp.exit };
+    const tr = { stops: sp.stops, pay: sp.pay, exit: sp.exit, length: sp.length };
     const r = await playTrack(L, tr, o);
     if (sp.cartLost) { setCarts(sp.cart, true); const left = sp.spinsLeft; say(left > 0 ? `CART LOST. ${left} LEFT` : 'THE LAST CART IS GONE', true); await W(600); }
     else if (sp.exit === 'level') { await W(300); }
@@ -2037,7 +2067,7 @@ function musicDefs() {
 }
 
 /* ---------- the shell hooks ---------- */
-function paintIdle() { idleOn = true; resetLanes(); LA.active = true; LB.active = false; LA.st = { load: 0, mult: 1, shields: 0, lanterns: 0 }; hudShown.load = -1; hudShown.mult = -1; stakeNow = S.bet(); hudAll(true); hudPos(30, 0); idleScene(); }
+function paintIdle() { idleOn = true; resetLanes(); LA.active = true; LB.active = false; LA.st = { load: 0, mult: 1, shields: 0, lanterns: 0 }; hudShown.load = -1; hudShown.mult = -1; hudShown.eq = -1; stakeNow = S.bet(); hudAll(true); hudPos(30, 0); idleScene(); }
 function idleScene() {
   [[LA, 1, 'nugget', 1100], [LA, 2, 'g3', 1420], [LA, 3, 'hat', 1760], [LA, 4, 'tnt', 2080]].forEach(([L, i, spr, x0]) => {
     const it = { type: spr, spr: SPR[spr], x0: x0 - L.cx - COLLECT + L.dist, dx: 0, dy: 0, live: false, n: null, i }; L.items.push(it); });
@@ -2088,10 +2118,12 @@ return {
     const g = $('grid'); g.appendChild(LA.w); g.appendChild(LB.w); LB.w.style.display = 'none';
     $('fxl').insertAdjacentHTML('beforeend', '<div id="rrBanner"><b></b><small></small></div>');
     $('hGear').insertAdjacentHTML('beforeend', '<div id="rrCarts">' + [1, 2, 3].map(() => '<svg class="rrs rrCI" style="width:50px;height:49px"><use href="#rrCartRide"/></svg>').join('') + '</div>');
+    H.dl.textContent = 'STOP'; $('hDepth').insertAdjacentHTML('beforeend', '<div id="rrDots"></div>'); $('hDist').querySelector('i').textContent = 'LOAD x MULTI ='; H.depth.textContent = '0/0';
+    $('grid').insertAdjacentHTML('beforeend', '<div id="rrRing"></div>'); ring = $('rrRing');
     bindLayers(); paintLayers(0, 0);
   },
   paintIdle,
-  roundStart() { EP++; killTimers(); inBonus = false; lastCart = 0; stakeNow = S.bet(); $('hud').classList.remove('bonus', 'twin'); H.dl.textContent = 'DEPTH'; curR = null; },
+  roundStart() { EP++; killTimers(); inBonus = false; lastCart = 0; stakeNow = S.bet(); $('hud').classList.remove('bonus', 'twin'); H.dl.textContent = 'STOP'; curR = null; },
   async clearBoard() {
     if (inBonus) return;
     LANES.forEach(L => L.live.forEach(it => { if (it.n && !it.fly) { const n = it.n; it.fly = true; anim(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 220 * T(), fill: 'forwards' }); } }));
@@ -2108,10 +2140,10 @@ return {
     inBonus = on; const hud = $('hud'); hud.classList.toggle('bonus', on); hud.classList.remove('twin');
     if (on) {
       const B = curR && curR.bonus || {}; resetLanes(); twinOn = false; $('scene').classList.remove('twin'); LB.w.style.display = 'none'; LB.active = false; lastCart = 0; curLv = 0;
-      setLevel(B.startLevel || 1); LA.st = { load: 0, mult: B.startMult || 1, shields: B.startShields || 0, lanterns: 0 }; LA.active = true; setCart(LA, baseCart(LA)); setDome(LA); H.dl.textContent = 'LEVEL ' + (B.startLevel || 1);
-      hudShown.load = -1; hudShown.mult = -1; hudAll(true); hudPos(100 * (B.startLevel || 1), 0); setCarts(1, false); S.music.intensity(.35);
+      setLevel(B.startLevel || 1); LA.st = { load: 0, mult: B.startMult || 1, shields: B.startShields || 0, lanterns: 0 }; LA.active = true; setCart(LA, baseCart(LA)); setDome(LA); H.dl.textContent = 'LVL ' + (B.startLevel || 1) + ' STOP';
+      hudShown.load = -1; hudShown.mult = -1; hudShown.eq = -1; hudAll(true); hudPos(100 * (B.startLevel || 1), 0); setCarts(1, false); S.music.intensity(.35);
     } else {
-      resetLanes(); setLevel(1); H.dl.textContent = 'DEPTH'; LA.st = { load: 0, mult: 1, shields: 0, lanterns: 0 }; hudShown.load = -1; hudShown.mult = -1; hudAll(true); hudPos(30, 0); idleOn = true; idleScene(); S.music.intensity(0);
+      resetLanes(); setLevel(1); H.dl.textContent = 'STOP'; LA.st = { load: 0, mult: 1, shields: 0, lanterns: 0 }; hudShown.load = -1; hudShown.mult = -1; hudShown.eq = -1; hudAll(true); hudPos(30, 0); idleOn = true; idleScene(); S.music.intensity(0);
     }
   }
 };

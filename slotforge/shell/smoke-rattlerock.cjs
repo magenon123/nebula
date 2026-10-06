@@ -53,6 +53,7 @@ const P = {
         sn.bonus = sn.bonus || h.classList.contains('bonus'); sn.dome = sn.dome || [...document.querySelectorAll('.rrDome')].some(e => e.style.display === 'block'); sn.crash = sn.crash || [...document.querySelectorAll('.rrCart use')].some(u => u.getAttribute('href') === '#rrCartCrash');
         sn.win = sn.win || [...document.querySelectorAll('.rrCart use')].some(u => u.getAttribute('href') === '#rrCartWin'); sn.forkL = sn.forkL || !!document.querySelector('#grid use[href="#rrForkL"],#grid use[href="#rrForkR"]');
         sn.maxLive = Math.max(sn.maxLive || 0, [...document.querySelectorAll('#grid .rrI')].filter(e => e.style.display !== 'none').length); sn.mult = Math.max(sn.mult || 0, +(document.getElementById('hMultV').textContent.replace(/\D/g, '') || 0));
+        sn.call = sn.call || !!document.querySelector('.rrCall'); sn.stop = sn.stop || /^[1-9]\d*\/\d+$/.test(document.getElementById('hDepthV').textContent); sn.eqv = sn.eqv || +document.getElementById('hDistV').textContent.replace(/[$,]/g, '') > 0; sn.ring = sn.ring || getComputedStyle(document.getElementById('rrRing')).display === 'block';
         sn.carts = Math.max(sn.carts || 0, document.querySelectorAll('#rrCarts .rrCI.lost').length); }, 40);
       new MutationObserver(() => window.__w.msgs.push(document.getElementById('msg').textContent)).observe(document.getElementById('msg'), { childList: true, characterData: true, subtree: true }); }),
     W: () => page.evaluate(() => window.__w),
@@ -79,7 +80,7 @@ const P = {
     if (R) { const exp = Math.round(R.totalPayout * stake * 100) / 100; check(name + ': win field = totalPayout x stake', Math.abs(win - exp) < .011, win + ' vs ' + exp);
       const cost = (R.cost || 1) * stake; check(name + ': balance = start - cost + win', Math.abs(bal - (bal0 - cost + exp)) < .02, bal + ' vs ' + (bal0 - cost + exp));
       check(name + ': win counter never overshoots', w.max <= exp + .011, w.max + ' > ' + exp); }
-    await t.shot(name + '-end'); console.log(`     ${name}: ${((Date.now() - t0) / 1000).toFixed(1)}s, win ${win}, max live nodes ${w.seen.maxLive}`); return { R, w };
+    await t.shot(name + '-end'); console.log(`     ${name}: ${((Date.now() - t0) / 1000).toFixed(1)}s, win ${win}, max live nodes ${w.seen.maxLive}`); return { R, w, secs: (Date.now() - t0) / 1000 };
   }
 
   console.log('== smoke: ' + file);
@@ -95,6 +96,7 @@ const P = {
     let r = await play(t, 'crash', P.crash, 11, { shots: [2500, 6000] }); check('crash: crash pose shown', r.w.seen.crash); check('crash: pays only the load', r.R.runs[0].pay === r.R.runs[0].load);
     console.log('-- clean door run');
     r = await play(t, 'door', P.door, 22, { shots: [3000, 7000] }); check('door: daylight burst + win pose', r.w.seen.exit && r.w.seen.win); check('door: multiplier climbed in HUD', r.w.seen.mult >= 4, r.w.seen.mult);
+    check('door: run lasts >= 12 s at default speed', r.secs >= 12, r.secs); check('door: callout plates shown', r.w.seen.call); check('door: HUD STOP n/N + equation + next ring', r.w.seen.stop && r.w.seen.eqv && r.w.seen.ring);
     console.log('-- shield absorbs TNT');
     r = await play(t, 'shield', P.shield, 33, { shots: [3000, 6000] }); check('shield: dome was shown', r.w.seen.dome); check('shield: run did not crash', !r.R.runs[0].crash && !r.w.seen.crash);
     console.log('-- fork');
