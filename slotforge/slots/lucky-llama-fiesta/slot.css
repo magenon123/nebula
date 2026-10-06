@@ -141,3 +141,4 @@ symbol#llSplashLink,symbol#llSplashParade,symbol#llSplashOutro{overflow:visible}
 @media (max-height:700px) and (orientation:landscape){#introM .sp,#outroM .sp{transform:scale(.72)}}
 #introM .quote,#outroM .quote{margin-top:40px}
 .rules span b{display:inline;font-family:inherit;font-weight:800;font-size:inherit;color:#ffd27a;margin:0}
+body.q2 .llSplash,body.lite .llSplash{filter:none}

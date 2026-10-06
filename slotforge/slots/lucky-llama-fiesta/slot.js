@@ -335,7 +335,7 @@ async function paradeSpin(sp, run, ctx) {
   });
   hideCallout(); cells.forEach(e => e.classList.remove('scat'));
   if (sp.ladderStep !== lastStep) { const up = sp.multiplier > lastMult; lastStep = sp.ladderStep; setLadder(sp.ladderStep, true); sfx.ladder(sp.ladderStep); if (up) { flashPlate('pdCallMult', 'pdCallMultN', 'x' + sp.multiplier, 1500); lastMult = sp.multiplier; } }
-  if (sp.retrigger) { flashPlate('pdCallSpins', 'pdCallSpinsN', '+' + sp.retrigger, 1700); sfx.spinsAdd(); cells.forEach(e => { if (e._code === 'SCA') FX.act(e, 0, 1); }); $('pdSpinsN').textContent = sp.spinsLeft; bump($('pdSpins')); await wait(1000); cells.forEach(e => { if (e._code === 'SCA') FX.rest(e); }); }
+  if (sp.retrigger) { callout(`3 FIESTA DRUMS! +${sp.retrigger} FREE SPINS`, 1500); flashPlate('pdCallSpins', 'pdCallSpinsN', '+' + sp.retrigger, 1700); sfx.spinsAdd(); cells.forEach(e => { if (e._code === 'SCA') FX.act(e, 0, 1); }); $('pdSpinsN').textContent = sp.spinsLeft; bump($('pdSpins')); await wait(1000); cells.forEach(e => { if (e._code === 'SCA') FX.rest(e); }); }
   if (sp.wins.length) run = await showWins(sp, run, ctx, sp.multiplier);
   if (sp.grab && sp.grab.values.length) run = await paradeGrab(sp, run, ctx);
   const fin = r2(run0 + stake * sp.totalPayout); if (fin !== run) { ctx.onWin(run, fin); run = fin; }
@@ -419,7 +419,13 @@ return {
   splashArt: kind => splash(kind === 'outro' ? 'llSplashOutro' : 'llSplashParade'),
   init() {
     for (let c = 0; c < 5; c++) for (let r = 0; r < 3; r++) { const e = mkCellEl(); e._c = c; e._r = r; e.style.cssText = `grid-column:${c + 1};grid-row:${r + 1}`; GRID.appendChild(e); cells.push(e); }
-    mkReels(); $('side').insertAdjacentHTML('beforeend', '');
+    mkReels();
+    /* phones that are shorter than ~19:9 (360x640, tablets): the logo/ladder/jackpot stack above the board needs room, so the board is zoomed a little smaller (the shell reads cfg.portrait on every fit) */
+    const tunePortrait = () => {
+      if (!(innerHeight > innerWidth * 1.02)) return false; const pt = S.cfg.portrait || (S.cfg.portrait = {}), W = 900, H = Math.max(1500, Math.round(W * innerHeight / innerWidth));
+      const g = Math.min(W / 840, (H - 652) / 1020), pad = Math.max(40, Math.round((W / g - 750) / 2)); if (pt.left === pad && pt.right === pad) return false; pt.left = pt.right = pad; return true;
+    };
+    addEventListener('resize', () => { if (tunePortrait()) dispatchEvent(new Event('resize')); }); if (tunePortrait()) setTimeout(() => dispatchEvent(new Event('resize')), 0);
     buildPaytable();
     new MutationObserver(() => { if (!S.isBusy()) { stakeNow = S.bet(); refreshJackpots(); cells.forEach(e => { if (e._code === 'MON' && e._mon) setEl(e, 'MON', e._mon); }); } }).observe($('bet'), { childList: true, characterData: true, subtree: true });
     window.__ll = { cells, reels, get simT() { return simT; }, callout, snapBoard };
