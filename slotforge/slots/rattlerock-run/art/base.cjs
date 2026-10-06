@@ -255,15 +255,58 @@ grad('glass', [[0, '#c8fff6'], [.5, '#4ac8d8'], [1, '#1a6a9a']]);
 const RAIL = 718;
 const flat = (pts, fill, extra = '') => `<polygon points="${pts.map(p => f(p[0]) + ',' + f(p[1])).join(' ')}" fill="${fill}" ${extra}/>`;
 
+
+// ---- expression + arm variants (rattlerock art) ----
+const fistG = (x, y, rot = 0, open = false, scl = 1) => { const ol = `stroke="${OUT}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"`;
+  let g = `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${scl})"><rect x="-18" y="8" width="36" height="24" rx="5" fill="url(#gold)" ${ol}/>`;
+  if (open) { g += `<path d="M-20,12 L-24,-18 C-25,-30 -11,-30 -10,-18 L-9,-22 C-9,-36 5,-36 5,-22 L6,-24 C7,-36 20,-34 18,-22 L22,-10 C26,-4 22,12 20,12 Z" fill="url(#glove)" ${ol}/><path d="M-30,-2 C-40,-6 -38,-18 -28,-16 L-18,-6 Z" fill="url(#glove)" ${ol}/>`; }
+  else g += `<path d="M-20,10 L-22,-14 C-22,-30 22,-30 22,-14 L20,10 Z" fill="url(#glove)" ${ol}/><path d="M-9,-26 V-8 M2,-28 V-8 M13,-26 V-8" stroke="${OUT}" stroke-width="2.4"/><path d="M-26,-4 C-36,-6 -34,-20 -24,-18 Z" fill="url(#glove)" ${ol}/>`;
+  g += `<path d="M-14,-18 L12,-22" stroke="#e8b878" stroke-width="3" opacity=".6" stroke-linecap="round"/></g>`; return g; };
+const FACE = {
+  mouth(k, ol) {
+    const teeth = `<path d="M22,33 C36,38 54,37 63,31 L61,40 C50,46 34,44 24,39 Z" fill="#fffdf2"/><path d="M36,36 v6 M46,37 v6" stroke="#c8b8a0" stroke-width="1.6"/>`;
+    if (k === 'cheer' || k === 'win') return `<path d="M14,28 C16,76 66,80 70,26 C54,38 30,38 14,28 Z" fill="#3a0a10" ${ol(2.8)}/><path d="M18,30 C34,41 54,40 67,28 L65,41 C52,50 32,48 20,41 Z" fill="#fffdf2"/><path d="M30,36 v8 M42,38 v8 M54,36 v8" stroke="#c8b8a0" stroke-width="1.6"/><path d="M26,58 C34,48 52,48 60,58 C54,72 32,72 26,58 Z" fill="#e0506a"/><path d="M43,52 v14" stroke="#a02a40" stroke-width="2"/><path d="M68,26 l5,-8" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>`;
+    if (k === 'crash') return `<path d="M16,40 C22,28 34,48 44,36 C52,28 62,40 70,30 C68,56 52,68 38,62 C26,58 18,50 16,40 Z" fill="#3a0a10" ${ol(2.8)}/><path d="M22,38 C30,34 36,44 44,38 L42,46 C34,50 26,46 22,38 Z" fill="#fffdf2"/><path d="M48,38 C54,34 60,40 66,34 L64,42 C58,46 52,44 48,38 Z" fill="#fffdf2"/><path d="M30,56 C38,50 50,52 56,58 C50,66 36,66 30,56 Z" fill="#e0506a"/>`;
+    if (k === 'shield') return `<path d="M20,32 C30,50 56,52 67,26 C56,34 34,36 20,32 Z" fill="#3a0a10" ${ol(2.6)}/><path d="M24,33 C36,38 54,37 64,29 L62,36 C50,43 36,41 26,37 Z" fill="#fffdf2"/><path d="M67,26 l5,-8" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>`;
+    return `<path d="M18,32 C28,56 58,56 66,28 C54,36 34,36 18,32 Z" fill="#3a0a10" ${ol(2.6)}/>${teeth}<path d="M62,30 l5,-6" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>`;
+  },
+  eyes(k, ol) {
+    if (k === 'cheer' || k === 'win') return `<path d="M8,-10 C14,-30 32,-30 38,-10" stroke="${OUT}" stroke-width="5.4" fill="none" stroke-linecap="round"/><path d="M48,-12 C52,-26 62,-26 67,-12" stroke="${OUT}" stroke-width="4.6" fill="none" stroke-linecap="round"/><path d="M12,-14 C16,-22 28,-22 32,-14" stroke="#fff" stroke-width="2" fill="none" opacity=".45"/>`;
+    if (k === 'crash') { const sp = (cx, cy, r) => `<ellipse cx="${cx}" cy="${cy}" rx="${r * 1.2}" ry="${r}" fill="#fffaf0" ${ol(2.8)}/><path d="M${cx},${cy} m0,0 c${r * .3},${-r * .1} ${r * .45},${r * .25} ${r * .2},${r * .45} c${-r * .35},${r * .35} ${-r * .85},${r * .05} ${-r * .75},${-r * .4} c${r * .15},${-r * .65} ${r * .95},${-r * .85} ${r * 1.1},${-r * .15}" fill="none" stroke="#1a0a04" stroke-width="2.4" stroke-linecap="round"/>`; return sp(22, -14, 13) + sp(58, -16, 8); }
+    const wide = k === 'shield' ? 1 : 1;
+    return `<g><ellipse cx="22" cy="-14" rx="14.5" ry="11" fill="#fffaf0" ${ol(2.8)}/><circle cx="27" cy="-13" r="7.8" fill="#9a5a1e"/><circle cx="28" cy="-13" r="4.2" fill="#1a0a04"/><circle cx="30" cy="-17" r="2.6" fill="#fff"/><circle cx="24" cy="-8" r="1.6" fill="#fff" opacity=".8"/><path d="M7,-18 C14,-28 32,-27 37,-17" stroke="${OUT}" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M8,-6 C16,0 30,0 36,-8" stroke="#a8583a" stroke-width="2" fill="none" opacity=".7"/></g><path d="M7,-17 C14,-28 32,-27 37,-16 L37,-12 C30,-18 14,-18 7,-12 Z" fill="#e0905e" stroke="${OUT}" stroke-width="2.6" stroke-linejoin="round"/><path d="M10,-7 C18,-3 30,-3 35,-9" stroke="#a8583a" stroke-width="2.4" fill="none"/><g><ellipse cx="57" cy="-16" rx="7.5" ry="9" fill="#fffaf0" ${ol(2.6)}/><circle cx="60" cy="-15" r="5" fill="#9a5a1e"/><circle cx="60.6" cy="-15" r="2.8" fill="#1a0a04"/><circle cx="62" cy="-18" r="1.6" fill="#fff"/><path d="M49,-22 C54,-28 63,-26 66,-18" stroke="${OUT}" stroke-width="3" fill="none" stroke-linecap="round"/></g>`;
+  },
+  brows(k, ol) {
+    const b = `<path d="M-6,-26 C6,-44 32,-44 44,-28 L42,-20 C30,-32 12,-30 -4,-18 Z" fill="#3a1a0e" ${ol(2.8)}/><path d="M2,-30 C12,-38 28,-38 38,-28" stroke="#7a4a30" stroke-width="2" fill="none" opacity=".8"/><path d="M46,-30 C54,-40 68,-36 72,-24 L68,-18 C62,-28 54,-28 46,-22 Z" fill="#3a1a0e" ${ol(2.6)}/>`;
+    if (k === 'cheer' || k === 'win') return `<g transform="translate(0 -9) rotate(-5 30 -30)">${b}</g>`;
+    if (k === 'crash') return `<g transform="translate(0 -12) rotate(6 30 -30)">${b}</g>`;
+    return b;
+  },
+};
+const FARARM = (st, limb, ol) => {
+  const a = st.arms || 'point';
+  if (a === 'up') return limb('M74,-196 L226,-234', 50, '#0f5a66') + limb('M226,-234 L266,-322', 40, '#b8683e') + fistG(270, -338, 14, false, 1.05);
+  if (a === 'out') return limb('M74,-196 L232,-206', 50, '#0f5a66') + limb('M232,-206 L300,-262', 40, '#b8683e') + fistG(306, -274, 40, true, 1.05);
+  return limb('M74,-196 L158,-128', 50, '#0f5a66') + limb('M160,-126 L196,-62', 40, '#b8683e');
+};
+const NEARARM = (st, limb, ol) => {
+  const a = st.arms || 'point';
+  const tealArm = d => limb(d, 56, '#1d9a96');
+  if (a === 'up') return tealArm('M14,-196 L-50,-262') + `<path d="M-30,-212 L-52,-250" stroke="#8ae8d8" stroke-width="5" opacity=".5" stroke-linecap="round"/>` + limb('M-52,-262 L-38,-352', 44, 'url(#skin3)') + (st.hold || '') + fistG(-36, -372, -8, false, 1.12);
+  if (a === 'out') return tealArm('M14,-196 L-70,-236') + limb('M-70,-236 L-118,-310', 44, 'url(#skin3)') + fistG(-124, -324, -30, true, 1.1);
+  if (a === 'grip') return tealArm('M14,-196 L58,-122') + `<path d="M26,-210 L58,-150" stroke="#8ae8d8" stroke-width="5" opacity=".5" stroke-linecap="round"/>` + limb('M58,-122 L92,-48', 44, 'url(#skin3)');
+  return tealArm('M14,-196 L70,-130') + `<path d="M26,-210 L68,-150" stroke="#8ae8d8" stroke-width="5" opacity=".5" stroke-linecap="round"/><path d="M58,-148 L84,-112 L98,-124 L74,-160 Z" fill="#c8f0e8" ${ol(3)}/>` + limb('M80,-124 L150,-150', 44, 'url(#skin3)') + `<path d="M96,-132 l8,10 M110,-136 l8,10 M124,-142 l8,10" stroke="#8a4a30" stroke-width="2.2" opacity=".55"/><path d="M92,-146 L140,-160" stroke="#ffe0c0" stroke-width="4" opacity=".5" stroke-linecap="round"/>`;
+};
+
 // ---------- the hero: young rugged dwarf miner, 3/4 view facing right ----------
-const dw3 = () => {
+const dw3 = (st = {}) => {
   const ol = (w = 3.4) => `stroke="${OUT}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
   let o = '';
   // scarf tail streaming back
   o += `<path d="M-6,-206 C-44,-224 -92,-214 -134,-232 C-160,-242 -184,-236 -206,-222 L-190,-212 L-200,-203 L-182,-198 C-150,-196 -128,-190 -108,-176 C-70,-168 -36,-174 -2,-186 Z" fill="url(#scarf)" ${ol()}/><path d="M-30,-206 C-70,-206 -110,-212 -156,-226 M-24,-190 C-60,-188 -100,-190 -140,-202" stroke="#a83a10" stroke-width="3" fill="none" opacity=".6"/><path d="M-20,-214 C-60,-224 -100,-220 -140,-234" stroke="#ffd890" stroke-width="3" fill="none" opacity=".75"/>`;
   // far arm (darker)
   const limb = (d, w, col) => `<path d="${d}" fill="none" stroke="${OUT}" stroke-width="${w + 7}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
-  o += limb('M74,-196 L158,-128', 50, '#0f5a66') + limb('M160,-126 L196,-62', 40, '#b8683e');
+  o += FARARM(st, limb, ol);
   o += `<path d="M146,-142 L172,-114" stroke="#0a3844" stroke-width="12" stroke-linecap="round"/>`;
   // torso: teal work jacket, leaning
   o += `<path d="M-74,-44 C-98,-110 -88,-176 -44,-210 C-8,-234 44,-238 76,-218 C106,-198 118,-156 104,-104 L92,-44 Z" fill="url(#tealJ)" ${ol(3.8)}/>`;
@@ -281,7 +324,7 @@ const dw3 = () => {
   // scarf wrap at neck
   o += `<path d="M10,-214 C40,-190 90,-186 118,-210 L124,-188 C92,-166 40,-168 6,-190 Z" fill="url(#scarf)" ${ol(3.4)}/><path d="M26,-196 C56,-182 90,-182 112,-196" stroke="#ffd080" stroke-width="3" fill="none" opacity=".7"/><path d="M80,-180 C84,-160 78,-146 86,-132 L102,-134 C96,-150 102,-166 100,-184 Z" fill="url(#scarf)" ${ol(3)}/>`;
   // ---------- head (3/4 right) ----------
-  o += `<g transform="translate(100 -270) scale(1.12)">`;
+  o += `<g transform="translate(100 -270) scale(${st.hs || 1.12})">`;
   // ear + neck
   o += `<path d="M-30,30 L44,40 L54,96 L-40,96 Z" fill="#c8764c" ${ol(3.2)}/>`;
   o += `<ellipse cx="-40" cy="2" rx="11" ry="16" fill="url(#skin3)" ${ol(3)}/><path d="M-42,-6 C-36,0 -38,8 -42,12" stroke="#a8583a" stroke-width="2.4" fill="none"/>`;
@@ -300,18 +343,12 @@ const dw3 = () => {
     o += `<ellipse cx="${bx}" cy="${by + 5}" rx="11.5" ry="5.6" fill="url(#gold)" ${ol(2.4)}/>`;
     o += `<path d="M${bx},${by + 68} l-6,14 l6,-5 l6,5 Z" fill="#c4561c" ${ol(2.2)}/>`;
   }
-  // mouth: crooked grin
-  o += `<path d="M18,32 C28,56 58,56 66,28 C54,36 34,36 18,32 Z" fill="#3a0a10" ${ol(2.6)}/><path d="M22,33 C36,38 54,37 63,31 L61,40 C50,46 34,44 24,39 Z" fill="#fffdf2"/><path d="M36,36 v6 M46,37 v6" stroke="#c8b8a0" stroke-width="1.6"/><path d="M62,30 l5,-6" stroke="${OUT}" stroke-width="3" stroke-linecap="round"/>`;
+  o += FACE.mouth(st.face, ol);
   // moustache
   o += `<path d="M58,22 C40,18 18,22 0,36 C12,44 26,42 36,35 C44,31 52,32 62,30 Z" fill="url(#copper)" ${ol(3.2)}/><path d="M50,24 C36,22 20,28 8,36" stroke="#ffcf90" stroke-width="2.4" fill="none" opacity=".6"/>`;
   // nose
   o += `<path d="M54,-20 C66,-8 78,4 76,16 C74,26 62,28 52,26 C46,24 44,18 48,8 Z" fill="#e48c5c" ${ol(3.2)}/><ellipse cx="62" cy="0" rx="6" ry="9" fill="#ffd0a8" opacity=".6" transform="rotate(-20 62 0)"/><path d="M58,22 q5,3 11,0" stroke="#7a3018" stroke-width="2.4" fill="none"/>`;
-  // eyes
-  o += `<g><ellipse cx="22" cy="-14" rx="14.5" ry="11" fill="#fffaf0" ${ol(2.8)}/><circle cx="27" cy="-13" r="7.8" fill="#9a5a1e"/><circle cx="28" cy="-13" r="4.2" fill="#1a0a04"/><circle cx="30" cy="-17" r="2.6" fill="#fff"/><path d="M7,-18 C14,-28 32,-27 37,-17" stroke="${OUT}" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M8,-6 C16,0 30,0 36,-8" stroke="#a8583a" stroke-width="2" fill="none" opacity=".7"/></g>`;
-  o += `<path d="M7,-17 C14,-28 32,-27 37,-16 L37,-12 C30,-18 14,-18 7,-12 Z" fill="#e0905e" stroke="${OUT}" stroke-width="2.6" stroke-linejoin="round"/><path d="M10,-7 C18,-3 30,-3 35,-9" stroke="#a8583a" stroke-width="2.4" fill="none"/>`;
-  o += `<g><ellipse cx="57" cy="-16" rx="7.5" ry="9" fill="#fffaf0" ${ol(2.6)}/><circle cx="60" cy="-15" r="5" fill="#9a5a1e"/><circle cx="60.6" cy="-15" r="2.8" fill="#1a0a04"/><circle cx="62" cy="-18" r="1.6" fill="#fff"/><path d="M49,-22 C54,-28 63,-26 66,-18" stroke="${OUT}" stroke-width="3" fill="none" stroke-linecap="round"/></g>`;
-  // bushy dark brows (determined)
-  o += `<path d="M-6,-26 C6,-44 32,-44 44,-28 L42,-20 C30,-32 12,-30 -4,-18 Z" fill="#3a1a0e" ${ol(2.8)}/><path d="M2,-30 C12,-38 28,-38 38,-28" stroke="#7a4a30" stroke-width="2" fill="none" opacity=".8"/><path d="M46,-30 C54,-40 68,-36 72,-24 L68,-18 C62,-28 54,-28 46,-22 Z" fill="#3a1a0e" ${ol(2.6)}/>`;
+  o += FACE.eyes(st.face, ol) + FACE.brows(st.face, ol);
   // hard hat
   o += `<ellipse cx="38" cy="-62" rx="110" ry="60" fill="url(#lampGlow)" opacity=".4"/>`;
   o += `<path d="M-64,-34 C-68,-94 -26,-118 22,-112 C66,-104 80,-64 74,-34 Z" fill="url(#hat)" ${ol(3.8)}/>`;
@@ -322,15 +359,12 @@ const dw3 = () => {
   o += `<path d="M-66,-62 C-30,-48 30,-44 76,-56 L74,-68 C30,-58 -30,-62 -66,-76 Z" fill="url(#leather)" ${ol(2.8)}/>`;
   for (const [gx, gy, gr] of [[-8, -66, 16], [26, -63, 15]]) o += `<circle cx="${gx}" cy="${gy}" r="${gr + 3}" fill="url(#gold)" ${ol(3)}/><circle cx="${gx}" cy="${gy}" r="${gr - 3}" fill="url(#glass)" ${ol(2)}/><path d="M${gx - gr * .6},${gy - gr * .2} A${gr * .7},${gr * .7} 0 0 1 ${gx},${gy - gr * .7}" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" opacity=".9"/>`;
   o += `<path d="M7,-66 L10,-63" stroke="${OUT}" stroke-width="4"/>`;
+  if (st.hatGlow) o += `<ellipse cx="20" cy="-74" rx="130" ry="96" fill="#fff0a0" opacity=".55"/><path d="M-64,-34 C-68,-94 -26,-118 22,-112 C66,-104 80,-64 74,-34 Z" fill="#fff6c0" opacity=".5"/>` + spark(-50,-100,20,.95) + spark(70,-110,14,.9) + spark(90,-60,12,.8);
   // headlamp
   o += `<g transform="translate(76 -58)"><circle r="46" fill="url(#lampGlow)"/><rect x="-12" y="-14" width="24" height="28" rx="7" fill="url(#gold)" ${ol(3)}/><circle cx="6" cy="0" r="10" fill="#fffbe6" ${ol(2.4)}/><circle cx="6" cy="0" r="5" fill="#fff"/></g>`;
   o += `</g>`;
   // near arm (front): pointing ahead
-  o += limb('M14,-196 L70,-130', 56, '#1d9a96');
-  o += `<path d="M26,-210 L68,-150" stroke="#8ae8d8" stroke-width="5" opacity=".5" stroke-linecap="round"/>`;
-  o += `<path d="M58,-148 L84,-112 L98,-124 L74,-160 Z" fill="#c8f0e8" ${ol(3)}/>`;
-  o += limb('M80,-124 L150,-150', 44, 'url(#skin3)');
-  o += `<path d="M96,-132 l8,10 M110,-136 l8,10 M124,-142 l8,10" stroke="#8a4a30" stroke-width="2.2" opacity=".55"/><path d="M92,-146 L140,-160" stroke="#ffe0c0" stroke-width="4" opacity=".5" stroke-linecap="round"/>`;
+  o += NEARARM(st, limb, ol);
   // rim lights: cool crystal blue on the back, warm lantern gold on the front
   o += `<path d="M-92,-120 C-98,-166 -78,-206 -40,-224" stroke="#8ae8ff" stroke-width="4" fill="none" opacity=".6" stroke-linecap="round"/><path d="M104,-190 C116,-170 114,-140 104,-110" stroke="#ffd070" stroke-width="3.4" fill="none" opacity=".55" stroke-linecap="round"/>`;
   return o;
@@ -344,4 +378,4 @@ const glovePoint = (x, y) => `<g transform="translate(${x} ${y})"><path d="M-30,
 
 const mush = (x, y, s, col) => `<g transform="translate(${x} ${y}) scale(${s})"><circle cy="-10" r="26" fill="${col}" opacity=".28"/><rect x="-3" y="-12" width="6" height="14" rx="2" fill="#d8f0e0" stroke="${OUT}" stroke-width="2"/><path d="M-13,-10 C-12,-26 12,-26 13,-10 Z" fill="${col}" stroke="${OUT}" stroke-width="2.4"/><circle cx="-4" cy="-17" r="2" fill="#fff" opacity=".8"/><circle cx="5" cy="-14" r="1.6" fill="#fff" opacity=".8"/></g>`;
 const heap2 = (cx, cy, wd, ht, n, ns) => `<path d="M${cx - wd / 2},${cy + 6} Q${cx - wd * .3},${cy - ht * 1.1} ${cx},${cy - ht} Q${cx + wd * .3},${cy - ht * 1.1} ${cx + wd / 2},${cy + 6} Z" fill="#b8681a" stroke="${OUT}" stroke-width="3"/>` + heap(cx, cy, wd, ht, n, ns);
-module.exports={heap2,fs,FONT,FONT2,R,rnd,f,lerp,OUT,grad,rad,get defs(){return defs},lantern,crystal,cluster,nugget,coin,heap,spark,tag,gem,items,dw3,glove3,glovePoint,cart,cartRim,mush,flat,RAIL,setSeed:n=>{seed=n}};
+module.exports={fistG,FACE,heap2,fs,FONT,FONT2,R,rnd,f,lerp,OUT,grad,rad,get defs(){return defs},lantern,crystal,cluster,nugget,coin,heap,spark,tag,gem,items,dw3,glove3,glovePoint,cart,cartRim,mush,flat,RAIL,setSeed:n=>{seed=n}};
