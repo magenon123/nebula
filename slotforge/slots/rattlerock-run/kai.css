@@ -70,9 +70,9 @@ body.portrait .rrCall{font-size:46px}
 #scene.rrT .ly-track{display:none}
 #rrTrack{position:absolute;left:0;top:0;overflow:visible;will-change:transform;pointer-events:none}
 #rrTrack path{fill:none;stroke-linejoin:round}
-#rrTrack .rrRail{stroke:#cfd6e6;stroke-width:7}#rrTrack .rrAlt{stroke:#cfd6e6;stroke-width:7}
-#rrTrack .rrBar{stroke:#4e5468;stroke-width:6}
-#rrTrack .rrSlp{stroke:#6e4a2a;stroke-width:16;stroke-dasharray:12 30}
+#rrTrack .rrRail{stroke:#e2e8f4;stroke-width:9}#rrTrack .rrAlt{stroke:#e2e8f4;stroke-width:9}
+#rrTrack .rrBar{stroke:#454b60;stroke-width:8}
+#rrTrack .rrSlp{stroke:#6e4a2a;stroke-width:20;stroke-dasharray:14 30}
 #rrTrack .rrLegs{stroke:#2e2018;stroke-width:9}
 .rrW .rrR{position:absolute;left:0;top:0;will-change:transform}
 .rrW .rrCart.bounce{transform-origin:50% 98%}

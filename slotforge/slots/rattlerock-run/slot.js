@@ -76,9 +76,9 @@ body.portrait .rrCall{font-size:46px}
 #scene.rrT .ly-track{display:none}
 #rrTrack{position:absolute;left:0;top:0;overflow:visible;will-change:transform;pointer-events:none}
 #rrTrack path{fill:none;stroke-linejoin:round}
-#rrTrack .rrRail{stroke:#cfd6e6;stroke-width:7}#rrTrack .rrAlt{stroke:#cfd6e6;stroke-width:7}
-#rrTrack .rrBar{stroke:#4e5468;stroke-width:6}
-#rrTrack .rrSlp{stroke:#6e4a2a;stroke-width:16;stroke-dasharray:12 30}
+#rrTrack .rrRail{stroke:#e2e8f4;stroke-width:9}#rrTrack .rrAlt{stroke:#e2e8f4;stroke-width:9}
+#rrTrack .rrBar{stroke:#454b60;stroke-width:8}
+#rrTrack .rrSlp{stroke:#6e4a2a;stroke-width:20;stroke-dasharray:14 30}
 #rrTrack .rrLegs{stroke:#2e2018;stroke-width:9}
 .rrW .rrR{position:absolute;left:0;top:0;will-change:transform}
 .rrW .rrCart.bounce{transform-origin:50% 98%}
@@ -134,7 +134,7 @@ function mkLane(id, rail, k, cx) {
   L.w = w; L.r = w.firstChild; L.cy = rail; L.cam = 0; L.rot = 0; L.cart = L.r.children[0]; L.dome = L.r.children[1]; L.cu = L.cart.firstChild; L.dome.style.opacity = 1; L.boom = document.createElementNS(NS, 'svg'); L.boom.setAttribute('class', 'rrs rrBoom'); L.boom.innerHTML = '<use href="#rrBoom1"/>'; L.boom.style.display = 'none';
   return L;
 }
-const RAIL0 = 690;
+const RAIL0 = 600;
 const LA = mkLane('A', RAIL0, 1, 340), LB = mkLane('B', 488, .72, 790);
 const LANES = [LA, LB];
 window.__rr = { LA, LB, ep: () => EP };   // test handle
