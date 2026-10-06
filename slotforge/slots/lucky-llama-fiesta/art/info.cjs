@@ -1,0 +1,12 @@
+module.exports = () => `  <p>5 reels x 3 rows, <b>20 fixed paylines</b>, wins pay left to right from reel 1: <b>3, 4 or 5 of a kind on adjacent reels</b>. The highest win per line counts and line wins add. Max win [[maxWin]]x your bet.</p>
+  <table class="pt" id="ptab"></table>
+  <div class="rules">
+    <div><b>WILD PONCHO</b><span>Don Lucho's striped poncho replaces every pay symbol (not the drum or the piñatas). It lands on reels 2 to 5. Five-of-a-kind WILDs pay like Don Lucho.</span></div>
+    <div><b>FIESTA DRUM (SCATTER)</b><span>Pays nothing by itself. <b>3, 4 or 5 drums</b> anywhere start <b>PONCHO PARADE</b> with 8, 12 or 20 free spins. 3 more drums in the bonus add 3 spins.</span></div>
+    <div><b>MONEY PIÑATAS</b><span>Piñatas carry a cash value (x1 to x25 your bet) or a jackpot: <b>MINI 20x, MINOR 50x, MAJOR 250x, GRAND 2,000x</b>. In the base game they pay nothing alone.</span></div>
+    <div><b>PIÑATA LINK</b><span><b>6 or more piñatas</b> on one spin start PIÑATA LINK: they lock in place, all other cells spin, you get <b>3 respins</b>, every new piñata that lands locks and resets the respins to 3. At the end every piñata is cracked left to right and its value is added to the TOTAL. Fill all 15 cells and you win the GRAND on top of every value.</span></div>
+    <div><b>PONCHO PARADE</b><span>Every WILD that lands <b>sticks</b> for the whole bonus and Lucho adds a stripe to the multiplier ladder: 1 poncho x1, 2 x2, 3 x3, 5 x5, 7 x8, 10 or more x10. The multiplier applies to <b>all line wins</b> of every spin. Piñatas in the bonus do not start Link: Don Lucho swings and collects every cash value on screen.</span></div>
+    <div><b>FIESTA LUCK (BET-UP)</b><span>Costs [[anteCost]]x your bet per spin. Drums and piñatas land much more often. The RTP stays the same.</span></div>
+    <div><b>BONUS BUY</b><span>PONCHO PARADE for [[buy:parade]]x your bet, PIÑATA LINK for [[buy:link]]x (starts with 6 piñatas), PARTY PACK for [[buy:party]]x (Parade that starts with 3 sticky ponchos). The reels drop the matching symbols and the bonus starts like a natural trigger. A round never pays more than [[maxWin]]x.</span></div>
+  </div>
+`;
