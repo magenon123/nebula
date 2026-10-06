@@ -35,19 +35,6 @@ body.lite .rrW.mv .rrCart.bounce{animation-duration:.5s}
 .rrCI{transition:opacity .3s,transform .3s;opacity:.95}
 .rrCI.cur{transform:scale(1.14)}
 .rrCI.lost{opacity:.2;transform:scale(.8)}
-/* portrait phone: the run window is the cart plus the next ~2 pickups (stage x 0..1000, see cfg.portrait); scene and game group share one transform */
-body.portrait #scene{left:calc(var(--gx,0px)*var(--g,1))!important;top:calc(var(--gy,0px)*var(--g,1))!important;width:1600px!important;height:900px!important;transform:scale(var(--g,1))!important;transform-origin:0 0!important}
-/* portrait: the run window is a band; the soft one-bitmap copy of the cavern (shell #backdrop) fills the screen around it instead of plain black */
-body.portrait #backdrop,body.lite #backdrop{display:block!important}
-body.portrait #stage{background:none}
-body.portrait #logo{left:310px;top:-150px;width:380px}
-body.portrait #hud{left:8px;top:10px;width:864px;height:128px}
-body.portrait #hud .hc i{font-size:17px;letter-spacing:2px}
-body.portrait #hud .hc b{font-size:42px}
-body.portrait #hud .hc b.two{font-size:36px}
-body.portrait .rrTag{font-size:44px}
-body.portrait #rrBanner{left:500px}
-body.portrait #rrBanner b{font-size:96px}
 
 /* ---- clarity: callout plates, stop dots, next-stop ring ---- */
 .rrCall{position:absolute;transform:translate(-50%,-50%);padding:6px 22px 8px;border-radius:99px;border:4px solid #1c0f08;background:linear-gradient(#ffe48a,#f0a92a);color:#2a1406;font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:36px;line-height:1;white-space:nowrap;pointer-events:none;box-shadow:0 5px 0 rgba(0,0,0,.45);will-change:transform,opacity;z-index:8}
@@ -59,7 +46,6 @@ body.portrait #rrBanner b{font-size:96px}
 #rrRing{display:none;position:absolute;left:0;top:0;width:180px;height:180px;border-radius:50%;border:6px solid rgba(255,230,120,.85);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25);animation:rrRingP .7s ease-in-out infinite alternate;pointer-events:none;will-change:transform}
 @keyframes rrRingP{from{opacity:.35}to{opacity:1}}
 body.lite #rrRing{animation:none;opacity:.8}
-body.portrait .rrCall{font-size:46px}
 
 .rrCall{position:absolute;transform:translate(-50%,-50%);padding:6px 22px 8px;border-radius:99px;border:4px solid #1c0f08;background:linear-gradient(#ffe48a,#f0a92a);color:#2a1406;font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:36px;line-height:1;white-space:nowrap;pointer-events:none;box-shadow:0 5px 0 rgba(0,0,0,.45);will-change:transform,opacity;z-index:8}
 .rrCall.gem{background:linear-gradient(#bff4ff,#45b4f0)}.rrCall.bad{background:linear-gradient(#ffb09a,#e0402a);color:#fff}.rrCall.good{background:linear-gradient(#c8ffb0,#4fc83a)}
@@ -70,7 +56,6 @@ body.portrait .rrCall{font-size:46px}
 #rrRing{display:none;position:absolute;left:0;top:0;width:180px;height:180px;border-radius:50%;border:6px solid rgba(255,230,120,.85);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25);animation:rrRingP .7s ease-in-out infinite alternate;pointer-events:none;will-change:transform}
 @keyframes rrRingP{from{opacity:.35}to{opacity:1}}
 body.lite #rrRing{animation:none;opacity:.8}
-body.portrait .rrCall{font-size:46px}
 
 /* ---- vertical ride: procedural rails, tunnel mouths ---- */
 #scene.rrT .ly-track{display:none}
@@ -98,6 +83,24 @@ body.portrait .rrCall{font-size:46px}
 .rrRig .rg-beam{opacity:.5}.rrRig .rg-sparkStreak{opacity:0}
 .rrW.mv .rrRig .rg-sparkStreak{opacity:1;animation:rrFlick .1s steps(2) infinite alternate}
 body.lite .rrW.mv .rrRig .rg-sparkStreak,body.lite .rrRig .rg-beam{display:none}
+
+/* ---- wide windows and phones ---- */
+#frame{overflow:visible}
+#rrTrackB{position:absolute;left:0;top:0;overflow:visible;display:none;pointer-events:none}
+#scene.twin ~ * #rrTrackB,#stage:has(#scene.twin) #rrTrackB{display:block}
+#scene .ly-track2{display:none!important}
+#rrTrackB .rrSlp{stroke-dasharray:10 21;stroke-width:14}
+body.portrait #ga{zoom:1!important;left:0!important;top:calc((var(--H,1950px) - 1950px)/2)!important}
+body.portrait #frame,body.portrait #grid,body.portrait #fxl{width:900px;height:1950px}
+body.portrait #logo{left:260px;top:215px;width:380px}
+body.portrait #hud{left:8px;top:74px;width:884px;height:132px}
+body.portrait #hud .hc i{font-size:17px;letter-spacing:2px}
+body.portrait #hud .hc b{font-size:44px}
+body.portrait #hud .hc b.two{font-size:34px}
+body.portrait .rrCall{font-size:46px}
+body.portrait .rrTag{font-size:44px}
+body.portrait #rrBanner{left:450px;top:520px}
+body.portrait #rrBanner b{font-size:84px}
 `;
 (function () { const st = document.createElement('style'); st.id = 'kaiCss'; st.textContent = KAI_CSS; document.head.appendChild(st); })();
 /*END-KAI-CSS*/
@@ -106,7 +109,8 @@ const { $, sfx, wait, T, shake, flash, embers, fmt } = S;
 let hintUntil = 0;
 const say = (t, h) => { if (performance.now() < hintUntil) return; S.say(t, h); };
 const NS = 'http://www.w3.org/2000/svg';
-const SPX = 360, COLLECT = 150, SPAWN_X = 1780, V0 = 330, POOL = 16;
+let SPAWN_X = 1780;
+const SPX = 360, COLLECT = 150, V0 = 330, POOL = 16;
 const ABORT = { abort: 1 };
 let EP = 0, curR = null, lastCart = 0, inBonus = false, twinOn = false, idleOn = true;
 const timers = new Set();
@@ -149,9 +153,15 @@ function mkLane(id, rail, k, cx) {
   L.w = w; L.r = w.firstChild; L.cy = rail; L.cam = 0; L.rot = 0; L.cart = L.r.children[0]; L.dome = L.r.children[1]; L.rg = rigRefs(L.cart.firstChild, k); L.dome.style.opacity = 1; L.boom = document.createElementNS(NS, 'svg'); L.boom.setAttribute('class', 'rrs rrBoom'); L.boom.innerHTML = '<use href="#rrBoom1"/>'; L.boom.style.display = 'none';
   return L;
 }
-const RAIL0 = 600;
+let RAIL0 = 600, PORT = false;
 const LA = mkLane('A', RAIL0, 1, 340), LB = mkLane('B', 488, .72, 790);
 const LANES = [LA, LB];
+function geom() {
+  PORT = document.body.classList.contains('portrait'); RAIL0 = PORT ? 1210 : 600;
+  LA.rail = RAIL0; LA.cx = PORT ? 250 : 340; LB.rail = PORT ? RAIL0 - 230 : 488; LB.cx = PORT ? 600 : 790; LB.cy = LB.rail;
+  for (const L of LANES) { L.w.style.left = (L.cx - 200 * L.k) + 'px'; L.w.style.top = (L.rail - 387 * L.k) + 'px'; }
+  const vw = PORT ? 900 : Math.max(1600, innerWidth / (S.scale() || 1)); SPAWN_X = Math.round(vw + (PORT ? 120 : (vw - 1600) / 2 + 180)); trk.ox = null; if (lay) bindLayers(); if (trkB.svg) trkB.svg.style.top = (LB.rail + 2) + 'px';
+}
 window.__rr = { LA, LB, ep: () => EP };   // test handle
 function RGS(c, id) { return `<svg class="rg rg-${c}"><use href="#rrRig${id}"/></svg>`; }
 function rigHTML() {
@@ -219,6 +229,13 @@ function mkTrack() {
   trk.svg = sv; trk.p = { legs: mk('rrLegs'), alt: mk('rrAlt'), altS: mk('rrSlp', 'translate(0,8)'), slp: mk('rrSlp', 'translate(0,8)'), bar: mk('rrBar', 'translate(0,13)'), rail: mk('rrRail') };
   trk.p.altS.setAttribute('class', 'rrSlp'); trk.p.altS.style.opacity = .85; $('grid').insertBefore(sv, $('grid').firstChild);
 }
+const trkB = { svg: null, p: null };
+function mkTrackB() {
+  const sv = document.createElementNS(NS, 'svg'); sv.setAttribute('id', 'rrTrackB'); sv.setAttribute('width', 10); sv.setAttribute('height', 10);
+  sv.innerHTML = '<path class="rrSlp" d="M-1400 7H3400" transform="translate(0,6) scale(1,.72)"/><path class="rrBar" d="M-1400 9H3400" stroke-width="6"/><path class="rrRail" d="M-1400 0H3400" stroke-width="7"/><path class="rrLegs" d="" />';
+  trkB.svg = sv; trkB.p = sv.firstChild; $('grid').insertBefore(sv, LA.w);
+}
+function paintTrackB() { if (!twinOn || !trkB.svg) return; const o = -(LB.dist * .72 % 31); if (trkB.o !== o) { trkB.o = o; trkB.p.style.strokeDashoffset = o; } }
 function drawTrack(ox) {
   trk.ox = ox; const TW = 3400, st = 30; let d = '', legs = '', prev = false;
   for (let u = ox; u <= ox + TW; u += st) {
@@ -235,8 +252,8 @@ function drawTrack(ox) {
 let lay = null, curLv = 1;
 function bindLayers() {
   const q = s => document.querySelector('#scene ' + s);
-  lay = { far: q('.ly-far.L' + curLv), fm: q('.ly-farmid.L' + curLv), mid: q('.ly-mid.L' + curLv), tr: q('.ly-track.L' + curLv), near: q('.ly-near.L' + curLv), t2: q('.ly-track2'), last: [null, null, null, null, null] };
-  document.querySelectorAll('#scene .ly-far,#scene .ly-farmid,#scene .ly-mid,#scene .ly-track,#scene .ly-near,#scene .ly-track2').forEach(e => { e.style.animation = 'none'; });
+  const x = PORT ? '-p' : ''; lay = { far: q('.ly-far' + x + '.L' + curLv), fm: q('.ly-farmid' + x + '.L' + curLv), mid: q('.ly-mid' + x + '.L' + curLv), tr: q('.ly-track' + x + '.L' + curLv), near: q('.ly-near' + x + '.L' + curLv), t2: q('.ly-track2'), last: [null, null, null, null, null] };
+  document.querySelectorAll('#scene .ly-far,#scene .ly-farmid,#scene .ly-mid,#scene .ly-track,#scene .ly-near,#scene .ly-track2,#scene .ly-far-p,#scene .ly-farmid-p,#scene .ly-mid-p,#scene .ly-track-p,#scene .ly-near-p').forEach(e => { e.style.animation = 'none'; });
 }
 function paintLayers(dA, dB) {
   const l = lay, c = LA.cam || 0, v = [(dA * .06) % 1600, (dA * .22) % 1600, dA % 1600, (dA * 1.5) % 1600, (dB * .72) % 1152], cy = Math.round(c * 10) / 10;
@@ -275,7 +292,7 @@ function tick(now) {
     while (L.ns < L.items.length) { const it = L.items[L.ns]; if (L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx < SPAWN_X) { if (spawn(L, it)) L.ns++; else break; } else break; }
     if (L.live.length) { let j = 0; for (let i = 0; i < L.live.length; i++) { const it = L.live[i]; if (!it.live) continue; if (it.n && L.cx + L.k * (it.x0 - L.dist + COLLECT) + it.dx < -420) { it.live = false; release(it.n); it.n = null; continue; } if (it.n && !it.fly) place(it, L); L.live[j++] = it; } L.live.length = j; }
   }
-  const sett = rideCam(dt); rigMotion(LA, dt); if (LB.active) rigMotion(LB, dt);
+  const sett = rideCam(dt); paintTrackB(); rigMotion(LA, dt); if (LB.active) rigMotion(LB, dt);
   paintLayers(LA.dist, LB.dist);
   if (ring) { const it = LA.next != null && LA.active ? LA.items[LA.next] : null; if (it && it.live && it.n && !it.fly && it.type !== 'door') { const x = LA.cx + (it.x0 - LA.dist + COLLECT) + it.dx, y = it.y + it.h * .5; ring.style.display = 'block'; ring.style.transform = `translate3d(${x - 90}px,${y - 90}px,0)`; } else if (ring.style.display !== 'none') ring.style.display = 'none'; }
   for (const L of LANES) if (L._mv !== L.go) { L._mv = L.go; L.w.classList.toggle('mv', L.go); }
@@ -608,7 +625,7 @@ return {
     $('hGear').insertAdjacentHTML('beforeend', '<div id="rrCarts">' + [1, 2, 3].map(() => '<svg class="rrs rrCI" style="width:50px;height:49px"><use href="#rrCartRide"/></svg>').join('') + '</div>');
     H.dl.textContent = 'STOP'; $('hDepth').insertAdjacentHTML('beforeend', '<div id="rrDots"></div>'); $('hDist').querySelector('i').textContent = 'LOAD x MULTI ='; H.depth.textContent = '0/0';
     $('grid').insertAdjacentHTML('beforeend', '<div id="rrRing"></div>'); ring = $('rrRing');
-    $('scene').classList.add('rrT'); mkTrack(); L_init(); bindLayers(); paintLayers(0, 0);
+    $('scene').classList.add('rrT'); mkTrack(); mkTrackB(); L_init(); geom(); addEventListener('resize', () => { if (document.body.classList.contains('portrait') !== PORT || true) { geom(); } }); bindLayers(); paintLayers(0, 0);
   },
   paintIdle,
   roundStart() { EP++; killTimers(); inBonus = false; lastCart = 0; stakeNow = S.bet(); $('hud').classList.remove('bonus', 'twin'); H.dl.textContent = 'STOP'; curR = null; },

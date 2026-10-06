@@ -29,19 +29,6 @@ body.lite .rrW.mv .rrCart.bounce{animation-duration:.5s}
 .rrCI{transition:opacity .3s,transform .3s;opacity:.95}
 .rrCI.cur{transform:scale(1.14)}
 .rrCI.lost{opacity:.2;transform:scale(.8)}
-/* portrait phone: the run window is the cart plus the next ~2 pickups (stage x 0..1000, see cfg.portrait); scene and game group share one transform */
-body.portrait #scene{left:calc(var(--gx,0px)*var(--g,1))!important;top:calc(var(--gy,0px)*var(--g,1))!important;width:1600px!important;height:900px!important;transform:scale(var(--g,1))!important;transform-origin:0 0!important}
-/* portrait: the run window is a band; the soft one-bitmap copy of the cavern (shell #backdrop) fills the screen around it instead of plain black */
-body.portrait #backdrop,body.lite #backdrop{display:block!important}
-body.portrait #stage{background:none}
-body.portrait #logo{left:310px;top:-150px;width:380px}
-body.portrait #hud{left:8px;top:10px;width:864px;height:128px}
-body.portrait #hud .hc i{font-size:17px;letter-spacing:2px}
-body.portrait #hud .hc b{font-size:42px}
-body.portrait #hud .hc b.two{font-size:36px}
-body.portrait .rrTag{font-size:44px}
-body.portrait #rrBanner{left:500px}
-body.portrait #rrBanner b{font-size:96px}
 
 /* ---- clarity: callout plates, stop dots, next-stop ring ---- */
 .rrCall{position:absolute;transform:translate(-50%,-50%);padding:6px 22px 8px;border-radius:99px;border:4px solid #1c0f08;background:linear-gradient(#ffe48a,#f0a92a);color:#2a1406;font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:36px;line-height:1;white-space:nowrap;pointer-events:none;box-shadow:0 5px 0 rgba(0,0,0,.45);will-change:transform,opacity;z-index:8}
@@ -53,7 +40,6 @@ body.portrait #rrBanner b{font-size:96px}
 #rrRing{display:none;position:absolute;left:0;top:0;width:180px;height:180px;border-radius:50%;border:6px solid rgba(255,230,120,.85);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25);animation:rrRingP .7s ease-in-out infinite alternate;pointer-events:none;will-change:transform}
 @keyframes rrRingP{from{opacity:.35}to{opacity:1}}
 body.lite #rrRing{animation:none;opacity:.8}
-body.portrait .rrCall{font-size:46px}
 
 .rrCall{position:absolute;transform:translate(-50%,-50%);padding:6px 22px 8px;border-radius:99px;border:4px solid #1c0f08;background:linear-gradient(#ffe48a,#f0a92a);color:#2a1406;font-family:var(--toon,RRNum),RRNum,sans-serif;font-size:36px;line-height:1;white-space:nowrap;pointer-events:none;box-shadow:0 5px 0 rgba(0,0,0,.45);will-change:transform,opacity;z-index:8}
 .rrCall.gem{background:linear-gradient(#bff4ff,#45b4f0)}.rrCall.bad{background:linear-gradient(#ffb09a,#e0402a);color:#fff}.rrCall.good{background:linear-gradient(#c8ffb0,#4fc83a)}
@@ -64,7 +50,6 @@ body.portrait .rrCall{font-size:46px}
 #rrRing{display:none;position:absolute;left:0;top:0;width:180px;height:180px;border-radius:50%;border:6px solid rgba(255,230,120,.85);box-shadow:inset 0 0 0 3px rgba(255,255,255,.25);animation:rrRingP .7s ease-in-out infinite alternate;pointer-events:none;will-change:transform}
 @keyframes rrRingP{from{opacity:.35}to{opacity:1}}
 body.lite #rrRing{animation:none;opacity:.8}
-body.portrait .rrCall{font-size:46px}
 
 /* ---- vertical ride: procedural rails, tunnel mouths ---- */
 #scene.rrT .ly-track{display:none}
@@ -92,3 +77,21 @@ body.portrait .rrCall{font-size:46px}
 .rrRig .rg-beam{opacity:.5}.rrRig .rg-sparkStreak{opacity:0}
 .rrW.mv .rrRig .rg-sparkStreak{opacity:1;animation:rrFlick .1s steps(2) infinite alternate}
 body.lite .rrW.mv .rrRig .rg-sparkStreak,body.lite .rrRig .rg-beam{display:none}
+
+/* ---- wide windows and phones ---- */
+#frame{overflow:visible}
+#rrTrackB{position:absolute;left:0;top:0;overflow:visible;display:none;pointer-events:none}
+#scene.twin ~ * #rrTrackB,#stage:has(#scene.twin) #rrTrackB{display:block}
+#scene .ly-track2{display:none!important}
+#rrTrackB .rrSlp{stroke-dasharray:10 21;stroke-width:14}
+body.portrait #ga{zoom:1!important;left:0!important;top:calc((var(--H,1950px) - 1950px)/2)!important}
+body.portrait #frame,body.portrait #grid,body.portrait #fxl{width:900px;height:1950px}
+body.portrait #logo{left:260px;top:215px;width:380px}
+body.portrait #hud{left:8px;top:74px;width:884px;height:132px}
+body.portrait #hud .hc i{font-size:17px;letter-spacing:2px}
+body.portrait #hud .hc b{font-size:44px}
+body.portrait #hud .hc b.two{font-size:34px}
+body.portrait .rrCall{font-size:46px}
+body.portrait .rrTag{font-size:44px}
+body.portrait #rrBanner{left:450px;top:520px}
+body.portrait #rrBanner b{font-size:84px}
