@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="sf-build" content="39f9ddc 10-05 14:37">
+<meta name="sf-build" content="ae87ef7 10-07 04:47">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>EmberClaw: Molten Reforge</title>
 <style>
@@ -2468,8 +2468,18 @@ $('buyOpen').onclick = () => {
   if (ante || luck) { const m = luck ? cfg.luck : cfg.fever; ante = false; luck = false; sfx.ui(); refreshUi(); say(m.offMsg); return; }   // tap the glowing sign again: mode off
   sfx.ui(); refreshUi(); openM('buyM');
 };
-$('bbM').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
-$('bbP').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
+/* BET ARROWS: one press = one step; HOLD = keeps stepping, speeding up (stops at the ends, on release, or when the controls lock for a spin) */
+function holdStep(el, d) {
+  let t = null; const stop = () => { clearTimeout(t); t = null; };
+  const step = () => { const was = bi; bi = Math.max(0, Math.min(BETS.length - 1, bi + d)); if (bi !== was) { sfx.ui(); refreshUi(); } return bi !== was; };
+  el.addEventListener('pointerdown', e => { if (el.disabled || (e.button || 0) > 0) return; if (!step()) return; let gap = 330;
+    const loop = () => { if (el.disabled || !step()) return stop(); gap = Math.max(60, gap * .82); t = setTimeout(loop, gap); }; t = setTimeout(loop, 430); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => el.addEventListener(ev, stop));
+  el.addEventListener('contextmenu', e => e.preventDefault());   // a long press must not open the phone's context menu
+  el.addEventListener('click', e => { if (e.detail === 0 && !el.disabled) step(); });   // keyboard / assistive technology (a real tap already stepped on pointerdown)
+}
+holdStep($('bbM'), -1); holdStep($('bbP'), 1);
+
 
 const mult = () => luck ? LUCK_COST : ante ? ANTE_COST : 1;
 function refreshUi() {
@@ -2495,8 +2505,7 @@ function openBets() {
 }
 $('betGrid').onclick = e => { const o = e.target.closest('.opt'); if (!o) return; sfx.ui(); bi = +o.dataset.i; refreshUi(); closeM('betM'); };
 $('betV').onclick = openBets;
-$('m').onclick = () => { sfx.ui(); bi = Math.max(0, bi - 1); refreshUi(); };
-$('p').onclick = () => { sfx.ui(); bi = Math.min(BETS.length - 1, bi + 1); refreshUi(); };
+holdStep($('m'), -1); holdStep($('p'), 1);
 $('spin').onclick = () => { if (busy && auto.left <= 0) { speedUp(); return; } if (auto.left > 0) { auto.left = 0; sfx.ui(); refreshUi(); say('Autoplay stopping after this spin'); return; } go(null); };
 /* hamburger menu */
 const closeMenu = () => { $('menu').hidden = true; };

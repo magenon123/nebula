@@ -76,9 +76,6 @@ body.portrait #scene .ctr{top:calc(450px + (var(--H,1600px)/2 - 640px)/var(--sc,
 
 /* KAI */
 
-
-
-
 /* ---------- KAI: client css (Lucky Llama Fiesta). Source: kai.css; `python3 embed-kai.py` splices it after the marker (art builds keep it) ---------- */
 #fsBox{display:none!important}
 body.co #msg{opacity:0}
