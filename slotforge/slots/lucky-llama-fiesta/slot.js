@@ -324,6 +324,7 @@ async function paradeSpin(sp, run, ctx) {
   if (!pdReady) await paradeIntro(B, ctx);
   $('pdSpinsN').textContent = sp.spinsLeft; bump($('pdSpins'));
   hideCallout();
+  cells.forEach(e => { if (!e.classList.contains('sticky')) { e.classList.remove('cracked', 'grabbed', 'win', 'wl', 'hit'); e.getAnimations().forEach(a => a.cancel()); } });   // a Collector-grabbed cell must not stay hidden on the next spin
   if (!spinning()) { startReels([1, 1, 1, 1, 1]); await wait(260); }
   const mm = monMap(sp), info = { mon: 0, sca: 0, parade: true }, newW = {}; sp.wilds.forEach(w => { if (w.new) newW[w.reel * 3 + w.row] = 1; });
   let nNew = 0;

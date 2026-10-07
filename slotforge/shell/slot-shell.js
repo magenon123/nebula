@@ -344,9 +344,9 @@ let bigTap = null;
 /* Coins tumble down the win screen, hit the floor, bounce twice (smaller each time), then fall away. Heavier with each level. */
 function coinRain(lv) {
   const box = $('bigCoins'); if (!box) return () => {};
-  const spawn = () => { if (box.childElementCount > (LITE ? 18 : 34)) return;
-    const c = document.createElement('i'), sz = 22 + Math.random() * 30, dur = (3600 + Math.random() * 1400) * T(), rot = (Math.random() < .5 ? -1 : 1) * (540 + Math.random() * 900), tilt = Math.random() * 40 - 20;
-    c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px`; box.appendChild(c);
+  const spawn = () => { if (box.childElementCount > (LITE ? 60 : 150)) return;
+    const c = document.createElement('i'), sz = 22 + Math.random() * 30, dur = (1900 + Math.random() * 700) * T(), rot = (Math.random() < .5 ? -1 : 1) * (540 + Math.random() * 900), tilt = Math.random() * 40 - 20;
+    c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px;font-size:${(sz * .62).toFixed(1)}px`; box.appendChild(c);
     const F = 90, f = (y, k) => `translateY(${y}vh) rotateY(${rot * k}deg) rotateZ(${tilt}deg)`;
     const an = c.animate([
       { transform: f(-14, 0), offset: 0, easing: 'cubic-bezier(.55,0,.9,.55)' },
@@ -357,8 +357,8 @@ function coinRain(lv) {
       { transform: f(F, .86), offset: .83, easing: 'cubic-bezier(.5,0,.9,.6)' },                   // third touch, then it just falls
       { transform: f(122, 1), offset: 1 }], { duration: dur });
     an.onfinish = () => c.remove(); };
-  for (let i = 0; i < 8 + lv * 2; i++) setTimeout(spawn, Math.random() * 500);
-  const iv = setInterval(spawn, Math.max(70, 190 - lv * 22));
+  for (let i = 0; i < (8 + lv * 2) * 5; i++) setTimeout(spawn, Math.random() * 500);
+  const iv = setInterval(spawn, Math.max(14, (190 - lv * 22) / 5));
   return () => clearInterval(iv);   // stop making new coins; the ones in the air finish their fall
 }
 async function bigWin(x, amt) {
@@ -368,7 +368,7 @@ async function bigWin(x, amt) {
   const N = steps.length, last = N - 1, B = $('big'), title = $('bigT'), amtEl = $('bigA');
   const th = steps.map((st, i) => i === 0 ? 0 : amt * st.min / x), end = i => i === last ? amt : th[i + 1];   // the amount at which each level begins
   const dur = i => (i === last ? 2200 + steps[i].lv * 450 : 1500) * T();
-  amtEl.textContent = fmt(0); $('bigX').textContent = ''; if ($('bigTag')) $('bigTag').textContent = bonusDone ? 'BONUS COMPLETE' : '';
+  amtEl.textContent = fmt(0); $('bigX').textContent = '';
   B.classList.add('show'); let stopRain = () => {}, seg = -1, segT0 = 0, done = false, lastTap = 0, lt = 0;
   const showStep = (i, now) => {
     seg = i; segT0 = now; const st = steps[i];
@@ -513,7 +513,7 @@ function refreshUi() {
   $('barR').classList.toggle('hot', ante || luck); $('betLbl').textContent = ante || luck ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !(ante || luck); $('feverBadge').textContent = luck ? cfg.luck.badge : cfg.fever ? cfg.fever.badge : '';
   if (LUCK_COST) { $('luck').textContent = luck ? 'DEACTIVATE' : 'ACTIVATE'; $('luck').classList.toggle('or', !luck); $('luck').classList.toggle('off', luck); }
   const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
-  $('betBar').style.width = (bi / (BETS.length - 1) * 100) + '%';
+  $('betBar').style.width = (BETS[bi] / BETS[BETS.length - 1] * 100) + '%';
   BUYS.forEach((b, i) => fitTxt($('p' + (i + 1)), fmt(s * b.mult), 34, '23px'));
   if (cfg.fever) { $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante); }
   $('bAuto').classList.toggle('on', auto.left > 0);

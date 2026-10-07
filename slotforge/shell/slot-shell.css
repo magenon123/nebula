@@ -285,7 +285,7 @@ html,body{touch-action:manipulation;-webkit-touch-callout:none}
 #bigRays,#big.maxwin::before{display:none!important}
 #bigCoins{position:absolute;inset:0;overflow:hidden;pointer-events:none;perspective:700px;z-index:1}
 #bigCoins i{position:absolute;top:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6b8 0,#ffd23a 38%,#d38a0c 78%,#8a5206 100%);box-shadow:inset 0 0 0 3px rgba(130,76,6,.75),inset 0 0 0 6px rgba(255,236,150,.55),0 3px 8px rgba(0,0,0,.45);will-change:transform}
-#bigCoins i::after{content:"$";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 55% var(--toon,Impact),sans-serif;color:#9a5a08;text-shadow:0 1px 0 rgba(255,240,170,.8)}
+#bigCoins i::after{content:"$";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 1em/1 var(--toon,Impact),sans-serif;color:#7a4204;text-shadow:0 1px 0 rgba(255,244,180,.9);backface-visibility:visible}
 #bigCard{z-index:3}
 
 /* ===== portrait (phone held upright): same game, re-laid out ===== */
