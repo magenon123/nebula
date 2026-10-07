@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="sf-build" content="ae87ef7 10-07 04:48">
+<meta name="sf-build" content="253e04f 10-07 05:54">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Lucky Llama Fiesta</title>
 <style>
@@ -2094,7 +2094,7 @@ function setWinCells(set) {
     e.classList.toggle('wl', on && e._code === 'WLD');
   });
 }
-async function countTo(ctx, from, to, ms) { if (to === from) return; await FX.tween(ms * T(), k => ctx.onWin(from, k >= 1 ? to : from + (to - from) * k)); }
+async function countTo(ctx, from, to, ms) { if (to === from) return; await FX.tween(ms * T(), k => ctx.onWin(from, k >= 1 ? to : from + (to - from) * Math.max(0, k))); }
 async function showWins(sp, run, ctx, mult) {
   const wins = sp.wins; if (!wins || !wins.length) return run;
   const stake = ctx.stake, steps = [], byPay = [...wins].sort((a, b) => b.pay - a.pay);
@@ -2210,7 +2210,7 @@ async function paradeSpin(sp, run, ctx) {
   if (sp.retrigger) { callout(`3 FIESTA DRUMS! +${sp.retrigger} FREE SPINS`, 1500); flashPlate('pdCallSpins', 'pdCallSpinsN', '+' + sp.retrigger, 1700); sfx.spinsAdd(); cells.forEach(e => { if (e._code === 'SCA') FX.act(e, 0, 1); }); $('pdSpinsN').textContent = sp.spinsLeft; bump($('pdSpins')); await wait(1000); cells.forEach(e => { if (e._code === 'SCA') FX.rest(e); }); }
   if (sp.wins.length) run = await showWins(sp, run, ctx, sp.multiplier);
   if (sp.grab && sp.grab.values.length) run = await paradeGrab(sp, run, ctx);
-  const fin = r2(run0 + stake * sp.totalPayout); if (fin !== run) { ctx.onWin(run, fin); run = fin; }
+  const fin = r2(run0 + stake * sp.totalPayout); if (fin > run) { ctx.onWin(run, fin); run = fin; }
   return run;
 }
 async function paradeGrab(sp, run, ctx) {

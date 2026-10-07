@@ -91,7 +91,7 @@ const P = {
     if (R) { const cost = Math.round(stake * R.cost * 100) / 100, exp = Math.round(R.totalPayout * stake * 100) / 100;
       check(name + ': win field = totalPayout x stake', Math.abs(win - exp) < .011, win + ' vs ' + exp);
       check(name + ': balance = before - cost + win', Math.abs(bal - (bal0 - cost + exp)) < .011, bal + ' vs ' + (bal0 - cost + exp).toFixed(2));
-      check(name + ': win counter never goes down', w.wins.every((v, i) => i === 0 || v >= w.wins[i - 1] - .001 || v === 0), JSON.stringify(w.wins.slice(0, 60))); }
+      check(name + ': win counter never goes down', w.wins.every((v, i) => i === 0 || v >= w.wins[i - 1] - .001 || v === 0), (() => { const i = w.wins.findIndex((v, j) => j > 0 && !(v >= w.wins[j - 1] - .001 || v === 0)); return i < 0 ? '' : 'drop at sample ' + i + ' of ' + w.wins.length + ': ' + JSON.stringify(w.wins.slice(Math.max(0, i - 4), i + 5)); })()); }
     check(name + ': board intact after the round', await t.boardOk()); check(name + ': no reel left spinning', await t.set("window.__ll.reels.every(r => r.mode === 'idle')"));
     return { R, w, win, bal, stake, ms: Date.now() - t0, ok };
   }
