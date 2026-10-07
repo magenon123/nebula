@@ -5,7 +5,7 @@ Order in the stage: scene, logo, frame, character, side. Sizes: symbols.svg ~400
 ## Stage geometry (1600x900)
 | piece | box | notes |
 |---|---|---|
-| `#scene` | full stage | baked `.day` plaza (golden hour), `.dusk` night variant fades in with `#scene.bonus` (1.6 s; use for Parade/Link), `.banners` = ONE thin layer (papel picado strings, 1600x420) that sways in CSS, `img.bdp` small backdrop copy (opacity 0, for the page backdrop). Composition is cover-friendly (sky/ground extend; nothing important at the edges). |
+| `#scene` | WIDE world, 3400x1800 baked at stage offset (-900,-400) (css `left:-900px;top:-400px` on `.bg`; `#scene` itself stays 1600x900, overflow visible, the stage does not clip) | `.day` golden-hour plaza, `.dusk` night variant fades in with `#scene.bonus` (1.6 s), `.banners` (3400x460 at left -900) = ONE sway layer, `.ctr`/`.ctrn` wooden counter 3400x684 at (-900,716) (day/dusk) that the shell HUD bars sit on (hidden in portrait), `img.bdp` small backdrop copy. The centre 1600x900 is the old composition; houses, church towers, trees, fountain, lamp posts, cobbles continue left/right/up/down for wide (21:9, 32:9) and tall windows. Props near the UI were moved: cantina at stage x 34-247 (left of the ladder), towers only at x<0 and x>1520, nothing behind the board/ladder/BUY sign/jackpot stack. Size: scene.html ~0.6 MB. |
 | `#logo` | (584,2) 432x142 | static svg viewBox 720x236, llama ears above the letters. Loading screen clones it big. Add class `off` to hide it in Link/Parade (the top strip is then free for the plates). |
 | `#frameArt` | (365,152) 870x528 | baked WebP (carved painted wood, brass studs, marigold garlands) |
 | `#frame` | **(425,190) 750x450: 5 cols x 3 rows, 150x150 cells** | contains `#grid` (css grid) and `#fxl` (z6 overlay). Cells have `margin:2px` (tile 146 + 4 gap). Right edge x=1175, bottom y=640. Shell `#msg` (y 728) sits below. |
@@ -45,3 +45,6 @@ Placeholders `[[maxWin]] [[anteCost]] [[buy:parade]] [[buy:link]] [[buy:party]]`
 
 ## RESUME NOTE
 All deliverables A-G done and rendered (contact.png, ui-sheet.png, stage-*.png). If something changes: edit `art/syms.cjs` / `ui.cjs` / `scene.cjs` / `frame.cjs` / `logo.cjs` / `side.cjs` / `css.cjs`, run `node art/bake-blur.cjs && node art/build.cjs && node art/card.cjs`. Not done: no symbol-level change for the engine's `Collector` grab motion beyond `llCollector`; side CSS positions are suggestions (move freely after the KAI marker).
+
+## Revision: wide scene (owner round)
+Scene is now 3400x1800 (see table). Regenerate: `node art/build.cjs` (scene.cjs generates the whole world; `art/vp.cjs <built.html>` screenshots the real game at 1912x948, 2560x1080, 1280x720, 390x844, 430x932, 1000x1000 into `art/vp/`).

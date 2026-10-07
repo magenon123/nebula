@@ -10,13 +10,13 @@ ${fonts()}
 #scene{pointer-events:none}
 #scene img{position:absolute;display:block;pointer-events:none}
 #scene img.bdp{left:0;top:0;width:100%;height:100%;opacity:0}
-#scene .bg{left:-900px;top:-300px;width:3400px;height:1500px}
-#scene .ctr{left:-900px;top:716px;width:3400px;height:484px}
+#scene .bg{left:-900px;top:-400px;width:3400px;height:1800px}
+#scene .ctr{left:-900px;top:716px;width:3400px;height:684px}
 #scene .ctrn{opacity:0;transition:opacity 1.6s}
 #scene.bonus .ctrn{opacity:1}
-body.portrait #scene .ctr{display:none}
+body.portrait #scene .ctr{top:calc(450px + (var(--H,1600px)/2 - 640px)/var(--sc,1.7))}
 #scene .dusk{opacity:0;transition:opacity 1.6s}
-#scene img.bdp{left:-900px;top:-300px;width:3400px;height:1500px}
+#scene img.bdp{left:-900px;top:-400px;width:3400px;height:1800px}
 #scene.bonus .dusk{opacity:1}
 #scene .banners{left:-900px;top:0;width:3400px;height:460px;transform-origin:50% 0;animation:llSway 6s ease-in-out infinite alternate}
 @keyframes llSway{0%{transform:skewX(-.7deg) translateX(-3px)}100%{transform:skewX(.7deg) translateX(3px)}}

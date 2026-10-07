@@ -11,9 +11,9 @@ module.exports.bg = function (DUSK) {
   const R = rng(7); let S = '', s2;
 // ---------- SKY ----------
 const ug = (st) => { const id = (DUSK ? 'lDu' : 'lBu') + 'sky'; L.defs.push(`<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="900">${st.map(([o, c]) => `<stop offset="${o}" stop-color="${c}"/>`).join('')}</linearGradient>`); return `url(#${id})`; };
-S += `<rect x="-900" y="-300" width="3400" height="1500" fill="${ug(DUSK ? [[0, '#05082a'], [.3, '#161a5a'], [.55, '#4a2a7a'], [.72, '#8a3a6a'], [.86, '#c8603a'], [1, '#e89a50']] : [[0, '#0c1448'], [.25, '#34378e'], [.45, '#a8488a'], [.62, '#ee7a3c'], [.78, '#ffb852'], [1, '#ffd98a']])}"/>`;
+S += `<rect x="-900" y="-400" width="3400" height="1800" fill="${ug(DUSK ? [[0, '#05082a'], [.3, '#161a5a'], [.55, '#4a2a7a'], [.72, '#8a3a6a'], [.86, '#c8603a'], [1, '#e89a50']] : [[0, '#0c1448'], [.25, '#34378e'], [.45, '#a8488a'], [.62, '#ee7a3c'], [.78, '#ffb852'], [1, '#ffd98a']])}"/>`;
 // stars faint at top
-for (let i = 0; i < 90; i++) S += `<circle cx="${-900 + R() * 3400}" cy="${-300 + R() * 450}" r="${.8 + R() * 1.2}" fill="#fff" opacity="${.35 + R() * .4}"/>`;
+for (let i = 0; i < 90; i++) S += `<circle cx="${-900 + R() * 3400}" cy="${-400 + R() * 550}" r="${.8 + R() * 1.2}" fill="#fff" opacity="${.35 + R() * .4}"/>`;
 S += `<circle cx="150" cy="560" r="700" fill="${rgrad([[0, 'rgba(255,240,170,.95)'], [.18, 'rgba(255,200,100,.65)'], [.5, 'rgba(255,140,70,.25)'], [1, 'rgba(255,120,60,0)']])}"/>`;
 S += `<circle cx="150" cy="560" r="62" fill="#fff6c0"/>`;
 if (DUSK) S += `<circle cx="1230" cy="150" r="46" fill="#f4f0d8"/><circle cx="1216" cy="140" r="42" fill="#161a5a" opacity=".0"/>`;
@@ -106,7 +106,7 @@ S += fountain(-300, 690) + lamp(-520, 676) + lamp(-180, 676, 0, 'r') + lamp(-760
 S += lamp(1498, 676, 0, 'r');
 
 // ---------- GROUND (plaza) ----------
-S += `<rect x="-900" y="640" width="3400" height="560" fill="${grad([[0, '#e4a05a'], [.25, '#c47a46'], [1, '#8a4a2c']])}"/>`;
+S += `<rect x="-900" y="640" width="3400" height="760" fill="${grad([[0, '#e4a05a'], [.25, '#c47a46'], [1, '#8a4a2c']])}"/>`;
 for (let r = 0; r < 5; r++) {
   const y = 646 + r * 22, hh = 11 + r * 3, sw = 38 + r * 14;
   for (let x = -900 - ((r * 17) % sw); x < 2500; x += sw) {
@@ -157,7 +157,7 @@ S += `<rect x="-900" y="640" width="3400" height="14" fill="${grad([[0, 'rgba(25
 }
 
 
-  if (DUSK) S += `<rect x="-900" y="-300" width="3400" height="1500" fill="rgba(30,20,90,.28)"/>`;
+  if (DUSK) S += `<rect x="-900" y="-400" width="3400" height="1800" fill="rgba(30,20,90,.28)"/>`;
   return { svg: S, defs: L.defs.slice() };
 };
 module.exports.strands = function () {
@@ -189,14 +189,14 @@ module.exports.counter = function (DUSK) {
   const R = rng(11); let S = '';
   const X0 = -900, W3 = 3400;
   S += `<rect x="${X0}" y="716" width="${W3}" height="34" fill="${grad([[0, 'rgba(30,8,4,0)'], [1, 'rgba(30,8,4,.5)']])}"/>`;
-  S += `<rect x="${X0}" y="750" width="${W3}" height="460" fill="${wood('#b8662e', '#4a2008')}"/>`;
-  for (let y = 790; y < 1200; y += 40) S += `<path d="M${X0},${y} H${X0 + W3}" stroke="rgba(30,10,5,.75)" stroke-width="3"/><path d="M${X0},${y + 2.5} H${X0 + W3}" stroke="rgba(255,200,130,.2)" stroke-width="2"/>`;
-  for (let i = 0; i < 260; i++) S += `<path d="M${(X0 + R() * W3).toFixed(0)},${(756 + R() * 440).toFixed(0)} h${(40 + R() * 160).toFixed(0)}" stroke="rgba(40,14,6,${(.12 + R() * .14).toFixed(2)})" stroke-width="${(1 + R() * 2).toFixed(1)}"/>`;
-  for (let y = 750; y < 1200; y += 40) { let x = X0 + R() * 300; while (x < X0 + W3) { S += `<path d="M${x.toFixed(0)},${y + 2} v${36}" stroke="rgba(30,10,5,.75)" stroke-width="3"/>`; x += 260 + R() * 360; } }
+  S += `<rect x="${X0}" y="750" width="${W3}" height="660" fill="${wood('#b8662e', '#4a2008')}"/>`;
+  for (let y = 790; y < 1400; y += 40) S += `<path d="M${X0},${y} H${X0 + W3}" stroke="rgba(30,10,5,.75)" stroke-width="3"/><path d="M${X0},${y + 2.5} H${X0 + W3}" stroke="rgba(255,200,130,.2)" stroke-width="2"/>`;
+  for (let i = 0; i < 340; i++) S += `<path d="M${(X0 + R() * W3).toFixed(0)},${(756 + R() * 640).toFixed(0)} h${(40 + R() * 160).toFixed(0)}" stroke="rgba(40,14,6,${(.12 + R() * .14).toFixed(2)})" stroke-width="${(1 + R() * 2).toFixed(1)}"/>`;
+  for (let y = 750; y < 1400; y += 40) { let x = X0 + R() * 300; while (x < X0 + W3) { S += `<path d="M${x.toFixed(0)},${y + 2} v${36}" stroke="rgba(30,10,5,.75)" stroke-width="3"/>`; x += 260 + R() * 360; } }
   S += `<rect x="${X0}" y="750" width="${W3}" height="12" fill="${brass()}" stroke="${O}" stroke-width="3"/>`;
   for (let x = X0 + 28; x < X0 + W3; x += 64) S += `<circle cx="${x}" cy="756" r="3.6" fill="#fff0a8" stroke="${O}" stroke-width="1.4"/>`;
   S += `<rect x="${X0}" y="762" width="${W3}" height="14" fill="${grad([[0, 'rgba(0,0,0,.35)'], [1, 'rgba(0,0,0,0)']])}"/>`;
-  S += `<rect x="${X0}" y="880" width="${W3}" height="330" fill="${grad([[0, 'rgba(20,6,2,0)'], [1, 'rgba(20,6,2,.55)']])}"/>`;
-  if (DUSK) S += `<rect x="${X0}" y="716" width="${W3}" height="500" fill="rgba(30,20,90,.3)"/>`;
+  S += `<rect x="${X0}" y="880" width="${W3}" height="530" fill="${grad([[0, 'rgba(20,6,2,0)'], [1, 'rgba(20,6,2,.55)']])}"/>`;
+  if (DUSK) S += `<rect x="${X0}" y="716" width="${W3}" height="700" fill="rgba(30,20,90,.3)"/>`;
   return { svg: S, defs: L.defs.slice() };
 };

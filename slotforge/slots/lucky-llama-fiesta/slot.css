@@ -6,13 +6,13 @@
 #scene{pointer-events:none}
 #scene img{position:absolute;display:block;pointer-events:none}
 #scene img.bdp{left:0;top:0;width:100%;height:100%;opacity:0}
-#scene .bg{left:-900px;top:-300px;width:3400px;height:1500px}
-#scene .ctr{left:-900px;top:716px;width:3400px;height:484px}
+#scene .bg{left:-900px;top:-400px;width:3400px;height:1800px}
+#scene .ctr{left:-900px;top:716px;width:3400px;height:684px}
 #scene .ctrn{opacity:0;transition:opacity 1.6s}
 #scene.bonus .ctrn{opacity:1}
-body.portrait #scene .ctr{display:none}
+body.portrait #scene .ctr{top:calc(450px + (var(--H,1600px)/2 - 640px)/var(--sc,1.7))}
 #scene .dusk{opacity:0;transition:opacity 1.6s}
-#scene img.bdp{left:-900px;top:-300px;width:3400px;height:1500px}
+#scene img.bdp{left:-900px;top:-400px;width:3400px;height:1800px}
 #scene.bonus .dusk{opacity:1}
 #scene .banners{left:-900px;top:0;width:3400px;height:460px;transform-origin:50% 0;animation:llSway 6s ease-in-out infinite alternate}
 @keyframes llSway{0%{transform:skewX(-.7deg) translateX(-3px)}100%{transform:skewX(.7deg) translateX(3px)}}
@@ -75,6 +75,8 @@ body.portrait #scene .ctr{display:none}
 .cell.hit,.winAnim{--ks0_rim:sy0_rim;--ks0_main:sy0_main;--ks0_spk:sy0_spk;--ks0_spk2:sy0_spk2;--ks1_rim:sy1_rim;--ks1_mL:sy1_mL;--ks1_mR:sy1_mR;--ks1_spk:sy1_spk;--ks1_spk2:sy1_spk2;--ks2_rim:sy2_rim;--ks2_main:sy2_main;--ks2_spk:sy2_spk;--ks2_spk2:sy2_spk2;--ks3_rim:sy3_rim;--ks3_main:sy3_main;--ks3_n1:sy3_n1;--ks3_n2:sy3_n2;--ks3_spk:sy3_spk;--ks4_rim:sy4_rim;--ks4_main:sy4_main;--ks4_steam:sy4_steam;--ks4_spk:sy4_spk;--ks4_spk2:sy4_spk2;--ks5_rim:sy5_rim;--ks5_main:sy5_main;--ks5_jaw:sy5_jaw;--ks5_glow:sy5_glow;--ks5_spk:sy5_spk;--ks5_spk2:sy5_spk2;--ks6_rim:sy6_rim;--ks6_main:sy6_main;--ks6_spk:sy6_spk;--ks6_spk2:sy6_spk2;--ks7_rim:sy7_rim;--ks7_main:sy7_main;--ks7_spk:sy7_spk;--ks7_spk2:sy7_spk2;--ks8_rim:sy8_rim;--ks8_main:sy8_main;--ks8_rays:sy8_rays;--ks8_n1:sy8_n1;--ks8_n2:sy8_n2;--ks9_rim:sy9_rim;--ks9_head:sy9_head;--ks9_pon:sy9_pon;--ks9_lid:sy9_lid;--ks9_spk:sy9_spk;--ks9_spk2:sy9_spk2;--ks9_spk3:sy9_spk3;--ks10_rim:sy10_rim;--ks10_main:sy10_main;--ks10_spk:sy10_spk;--ks10_spk2:sy10_spk2;--ks11_rim:sy11_rim;--ks11_main:sy11_main;--ks11_stL:sy11_stL;--ks11_stR:sy11_stR;--ks11_ring:sy11_ring;--ks11_spk:sy11_spk;--ks12_rim:sy12_rim;--ks12_main:sy12_main;--ks12_spk:sy12_spk;--ks12_spk2:sy12_spk2;--ks12_spk3:sy12_spk3;--ks12_mini_rim:sy12_mini_rim;--ks12_mini_main:sy12_mini_main;--ks12_mini_spk:sy12_mini_spk;--ks12_mini_spk2:sy12_mini_spk2;--ks12_mini_spk3:sy12_mini_spk3;--ks12_minor_rim:sy12_minor_rim;--ks12_minor_main:sy12_minor_main;--ks12_minor_spk:sy12_minor_spk;--ks12_minor_spk2:sy12_minor_spk2;--ks12_minor_spk3:sy12_minor_spk3;--ks12_major_rim:sy12_major_rim;--ks12_major_main:sy12_major_main;--ks12_major_spk:sy12_major_spk;--ks12_major_spk2:sy12_major_spk2;--ks12_major_spk3:sy12_major_spk3;--ks12_grand_rim:sy12_grand_rim;--ks12_grand_main:sy12_grand_main;--ks12_grand_spk:sy12_grand_spk;--ks12_grand_spk2:sy12_grand_spk2;--ks12_grand_spk3:sy12_grand_spk3;--ks13_rim:sy13_rim;--ks13_main:sy13_main;--ks13_spk:sy13_spk;--ks13_spk2:sy13_spk2;--ks13_spk3:sy13_spk3;--ks13_aura:sy13_aura}
 
 /* KAI */
+
+
 
 
 /* ---------- KAI: client css (Lucky Llama Fiesta). Source: kai.css; `python3 embed-kai.py` splices it after the marker (art builds keep it) ---------- */
