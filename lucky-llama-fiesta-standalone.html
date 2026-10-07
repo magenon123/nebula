@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="sf-build" content="2910878 10-07 04:36">
+<meta name="sf-build" content="3f35595 10-07 04:37">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Lucky Llama Fiesta (offline demo)</title>
 <style>
@@ -471,7 +471,6 @@ body.portrait #lkTotal{left:600px;top:-189px;zoom:.9;transform:none}
 body.portrait #pdCallMult{left:420px;top:-120px;zoom:1.25}
 body.portrait #pdCallSpins{left:475px;top:-120px;zoom:1.25}
 body.portrait #coLine{left:288px;top:470px;zoom:1.46}
-body.portrait #pdCollector{left:1421px;top:-443px;zoom:.7}
 
 /* ---------- bonus intro / outro splash: compact so the whole splash fits a 16:9 window ---------- */
 .llSplash{width:300px;height:260px;margin:0 auto -30px;position:relative;z-index:1;filter:drop-shadow(0 8px 0 rgba(0,0,0,.4))}
@@ -487,6 +486,8 @@ symbol#llSplashLink,symbol#llSplashParade,symbol#llSplashOutro{overflow:visible}
 #introM .quote,#outroM .quote{margin-top:40px}
 .rules span b{display:inline;font-family:inherit;font-weight:800;font-size:inherit;color:#ffd27a;margin:0}
 body.q2 .llSplash,body.lite .llSplash{filter:none}
+#pdCollector{display:none!important}
+.cell.grabbed::before{content:"";position:absolute;inset:-4px;border-radius:22px;z-index:0;box-shadow:0 0 0 5px #ffd23f,0 0 26px 10px rgba(255,210,63,.9);animation:llBeat .3s ease-in-out infinite}
 
 </style></head><body>
 <div id="loadM"><div class="lmLogo" id="lmLogo"></div><div class="lmVol" id="lmVol"></div><div class="lmCards" id="lmCards"></div><div class="lmBar"><i id="lmFill"></i></div><div class="lmTxt" id="lmTxt">LOADING</div><div class="lmTap" id="lmTap">CLICK TO CONTINUE</div><div class="lmWarn">Stuck here? Open this file in Chrome or Safari. File viewers and chat apps cannot run the game.</div></div><noscript><div style="position:fixed;inset:0;z-index:999;background:#111;color:#fff;padding:40px;font:20px/1.4 sans-serif">JavaScript is turned off or blocked here. Open this file in Chrome or Safari.</div></noscript>
@@ -2186,7 +2187,6 @@ async function paradeIntro(B, ctx) {
     sfx.ladder(3); lastStep = 3; lastMult = 3; setLadder(3, true); await wait(1000);
   }
 }
-function collectorSwing() { const e = $('pdCollector'); e.classList.remove('swing'); void e.offsetWidth; e.classList.add('swing'); }
 async function paradeSpin(sp, run, ctx) {
   const B = curR.bonus, stake = ctx.stake, run0 = run; stakeNow = stake;
   if (!pdReady) await paradeIntro(B, ctx);
@@ -2209,17 +2209,16 @@ async function paradeSpin(sp, run, ctx) {
   return run;
 }
 async function paradeGrab(sp, run, ctx) {
-  const stake = ctx.stake, vals = [...sp.grab.values].sort((a, b) => a.reel - b.reel || a.row - b.row), col = $('pdCollector'); let cur = run, tot = 0;
-  collectorSwing(); sfx.swing(); callout(`DON LUCHO COLLECTS ${plural(vals.length, 'PIÑATA')} (NO MULTIPLIER)`); await wait(450);
+  const stake = ctx.stake, vals = [...sp.grab.values].sort((a, b) => a.reel - b.reel || a.row - b.row); let cur = run, tot = 0;
   for (const v of vals) {
-    const e = cellOf(v.reel, v.row), [sx, sy] = ctr(e), [tx, ty] = ctr(col), k = S.scale(), g = e;
-    tot = r4(tot + v.value); const to = r2(run + stake * tot); sfx.grab(); S.pop(sx, sy - 24, '+' + money(v.value * stake));
-    e.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(0,-14px) scale(1.15)', opacity: 1, offset: .25 }, { transform: `translate(${(tx - sx) / k}px,${(ty - sy) / k}px) scale(.3)`, opacity: .2 }], { duration: 420 * T(), fill: 'forwards', easing: 'cubic-bezier(.5,0,.8,.6)' });
-    e.classList.add('cracked'); setTimeout(() => FX.shards(tx, ty, v.jackpot ? 20 : 8, ['#ffd23f', '#fff3c0', '#ff8a3a'], { power: .8 }), 380 * T());
-    if (v.jackpot) { sfx.jackpot(v.jackpot.toLowerCase()); callout(`${v.jackpot} GRAB! ${money(v.value * stake)}`); shake(1.8); }
-    await Promise.all([countTo(ctx, cur, to, 300), wait(v.jackpot ? 800 : 380)]); cur = to;
+    const e = cellOf(v.reel, v.row), [sx, sy] = ctr(e); tot = r4(tot + v.value); const to = r2(run + stake * tot);
+    sfx.grab(); callout(`COLLECTOR GRABS +${money(v.value * stake)} (no multiplier)`);
+    e.classList.add('grabbed'); e.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.2)', opacity: 1, offset: .4 }, { transform: 'scale(.5)', opacity: 0 }], { duration: 520 * T(), delay: 260 * T(), fill: 'forwards', easing: 'ease-in' });
+    setTimeout(() => { FX.shards(sx, sy, v.jackpot ? 24 : 12, ['#ffd23f', '#fff3c0', '#ff8a3a'], { power: 1 }); S.pop(sx, sy - 24, '+' + money(v.value * stake)); e.classList.add('cracked'); }, 300 * T());
+    if (v.jackpot) { sfx.jackpot(v.jackpot.toLowerCase()); callout(`${v.jackpot} GRAB! +${money(v.value * stake)} (no multiplier)`); shake(1.8); }
+    await Promise.all([countTo(ctx, cur, to, 320), wait(v.jackpot ? 1000 : 560)]); cur = to;
   }
-  hideCallout(); return cur;
+  cells.forEach(e => e.classList.remove('grabbed')); hideCallout(); return cur;
 }
 
 /* ---------------------------------------------------------------- bonus entry/exit, splash copy */
@@ -2302,7 +2301,7 @@ return {
     paint([['SKU', 'TAC', 'GUI'], ['SKU', 'MON', 'SOM'], ['WLD', 'LUC', 'SCA'], ['TRU', 'MAC', 'MON'], ['CHI', 'MAS', 'MAR']], [{ reel: 1, row: 1, value: 5, jackpot: null }, { reel: 3, row: 2, value: 50, jackpot: 'MINOR' }]);
     Object.keys(JPV).forEach(k => jpEl(k).classList.add('on')); refreshJackpots(); setLadder(0); lastSnap = snapBoard();
   },
-  roundStart() { document.body.classList.remove('llb'); gen++; clearTimers(); stakeNow = S.bet(); overlaysOff(); abortReels(); resetCells(); setBlurMode(false); inBonus = false; bType = null; linkReady = false; pdReady = false; lastStep = 0; lastMult = 1; setLadder(0); $('pdCollector').classList.remove('on', 'swing'); Object.keys(JPV).forEach(k => jpEl(k).classList.add('on')); refreshJackpots(); lastSnap = snapBoard(); },
+  roundStart() { document.body.classList.remove('llb'); gen++; clearTimers(); stakeNow = S.bet(); overlaysOff(); abortReels(); resetCells(); setBlurMode(false); inBonus = false; bType = null; linkReady = false; pdReady = false; lastStep = 0; lastMult = 1; setLadder(0); Object.keys(JPV).forEach(k => jpEl(k).classList.add('on')); refreshJackpots(); lastSnap = snapBoard(); },
   async clearBoard() { if (bType === 'link') return; startReels([1, 1, 1, 1, 1]); await wait(260); },
   restoreBoard() { clearTimers(); abortReels(); overlaysOff(); resetCells(); setBlurMode(false); if (lastSnap) paint(lastSnap.grid, lastSnap.money); },
   baseSpin: R => { curR = R; return Object.assign({}, R.spin, { __base: true }); },
@@ -2317,10 +2316,10 @@ return {
     const sc = $('scene'), lg = $('logo'), R = curR; if (!R || !R.bonus) return;
     if (on) {
       inBonus = true; bType = R.bonus.type; document.body.classList.add('llb'); sc.classList.add('bonus'); lg.classList.add('off'); S.music.intensity(.35); linkReady = false; pdReady = false; hideCallout();
-      if (bType === 'parade') { Object.keys(JPV).forEach(k => jpEl(k).classList.remove('on')); $('pdCollector').classList.add('on'); plate('pdSpins', true); $('pdSpinsN').textContent = R.bonus.startSpins; }
+      if (bType === 'parade') { Object.keys(JPV).forEach(k => jpEl(k).classList.remove('on')); plate('pdSpins', true); $('pdSpinsN').textContent = R.bonus.startSpins; }
     } else {
       inBonus = false; document.body.classList.remove('llb'); sc.classList.remove('bonus'); lg.classList.remove('off'); S.music.intensity(0); overlaysOff(); abortReels(); resetCells(); setBlurMode(false); setLadder(0);
-      $('pdCollector').classList.remove('on', 'swing'); Object.keys(JPV).forEach(k => jpEl(k).classList.add('on')); refreshJackpots();
+      Object.keys(JPV).forEach(k => jpEl(k).classList.add('on')); refreshJackpots();
       if (baseSnap) paint(baseSnap.grid, baseSnap.money); bType = null;
       const link = R.bonus.type === 'link'; $('outroRibbon').textContent = link ? 'THE LINK IS COMPLETE' : R.bought === 'party' ? 'THE PARTY IS OVER' : 'THE PARADE IS OVER';
       document.querySelector('#outroM .mtop').textContent = link ? 'PIÑATA LINK TOTAL' : 'PARADE TOTAL'; $('outroArt').innerHTML = splash('llSplashOutro');

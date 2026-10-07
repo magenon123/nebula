@@ -10,10 +10,15 @@ ${fonts()}
 #scene{pointer-events:none}
 #scene img{position:absolute;display:block;pointer-events:none}
 #scene img.bdp{left:0;top:0;width:100%;height:100%;opacity:0}
-#scene .bg{left:0;top:0;width:1600px;height:900px}
+#scene .bg{left:-900px;top:-300px;width:3400px;height:1500px}
+#scene .ctr{left:-900px;top:716px;width:3400px;height:484px}
+#scene .ctrn{opacity:0;transition:opacity 1.6s}
+#scene.bonus .ctrn{opacity:1}
+body.portrait #scene .ctr{display:none}
 #scene .dusk{opacity:0;transition:opacity 1.6s}
+#scene img.bdp{left:-900px;top:-300px;width:3400px;height:1500px}
 #scene.bonus .dusk{opacity:1}
-#scene .banners{left:0;top:0;width:1600px;height:420px;transform-origin:50% 0;animation:llSway 6s ease-in-out infinite alternate}
+#scene .banners{left:-900px;top:0;width:3400px;height:460px;transform-origin:50% 0;animation:llSway 6s ease-in-out infinite alternate}
 @keyframes llSway{0%{transform:skewX(-.7deg) translateX(-3px)}100%{transform:skewX(.7deg) translateX(3px)}}
 #logo.off{opacity:0}
 #logo{transition:opacity .4s;position:absolute;left:584px;top:2px;width:432px;height:142px;overflow:visible;pointer-events:none;z-index:3}

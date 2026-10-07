@@ -54,7 +54,6 @@ body.portrait #lkTotal{left:600px;top:-189px;zoom:.9;transform:none}
 body.portrait #pdCallMult{left:420px;top:-120px;zoom:1.25}
 body.portrait #pdCallSpins{left:475px;top:-120px;zoom:1.25}
 body.portrait #coLine{left:288px;top:470px;zoom:1.46}
-body.portrait #pdCollector{left:1421px;top:-443px;zoom:.7}
 
 /* ---------- bonus intro / outro splash: compact so the whole splash fits a 16:9 window ---------- */
 .llSplash{width:300px;height:260px;margin:0 auto -30px;position:relative;z-index:1;filter:drop-shadow(0 8px 0 rgba(0,0,0,.4))}
@@ -70,3 +69,5 @@ symbol#llSplashLink,symbol#llSplashParade,symbol#llSplashOutro{overflow:visible}
 #introM .quote,#outroM .quote{margin-top:40px}
 .rules span b{display:inline;font-family:inherit;font-weight:800;font-size:inherit;color:#ffd27a;margin:0}
 body.q2 .llSplash,body.lite .llSplash{filter:none}
+#pdCollector{display:none!important}
+.cell.grabbed::before{content:"";position:absolute;inset:-4px;border-radius:22px;z-index:0;box-shadow:0 0 0 5px #ffd23f,0 0 26px 10px rgba(255,210,63,.9);animation:llBeat .3s ease-in-out infinite}

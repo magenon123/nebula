@@ -61,7 +61,7 @@ const P = {
         W.locked = Math.max(W.locked, document.querySelectorAll('#grid .cell.locked').length); W.cracked = Math.max(W.cracked, document.querySelectorAll('#grid .cell.cracked').length);
         W.sticky = Math.max(W.sticky, document.querySelectorAll('#grid .cell.sticky').length); const l = $('ladder').getAttribute('class').split(' ')[0]; W.ladder[l] = 1;
         if (document.querySelector('#jps .jp.lit')) W.jp++; ['lkRespins', 'lkTotal', 'pdSpins', 'pdCallMult', 'pdCallSpins', 'grandPlate'].forEach(id => { if ($(id).classList.contains('on')) W.plates[id] = 1; });
-        if ($('pdCollector').classList.contains('swing')) W.swing++; if ($('scene').classList.contains('bonus')) W.bonus++; if ($('logo').classList.contains('off')) W.logoOff++;
+        { const c = $('pdCollector'); if (c && c.getClientRects().length && getComputedStyle(c).display !== 'none') W.swing++; } if ($('scene').classList.contains('bonus')) W.bonus++; if ($('logo').classList.contains('off')) W.logoOff++;
         if ($('lkRespins').classList.contains('on')) { const n = $('lkRespinsN').textContent; if (W.respins[W.respins.length - 1] !== n) W.respins.push(n); }
         if ($('pdSpins').classList.contains('on')) { const n = $('pdSpinsN').textContent; if (W.spinsLeft[W.spinsLeft.length - 1] !== n) W.spinsLeft.push(n); }
         const m = $('msg').textContent; if (W.msgs[W.msgs.length - 1] !== m) W.msgs.push(m); }, 40); }),
@@ -143,7 +143,7 @@ const P = {
   check('parade: sticky wilds kept (count = last wildCount)', r.w.sticky === lastSp.wildCount, r.w.sticky + ' vs ' + lastSp.wildCount);
   check('parade: ladder steps lit (m0 -> a step >= 3, at least 2 steps)', Object.keys(r.w.ladder).some(k => /m[3-6]/.test(k)) && Object.keys(r.w.ladder).length >= 3, Object.keys(r.w.ladder).join(','));
   check('parade: multiplier callout', !!r.w.plates.pdCallMult); check('parade: spins left counts down to 0', r.w.spinsLeft[r.w.spinsLeft.length - 1] === '0' && r.w.spinsLeft.length >= PB.spins.length - 1, r.w.spinsLeft.join(','));
-  check('parade: Collector swings for grabs', r.w.swing > 3); check('parade: Collector callout says no multiplier', r.w.co.some(c => /NO MULTIPLIER/.test(c)));
+  check('parade: no collector character visible beside the board', r.w.swing === 0); check('parade: grab callout "COLLECTOR GRABS +$x (no multiplier)"', r.w.co.some(c => /^COLLECTOR GRABS \+\S+ \(no multiplier\)/.test(c)), JSON.stringify(r.w.co.filter(c => /GRAB/.test(c))));
   check('parade: wins show the multiplier "(x3)"', r.w.co.some(c => /\(x[2-9]|\(x10\)/.test(c)), JSON.stringify(r.w.co.slice(0, 8)));
   check('parade: ladder back to m0 and sticky cleared at the end', await page.evaluate(() => document.getElementById('ladder').getAttribute('class') === 'm0' && document.querySelectorAll('.cell.sticky').length === 0));
 
