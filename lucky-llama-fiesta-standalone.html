@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="sf-build" content="0b01ede 10-07 10:00">
+<meta name="sf-build" content="93ad066 10-07 10:07">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Lucky Llama Fiesta (offline demo)</title>
 <style>
@@ -290,8 +290,7 @@ html,body{touch-action:manipulation;-webkit-touch-callout:none}
 /* ===== win screen v3: coin rain instead of spinning rays ===== */
 #bigRays,#big.maxwin::before{display:none!important}
 #bigCoins{position:absolute;inset:0;overflow:hidden;pointer-events:none;perspective:700px;z-index:1}
-#bigCoins i{position:absolute;top:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6b8 0,#ffd23a 38%,#d38a0c 78%,#8a5206 100%);box-shadow:inset 0 0 0 3px rgba(130,76,6,.75),inset 0 0 0 6px rgba(255,236,150,.55),0 3px 8px rgba(0,0,0,.45);will-change:transform}
-#bigCoins i::after{content:"$";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 1em/1 var(--toon,Impact),sans-serif;color:#7a4204;text-shadow:0 1px 0 rgba(255,244,180,.9);backface-visibility:visible}
+#bigCoins i{position:absolute;top:0;border-radius:50%;background:url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%20100%20100%22%3E%3Cdefs%3E%3CradialGradient%20id=%22a%22%20cx=%22.35%22%20cy=%22.3%22%20r=%22.9%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%23fff3a6%22/%3E%3Cstop%20offset=%22.45%22%20stop-color=%22%23ffcf2e%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%23c4780a%22/%3E%3C/radialGradient%3E%3ClinearGradient%20id=%22b%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%23ffe98a%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%239a5a06%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle%20cx=%2250%22%20cy=%2250%22%20r=%2248%22%20fill=%22%236a3a04%22/%3E%3Ccircle%20cx=%2250%22%20cy=%2250%22%20r=%2245%22%20fill=%22url%28%23b%29%22/%3E%3Ccircle%20cx=%2250%22%20cy=%2250%22%20r=%2237%22%20fill=%22url%28%23a%29%22%20stroke=%22%23a8660a%22%20stroke-width=%222.5%22/%3E%3Ctext%20x=%2250%22%20y=%2250%22%20text-anchor=%22middle%22%20dominant-baseline=%22central%22%20font-family=%22Arial%20Black%2CArial%2CHelvetica%2Csans-serif%22%20font-weight=%22900%22%20font-size=%2254%22%20fill=%22%23fff0a0%22%20transform=%22translate%281.5%202%29%22%20opacity=%22.9%22%3E%24%3C/text%3E%3Ctext%20x=%2250%22%20y=%2250%22%20text-anchor=%22middle%22%20dominant-baseline=%22central%22%20font-family=%22Arial%20Black%2CArial%2CHelvetica%2Csans-serif%22%20font-weight=%22900%22%20font-size=%2254%22%20fill=%22%23a9610a%22%20stroke=%22%237a4204%22%20stroke-width=%221.5%22%3E%24%3C/text%3E%3C/svg%3E") center/100% 100% no-repeat;filter:drop-shadow(0 3px 3px rgba(0,0,0,.45));will-change:transform}
 #bigCard{z-index:3}
 
 /* ===== portrait (phone held upright): same game, re-laid out ===== */
@@ -319,7 +318,7 @@ body.portrait #menu button{font-size:22px;padding:14px 14px}
 #shaker{background:transparent}
 /* ===== win screen: no live blur of the game underneath (it re-blurred every frame); a plain dark veil instead ===== */
 #bigBlur{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:radial-gradient(ellipse at 50% 46%,rgba(8,10,22,.55),rgba(2,3,8,.93) 80%)}
-#bigCoins i{box-shadow:none!important;background:radial-gradient(circle at 35% 30%,#fff2a8 0,#ffd23a 40%,#c98208 82%,#8a5206 100%);border:2px solid #8a5206}
+#bigCoins i{filter:none}
 #bigCoins{perspective:none!important}
 
 /* ===== phone mode ===== */
@@ -1595,8 +1594,8 @@ let bigTap = null;
 function coinRain(lv) {
   const box = $('bigCoins'); if (!box) return () => {};
   const spawn = () => { if (box.childElementCount > (LITE ? 60 : 150)) return;
-    const c = document.createElement('i'), sz = 22 + Math.random() * 30, dur = (1900 + Math.random() * 700) * T(), tilt = Math.random() * 40 - 20;
-    c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px;font-size:${(sz * .62).toFixed(1)}px`; box.appendChild(c);
+    const c = document.createElement('i'), sz = 30 + Math.random() * 26, dur = (1900 + Math.random() * 700) * T(), tilt = Math.random() * 40 - 20;
+    c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px;`; box.appendChild(c);
     const an = c.animate([{ transform: `translateY(-14vh) rotateZ(${tilt}deg)`, easing: 'cubic-bezier(.4,0,.9,.6)' }, { transform: `translateY(112vh) rotateZ(${tilt}deg)` }], { duration: dur });
     an.onfinish = () => c.remove(); };
   for (let i = 0; i < (8 + lv * 2) * 5; i++) setTimeout(spawn, Math.random() * 500);

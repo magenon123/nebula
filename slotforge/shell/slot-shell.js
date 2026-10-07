@@ -345,8 +345,8 @@ let bigTap = null;
 function coinRain(lv) {
   const box = $('bigCoins'); if (!box) return () => {};
   const spawn = () => { if (box.childElementCount > (LITE ? 60 : 150)) return;
-    const c = document.createElement('i'), sz = 22 + Math.random() * 30, dur = (1900 + Math.random() * 700) * T(), tilt = Math.random() * 40 - 20;
-    c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px;font-size:${(sz * .62).toFixed(1)}px`; box.appendChild(c);
+    const c = document.createElement('i'), sz = 30 + Math.random() * 26, dur = (1900 + Math.random() * 700) * T(), tilt = Math.random() * 40 - 20;
+    c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px;`; box.appendChild(c);
     const an = c.animate([{ transform: `translateY(-14vh) rotateZ(${tilt}deg)`, easing: 'cubic-bezier(.4,0,.9,.6)' }, { transform: `translateY(112vh) rotateZ(${tilt}deg)` }], { duration: dur });
     an.onfinish = () => c.remove(); };
   for (let i = 0; i < (8 + lv * 2) * 5; i++) setTimeout(spawn, Math.random() * 500);
