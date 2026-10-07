@@ -336,3 +336,12 @@ body.portrait #buyOpen .plq{top:0;bottom:0;flex-direction:row;gap:18px;padding:0
 body.portrait #buyOpen svg{width:96px;height:96px}
 body.portrait #buyOpen b{font-size:46px;line-height:.95;text-align:left}
 body.portrait #buyOpen.lit::after{bottom:-26px}
+/* Loading + features screens: their own opaque backgrounds (the slot is never visible behind them) */
+#loadM{backdrop-filter:none;-webkit-backdrop-filter:none;background:
+  radial-gradient(ellipse at 50% 38%,color-mix(in srgb,var(--acc2,#ff6a1a) 38%,transparent) 0,transparent 55%),
+  repeating-conic-gradient(from 0deg at 50% 38%,rgba(255,255,255,.045) 0 6deg,transparent 6deg 18deg),
+  linear-gradient(180deg,#0b0f1e 0,#150d1f 100%)}
+#loadM.ready{background:
+  radial-gradient(ellipse at 50% 100%,color-mix(in srgb,var(--accent,#ffb02e) 30%,transparent) 0,transparent 60%),
+  radial-gradient(circle at 20% 15%,color-mix(in srgb,var(--acc1,#e8503a) 28%,transparent) 0,transparent 45%),
+  linear-gradient(160deg,#241433 0,#10192e 55%,#0a0d18 100%)}

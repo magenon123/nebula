@@ -341,21 +341,13 @@ let bonusDone = false;
 const LADDER = cfg.winLevels || [{ min: 20, name: 'BIG WIN', lv: 1 }, { min: 50, name: 'MEGA WIN', lv: 2 }, { min: 100, name: 'EPIC WIN', lv: 3 }, { min: 250, name: 'LEGENDARY WIN', lv: 4 }];
 const tierOf = x => { let t = null; for (const l of LADDER) if (x >= l.min) t = l; return t; };
 let bigTap = null;
-/* Coins tumble down the win screen, hit the floor, bounce twice (smaller each time), then fall away. Heavier with each level. */
+/* Coins fall straight down the win screen (no spin, no bounce). Heavier with each level. */
 function coinRain(lv) {
   const box = $('bigCoins'); if (!box) return () => {};
   const spawn = () => { if (box.childElementCount > (LITE ? 60 : 150)) return;
-    const c = document.createElement('i'), sz = 22 + Math.random() * 30, dur = (1900 + Math.random() * 700) * T(), rot = (Math.random() < .5 ? -1 : 1) * (540 + Math.random() * 900), tilt = Math.random() * 40 - 20;
+    const c = document.createElement('i'), sz = 22 + Math.random() * 30, dur = (1900 + Math.random() * 700) * T(), tilt = Math.random() * 40 - 20;
     c.style.cssText = `left:${Math.random() * 96}%;width:${sz}px;height:${sz}px;font-size:${(sz * .62).toFixed(1)}px`; box.appendChild(c);
-    const F = 90, f = (y, k) => `translateY(${y}vh) rotateY(${rot * k}deg) rotateZ(${tilt}deg)`;
-    const an = c.animate([
-      { transform: f(-14, 0), offset: 0, easing: 'cubic-bezier(.55,0,.9,.55)' },
-      { transform: f(F, .38), offset: .40, easing: 'cubic-bezier(.1,.55,.45,1)' },                 // first hit
-      { transform: f(F - 17, .55), offset: .55, easing: 'cubic-bezier(.55,0,.9,.55)' },            // first bounce, high
-      { transform: f(F, .68), offset: .68, easing: 'cubic-bezier(.1,.55,.45,1)' },                 // second hit
-      { transform: f(F - 6, .78), offset: .76, easing: 'cubic-bezier(.55,0,.9,.55)' },             // second bounce, small
-      { transform: f(F, .86), offset: .83, easing: 'cubic-bezier(.5,0,.9,.6)' },                   // third touch, then it just falls
-      { transform: f(122, 1), offset: 1 }], { duration: dur });
+    const an = c.animate([{ transform: `translateY(-14vh) rotateZ(${tilt}deg)`, easing: 'cubic-bezier(.4,0,.9,.6)' }, { transform: `translateY(112vh) rotateZ(${tilt}deg)` }], { duration: dur });
     an.onfinish = () => c.remove(); };
   for (let i = 0; i < (8 + lv * 2) * 5; i++) setTimeout(spawn, Math.random() * 500);
   const iv = setInterval(spawn, Math.max(14, (190 - lv * 22) / 5));
@@ -513,7 +505,8 @@ function refreshUi() {
   $('barR').classList.toggle('hot', ante || luck); $('betLbl').textContent = ante || luck ? 'TOTAL BET' : 'BET'; $('feverBadge').hidden = !(ante || luck); $('feverBadge').textContent = luck ? cfg.luck.badge : cfg.fever ? cfg.fever.badge : '';
   if (LUCK_COST) { $('luck').textContent = luck ? 'DEACTIVATE' : 'ACTIVATE'; $('luck').classList.toggle('or', !luck); $('luck').classList.toggle('off', luck); }
   const fitTxt = (el, txt, big, small) => { el.textContent = txt; el.style.fontSize = txt.length > 10 ? small : ''; }; $('bet').textContent = fmt(risk); $('bbBet').textContent = fmt(s);
-  $('betBar').style.width = (BETS[bi] / BETS[BETS.length - 1] * 100) + '%';
+  { const R = $('barR').getBoundingClientRect(), S = $('spin').getBoundingClientRect(), vis = R.width > 0 ? Math.max(.3, Math.min(1, (Math.min(R.right, S.width && S.left > R.left ? S.left : R.right) - R.left) / R.width)) : 1;
+    $('betBar').style.width = (bi / (BETS.length - 1) * vis * 100) + '%'; }   // one equal step per click; full length = the part of the panel the spin button does not cover
   BUYS.forEach((b, i) => fitTxt($('p' + (i + 1)), fmt(s * b.mult), 34, '23px'));
   if (cfg.fever) { $('ante').textContent = ante ? 'DEACTIVATE' : 'ACTIVATE'; $('ante').classList.toggle('or', !ante); $('ante').classList.toggle('off', ante); }
   $('bAuto').classList.toggle('on', auto.left > 0);
