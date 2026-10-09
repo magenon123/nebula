@@ -115,3 +115,118 @@ body.portrait #ctTally{padding:6px 14px}body.portrait #ctTally div{gap:12px;-web
 body.lite .ctWave{box-shadow:none}
 body.lite #ctRules{box-shadow:none}
 body.lite #grid.tinG .cell.closed::after{animation-duration:5s}
+
+/* ===================== kai: phone fixes (QA D1-D8) ===================== */
+/* splash column order is fixed by `order`, so slot.js can split it into left/right halves without changing the desktop layout */
+.spL,.spR{display:contents}
+#introM .splashArt{order:1}#introM .gems{order:2}#introM .medalWrap{order:3}#introM .ribbon{order:4}#introM .quote{order:5}#introM .chips{order:6}#introM .preMap{order:7}#introM .tapHint{order:8}
+#outroM .splashArt{order:1}#outroM .ribbon{order:2}#outroM .quote{order:3}#outroM .medalWrap{order:4}#outroM #ctTally{order:5}#outroM .tapHint{order:6}
+#ctRules .sh{display:none}
+
+/* --- D3/D6 portrait phone: outro quote below the ribbon, chips on one line each --- */
+body.portrait #outroM .ribbon{margin-bottom:16px!important}
+body.portrait .modal.splash .quote{max-width:min(340px,100%);font-size:22px;line-height:1.15;margin-top:12px;position:relative;z-index:7}
+body.portrait .modal.splash .chips{flex-direction:column;align-items:center;gap:8px;max-width:100%;margin-top:16px}
+body.portrait .modal.splash .chips span{white-space:nowrap;font-size:12px;letter-spacing:.6px;padding:8px 12px 6px;max-width:100%;box-sizing:border-box}
+body.portrait .modal.splash .tapHint{font-size:13px;letter-spacing:3px;margin-top:16px}
+body.portrait #outroM .tapHint{margin-top:18px!important}
+
+/* --- D7 portrait phone: the in-bonus rules strip must read at ~10px effective (stage is scaled .43) --- */
+body.portrait #ctRules{top:128px;left:16px;width:868px;grid-template-columns:1fr auto;column-gap:16px;row-gap:4px;padding:8px 18px 10px;border-width:3px}
+body.portrait #ctRules b{grid-row:1;grid-column:1;font-size:32px;-webkit-text-stroke:6px #1c2340}
+body.portrait #ctRules .lg{grid-row:1;grid-column:2;margin:0;font-size:23px;letter-spacing:1px;gap:8px}
+body.portrait #ctRules .lg i{font-size:25px;padding:0 10px;border-width:3px}
+body.portrait #ctRules ul{grid-row:2;grid-column:1/3;gap:0 18px}
+body.portrait #ctRules li{font-size:24px;line-height:1.28;letter-spacing:.4px;white-space:nowrap;padding-left:22px}
+body.portrait #ctRules li::before{top:10px;width:11px;height:11px}
+body.portrait #ctRules .lo{display:none}body.portrait #ctRules .sh{display:inline}
+
+/* --- D2 phones: >=44px effective hit areas (stage is scaled ~.43, so 44px = ~102 stage units) --- */
+body.lite #menuBtn{position:relative}
+body.lite #menuBtn::after{content:"";position:absolute;inset:-24px}
+body.lite #bAuto::after{content:"";position:absolute;inset:-17px;border-radius:50%}
+body.lite:not(.portrait) #bAuto::after{inset:-25px}
+/* the bet arrows sit side by side (lower | raise) so each gets its own 44px-wide hit area, fully inside the bet bar */
+body.lite #barR{padding-left:24px}
+body.lite #chev{right:6px;left:auto;top:0;bottom:0;width:216px;height:auto;flex-direction:row;justify-content:space-between}
+body.lite #chev button{position:relative;width:104px;height:auto;flex:none;border-radius:12px;background:rgba(255,255,255,.07)}
+body.lite #chev #m{order:1}body.lite #chev #p{order:2}
+body.lite #chev button::after{content:"";position:absolute;left:0;right:0;top:-12px;bottom:-12px}
+body.lite #chev svg{width:40px;height:24px;transform:rotate(90deg);stroke:#fff}
+body.portrait.lite #barR{width:540px}
+body.portrait.lite #barL{width:820px}
+body.lite:not(.portrait) #barL{width:560px}
+body.lite:not(.portrait) #barR{left:740px;width:520px}
+body.lite:not(.portrait) #chev{right:72px}
+
+/* --- D8 bonus buy screen on phones: compact cards --- */
+body.portrait .modal.bb{padding:12px 10px 10px;justify-content:flex-start}
+body.portrait .bbT{font-size:28px;padding:6px 26px 2px;margin:0 0 8px}
+body.portrait .bbX{right:10px;top:10px;width:44px;height:44px;font-size:26px}
+body.portrait .bbBet{margin-bottom:8px;padding:4px 12px;gap:12px}
+body.portrait .bbBet b{font-size:30px;min-width:110px}
+body.portrait .bbBet button{width:44px;height:44px}
+body.portrait .bbRow{flex-direction:column;flex-wrap:nowrap;gap:8px;width:100%;max-width:370px;padding:0 0 10px}
+body.portrait .bbc{width:100%;box-sizing:border-box;padding:8px 10px 8px 76px;min-height:100px;text-align:left;transform:none!important;display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:center}
+body.portrait .bbc .med{left:8px;top:50%;margin:-30px 0 0;width:60px;height:60px;border-width:4px}
+body.portrait .bbc .med svg{width:42px;height:42px}
+body.portrait .bbc h3{grid-column:1/3;font-size:20px;margin:0 0 2px}
+body.portrait .bbc p{grid-column:1/3;font-size:11px;line-height:1.25;min-height:0;margin:0 0 4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+body.portrait .bbc .vol{grid-column:1;margin:0;justify-content:flex-start;gap:2px}
+body.portrait .bbc .vol span{display:none}
+body.portrait .bbc .vol i{width:11px;height:14px}
+body.portrait .bbc .price,body.portrait .bbc .price#pa{grid-column:1;margin:2px 0 0;font-size:22px;padding:1px 14px 0;justify-self:start}
+body.portrait .bbc button.go{grid-column:2;grid-row:3/5;width:112px;min-height:48px;font-size:19px;letter-spacing:1px;padding:8px 0 6px}
+
+@media (max-height:430px) and (orientation:landscape){
+  /* --- D1 landscape phone: splash = two columns that fit in the window height --- */
+  .modal.splash{padding:4px}
+  .modal.splash .sp{flex-direction:row;align-items:center;justify-content:center;gap:18px;padding:0 10px}
+  .modal.splash .spL,.modal.splash .spR{display:flex;flex-direction:column;align-items:center;min-width:0}
+  .modal.splash .spR{max-width:400px}
+  .modal.splash .splashArt svg.kojiSplash,.modal.splash .splashArt svg.kojiSplash.super{width:132px;height:123px;margin:0 auto -34px}
+  #introM .splashArt svg.kojiSplash,#outroM .splashArt svg.kojiSplash{margin-bottom:-34px}
+  .modal.splash .gems{display:none}
+  .modal.splash .medal{width:170px;height:170px;border-width:8px;box-shadow:inset 0 0 0 5px var(--gold2),inset 0 0 0 8px var(--ink),0 8px 0 rgba(0,0,0,.45)}
+  .modal.splash .medal .mtop{font-size:11px;letter-spacing:3px}
+  .modal.splash .medal .mnum{font-size:92px;-webkit-text-stroke:7px var(--ink);margin-top:6px;text-shadow:0 5px 0 var(--ink)}
+  .modal.splash .medal .mlbl{font-size:24px;-webkit-text-stroke:5px var(--ink);text-shadow:0 3px 0 var(--ink)}
+  .modal.splash .medal.wide{width:300px;height:104px;border-radius:44px}
+  .modal.splash .medal.wide .mnum{font-size:50px;margin-top:2px}
+  #outroM:has(#ctTally) .medal.wide{height:104px}
+  .modal.splash .ribbon{margin-top:-20px;padding:8px 40px 4px;font-size:26px;border-width:5px}
+  .modal.splash .ribbon::before,.modal.splash .ribbon::after{width:40px;top:10px;border-width:5px}
+  .modal.splash .ribbon::before{left:-32px}.modal.splash .ribbon::after{right:-32px}
+  #outroM .ribbon{margin:0 0 -16px!important}
+  .modal.splash .quote{margin-top:0;font-size:18px;line-height:1.15;max-width:100%}
+  .modal.splash .chips{flex-direction:column;align-items:center;gap:5px;margin-top:10px}
+  .modal.splash .chips span{white-space:nowrap;font-size:12px;letter-spacing:1px;padding:5px 12px 3px}
+  .modal.splash .preMap{margin-top:8px}.modal.splash .preMap small{font-size:13px;margin-bottom:3px}
+  .modal.splash .preMap div{grid-template-columns:repeat(5,22px);gap:3px}.modal.splash .preMap i{height:13px;border-width:2px}
+  .modal.splash .tapHint{margin-top:10px!important;font-size:12px;letter-spacing:3px}
+  #ctTally{margin-top:0;width:100%;padding:5px 14px}
+  #ctTally div{font-size:17px;-webkit-text-stroke:4px #1c2340;gap:12px}
+  #outroM #ctTally+.quote{margin-top:10px}
+
+  /* --- title cards (trigger / end card) --- */
+  #ctTitle .tcR{height:150px;margin-top:-75px}
+  #ctTitle b{font-size:84px;-webkit-text-stroke:10px #1c2340}
+  #ctTitle.t-super b{font-size:72px}
+  #ctTitle .tcS{font-size:24px;-webkit-text-stroke:6px #1c2340}
+  #ctTitle.end .tcR{height:110px;margin-top:-55px}#ctTitle.end b{font-size:52px;-webkit-text-stroke:7px #1c2340}#ctTitle.end .tcS{font-size:20px}
+
+  /* --- D8 bonus buy: header on one tight row, cards side by side --- */
+  .modal.bb{padding:6px 8px 6px}
+  .bbT{font-size:22px;padding:4px 22px 1px;margin:0 0 4px}
+  .bbX{right:8px;top:6px;width:44px;height:44px;font-size:26px}
+  .bbBet{margin-bottom:22px;padding:2px 10px;gap:10px}.bbBet small{font-size:10px}.bbBet b{font-size:24px;min-width:90px}.bbBet button{width:44px;height:44px;font-size:24px}
+  .bbRow{flex-wrap:nowrap;gap:8px;width:100%;max-width:none;padding:0 0 8px;align-items:stretch}
+  .bbc{flex:1 1 0;width:auto;min-width:0;box-sizing:border-box;padding:34px 8px 8px;transform:none!important;display:flex;flex-direction:column;align-items:center}
+  .bbc .med{top:-24px;width:56px;height:56px;margin-left:-28px;border-width:4px}.bbc .med svg{width:40px;height:40px}
+  .bbc h3{font-size:17px;margin-bottom:2px}
+  .bbc p{font-size:10.5px;line-height:1.25;min-height:0;margin:0;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .vol{margin:3px 0 4px}.vol span{display:none}.vol i{width:11px;height:14px}
+  .bbc .price,.price#pa{font-size:20px;margin:0 0 4px;padding:1px 12px 0}
+  .bbc button.go{margin-top:auto;font-size:20px;padding:7px 0 5px;min-height:44px}
+  body.portrait .bbc,body.portrait .bbRow{}
+}

@@ -218,11 +218,12 @@ function wipe(type) {   // curtain of the bonus colour sweeps across as the bonu
 function setRules(type) {
   const r = $('ctRules'); if (!r) return; if (!type) { r.hidden = true; return; }
   const F = FSI[type] || {}, rt = F.retrigger || {}, k3 = Object.keys(rt)[0];
-  const items = type === 'tin' ? ['TINS LOCK IN PLACE', 'NEW TIN: POURS RESET TO 3', 'FULL ROW: KITE LAUNCH x2', 'ALL 20: GRAND DRAGON KITE']
-    : type === 'fs' ? ['WINNING DRAWERS STEEP DARKER', 'STEEPED DRAWERS BOOST LINES', k3 ? `${k3} DRUMS: +${rt[k3]} SPINS` : 'DRUMS: MORE SPINS']
-    : ['SOME DRAWERS START STEEPED', 'GOLD DRAWERS PAY THE MOST', k3 ? `${k3} DRUMS: +${rt[k3]} SPINS` : 'DRUMS: MORE SPINS'];
+  const drums = k3 ? `${k3} DRUMS: +${rt[k3]} SPINS` : 'DRUMS: MORE SPINS';   // [full line, short line for a portrait phone (same meaning, bigger type)]
+  const items = type === 'tin' ? [['TINS LOCK IN PLACE', 'TINS STAY LOCKED'], ['NEW TIN: POURS RESET TO 3', 'NEW TIN: POURS BACK TO 3'], ['FULL ROW: KITE LAUNCH x2', 'FULL ROW: KITE x2'], ['ALL 20: GRAND DRAGON KITE', 'ALL 20: GRAND KITE']]
+    : type === 'fs' ? [['WINNING DRAWERS STEEP DARKER', 'WINS STEEP DRAWERS'], ['STEEPED DRAWERS BOOST LINES', 'STEEPED DRAWERS BOOST'], [drums, drums]]
+    : [['SOME DRAWERS START STEEPED', 'SOME START STEEPED'], ['GOLD DRAWERS PAY THE MOST', 'GOLD PAYS THE MOST'], [drums, drums]];
   const leg = type === 'tin' ? '' : `<div class="lg"><span>DRAWER BOOST</span>${(fsBoost || []).map((b, i) => i ? `<i class="l${i}${i === fsMax && type === 'super' ? ' gd' : ''}">+${b}</i>` : '').join('')}</div>`;
-  r.innerHTML = `<b>${TITLES[type][0]}</b><ul>${items.map(t => `<li>${t}</li>`).join('')}</ul>${leg}`; r.hidden = false;
+  r.innerHTML = `<b>${TITLES[type][0]}</b><ul>${items.map(t => `<li><span class="lo">${t[0]}</span><span class="sh">${t[1]}</span></li>`).join('')}</ul>${leg}`; r.hidden = false;
   r.animate([{ opacity: 0, transform: 'translateX(-40px)' }, { opacity: 1, transform: 'none' }], { duration: 500 * T(), delay: 500 * T(), easing: 'ease-out', fill: 'backwards' });
 }
 const tinTier = nt => nt.kind !== 'value' ? 3 : nt.value >= 10 ? 3 : nt.value >= 5 ? 2 : nt.value >= 2 ? 1 : 0;
@@ -423,7 +424,22 @@ const toLocal = (x, y) => { const b = fxl().getBoundingClientRect(), k = b.width
 const toStage = (x, y) => { const b = $('stage').getBoundingClientRect(), k = b.width / 1600; return [(x - b.left) / k, (y - b.top) / k]; };
 const splashSvg = sup => `<svg class="kojiSplash${sup ? ' super' : ''}" viewBox="30 -50 420 390"><use href="#kojiSplash${sup ? 'Super' : ''}"/></svg>`;
 /* per-bonus splash copy, portraits and the pre-steeped map (the shell builds the splash once; we re-dress it before every bonus) */
+/* kai: the splash column is split into a left (art, medal, ribbon) and a right (quote, chips, tally, tap hint) half. On desktop/portrait both halves are display:contents (no layout change);
+   in a landscape phone they become two columns (kai.css). fitSplash() then zooms the whole thing down if it still does not fit the window. */
+function splitSplash() {
+  ['introM', 'outroM'].forEach(id => { const sp = $(id).querySelector('.sp'); if (!sp || sp.querySelector(':scope > .spL')) return;
+    const L = document.createElement('div'), Rr = document.createElement('div'); L.className = 'spL'; Rr.className = 'spR';
+    [...sp.children].forEach(c => (c.matches('.splashArt,.gems,.medalWrap,.ribbon') ? L : Rr).appendChild(c)); sp.append(L, Rr); });
+}
+function fitSplash(id) {
+  const m = $(id), sp = m && m.querySelector('.sp'); if (!sp) return; sp.style.zoom = ''; const h = sp.offsetHeight, w = sp.offsetWidth, ah = innerHeight - 8, aw = innerWidth - 8;
+  const z = Math.min(1, ah / Math.max(1, h), aw / Math.max(1, w)); if (z < .995) sp.style.zoom = z.toFixed(3);
+}
+{ let t = 0; const refit = () => { clearTimeout(t); t = setTimeout(() => ['introM', 'outroM'].forEach(id => { if ($(id) && !$(id).hidden) fitSplash(id); }), 30); };
+  addEventListener('resize', refit);
+  ['introM', 'outroM'].forEach(id => { const m = $(id); if (!m) return; new MutationObserver(refit).observe(m, { attributes: true, attributeFilter: ['hidden'] }); }); }
 function setupSplash(type, R) {
+  splitSplash();
   const sup = type === 'super', tin = type === 'tin', I = S.cfg.intro, O = S.cfg.outro, B = R.bonus || {}, F = FSI[type] || {};
   ['introM', 'outroM'].forEach(id => $(id).classList.toggle('sup', sup));
   $('introLbl').textContent = tin ? I.unit : 'SPINS';
@@ -442,7 +458,8 @@ function setupSplash(type, R) {
     $('introChips').insertAdjacentHTML('afterend', `<div class="preMap"><small>KOJI POURS ON FOUR DRAWERS</small><div>${Array.from({ length: ROWS * COLS }, (_, i) => `<i class="${pre.has(i) ? 'g' : ''}" style="--d:${300 + [...pre].indexOf(i) * 260}ms"></i>`).join('')}</div></div>`);
   }
 }
-function setupOutro() {   // a clean tally under the total (the shell counts the total up; the rows fade in one by one above it)
+function setupOutro() {
+  splitSplash();   // a clean tally under the total (the shell counts the total up; the rows fade in one by one above it)
   const old = $('ctTally'); if (old) old.remove();
   const sp = (bonusR && bonusR.bonus && bonusR.bonus.spins) || []; if (!sp.length) return; const k = curStake, rows = [];
   if (bType === 'tin') {
@@ -454,7 +471,7 @@ function setupOutro() {   // a clean tally under the total (the shell counts the
     const rt = sp.filter(x => x.retrigger).length, best = Math.max(0, ...sp.map(x => x.totalPayout || 0)), top = sp.reduce((a, x) => a + (x.levelUps || []).filter(u => u.popKite).length, 0);
     rows.push([`${sp.length} SPINS POURED` + (rt ? ` (${rt} RETRIGGER${rt === 1 ? '' : 'S'})` : ''), '']); if (top) rows.push([`${top} DRAWERS FULLY STEEPED`, '']); rows.push(['BEST SPIN', fmt(best * k)]);
   }
-  $('outroM').querySelector('.medalWrap').insertAdjacentHTML('afterend', `<div id="ctTally">${rows.map((r, i) => `<div style="--d:${400 + i * 330}ms"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>`);
+  $('outroM').querySelector('.spR').insertAdjacentHTML('afterbegin', `<div id="ctTally">${rows.map((r, i) => `<div style="--d:${400 + i * 330}ms"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>`);
 }
 function setLv(d, lv) {
   if (lv) d.dataset.lv = lv; else delete d.dataset.lv;
