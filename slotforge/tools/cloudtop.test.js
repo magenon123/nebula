@@ -131,8 +131,14 @@ test('CONTRACT v1 on random rounds, base and buy; JSON-safe; bounded respins', (
     assert.doesNotThrow(() => JSON.stringify(r));
   }
 });
-test('FS Luck (ante 2x), no MAX LUCK; three buys, Tin Rush stays 60x', () => {
-  assert.equal(T.CFG.anteCost, 2); assert.ok(!T.CFG.luckCost); assert.deepEqual(Object.keys(T.CFG.buy), ['tin', 'fs', 'super']); assert.equal(T.CFG.buy.tin.cost, 60); assert.equal(T.CFG.maxWin, 5000);
+test('FS Luck (ante 3x), no MAX LUCK; three buys, Tin Rush stays 60x', () => {
+  assert.equal(T.CFG.anteCost, 3); assert.ok(!T.CFG.luckCost); assert.deepEqual(Object.keys(T.CFG.buy), ['tin', 'fs', 'super']); assert.equal(T.CFG.buy.tin.cost, 60); assert.equal(T.CFG.maxWin, 5000);
+});
+
+test('FS Luck: no tin coins, Tin Rush never triggers, only Free Spins / Super', () => {
+  const rng = mulberry(321); let fs = 0;
+  for (let i = 0; i < 40000; i++) { const r = T.playRound(rng, { ante: true }); assert.equal(r.cost, 3); assert.equal(r.tins.count, 0); assert.notEqual(r.bonusType, 'tin'); if (r.bonusType === 'fs' || r.bonusType === 'super') fs++; }
+  assert.ok(fs > 1500 && fs < 4500, 'FS about 1 in 14: ' + fs);
 });
 
 /* ---------------- Free Spins / Super Free Spins (Steeping Drawers) ---------------- */

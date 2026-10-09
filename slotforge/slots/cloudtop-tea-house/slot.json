@@ -54,7 +54,7 @@
  ],
  "defaultBet": 1,
  "maxWin": 5000,
- "anteCost": 2,
+ "anteCost": 3,
  "scatterSym": 10,
  "char": {
   "el": "char",
@@ -169,7 +169,7 @@
   "name": "FS Luck",
   "sym": 16,
   "vol": 3,
-  "text": "Pay 2x per spin and the festival drums (FS) land far more often, so Free Spins and Super Free Spins come about 6 times as often. Stays on until you switch it off.",
+  "text": "Pay 3x per spin and the festival drums (FS) land far more often: Free Spins and Super Free Spins come about every 14 spins. Tin Rush is switched off while it is on. Stays on until you switch it off.",
   "badge": "FS LUCK \u00d72",
   "onMsg": "FS LUCK ON. TOTAL BET x2",
   "offMsg": "FS LUCK OFF"
