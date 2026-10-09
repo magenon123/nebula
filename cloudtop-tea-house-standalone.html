@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="sf-build" content="a7d4471 10-09 21:42">
+<meta name="sf-build" content="1b9d9d8 10-09 21:57">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Koji's Cloudtop Tea House (offline demo)</title>
 <style>
@@ -956,14 +956,24 @@ body.portrait .modal.splash .tapHint{font-size:13px;letter-spacing:3px;margin-to
 body.portrait #outroM .tapHint{margin-top:18px!important}
 
 /* --- D7 portrait phone: the in-bonus rules strip must read at ~10px effective (stage is scaled .43) --- */
-body.portrait #ctRules{top:128px;left:16px;width:868px;grid-template-columns:1fr auto;column-gap:16px;row-gap:4px;padding:8px 18px 10px;border-width:3px}
+body.portrait #ctRules{top:128px;left:16px;width:868px;max-width:calc(100% - 32px);box-sizing:border-box;grid-template-columns:1fr auto;column-gap:16px;row-gap:4px;padding:8px 18px 10px;border-width:3px}
 body.portrait #ctRules b{grid-row:1;grid-column:1;font-size:32px;-webkit-text-stroke:6px #1c2340}
 body.portrait #ctRules .lg{grid-row:1;grid-column:2;margin:0;font-size:23px;letter-spacing:1px;gap:8px}
 body.portrait #ctRules .lg i{font-size:25px;padding:0 10px;border-width:3px}
 body.portrait #ctRules ul{grid-row:2;grid-column:1/3;gap:0 18px}
-body.portrait #ctRules li{font-size:24px;line-height:1.28;letter-spacing:.4px;white-space:nowrap;padding-left:22px}
+body.portrait #ctRules li{font-size:24px;line-height:1.2;letter-spacing:.2px;white-space:normal;padding-left:22px}
 body.portrait #ctRules li::before{top:10px;width:11px;height:11px}
 body.portrait #ctRules .lo{display:none}body.portrait #ctRules .sh{display:inline}
+
+/* tablet portrait (>=600px wide): the stage is scaled ~.85, so the strip goes small into the sky to the right of the counter plaque and clears the logo */
+@media (min-width:600px){
+  body.portrait #ctRules{top:12px;left:330px;width:560px;padding:6px 14px 8px;grid-template-columns:auto 1fr;border-width:3px}
+  body.portrait #ctRules b{font-size:24px;-webkit-text-stroke:5px #1c2340}
+  body.portrait #ctRules .lg{font-size:13px;justify-self:end}body.portrait #ctRules .lg i{font-size:16px;padding:0 7px}
+  body.portrait #ctRules ul{display:flex;flex-wrap:wrap;gap:0 16px}
+  body.portrait #ctRules li{font-size:14px;line-height:1.3;padding-left:16px}
+  body.portrait #ctRules li::before{top:4px;width:8px;height:8px}
+}
 
 /* --- D2 phones: >=44px effective hit areas (stage is scaled ~.43, so 44px = ~102 stage units) --- */
 body.lite #menuBtn{position:relative}
@@ -1007,13 +1017,14 @@ body.portrait .bbc button.go{grid-column:2;grid-row:3/5;width:112px;min-height:4
   .modal.splash{padding:4px}
   .modal.splash .sp{flex-direction:row;align-items:center;justify-content:center;gap:18px;padding:0 10px}
   .modal.splash .spL,.modal.splash .spR{display:flex;flex-direction:column;align-items:center;min-width:0}
-  .modal.splash .spR{max-width:400px}
+  .modal.splash .spR{max-width:420px}
+  .modal.splash .sp{gap:28px}
   .modal.splash .splashArt svg.kojiSplash,.modal.splash .splashArt svg.kojiSplash.super{width:132px;height:123px;margin:0 auto -34px}
-  #introM .splashArt svg.kojiSplash,#outroM .splashArt svg.kojiSplash{margin-bottom:-34px}
+  #introM .splashArt svg.kojiSplash,#outroM .splashArt svg.kojiSplash{margin-bottom:-14px}
   .modal.splash .gems{display:none}
-  .modal.splash .medal{width:170px;height:170px;border-width:8px;box-shadow:inset 0 0 0 5px var(--gold2),inset 0 0 0 8px var(--ink),0 8px 0 rgba(0,0,0,.45)}
+  .modal.splash .medal{width:150px;height:150px;border-width:8px;box-shadow:inset 0 0 0 5px var(--gold2),inset 0 0 0 8px var(--ink),0 8px 0 rgba(0,0,0,.45)}
   .modal.splash .medal .mtop{font-size:11px;letter-spacing:3px}
-  .modal.splash .medal .mnum{font-size:92px;-webkit-text-stroke:7px var(--ink);margin-top:6px;text-shadow:0 5px 0 var(--ink)}
+  .modal.splash .medal .mnum{font-size:80px;-webkit-text-stroke:7px var(--ink);margin-top:6px;text-shadow:0 5px 0 var(--ink)}
   .modal.splash .medal .mlbl{font-size:24px;-webkit-text-stroke:5px var(--ink);text-shadow:0 3px 0 var(--ink)}
   .modal.splash .medal.wide{width:300px;height:104px;border-radius:44px}
   .modal.splash .medal.wide .mnum{font-size:50px;margin-top:2px}
@@ -1021,13 +1032,13 @@ body.portrait .bbc button.go{grid-column:2;grid-row:3/5;width:112px;min-height:4
   .modal.splash .ribbon{margin-top:-20px;padding:8px 40px 4px;font-size:26px;border-width:5px}
   .modal.splash .ribbon::before,.modal.splash .ribbon::after{width:40px;top:10px;border-width:5px}
   .modal.splash .ribbon::before{left:-32px}.modal.splash .ribbon::after{right:-32px}
-  #outroM .ribbon{margin:0 0 -16px!important}
+  #outroM .ribbon{margin:0 0 8px!important}
   .modal.splash .quote{margin-top:0;font-size:18px;line-height:1.15;max-width:100%}
   .modal.splash .chips{flex-direction:column;align-items:center;gap:5px;margin-top:10px}
   .modal.splash .chips span{white-space:nowrap;font-size:12px;letter-spacing:1px;padding:5px 12px 3px}
   .modal.splash .preMap{margin-top:8px}.modal.splash .preMap small{font-size:13px;margin-bottom:3px}
   .modal.splash .preMap div{grid-template-columns:repeat(5,22px);gap:3px}.modal.splash .preMap i{height:13px;border-width:2px}
-  .modal.splash .tapHint{margin-top:10px!important;font-size:12px;letter-spacing:3px}
+  .modal.splash .tapHint{margin-top:10px!important;font-size:11px;letter-spacing:2px;white-space:nowrap}
   #ctTally{margin-top:0;width:100%;padding:5px 14px}
   #ctTally div{font-size:17px;-webkit-text-stroke:4px #1c2340;gap:12px}
   #outroM #ctTally+.quote{margin-top:10px}
@@ -2892,7 +2903,7 @@ function setRules(type) {
   const r = $('ctRules'); if (!r) return; if (!type) { r.hidden = true; return; }
   const F = FSI[type] || {}, rt = F.retrigger || {}, k3 = Object.keys(rt)[0];
   const drums = k3 ? `${k3} DRUMS: +${rt[k3]} SPINS` : 'DRUMS: MORE SPINS';   // [full line, short line for a portrait phone (same meaning, bigger type)]
-  const items = type === 'tin' ? [['TINS LOCK IN PLACE', 'TINS STAY LOCKED'], ['NEW TIN: POURS RESET TO 3', 'NEW TIN: POURS BACK TO 3'], ['FULL ROW: KITE LAUNCH x2', 'FULL ROW: KITE x2'], ['ALL 20: GRAND DRAGON KITE', 'ALL 20: GRAND KITE']]
+  const items = type === 'tin' ? [['TINS LOCK IN PLACE', 'TINS STAY LOCKED'], ['NEW TIN: POURS RESET TO 3', 'NEW TIN: POURS TO 3'], ['FULL ROW: KITE LAUNCH x2', 'FULL ROW: KITE x2'], ['ALL 20: GRAND DRAGON KITE', 'ALL 20: GRAND KITE']]
     : type === 'fs' ? [['WINNING DRAWERS STEEP DARKER', 'WINS STEEP DRAWERS'], ['STEEPED DRAWERS BOOST LINES', 'STEEPED DRAWERS BOOST'], [drums, drums]]
     : [['SOME DRAWERS START STEEPED', 'SOME START STEEPED'], ['GOLD DRAWERS PAY THE MOST', 'GOLD PAYS THE MOST'], [drums, drums]];
   const leg = type === 'tin' ? '' : `<div class="lg"><span>DRAWER BOOST</span>${(fsBoost || []).map((b, i) => i ? `<i class="l${i}${i === fsMax && type === 'super' ? ' gd' : ''}">+${b}</i>` : '').join('')}</div>`;

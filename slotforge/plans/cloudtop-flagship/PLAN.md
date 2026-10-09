@@ -48,8 +48,8 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 - [x] 4.3 rin: mobile portrait/landscape + perf review; fix list to owners. (review done; DEFECTS FOUND, see Log; fixes pending with owners)
 - [x] 4.4 maya: branding in info/credits + splash corner.
 ### Stage 5: regression + final review
-- [ ] 5.1 rin/lead: unit tests, smoke-cloudtop, bets/payouts/balance/bonus completion/autoplay/console errors, screenshots desktop + phone.
-- [ ] 5.2 lead: final quality review, STATUS.md, deliver file to owner, list remaining defects.
+- [x] 5.1 rin/lead: unit tests, smoke-cloudtop, bets/payouts/balance/bonus completion/autoplay/console errors, screenshots desktop + phone.
+- [x] 5.2 lead: final quality review, STATUS.md, deliver file to owner, list remaining defects.
 
 ## QA DEFECT LIST (rin, b846feb) - fix status
 - [x] D1 HIGH landscape phone 844x390: bonus intro/outro splashes cut off (kai, via kai.css; no shell change)
@@ -61,6 +61,7 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 - [x] D9 LOW raw JS error text shown to player: shell now shows a friendly message (lead)
 
 ## Log (newest first; add a line per finished item with commit hash)
+- FINAL (lead): rebuilt; engine/math untouched (git diff d99fe90 engines = none; slot.json only studio/portrait added); 26/26 unit tests pass; smoke-cloudtop RESULT: PASS (full run); other five games byte-identical to d99fe90. Delivered cloudtop-tea-house-standalone.html. REMAINING (not done): real-device/iOS/GPU perf and sound never checked by a human; Super FS heaviest moment (software-render fps low); landscape intro Koji partly covered by medal; portrait outro ribbon overlaps Koji's lower face slightly; symbols are re-shaded, not redrawn (owner may want new art); splash corner mark skipped; real-server mode untested.
 - kai D1,D2,D3,D6,D7,D8 + tablet strip fixed (commit: see git log 'kai phone fixes'): splash split into 2 columns on landscape phone + fit-zoom, 44px hit areas (bet arrows now side by side), compact buy cards, portrait chips/quote/rules strip.
 - D4+D5 done (leo, c5933ae): D5 root cause = Chromium mobile bug: SVG <text> with textLength / per-glyph rotate+dy renders ~3x too big (logo CL/O clipped); logo.html wordmark + TEA HOUSE now outlined paths (fontTools, art/fonts/LuckiestGuy.ttf; raw/logo.html too), plus small landscape-phone logo rule. D4: slot.css PORTRAIT block aligns #scene with the board group (scale --g, offset --gx/--gyT) so the tea house wraps the board, scene.html .bleed (sky+clouds above, paving below, dusk tint .dk; generator art/bleed.cjs, re-run after wobble/light) fills tall phones, slot.json portrait {left:110,right:110} centres the board. Known: tablet bonus rules strip (kai) still overlaps the logo.
 - 4.3 QA done (rin): 390x844/844x390/768x1024/1600x900/2560x1080 layouts, 3 bonuses x portrait+landscape phone, hold-to-repeat, autoplay 10, error recovery, 200 base + 20 tin/fs/super money invariants (0 mismatches), perf (relative, software GL), smoke PASS, unit 26/26. DEFECTS OPEN: landscape-phone intro/outro splash cut off (modal.splash overflow:hidden, quote/chips/tally/tap-hint below fold), portrait outro quote hidden under Koji+ribbon, bet arrows ~24x12 px hit area in portrait (menu 20px, autoplay 36px), portrait scene empty mid band, landscape phone logo clipped at top, buy screen needs scroll on phones. Scripts: slotforge/slots/cloudtop-tea-house/test/qa-*.cjs. Not checked: real devices/GPU, real touch long-press, safe-area notch insets.
