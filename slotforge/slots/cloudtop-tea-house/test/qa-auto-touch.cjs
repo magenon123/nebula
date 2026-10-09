@@ -1,0 +1,6 @@
+const { sleep, open } = require('./qa-lib.cjs');
+(async () => { const { browser, page, errors } = await open([390, 844], { mobile: true });
+  await page.evaluate(() => { const o = SLOT_ENGINE.playRound; window.__log = []; SLOT_ENGINE.playRound = (r, a) => { const x = o(r, a); window.__log.push([x.cost, x.totalPayout, !!x.bonusTriggered]); return x; }; });
+  await page.click('#bAuto', { force: true }); await sleep(300); await page.click('#autoOpts .opt >> nth=0', { force: true }); await page.click('#autoGo', { force: true });
+  const t0 = Date.now(); while (Date.now() - t0 < 200000) { const s = await page.evaluate(() => ({ cnt: document.getElementById('spinCnt').hidden ? null : document.getElementById('spinCnt').textContent, rounds: window.__log.length, bonus: window.__log.filter(x => x[2]).length, intro: !document.getElementById('introM').hidden, outro: !document.getElementById('outroM').hidden, big: document.getElementById('big').classList.contains('show'), msg: document.getElementById('msg').textContent })); console.log(((Date.now() - t0) / 1000 | 0) + 's', JSON.stringify(s)); if (!s.cnt && s.rounds >= 10) break; await sleep(8000); }
+  console.log('errors', errors); await browser.close(); })();

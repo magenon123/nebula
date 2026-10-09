@@ -3,7 +3,7 @@ const { sleep, open, vis, settle } = require('./qa-lib.cjs');
 const money = s => Math.round(parseFloat(s.replace(/[$,]/g, '')) * 100) / 100;
 const res = []; const ck = (n, ok, x = '') => { res.push([n, ok, x]); console.log((ok ? 'ok   ' : 'FAIL ') + n + (x ? '  ' + x : '')); };
 (async () => {
-  for (const mob of [false, true]) {
+  for (const mob of (process.env.ONLY ? [process.env.ONLY === 'touch'] : [false, true])) {
     console.log('--- ' + (mob ? 'touch 390x844' : 'mouse 1600x900'));
     const { browser, page, errors } = await open(mob ? [390, 844] : [1600, 900], { mobile: mob });
     const bet = async () => money(await page.$eval('#bet', e => e.textContent));
@@ -25,12 +25,12 @@ const res = []; const ck = (n, ok, x = '') => { res.push([n, ok, x]); console.lo
     const wallet0 = money(await page.$eval('#bal', e => e.textContent)); await page.click('#bAuto', { force: true }); await sleep(300);
     const labels = await page.$$eval('#autoOpts .opt', o => o.map(x => x.textContent.trim())); console.log('  autoplay options:', labels.join(','));
     const i10 = labels.findIndex(l => /^10\b/.test(l)); await page.click('#autoOpts .opt >> nth=' + Math.max(i10, 0), { force: true }); await page.click('#autoGo', { force: true });
-    const t0 = Date.now(); let max = 0, seenCnt = new Set(); while (Date.now() - t0 < 600000) { const c = await page.$eval('#spinCnt', e => e.hidden ? null : e.textContent.trim()); if (c) seenCnt.add(c); const L = await page.evaluate(() => window.__log.length); max = L; if (L >= 10 && !c) break; await sleep(150); }
+    const t0 = Date.now(); let max = 0, seenCnt = new Set(); while (Date.now() - t0 < 600000) { const c = await page.$eval('#spinCnt', e => e.hidden ? null : e.textContent.trim()); if (c) seenCnt.add(c); const L = await page.evaluate(() => window.__log.length); max = L; if (L >= 10 && !c) break; if ((Date.now() - t0) % 20000 < 200) console.log('  .. autoplay state', await page.evaluate(() => JSON.stringify({ c: document.getElementById('spinCnt').textContent, rounds: window.__log.length, intro: !document.getElementById('introM').hidden, outro: !document.getElementById('outroM').hidden, big: document.getElementById('big').className, msg: document.getElementById('msg').textContent, bet: document.getElementById('bet').textContent }))); await sleep(150); }
     ck('autoplay: counter shown', seenCnt.size > 0, [...seenCnt].join(','));
     const ok = await settle(page, 300000); ck('autoplay ends and settles', ok); const L = await page.evaluate(() => window.__log); ck('autoplay ran exactly the chosen 10 base rounds (+0 extra)', L.length === 10, 'rounds=' + L.length);
     const st = await page.evaluate(() => ({ cnt: document.getElementById('spinCnt').hidden, spinBusy: document.getElementById('spin').classList.contains('busy'), pDis: document.getElementById('p').disabled, buyDis: document.getElementById('buyOpen').disabled }));
     ck('no stuck state after autoplay (counter hidden, controls enabled)', st.cnt && !st.spinBusy && !st.pDis && !st.buyDis, JSON.stringify(st));
-    const wallet1 = money(await page.$eval('#bal', e => e.textContent)); const exp = Math.round((wallet0 - L.reduce((a, x) => a + x.cost, 0) + L.reduce((a, x) => a + x.tp, 0)) * 100) / 100;
+    const wallet1 = money(await page.$eval('#bal', e => e.textContent)); const stk = await bet(); const r2 = n => Math.round(n * 100) / 100; const exp = r2(wallet0 + L.reduce((a, x) => r2(a - r2(stk * x.cost) + r2(stk * x.tp)), 0));
     ck('autoplay: balance change == sum(totalPayout x stake) - cost', Math.abs(wallet1 - exp) < .011, `${wallet0}->${wallet1} expected ${exp}; bonuses=${L.filter(x => x.bonus).length}`);
     // turbo / tap speed-up: time one spin normal vs turbo vs tapped
     const timeSpin = async tap => { const t = Date.now(); await page.click('#spin', { force: true }); if (tap) { await sleep(700); await page.mouse.click(mob ? 195 : 800, mob ? 300 : 300); } await settle(page); return Date.now() - t; };

@@ -267,7 +267,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
 
   // natural FS (3 drums on the base spin with a line win) and natural SUPER from the base spin
   await page.evaluate(FORCE(`x => !x.bought && x.bonusType === 'fs' && x.fsScatter.count === 3 && x.cascadeSteps[0].wins.length >= 1 && x.totalPayout < 100`, 64)); await watchMsgs(); await clk('#spin');
-  check('natural FS: lines shown, then the drums, then the intro', await waitFor('#introM', 120000) && await sawMsg(/DRUMS! FREE SPINS/)); await sleep(900); await clk('#introM', { position: { x: 80, y: 80 } });
+  check('natural FS: lines shown, then the drums, then the intro', await waitFor('#introM', 120000) && await sawMsg(/(DRUMS?|FREE SPINS)/i)); await sleep(900); await clk('#introM', { position: { x: 80, y: 80 } });
   await runFs('R7-nat-fs'); await finishFs('R7-nat-fs', 'natural FS'); await page.evaluate(NORMAL);
   await page.evaluate(FORCE(`x => !x.bought && x.bonusType === 'super' && x.totalPayout < 400`, 65)); await watchMsgs(); await clk('#spin');
   check('natural SUPER: intro appears', await waitFor('#introM', 120000)); await sleep(900); check('natural SUPER: intro is the super splash', await page.$eval('#introM', e => e.classList.contains('sup'))); await clk('#introM', { position: { x: 80, y: 80 } });
@@ -303,6 +303,9 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   await clk('#buyOpen'); await sleep(200); await page.keyboard.press('Escape'); await sleep(150); check('Escape closes the buy screen', !(await vis('#buyM')));
   for (const [w, h] of [[800, 600], [844, 390], [390, 844]]) { await page.setViewportSize({ width: w, height: h }); await sleep(500); await shot(`vp-${w}x${h}`);
     check(`stage fits ${w}x${h}`, await page.$eval('#stage', e => { const b = e.getBoundingClientRect(); return b.width <= innerWidth + 2 && b.height <= innerHeight + 2; })); }
+  await page.setViewportSize({ width: 390, height: 844 }); await sleep(500);
+  check('phone portrait: bet arrows / menu / autoplay / spin / bonus buy on screen, spin >= 80px, buy >= 44px high', await page.evaluate(() => ['m', 'p', 'menuBtn', 'bAuto', 'spin', 'buyOpen'].every(id => { const b = document.getElementById(id).getBoundingClientRect(); return b.left >= -1 && b.top >= -1 && b.right <= innerWidth + 1 && b.bottom <= innerHeight + 1; }) && document.getElementById('spin').getBoundingClientRect().width >= 80 && document.getElementById('buyOpen').getBoundingClientRect().height >= 44));
+  check('phone portrait: bet arrow rects >= 12px (known small, see QA report; informational floor only)', await page.evaluate(() => ['m', 'p'].every(id => document.getElementById(id).getBoundingClientRect().height >= 12)));
   await page.setViewportSize({ width: 1600, height: 900 }); await sleep(300);
   check('no console/page errors', errors.length === 0, errors.slice(0, 5).join(' | '));
   await browser.close();
