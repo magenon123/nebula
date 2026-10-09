@@ -429,3 +429,5 @@ symbol#kojiSplashSuper,symbol#kojiSplash{overflow:visible}
 
 /* Tin value chip: top-left corner so it never covers the TIN tag at the bottom of the tin */
 .cell .m{transform-origin:0 0;left:10px;right:auto;top:9px;bottom:auto;transform:none;min-width:34px;padding:0 6px;font-size:17px;border-width:3px;line-height:1.25}
+
+/* KAI */
