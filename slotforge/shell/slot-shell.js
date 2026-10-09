@@ -592,6 +592,11 @@ hooks.paintIdle();
   window.__booted = true;
   const el = $('loadM'), L = cfg.loading || {}; if (!el) return;
   if (navigator.webdriver && !/[?&]load=1/.test(location.search)) { el.remove(); return; }   // automated tests skip the screen (add ?load=1 to see it)
+  if (window.SF_BRAND) {   // opt-in studio branding (slots with a brand/ folder): themed art behind the loading + features screens, studio mark at the bottom
+    const B = window.SF_BRAND; el.classList.add('branded');
+    if (B.art) el.insertAdjacentHTML('afterbegin', '<div id="lmArt" aria-hidden="true">' + B.art + '</div>');
+    if (B.logo) el.insertAdjacentHTML('beforeend', '<div class="lmStudio"><span>' + ((B.studio && B.studio.presents) || 'PRESENTED BY') + '</span><div class="lmStudioLogo">' + B.logo + '</div></div>');
+  }
   const logo = document.getElementById('logo'); if (logo) { const c = logo.cloneNode(true); c.removeAttribute('id'); c.removeAttribute('filter'); c.style.cssText = ''; $('lmLogo').appendChild(c); } else $('lmLogo').innerHTML = `<div class="lmBig">${cfg.logoText || ''}</div>`;
   const cards = (L.features || []).map(f => ({ title: f.title, text: f.text, ico: f.sym != null ? sym(f.sym) : (f.svg || ''), big: f.big }));
   cards.push({ title: 'MAX WIN', text: L.maxText || `Win up to ${cfg.maxWin.toLocaleString('en-US')} times your bet.`, big: cfg.maxWin.toLocaleString('en-US') + 'x' });

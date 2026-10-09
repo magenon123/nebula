@@ -79,10 +79,17 @@ def assemble(slug, standalone):
     scripts += '/* ---- shell music engine ---- */\n' + read(SF, 'shell', 'slot-music.js') + '\n'
     scripts += '/* ---- shell ---- */\n' + re.sub(r"^'use strict';\n", '', read(SF, 'shell', 'slot-shell.js'), count=1)
     scripts += '\n/* ---- slot: %s ---- */\n' % slug + read(sd, 'slot.js')
+    # opt-in studio branding: slots/<slug>/brand/{loading-art.html,loading.css,nebula-studios.svg}. Slots without a brand/ folder build exactly as before.
+    bd = os.path.join(sd, 'brand'); brand = {}
+    if os.path.isdir(bd):
+        for k, f in (('art', 'loading-art.html'), ('logo', 'nebula-studios.svg')):
+            if os.path.exists(os.path.join(bd, f)): brand[k] = read(bd, f)
+        if brand: brand['studio'] = cfg.get('studio', {}); scripts = "window.SF_BRAND = %s;\n" % json.dumps(brand, ensure_ascii=False) + scripts
+    slot_css = read(sd, 'slot.css') + ('\n' + read(bd, 'loading.css') if os.path.exists(os.path.join(bd, 'loading.css')) else '')
     title = cfg['title'] + (' (offline demo)' if standalone else '')
     parts = {
         'TITLE': title, 'INFO_TITLE': cfg['infoTitle'],
-        'SHELL_CSS': read(SF, 'shell', 'slot-shell.css'), 'SLOT_CSS': read(sd, 'slot.css'),
+        'SHELL_CSS': read(SF, 'shell', 'slot-shell.css'), 'SLOT_CSS': slot_css,
         'SHELL_DEFS': read(SF, 'shell', 'shell-defs.svg'), 'SYMBOLS': read(sd, 'symbols.svg'),
         'SCENE': read(sd, 'scene.html'), 'LOGO': read(sd, 'logo.html'), 'FRAME': read(sd, 'frame.html'),
         'CHARACTER': read(sd, 'character.html'), 'SIDE': read(sd, 'side.html') + (read(sd, 'sweep.html') if os.path.exists(os.path.join(sd, 'sweep.html')) else '') + (read(sd, 'flare.html') if os.path.exists(os.path.join(sd, 'flare.html')) else '') + (read(sd, 'astro.html') if os.path.exists(os.path.join(sd, 'astro.html')) else ''), 'INFO': info,

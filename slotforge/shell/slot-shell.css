@@ -344,3 +344,9 @@ body.portrait #buyOpen.lit::after{bottom:-26px}
   radial-gradient(ellipse at 50% 100%,color-mix(in srgb,var(--accent,#ffb02e) 30%,transparent) 0,transparent 60%),
   radial-gradient(circle at 20% 15%,color-mix(in srgb,var(--acc1,#e8503a) 28%,transparent) 0,transparent 45%),
   linear-gradient(160deg,#241433 0,#10192e 55%,#0a0d18 100%)}
+/* opt-in studio branding on the loading/features screens */
+#loadM.branded #lmArt{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+#loadM.branded>*:not(#lmArt):not(.lmStudio){position:relative;z-index:1}
+#loadM .lmStudio{z-index:1}
+#loadM .lmStudio{position:absolute;left:0;right:0;bottom:max(14px,2.4vh);display:flex;flex-direction:column;align-items:center;gap:4px;font-family:var(--toon);font-size:clamp(10px,1.2vw,14px);letter-spacing:4px;color:rgba(255,255,255,.62);pointer-events:none}
+#loadM .lmStudioLogo{height:clamp(26px,5vh,46px);display:flex}#loadM .lmStudioLogo svg{height:100%;width:auto}
