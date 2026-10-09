@@ -65,7 +65,10 @@ function musicDefs() {
   };
   const stingers = {
     win(K) { const { V, dest, t } = K; [0, 2, 3].forEach((d, i) => V.koto(dest, t + i * .11, K.note(d, 1), { g: .08, d: 1 })); V.tok(dest, t + .36, .6); },
-    bonus(K) { const { V, dest, t } = K; V.taiko(dest, t, 1, { g: .4 }); [0, 1, 2, 3, 4, 5, 6, 7].forEach((d, i) => V.koto(dest, t + .15 + i * .07, K.note(d, 1), { g: .06, d: 1.1 })); V.shaku(dest, t + .5, 1.8, K.note(4, 1), { g: .06 }); },
+    bonus(K) { const { V, dest, t } = K;
+      if (bType === 'fs') { [0, 1, 2, 3, 4].forEach(i => V.taiko(dest, t + i * .11, .7 + i * .1, { g: .38 })); [0, 2, 3, 5, 7].forEach((d, i) => V.koto(dest, t + .45 + i * .08, K.note(d + 3, 1), { g: .06, d: 1.1 })); V.shaku(dest, t + .5, 1.8, K.note(5, 1), { g: .06 }); return; }
+      if (bType === 'super') { V.metal(dest, t, K.mtof(47), 3.4, .15, [1, 2.4, 4.1, 6.7]); for (let i = 0; i < 8; i++) V.taiko(dest, t + i * .09, .6 + i * .07, { g: .36 }); for (let i = 0; i < 12; i++) V.koto(dest, t + .45 + i * .06, K.note(i + 2, 1), { g: .06, d: 1.4 }); V.shaku(dest, t + .8, 2.4, K.note(7, 2), { g: .07 }); return; }
+      V.taiko(dest, t, 1, { g: .4 }); [0, 1, 2, 3, 4, 5, 6, 7].forEach((d, i) => V.koto(dest, t + .15 + i * .07, K.note(d, 1), { g: .06, d: 1.1 })); V.shaku(dest, t + .5, 1.8, K.note(4, 1), { g: .06 }); },
     outro(K) { const { V, dest, t } = K; [3, 2, 0, -2].forEach((d, i) => V.koto(dest, t + i * .22, K.note(d, 1), { g: .07, d: 1.5 })); V.metal(dest, t + .7, K.mtof(74), 2.2, .08); },
     grand(K) { const { V, dest, t } = K; V.metal(dest, t, K.mtof(50), 3, .16, [1, 2.4, 4.1, 6.7]); for (let i = 0; i < 12; i++) V.taiko(dest, t + .4 + i * (.3 - i * .014), .5 + i * .05, { g: .3 }); for (let i = 0; i < 14; i++) V.koto(dest, t + .5 + i * .06, K.note(i, 1), { g: .06, d: 1.2 }); V.shaku(dest, t + 1, 2.2, K.note(4, 2), { g: .06 }); }
   };
