@@ -52,6 +52,7 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 - [ ] 5.2 lead: final quality review, STATUS.md, deliver file to owner, list remaining defects.
 
 ## Log (newest first; add a line per finished item with commit hash)
+- bonus-env.html done (maya) HASH: #bonusEnv[data-bonus=tin|fs|super] layers, --envPulse, lite/reduced-motion off; checked 1600x900 + 390x844.
 - 2.2 done (leo): symbol finish in art/lib.cjs shape(): 3-step cel shading + reflected light + auto rim highlight + specular on spheres, stronger shade contrast; symbols.svg regenerated (build.cjs then wobble.cjs symbols.svg; ids/viewBox/win hooks untouched). Restore character.html with git if build.cjs rewrites it raw.
 - 2.1 done (leo): scene far ridge+haze, warm board pool, vignette, tansu depth shadows, eave lamp halos, board inner shadow/warm light, CSS petals (body.lite off), bottom-left props tidied, tile plate finish. Generator: art/light.cjs (run AFTER wobble.cjs). Rebuild/ordering note in slot.css ART-LIGHT block.
 - 2.3 done (maya): brand/ kit (nebula-studios.svg, nebula-mark.svg, loading-art.html, loading.css, README.md) + slot.json `studio`; loading+features themed, checked at 1600x900 and 390x844 via ?load=1. Gap: portrait crops lantern/cup art (slice).
