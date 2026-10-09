@@ -297,7 +297,7 @@ async function showTrigger(R) {
     list = R.fsScatter.cells.slice().sort((a, b) => a[1] - b[1] || a[0] - b[0]); nm = list.length; step = 150; sound = i => sfx.drum(i);
   } else { list = R.tins ? R.tins.cells.slice() : tinCells(lastGrid); list.sort((a, b) => a[1] - b[1] || a[0] - b[0]); nm = list.length; step = Math.max(70, 150 - nm * 4); sound = i => sfx.tin(i); }
   restCells(); GRID.classList.add('focus'); clearLinks(); koji('tease'); sfx.antRise(bType);
-  say(bType === 'super' ? `${nm} DRUMS... SUPER FREE SPINS!` : bType === 'fs' ? `${nm} DRUMS... FREE SPINS!` : `${nm} TEA TINS... TIN RUSH!`, true);
+  say(bType === 'super' ? `${nm} DRUMS! SUPER FREE SPINS` : bType === 'fs' ? `${nm} DRUMS! FREE SPINS` : `${nm} TEA TINS! TIN RUSH`, true);
   list.forEach(([r, c], i) => { FX.act(at(r, c), i * step, c); at(r, c).classList.add('scat'); after(i * step, () => { sound(i); ring(at(r, c), 500); gold(r, c, lt(6), .6 + i * .05); }); });
   await wait(list.length * step + 450);
   /* all together: a flash, the pieces burst, then the title card */
