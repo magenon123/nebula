@@ -45,13 +45,14 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 ### Stage 4: animation, audio, mobile, branding
 - [x] 4.1 kai: win presentation scaling + anticipation polish.
 - [x] 4.2 kai: audio distinct per bonus (slot-music.js usage via slot.js only).
-- [ ] 4.3 rin: mobile portrait/landscape + perf review; fix list to owners.
+- [x] 4.3 rin: mobile portrait/landscape + perf review; fix list to owners. (review done; DEFECTS FOUND, see Log; fixes pending with owners)
 - [x] 4.4 maya: branding in info/credits + splash corner.
 ### Stage 5: regression + final review
 - [ ] 5.1 rin/lead: unit tests, smoke-cloudtop, bets/payouts/balance/bonus completion/autoplay/console errors, screenshots desktop + phone.
 - [ ] 5.2 lead: final quality review, STATUS.md, deliver file to owner, list remaining defects.
 
 ## Log (newest first; add a line per finished item with commit hash)
+- 4.3 QA done (rin): 390x844/844x390/768x1024/1600x900/2560x1080 layouts, 3 bonuses x portrait+landscape phone, hold-to-repeat, autoplay 10, error recovery, 200 base + 20 tin/fs/super money invariants (0 mismatches), perf (relative, software GL), smoke PASS, unit 26/26. DEFECTS OPEN: landscape-phone intro/outro splash cut off (modal.splash overflow:hidden, quote/chips/tally/tap-hint below fold), portrait outro quote hidden under Koji+ribbon, bet arrows ~24x12 px hit area in portrait (menu 20px, autoplay 36px), portrait scene empty mid band, landscape phone logo clipped at top, buy screen needs scroll on phones. Scripts: slotforge/slots/cloudtop-tea-house/test/qa-*.cjs. Not checked: real devices/GPU, real touch long-press, safe-area notch insets.
 - 4.4 done (maya): info.html CREDITS block (Nebula mark + game name + "Developed by Nebula Studios" + v1.0, inline-styled, placeholders untouched). Splash corner mark SKIPPED on purpose: splash.html is only a doc comment, the bonus-intro art is kojiSplash in symbols.svg/slot.css (leo/kai files) and a corner mark would clutter the splash; the studio is already on the loading + features screens. bonus-env.html: portrait bleed fix (body.portrait: each env extends 1100px above/below the stage, edge colours continued by ::before/::after gradients; no blank band at 390x844 for tin/fs/super) + Tin Rush furnace glow raised (bigger, brighter ellipses, pulse .88-1).
 - 4.1/4.2 done (9068cce): win size classes (tag, sparkle, Koji+coins), tease hold veil + riser, per-bonus trigger/bonus/outro sfx + stingers (trig, end, bigtin, launch, top), tin/FS/Super music already distinct (128/112/142 bpm).
 - 3.2/3.3 done (9f32d6b): FS + Super: trigger sequence (drums beat, veil, riser) + title cards (indigo/gold FS, gold-ray Super), curtain wipe in, end cards out ('STEEPING COMPLETE'), plaque in tag colour, rules plaque + drawer boost legend, LEVEL +N callouts + ring waves on level-up, plaque bump on retrigger, outro stats tally, dataset.bonus='fs'|'super'.
