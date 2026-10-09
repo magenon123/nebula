@@ -39,7 +39,7 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 - [x] 2.3 maya: Nebula Studios logo (SVG) + themed loading + features screens (cfg in slot.json, `studio`).
 - [x] 2.4 lead (260d13d): shell opt-in `cfg.studio` (loading footer, info credits line); no change for games without it.
 ### Stage 3: bonuses
-- [ ] 3.1 maya+kai: Tin Rush identity (environment layer, tin-well cells, trigger sequence, counter plaque, rules strip).
+- [~] 3.1 maya+kai (kai client part DONE, env layer = maya): Tin Rush identity (environment layer, tin-well cells, trigger sequence, counter plaque, rules strip).
 - [ ] 3.2 kai: Free Spins identity (environment, transition in/out, counter/multiplier readability).
 - [ ] 3.3 kai: Super Free Spins identity (distinct from FS).
 ### Stage 4: animation, audio, mobile, branding
@@ -52,6 +52,7 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 - [ ] 5.2 lead: final quality review, STATUS.md, deliver file to owner, list remaining defects.
 
 ## Log (newest first; add a line per finished item with commit hash)
+- 3.1 kai part done (HASH31): Tin Rush trigger (veil, rising bells, pulse, TIN RUSH title card), tin-lid wells + warm locked glow + pours plaque with pips + rules strip (kai.css), reset fly-to-plaque, per-value landing wave/sparkle/sfx, Kite/Grand charge-up anticipation, RUSH COMPLETE end card, outro tally rows, dataset.bonus + --envPulse on #bonusEnv. NOTE: slot.css carries the spliced kai.css below /* KAI */ (leo's file, not committed by kai).
 - bonus-env.html done (maya) f3b2f08: #bonusEnv[data-bonus=tin|fs|super] layers, --envPulse, lite/reduced-motion off; checked 1600x900 + 390x844.
 - 2.2 done (leo): symbol finish in art/lib.cjs shape(): 3-step cel shading + reflected light + auto rim highlight + specular on spheres, stronger shade contrast; symbols.svg regenerated (build.cjs then wobble.cjs symbols.svg; ids/viewBox/win hooks untouched). Restore character.html with git if build.cjs rewrites it raw.
 - 2.1 done (leo): scene far ridge+haze, warm board pool, vignette, tansu depth shadows, eave lamp halos, board inner shadow/warm light, CSS petals (body.lite off), bottom-left props tidied, tile plate finish. Generator: art/light.cjs (run AFTER wobble.cjs). Rebuild/ordering note in slot.css ART-LIGHT block.

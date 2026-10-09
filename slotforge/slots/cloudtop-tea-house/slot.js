@@ -17,6 +17,14 @@ const ctrG = (r, c) => [(c + .5) * CW, (r + .5) * CH];
 const scr = (r, c) => { const b = at(r, c).getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; };
 const ALL = [].concat(...Array.from({ length: ROWS }, (_, r) => Array.from({ length: COLS }, (_, c) => [r, c])));
 const cnt = n => `${n} ${n === 1 ? 'POUR' : 'POURS'} LEFT`;
+/* ---------- kai: presentation helpers (everything here is look only; no outcome is computed) ---------- */
+const LITE = document.body.classList.contains('lite'), lt = n => LITE ? Math.max(1, Math.ceil(n * .5)) : n;
+const BCLS = { tin: 'ctTin', fs: 'ctFs', super: 'ctSup' }; let curStake = 1;
+const envEl = () => document.getElementById('bonusEnv');
+function setEnv(type) { const e = envEl(); if (!e) return; if (type) e.dataset.bonus = type; else { delete e.dataset.bonus; e.style.removeProperty('--envPulse'); } }
+function envPulse(v) { const e = envEl(); if (e) e.style.setProperty('--envPulse', v); }
+const plaqueHit = () => $('fsBox').animate([{ transform: 'none' }, { transform: 'scale(1.2) rotate(-2deg)', offset: .18 }, { transform: 'scale(.96)', offset: .4 }, { transform: 'none' }], { duration: 900 * T(), easing: 'ease-out' });
+const holdOff = () => document.body.classList.remove('ctHold', 'ctAnt');
 
 /* ---------- MUSIC: "morning on the cliff" (base, 92 bpm) and "kite weather" (Tin Rush, 128 bpm); D Hirajoshi (D E F A Bb) ---------- */
 function musicDefs() {
@@ -95,6 +103,14 @@ function musicDefs() {
   };
   stingers.steep = K => { const { V, dest, t } = K; [0, 2, 4].forEach((d, i) => V.koto(dest, t + i * .09, K.note(d + 2, 1), { g: .07, d: .9 })); V.tok(dest, t + .3, .6); };
   stingers.retrig = K => { const { V, dest, t } = K; V.taiko(dest, t, 1, { g: .4 }); [0, 2, 3, 4, 5, 7].forEach((d, i) => V.koto(dest, t + .1 + i * .06, K.note(d, 1), { g: .06, d: 1 })); V.shaku(dest, t + .4, 1.4, K.note(4, 1), { g: .05 }); };
+  /* kai: one trigger and one bonus stinger per bonus, plus big tin / kite launch / top level / end card */
+  stingers.trig = K => { const { V, dest, t } = K; V.taiko(dest, t, 1, { g: .45 }); if (bType === 'tin') { [0, 2, 4, 6].forEach((d, i) => V.koto(dest, t + .08 + i * .06, K.note(d + 2, 1), { g: .07, d: 1 })); }
+    else if (bType === 'fs') { [0, 1, 2].forEach(i => V.taiko(dest, t + .1 + i * .1, .8, { g: .4 })); V.shaku(dest, t + .2, 1.4, K.note(4, 1), { g: .06 }); }
+    else { V.metal(dest, t, K.mtof(47), 3, .14, [1, 2.4, 4.1, 6.7]); [0, 2, 3, 4, 6, 7, 9].forEach((d, i) => V.koto(dest, t + .1 + i * .06, K.note(d + 3, 1), { g: .07, d: 1.6 })); V.shaku(dest, t + .3, 2.2, K.note(7, 1), { g: .07 }); } };
+  stingers.end = K => { const { V, dest, t } = K; [4, 2, 0].forEach((d, i) => V.koto(dest, t + i * .18, K.note(d, 1), { g: .07, d: 1.4 })); V.metal(dest, t + .5, K.mtof(bType === 'super' ? 78 : 74), 2, .07); };
+  stingers.bigtin = K => { const { V, dest, t } = K; V.metal(dest, t, K.mtof(62), 1.8, .12, [1, 2.76]); [2, 3, 4, 6].forEach((d, i) => V.koto(dest, t + .05 + i * .06, K.note(d + 2, 1), { g: .07, d: 1 })); V.taiko(dest, t, .8, { g: .3 }); };
+  stingers.launch = K => { const { V, dest, t } = K; V.shaku(dest, t, 1.4, K.note(4, 1), { g: .07, a: .2 }); [0, 1, 2, 3, 4, 5].forEach((d, i) => V.koto(dest, t + .3 + i * .07, K.note(d + 2, 1), { g: .06, d: .9 })); V.taiko(dest, t + .4, 1, { g: .38 }); };
+  stingers.top = K => { const { V, dest, t } = K; V.metal(dest, t, K.mtof(bType === 'super' ? 74 : 69), 2, .1, [1, 2.4, 4.1]); [0, 2, 3, 5, 7].forEach((d, i) => V.koto(dest, t + i * .07, K.note(d + 3, 1), { g: .07, d: 1.1 })); };
   return { base: zen, steep, sup, get bonus() { return bType === 'super' ? sup : bType === 'fs' ? steep : rush; }, stingers };
 }
 
@@ -115,7 +131,7 @@ function dropCells(list, base = 0) {
 function dropReels(grid) {
   let base = 0, end = 0, tease = false, seen = 0, seenF = 0, said = false; const times = {};
   for (let c = 0; c < COLS; c++) {
-    if (seen >= 5 || seenF >= 2) { tease = true; base += 560; const b0 = base; after(b0 - 500 + c * 92, () => { sfx.beat(); if (!said) { said = true; say('ONE MORE...', true); } shake(.3); }); }
+    if (seen >= 5 || seenF >= 2) { if (!tease) after(Math.max(0, base + 60), () => { document.body.classList.add('ctHold'); sfx.hold(); }); tease = true; base += 560; const b0 = base; after(b0 - 500 + c * 92, () => { sfx.beat(); if (!said) { said = true; say('ONE MORE...', true); } shake(.3); }); }
     const r = dropCells(Array.from({ length: ROWS }, (_, i) => [i, c]), base); end = Math.max(end, r.end); Object.assign(times, r.times);
     for (let i = 0; i < ROWS; i++) { if (grid[i][c] === TIN) seen++; else if (grid[i][c] === FSS) seenF++; }
   }
@@ -173,7 +189,48 @@ function flipSym(d, sym) {
   g.style.transformOrigin = '50% 60%'; g.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(.05) scaleY(1.1)', offset: .5 }, { transform: 'scaleX(1)' }], { duration: 300 * T(), easing: 'ease-in-out' });
   setTimeout(() => { const u = g.querySelector('use'); if (u) u.setAttribute('href', '#s' + sym); }, 150 * T());
 }
-function setFs(n, bump) { const e = $('fs'); e.textContent = n; if (bump) e.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.8) rotate(-6deg)', offset: .3 }, { transform: 'scale(.92)', offset: .65 }, { transform: 'scale(1)' }], { duration: 620 * T(), easing: 'ease-out' }); }
+function pips(n, refill) { const p = $('ctPips'); if (!p) return; [...p.children].forEach((i, k) => { const on = k < n, was = i.classList.contains('on'); i.classList.toggle('on', on);
+  if (refill && on && !was) { i.style.setProperty('--d', k * 120 + 'ms'); i.classList.remove('re'); void i.offsetWidth; i.classList.add('re'); } else if (!refill) i.classList.remove('re'); }); }
+function setFs(n, bump) { const e = $('fs'); e.textContent = n;
+  if (bType === 'tin') { pips(n); $('fsBox').classList.toggle('low', n <= 1); envPulse(n <= 1 ? 2.2 : n === 2 ? 1.5 : 1); } if (bump) e.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.8) rotate(-6deg)', offset: .3 }, { transform: 'scale(.92)', offset: .65 }, { transform: 'scale(1)' }], { duration: 620 * T(), easing: 'ease-out' }); }
+
+
+/* ---------- kai: title cards, curtain wipe, rules plaque, per-value landing effects ---------- */
+const TITLES = { tin: ['TIN RUSH', 'THE TINS ARE LOCKED IN'], fs: ['FREE SPINS', 'THE DRUMS CALL THE SPIRITS'], super: ['SUPER FREE SPINS', 'A GOLDEN INFUSION'] };
+async function titleCard(type, sub, ms = 1900, end) {
+  const t = $('ctTitle'); if (!t) return; t.className = 't-' + type + (end ? ' end' : ''); t.querySelector('b').textContent = end || TITLES[type][0]; t.querySelector('.tcS').textContent = sub || ''; t.hidden = false;
+  S.music.stinger(end ? 'end' : 'trig'); sfx.titleHit(type, !!end);
+  const b = t.querySelector('.tcB'), r = t.querySelector('.tcR');
+  t.animate([{ opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 1, offset: .86 }, { opacity: 0 }], { duration: ms * T(), easing: 'linear' });
+  b.animate([{ transform: 'scale(.25) rotate(-5deg)', opacity: 0 }, { transform: 'scale(1.16) rotate(1.5deg)', opacity: 1, offset: .16 }, { transform: 'scale(.97)', offset: .26 }, { transform: 'scale(1)', offset: .34 }, { transform: 'scale(1.03)', offset: .86 }, { transform: 'scale(1.1)', opacity: 0 }], { duration: ms * T(), easing: 'ease-out' });
+  r.animate([{ transform: 'scaleY(.05)' }, { transform: 'scaleY(1)', offset: .14 }, { transform: 'scaleY(1)', offset: .86 }, { transform: 'scaleY(.05)' }], { duration: ms * T(), easing: 'ease-out' });
+  if (!end) { flash(type === 'super' ? 2.4 : 1.6); shake(type === 'super' ? 2.2 : 1.4); embers(lt(type === 'super' ? 120 : 70), innerWidth / 2, innerHeight / 2, true); if (type !== 'tin') coins(lt(type === 'super' ? 50 : 24)); }
+  await wait(ms - 120); t.hidden = true;
+}
+const endCard = (type, title, sub) => titleCard(type, sub, 1500, title);
+function wipe(type) {   // curtain of the bonus colour sweeps across as the bonus starts (transform/opacity only)
+  const w = $('ctWipe'); if (!w) return; w.className = 'w-' + type; w.hidden = false;
+  w.animate([{ transform: 'translateX(-105%)' }, { transform: 'translateX(0)', offset: .42 }, { transform: 'translateX(0)', offset: .56 }, { transform: 'translateX(105%)' }], { duration: 1100 * T(), easing: 'cubic-bezier(.6,0,.3,1)' }).finished.then(() => { w.hidden = true; }, () => { w.hidden = true; });
+}
+function setRules(type) {
+  const r = $('ctRules'); if (!r) return; if (!type) { r.hidden = true; return; }
+  const F = FSI[type] || {}, rt = F.retrigger || {}, k3 = Object.keys(rt)[0];
+  const items = type === 'tin' ? ['TINS LOCK IN PLACE', 'NEW TIN: POURS RESET TO 3', 'FULL ROW: KITE LAUNCH x2', 'ALL 20: GRAND DRAGON KITE']
+    : type === 'fs' ? ['WINNING DRAWERS STEEP DARKER', 'STEEPED DRAWERS BOOST LINES', k3 ? `${k3} DRUMS: +${rt[k3]} SPINS` : 'DRUMS: MORE SPINS']
+    : ['SOME DRAWERS START STEEPED', 'GOLD DRAWERS PAY THE MOST', k3 ? `${k3} DRUMS: +${rt[k3]} SPINS` : 'DRUMS: MORE SPINS'];
+  const leg = type === 'tin' ? '' : `<div class="lg"><span>DRAWER BOOST</span>${(fsBoost || []).map((b, i) => i ? `<i class="l${i}${i === fsMax && type === 'super' ? ' gd' : ''}">+${b}</i>` : '').join('')}</div>`;
+  r.innerHTML = `<b>${TITLES[type][0]}</b><ul>${items.map(t => `<li>${t}</li>`).join('')}</ul>${leg}`; r.hidden = false;
+  r.animate([{ opacity: 0, transform: 'translateX(-40px)' }, { opacity: 1, transform: 'none' }], { duration: 500 * T(), delay: 500 * T(), easing: 'ease-out', fill: 'backwards' });
+}
+const tinTier = nt => nt.kind !== 'value' ? 3 : nt.value >= 10 ? 3 : nt.value >= 5 ? 2 : nt.value >= 2 ? 1 : 0;
+function landFx(nt, lock, ctx) {   // every tin landing: a ring wave + sparkle that grow with the tin's value
+  const d = at(nt.r, nt.c), tier = tinTier(nt), w = document.createElement('i'); w.className = 'ctWave t' + tier; d.append(w);
+  w.animate([{ transform: 'scale(.3)', opacity: .95 }, { transform: `scale(${1.25 + tier * .4})`, opacity: 0 }], { duration: (480 + tier * 140) * T(), easing: 'ease-out' }).finished.then(() => w.remove(), () => w.remove());
+  gold(nt.r, nt.c, lt((lock ? 3 : 5) + tier * 5), .4 + tier * .35); sfx.tinPop(tier);
+  if (tier >= 1 && !lock) { const [x, y] = scr(nt.r, nt.c); pop(x, y - 40, '+' + fmt(nt.value * ctx.stake)); }
+  if (tier >= 2 && !lock) { d.animate([{ transform: 'none' }, { transform: 'scale(1.12)', offset: .3 }, { transform: 'none' }], { duration: 380 * T(), easing: 'ease-out' }); flash(.5 + tier * .4); }
+  if (tier >= 3 && !lock) { shake(1.2); S.music.stinger('bigtin'); }
+}
 
 /* ---------- base spin ---------- */
 const tinCells = grid => { const o = []; grid.forEach((row, r) => row.forEach((s, c) => { if (s === TIN) o.push([r, c]); })); return o; };
@@ -195,12 +252,16 @@ async function evalWins(st, ctx, run) {
       w.cells.forEach(([r, c], j) => after(R.arrive[j] + 30, () => { const tg = at(r, c).querySelector('.tg'); if (tg) { tg.classList.remove('fl'); void tg.offsetWidth; tg.classList.add('fl'); } }));
       xChip(w, R.arrive[lastC] + 120, i);
     }
-    if (n <= 8) after(R.arrive[lastC] + 90, () => { const [x, y] = scr(...w.cells[Math.min(2, lastC)]); pop(x, y - 30, '+' + fmt(w.payout * ctx.stake)); });
+    if (n <= 8 && st.payout < 5) after(R.arrive[lastC] + 90, () => { const [x, y] = scr(...w.cells[Math.min(2, lastC)]); pop(x, y - 30, '+' + fmt(w.payout * ctx.stake)); });
     endAll = Math.max(endAll, R.arrive[lastC]);
   });
   cellT.forEach(o => FX.act(at(o.r, o.c), o.dl, o.c));
   sfx.win(Math.min(7, n + (st.payout > 5 ? 2 : 0)));
-  char('win', 1500 * T()); const before = run; run += st.payout * ctx.stake; after(endAll, () => ctx.onWin(before, run));
+  const sz = st.payout >= 25 ? 4 : st.payout >= 10 ? 3 : st.payout >= 5 ? 2 : st.payout >= 2 ? 1 : 0;   // win size class: 0 small tag, 1 sparkle, 2 bigger sparkle + tag, 3 Koji + particles, 4 big
+  char(sz >= 3 ? 'big' : 'win', (sz >= 3 ? 3200 : 1500) * T()); const before = run; run += st.payout * ctx.stake; after(endAll, () => ctx.onWin(before, run));
+  if (sz >= 1) after(endAll + 30, () => { cellT.forEach(o => gold(o.r, o.c, lt(3 + sz * 3), .35 + sz * .3)); if (sz >= 2) flash(.5 + sz * .35); if (sz >= 3) { shake(sz - 1.2); coins(lt(14 + sz * 10)); embers(lt(40 + sz * 20), innerWidth / 2, innerHeight / 2, true); } });
+  if (sz >= 2) after(endAll + 140, () => { const t = document.createElement('div'); t.className = 'ctWinTag s' + sz; t.textContent = '+' + fmt(st.payout * ctx.stake); fxl().append(t);
+    t.animate([{ opacity: 0, transform: 'translate(-50%,-30%) scale(.3)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.2)', offset: .2 }, { opacity: 1, transform: 'translate(-50%,-56%) scale(1)', offset: .7 }, { opacity: 0, transform: 'translate(-50%,-110%) scale(1)' }], { duration: 1500 * T(), easing: 'ease-out' }).finished.then(() => t.remove(), () => t.remove()); });
   if (n > 8) after(endAll + 100, () => { const [x, y] = scr(1, 2); pop(x, y, '+' + fmt(st.payout * ctx.stake)); });
   say(`A FINE CUP! +${fmt(st.payout * ctx.stake)}`, true);
   await wait(endAll + 800); fadeLinks(240); GRID.classList.remove('focus'); restCells(); return run;
@@ -211,7 +272,7 @@ async function baseSpin(sp, run, ctx) {
   tins.slice().sort((a, b) => dt.times[a[0] * COLS + a[1]] - dt.times[b[0] * COLS + b[1]]).forEach(([r, c], i) => { const t = dt.times[r * COLS + c]; after(t, () => { sfx.tin(i); ring(at(r, c)); }); });
   fsCellsOf(sp.initialGrid).sort((a, b) => dt.times[a[0] * COLS + a[1]] - dt.times[b[0] * COLS + b[1]]).forEach(([r, c], i) => { const t = dt.times[r * COLS + c]; after(t, () => { sfx.drum(i); ring(at(r, c)); }); });
   if (dt.tease) after(Math.max(300, dt.end - 1500), () => { const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('tease'); });
-  await wait(dt.end + 260);
+  await wait(dt.end + 260); holdOff();
   if (dt.tease) {
     const nF = fsCellsOf(sp.initialGrid).length, ch = $('char'), hit = tins.length >= 6 || nF >= 3; ch.classList.add(hit ? 'exhale' : 'slump'); setTimeout(() => ch.classList.remove('tease', 'exhale', 'slump'), 750 * T());
     if (!hit && tins.length >= 4) { say('ALMOST... JUST ONE MORE TIN', true); await wait(650); }
@@ -225,19 +286,22 @@ async function baseSpin(sp, run, ctx) {
   return run;
 }
 async function showTrigger(R) {
-  bonusR = R; bType = R.bonusType || 'tin'; setupSplash(bType, R);
-  if (bType !== 'tin') {   // FS drums: the three (four) drums beat one after another
-    const dl = R.fsScatter.cells.slice().sort((a, b) => a[1] - b[1] || a[0] - b[0]);
-    restCells(); GRID.classList.add('focus'); clearLinks();
-    dl.forEach(([r, c], i) => { FX.act(at(r, c), i * 140, c); at(r, c).classList.add('scat'); after(i * 140, () => { sfx.drum(i); ring(at(r, c), 500); gold(r, c, 8, .8); }); });
-    say(bType === 'super' ? `${dl.length} DRUMS! SUPER FREE SPINS` : `${dl.length} DRUMS! FREE SPINS`, true); char('special', 1100 * T());
-    await wait(dl.length * 140 + 1000); return;
-  }
-  const list = R.tins ? R.tins.cells.slice() : tinCells(lastGrid); list.sort((a, b) => a[1] - b[1] || a[0] - b[0]);
-  restCells(); GRID.classList.add('focus'); clearLinks();
-  list.forEach(([r, c], i) => { FX.act(at(r, c), i * 120, c); at(r, c).classList.add('scat'); after(i * 120, () => { sfx.tin(i); ring(at(r, c), 500); }); });
-  say(`${list.length} TEA TINS! TIN RUSH`, true); char('special', 1100 * T());
-  await wait(list.length * 120 + 900);
+  bonusR = R; bType = R.bonusType || 'tin'; setupSplash(bType, R); holdOff();
+  const ch = $('char'), koji = st => { ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add(st); };
+  document.body.classList.add('ctAnt');   // the room dims, only the triggering pieces keep their light
+  let list, nm, sound, step;
+  if (bType !== 'tin') {   // FS drums: the three (four) drums beat one after another, faster and louder each time
+    list = R.fsScatter.cells.slice().sort((a, b) => a[1] - b[1] || a[0] - b[0]); nm = list.length; step = 150; sound = i => sfx.drum(i);
+  } else { list = R.tins ? R.tins.cells.slice() : tinCells(lastGrid); list.sort((a, b) => a[1] - b[1] || a[0] - b[0]); nm = list.length; step = Math.max(70, 150 - nm * 4); sound = i => sfx.tin(i); }
+  restCells(); GRID.classList.add('focus'); clearLinks(); koji('tease'); sfx.antRise(bType);
+  say(bType === 'super' ? `${nm} DRUMS... SUPER FREE SPINS!` : bType === 'fs' ? `${nm} DRUMS... FREE SPINS!` : `${nm} TEA TINS... TIN RUSH!`, true);
+  list.forEach(([r, c], i) => { FX.act(at(r, c), i * step, c); at(r, c).classList.add('scat'); after(i * step, () => { sound(i); ring(at(r, c), 500); gold(r, c, lt(6), .6 + i * .05); }); });
+  await wait(list.length * step + 450);
+  /* all together: a flash, the pieces burst, then the title card */
+  list.forEach(([r, c]) => { ring(at(r, c), 700); gold(r, c, lt(10), 1.1); });
+  koji('special'); setTimeout(() => ch.classList.remove('special'), 1000 * T());
+  await titleCard(bType, `${nm} ${bType === 'tin' ? 'TEA TINS' : 'DRUMS'}`, bType === 'super' ? 2300 : 1900);
+  holdOff();
 }
 
 /* ---------- Tin Rush (hold and win) ---------- */
@@ -269,9 +333,9 @@ async function placeTin(nt, k, lock, ctx) {
   const d = at(nt.r, nt.c), sym = KIND_SYM[nt.kind];
   if (lock) { d.classList.add('locked'); if (sym !== TIN) flipSym(d, sym); }
   else { setCell(d, sym, null, ' locked land'); }
-  sfx.tin(k); ring(d); if (nt.kind !== 'value') gold(nt.r, nt.c, 8, .7);
+  sfx.tin(k); ring(d); landFx(nt, lock, ctx); if (nt.kind !== 'value') gold(nt.r, nt.c, lt(8), .7);
   if (nt.kind === 'collector') { await wait(lock ? 220 : 260); await collectorSuck(nt, d); }
-  else { if (nt.kind === 'mini' || nt.kind === 'minor' || nt.kind === 'major') { sfx.jackpot(nt.kind); say(nt.kind.toUpperCase() + ' TIN! x' + nt.value, true); char('special', 900 * T()); if (nt.kind === 'major') { shake(3); flash(2.5); embers(120, ...scr(nt.r, nt.c), true); } else flash(1); }
+  else { if (nt.kind === 'mini' || nt.kind === 'minor' || nt.kind === 'major') { sfx.jackpot(nt.kind); say(nt.kind.toUpperCase() + ' TIN! x' + nt.value, true); char('special', 900 * T()); if (nt.kind === 'major') { shake(3); flash(2.5); embers(lt(120), ...scr(nt.r, nt.c), true); S.music.stinger('bigtin'); } else flash(1); }
     await wait(lock ? 160 : 120); setChip(d, nt.value, true); await wait(lock ? 150 : 200); }
   board.set(nt.r * COLS + nt.c, { kind: nt.kind, value: nt.value });
 }
@@ -281,10 +345,13 @@ const KITE_SVG = `<svg viewBox="0 0 120 250" width="120" height="250" style="ove
 async function kiteLaunch(k, bump, ctx) {
   const row = k.row, gate = $('gates').children[row], rowCells = [0, 1, 2, 3, 4].map(c => at(row, c)), band = document.createElement('div');
   band.className = 'ctBand'; band.style.top = row * CH + 'px'; fxl().append(band);
-  GRID.classList.add('focus'); gate.classList.remove('launch'); gate.classList.add('on'); sfx.gate(); S.music.duck(.25, 1.9, 1.4);
+  GRID.classList.add('focus'); gate.classList.remove('launch');
+  rowCells.forEach(d => d.classList.add('charge')); gate.classList.add('charge'); sfx.charge(); say('A FULL ROW...', true); S.music.duck(.3, 1.8, 1.2);
+  await wait(760); rowCells.forEach(d => d.classList.remove('charge')); gate.classList.remove('charge');
+  gate.classList.add('on'); sfx.gate();
   band.animate([{ opacity: 0, transform: 'scaleX(.3)' }, { opacity: 1, transform: 'scaleX(1)', offset: .25 }, { opacity: 1, offset: .8 }, { opacity: 0 }], { duration: 2100 * T(), easing: 'ease-out' });
   rowCells.forEach((d, c) => { d.classList.add('hit'); d.style.zIndex = 'auto'; });
-  say('KITE LAUNCH! ROW x2', true); banner('KITE LAUNCH!', 'THIS ROW DOUBLES', 1900, true); char('special', 900 * T());
+  say('KITE LAUNCH! ROW x2', true); banner('KITE LAUNCH!', 'THIS ROW DOUBLES', 1900, true); char('special', 900 * T()); S.music.stinger('launch');
   await wait(520);
   gate.classList.add('launch'); sfx.kite(); shake(2.6); flash(2.2); embers(70, ...scr(row, 0), true);
   const kt = document.createElement('div'); kt.className = 'ctK'; kt.innerHTML = KITE_SVG; fxl().append(kt);
@@ -310,8 +377,9 @@ async function kiteLaunch(k, bump, ctx) {
   say('THE KITE FLIES!', true);
 }
 async function grandKite(g, bump, ctx) {
-  GRID.classList.add('focus'); ALL.forEach(([r, c]) => FX.act(at(r, c), (r + c) * 55, c));
-  const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('maxwin');
+  GRID.classList.add('focus'); const ch = $('char'); document.body.classList.add('ctAnt'); say('EVERY DRAWER IS FULL...', true); sfx.charge(); sfx.beat(); S.music.duck(.12, 2.6, 1.4);
+  cells.forEach(d => d.classList.add('charge')); await wait(1100); sfx.charge(); sfx.beat(); shake(1.6); await wait(650); cells.forEach(d => d.classList.remove('charge')); holdOff();
+  ALL.forEach(([r, c]) => FX.act(at(r, c), (r + c) * 55, c)); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('maxwin');
   say('GRAND DRAGON KITE!', true); sfx.grand(); S.music.duck(.15, 3.5, 1.6); S.music.stinger('grand'); banner('GRAND DRAGON KITE', '+' + g.bonus + 'x BONUS', 3000, true);
   const dr = document.createElement('div'); dr.className = 'ctDragon'; dr.innerHTML = `<svg viewBox="0 0 128 128" width="330" height="330" style="overflow:visible"><use href="#s${GRAND}"/></svg>`; fxl().append(dr);
   dr.animate([{ transform: 'translate(155px,640px) scale(.5) rotate(-8deg)', opacity: 0 }, { transform: 'translate(155px,330px) scale(1) rotate(3deg)', opacity: 1, offset: .35 }, { transform: 'translate(155px,120px) scale(1.05) rotate(-3deg)', opacity: 1, offset: .75 }, { transform: 'translate(155px,-120px) scale(1.2) rotate(5deg)', opacity: 0 }], { duration: 3000 * T(), easing: 'ease-in-out', fill: 'both' });
@@ -320,7 +388,7 @@ async function grandKite(g, bump, ctx) {
   await wait(3200); dr.remove(); GRID.classList.remove('focus'); restCells(); setTimeout(() => ch.classList.remove('maxwin'), 800 * T());
 }
 async function bonusStep(sp, run0, ctx) {
-  const stake = ctx.stake, cap = MAXW * stake, lock = sp.kind === 'lock'; let run = run0;
+  curStake = ctx.stake; const stake = ctx.stake, cap = MAXW * stake, lock = sp.kind === 'lock'; let run = run0;
   const bump = d => setRun(run + d), setRun = v => { v = Math.min(cap, v); if (v !== run) { ctx.onWin(run, v); run = v; } };
   if (lock) { rushLeft = 3; resets = 0; board.clear(); setFs(3); say('THE TINS SHOW THEIR PRIZES', true); await wait(250); }
   else {
@@ -333,13 +401,14 @@ async function bonusStep(sp, run0, ctx) {
   tinsNow = board.size; S.music.intensity(Math.min(1, board.size / 17 + resets * .06));
   if (!sp.newTins.length) { sfx.empty(); say('NO NEW TIN. ' + cnt(sp.spinsLeft), true); await wait(380); }
   /* counter first, so a Kite Launch plays on the right number */
-  if (!lock && sp.reset) { resets++; rushLeft = 3; setFs(3, true); sfx.reset(); say('A NEW TIN! POURS RESET TO 3', true); await wait(520); }
+  if (!lock && sp.reset) { resets++; rushLeft = 3; sfx.reset(); say('A NEW TIN! POURS RESET TO 3', true); const nt = sp.newTins[sp.newTins.length - 1], fb = $('fsBox').getBoundingClientRect();
+    if (nt) fly(ctrG(nt.r, nt.c), toLocal(fb.left + fb.width / 2, fb.top + fb.height / 2), 'RESET', 0); await wait(380); setFs(3, true); pips(3, true); plaqueHit(); flash(.8); await wait(520); }
   else if (!lock) { rushLeft = sp.spinsLeft; setFs(rushLeft, true); }
   else { rushLeft = sp.spinsLeft; }
   for (const kl of sp.kite) { await kiteLaunch(kl, bump, ctx); S.music.intensity(Math.min(1, board.size / 17 + resets * .06 + .2)); }
   if (sp.grand) await grandKite(sp.grand, bump, ctx);
   setRun(run0 + sp.totalPayout * stake);
-  if (sp.spinsLeft === 0 && !sp.grand) { say('THE LAST POUR... ' + board.size + ' TINS IN THE DRAWERS', true); await wait(500); }
+  if (sp.spinsLeft === 0) { say('THE LAST POUR... ' + board.size + ' TINS IN THE DRAWERS', true); await wait(500); await endCard('tin', 'RUSH COMPLETE', board.size + ' TINS IN THE DRAWERS'); }
   else if (!sp.kite.length && sp.newTins.length && !lock) say(cnt(rushLeft), true);
   return run;
 }
@@ -370,7 +439,20 @@ function setupSplash(type, R) {
     $('introChips').insertAdjacentHTML('afterend', `<div class="preMap"><small>KOJI POURS ON FOUR DRAWERS</small><div>${Array.from({ length: ROWS * COLS }, (_, i) => `<i class="${pre.has(i) ? 'g' : ''}" style="--d:${300 + [...pre].indexOf(i) * 260}ms"></i>`).join('')}</div></div>`);
   }
 }
-function setupOutro() { /* outro dressing was done in setupSplash; nothing else to do here */ }
+function setupOutro() {   // a clean tally under the total (the shell counts the total up; the rows fade in one by one above it)
+  const old = $('ctTally'); if (old) old.remove();
+  const sp = (bonusR && bonusR.bonus && bonusR.bonus.spins) || []; if (!sp.length) return; const k = curStake, rows = [];
+  if (bType === 'tin') {
+    const total = sp.reduce((a, x) => a + (x.totalPayout || 0), 0), kites = sp.reduce((a, x) => a + (x.kite || []).reduce((b, y) => b + (y.gain || 0), 0), 0), grand = sp.reduce((a, x) => a + (x.grand ? x.grand.bonus : 0), 0), nK = sp.reduce((a, x) => a + (x.kite || []).length, 0);
+    rows.push([`${board.size} TINS IN THE DRAWERS`, fmt(Math.max(0, total - kites - grand) * k)]);
+    if (nK) rows.push([`${nK} KITE ${nK === 1 ? 'LAUNCH' : 'LAUNCHES'}`, '+' + fmt(kites * k)]);
+    if (grand) rows.push(['GRAND DRAGON KITE', '+' + fmt(grand * k)]);
+  } else {
+    const rt = sp.filter(x => x.retrigger).length, best = Math.max(0, ...sp.map(x => x.totalPayout || 0)), top = sp.reduce((a, x) => a + (x.levelUps || []).filter(u => u.popKite).length, 0);
+    rows.push([`${sp.length} SPINS POURED`, '']); if (rt) rows.push([`${rt} ${rt === 1 ? 'RETRIGGER' : 'RETRIGGERS'}`, '']); if (top) rows.push([`${top} DRAWERS FULLY STEEPED`, '']); rows.push(['BEST SPIN', fmt(best * k)]);
+  }
+  $('outroM').querySelector('.medalWrap').insertAdjacentHTML('afterend', `<div id="ctTally">${rows.map((r, i) => `<div style="--d:${400 + i * 330}ms"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>`);
+}
 function setLv(d, lv) {
   if (lv) d.dataset.lv = lv; else delete d.dataset.lv;
   let tg = d.querySelector('.tg');
@@ -406,24 +488,27 @@ function steepCell(u, gold) {
     setLv(d, u.to); const tg = d.querySelector('.tg'); if (tg) tg.animate([{ transform: 'scale(.2) rotate(-30deg)' }, { transform: 'scale(1.5) rotate(10deg)', offset: .4 }, { transform: 'scale(1) rotate(0)' }], { duration: 520 * T(), easing: 'cubic-bezier(.3,1.6,.5,1)' });
     const w = document.createElement('div'); w.className = 'ctWash' + (gold ? ' g' : ''); d.append(w); w.animate([{ opacity: .95, transform: 'scale(.2)' }, { opacity: .8, transform: 'scale(1.05)', offset: .45 }, { opacity: 0, transform: 'scale(1.1)' }], { duration: 900 * T(), easing: 'ease-out' }).finished.then(() => w.remove(), () => w.remove());
     d.animate([{ transform: 'none' }, { transform: 'scale(1.08,.94)', offset: .3 }, { transform: 'scale(.97,1.04)', offset: .62 }, { transform: 'none' }], { duration: 520 * T(), easing: 'ease-out' });
-    const [sx, sy] = scr(u.r, u.c); S.shards(sx, sy, 7, ['#fff6e2', '#f0d8a8', '#c98b4a', gold ? '#ffd23a' : '#e9c995'], { power: .45, edge: 'rgba(28,35,64,.5)' });
-    if (u.popKite) { sfx.kitePop(); S.music.stinger('steep'); skyKite(u.r, u.c, gold); S.shards(sx, sy, 12, ['#f2d23a', '#d9432e', '#fbf1dc'], { power: .8, edge: 'rgba(28,35,64,.6)' }); }
+    const [sx, sy] = scr(u.r, u.c); S.shards(sx, sy, lt(7 + u.to * 2), ['#fff6e2', '#f0d8a8', '#c98b4a', gold ? '#ffd23a' : '#e9c995'], { power: .45 + u.to * .08, edge: 'rgba(28,35,64,.5)' });
+    const wv = document.createElement('i'); wv.className = 'ctWave t' + Math.min(3, u.to) + (gold ? ' g' : ''); d.append(wv); wv.animate([{ transform: 'scale(.3)', opacity: .95 }, { transform: 'scale(1.7)', opacity: 0 }], { duration: 700 * T(), easing: 'ease-out' }).finished.then(() => wv.remove(), () => wv.remove());
+    const up = document.createElement('div'); up.className = 'ctUp' + (gold ? ' g' : ''); up.textContent = 'LEVEL ' + u.to + (fsBoost[u.to] ? '  +' + fsBoost[u.to] : ''); up.style.left = ctrG(u.r, u.c)[0] + 'px'; up.style.top = ctrG(u.r, u.c)[1] - 30 + 'px'; fxl().append(up);
+    up.animate([{ opacity: 0, transform: 'translate(-50%,0) scale(.4)' }, { opacity: 1, transform: 'translate(-50%,-14px) scale(1.15)', offset: .25 }, { opacity: 1, transform: 'translate(-50%,-30px) scale(1)', offset: .75 }, { opacity: 0, transform: 'translate(-50%,-52px) scale(1)' }], { duration: 1300 * T(), easing: 'ease-out' }).finished.then(() => up.remove(), () => up.remove());
+    if (u.popKite) { sfx.kitePop(); S.music.stinger('top'); flash(1.4); skyKite(u.r, u.c, gold); S.shards(sx, sy, 12, ['#f2d23a', '#d9432e', '#fbf1dc'], { power: .8, edge: 'rgba(28,35,64,.6)' }); }
   });
 }
 async function pourUps(sp) {
   const ups = sp.levelUps; if (!ups.length) return; const gold = bType === 'super';
-  say(ups.some(u => u.popKite) ? 'A DRAWER IS FULLY STEEPED! THE KITE FLIES' : 'KOJI POURS... THE DRAWERS STEEP DARKER', true); char('special', 900 * T()); sfx.pour();
+  say(ups.some(u => u.popKite) ? 'A DRAWER IS FULLY STEEPED! THE KITE FLIES' : `KOJI POURS... ${ups.length} ${ups.length === 1 ? 'DRAWER STEEPS' : 'DRAWERS STEEP'} DARKER`, true); char('special', 900 * T()); sfx.pour();
   ups.forEach((u, i) => after(i * 190, () => steepCell(u, gold && u.to >= fsMax - 1)));
   await wait(ups.length * 190 + 1250);
 }
 const sumLv = lv => lv.reduce((a, r) => a + r.reduce((x, y) => x + y, 0), 0);
 async function fsSpin(sp, run0, ctx) {
-  const stake = ctx.stake, sup = bType === 'super', dec = sp.spinsLeft - (sp.retrigger || 0); let run = run0;
+  curStake = ctx.stake; const stake = ctx.stake, sup = bType === 'super', dec = sp.spinsLeft - (sp.retrigger || 0); let run = run0;
   setFs(dec, true); char('spin', 950 * T()); say(sup ? 'SUPER STEEP...' : 'STEEPING...');
   paint(sp.landed); applyLevels(sp.levels); sfx.drop();
   const dt = dropReels(sp.landed); fsCellsOf(sp.landed).sort((a, b) => dt.times[a[0] * COLS + a[1]] - dt.times[b[0] * COLS + b[1]]).forEach(([r, c], i) => { const t = dt.times[r * COLS + c]; after(t, () => { sfx.drum(i); ring(at(r, c)); }); });
   if (dt.tease) after(Math.max(300, dt.end - 1500), () => { const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('tease'); });
-  await wait(dt.end + 260);
+  await wait(dt.end + 260); holdOff();
   if (dt.tease) { const ch = $('char'); ch.classList.add(sp.fsCount >= 3 ? 'exhale' : 'slump'); setTimeout(() => ch.classList.remove('tease', 'exhale', 'slump'), 750 * T()); }
   if (sp.bundle) await flipBundles(sp.bundle, sp.grid);
   if (sp.wins.length) run = await evalWins({ wins: sp.wins, payout: sp.totalPayout }, ctx, Math.min(run, MAXW * stake));
@@ -437,9 +522,9 @@ async function fsSpin(sp, run0, ctx) {
     banner(`+${sp.retrigger} SPINS!`, 'THE DRUMS BEAT AGAIN', 1900, true); say(`MORE DRUMS! +${sp.retrigger} SPINS`, true);
     await wait(700);
     const fb = $('fsBox').getBoundingClientRect(), to = toLocal(fb.left + fb.width / 2, fb.top + fb.height / 2), from = ctrG(...cellsF[0]);
-    await fly(from, to, '+' + sp.retrigger, 0); setFs(sp.spinsLeft, true); sfx.reset(); await wait(500); restCells();
+    await fly(from, to, '+' + sp.retrigger, 0); setFs(sp.spinsLeft, true); sfx.reset(); plaqueHit(); await wait(500); restCells();
   }
-  if (sp.spinsLeft === 0) { say('THE LAST CUP IS POURED', true); await wait(420); }
+  if (sp.spinsLeft === 0) { say('THE LAST CUP IS POURED', true); await wait(420); await endCard(bType, sup ? 'SUPER STEEP COMPLETE' : 'STEEPING COMPLETE', `${sp.spinIndex} SPINS POURED`); }
   return run;
 }
 
@@ -507,8 +592,8 @@ return {
         shaku(N(7), t + .02, 1.1, .11); osc('triangle', 330, t + .5, .5, .13, .002, 300); koto(N(3), t + .5, .12, .8); osc('sawtooth', 110, t + .5, .2, .03, .002, 140);
         taiko(t + .58, 1.3, 105); noise(t + .58, .5, .12, 'lowpass', 700, 150); [0, 1, 2, 3, 4].forEach(i => osc('sine', 1500 + i * 180, t + .8 + i * .175, .08, .03, .002)); },
       grand: () => { const t = T0(); bell(147, t, 1.5, 3.2); for (let i = 0; i < 10; i++) taiko(t + .35 + i * (.28 - i * .012), .6 + i * .05, 110); for (let i = 0; i < 14; i++) koto(N(i % 11) * (i > 10 ? 2 : 1), t + .5 + i * .06, .07, 1.4); shaku(N(7), t + 1, 2.2, .1); noise(t + 1.8, 1.4, .12, 'bandpass', 500, 4000, 1, .6); },
-      bonus: () => { const t = T0(); bell(220, t, 1.2, 2.4); taiko(t + .1, 1.2, 100); taiko(t + .5, 1, 100); for (let i = 0; i < 8; i++) koto(N(i), t + .7 + i * .08, .08, 1.2); shaku(N(7), t + 1.2, 1.8, .08); },
-      outro: () => { const t = T0(); [7, 5, 3, 0].forEach((n, i) => koto(N(n), t + i * .2, .08, 1.4)); bell(N(0) / 2, t + .7, 1, 2.4); noise(t + .9, .8, .05, 'bandpass', 800, 300, 1, .3); },
+      bonus: () => { const t = T0(); if (bType === 'fs') { for (let i = 0; i < 5; i++) taiko(t + i * .1, .8 + i * .1, 100 + i * 14); [0, 2, 4, 6, 8].forEach((n, i) => koto(N(n + 3), t + .4 + i * .08, .08, 1.2)); shaku(N(4), t + .6, 1.6, .08); return; } if (bType === 'super') { bell(147, t, 1.5, 3.4); for (let i = 0; i < 8; i++) taiko(t + i * .08, .7 + i * .06, 96 + i * 10); for (let i = 0; i < 14; i++) koto(N(i + 2), t + .5 + i * .06, .07, 1.5); shaku(N(7), t + .8, 2.2, .1); return; } bell(220, t, 1.2, 2.4); taiko(t + .1, 1.2, 100); taiko(t + .5, 1, 100); for (let i = 0; i < 8; i++) koto(N(i), t + .7 + i * .08, .08, 1.2); shaku(N(7), t + 1.2, 1.8, .08); },
+      outro: () => { const t = T0(); if (bType === 'super') { [9, 7, 5, 3, 0].forEach((n, i) => koto(N(n), t + i * .18, .09, 1.8)); bell(N(0) / 2, t + .6, 1.2, 3.2); metal(N(4), t + .9, 2.4, .08, [1, 2.4]); return; } [7, 5, 3, 0].forEach((n, i) => koto(N(n), t + i * .2, .08, 1.4)); bell(N(0) / 2, t + .7, 1, 2.4); noise(t + .9, .8, .05, 'bandpass', 800, 300, 1, .3); },
       big: lv => { const t = T0(); for (let i = 0; i < lv + 1; i++) bell(N(2 + i * 2) / 2, t + i * .26, .9, 1.6);
         for (let i = 0; i < 4 + lv * 3; i++) taiko(t + .1 + i * Math.max(.07, .22 - i * .01), .5 + i * .04, 120); shaku(N(7), t + .2, 1.5, .1);
         [0, 2, 4, 6, 8, 10].slice(0, 3 + lv).forEach((n, i) => koto(N(n), t + .3 + i * .1, .07, 1.2)); },
@@ -522,6 +607,23 @@ return {
       /* x(1+boost) chip pops at the end of the string */
       xchip: b => { const t = T0(); metal(N(4 + Math.min(8, b)) , t, .6, .12, [1, 2.76]); tok(t, 1500, .08); },
       retrig: () => { const t = T0(); for (let i = 0; i < 6; i++) taiko(t + i * .09, .45 + i * .08, 100 + i * 10); [0, 2, 4, 5, 7, 9, 11].forEach((n, i) => koto(N(n + 2), t + .3 + i * .06, .08, 1.1)); bell(N(5), t + .35, 1, 2); },
+      /* kai: bonus trigger build-up (a rising wind + a bell that climbs; the drums version beats faster, the super version adds a gold shimmer) */
+      antRise: type => { const t = T0(), n = type === 'super' ? 9 : 7; noise(t, 1.7, .15, 'bandpass', 260, 4600, 1.6, .9);
+        for (let i = 0; i < n; i++) bell(N(i * (type === 'tin' ? 2 : 1) + 1) / 2, t + .15 + i * (type === 'super' ? .17 : .2), .5 + i * .06, .9);
+        if (type !== 'tin') for (let i = 0; i < 6; i++) taiko(t + i * (.32 - i * .03), .35 + i * .1, 92 + i * 6); else for (let i = 0; i < 4; i++) taiko(t + .2 + i * .36, .5 + i * .12, 100);
+        if (type === 'super') for (let i = 0; i < 12; i++) osc('sine', 1800 + i * 170, t + .3 + i * .1, .12, .025, .003); },
+      hold: () => { const t = T0(); noise(t, 1.4, .1, 'bandpass', 300, 2600, 1.4, .7); taiko(t + .1, .45, 84); taiko(t + .48, .38, 84); taiko(t + .9, .5, 84); },
+      titleHit: (type, end) => { const t = T0();
+        if (end) { [3, 2, 0].forEach((d, i) => koto(N(d + 2), t + i * .16, .08, 1.3)); bell(N(0) / 2, t + .3, .8, 2); return; }
+        taiko(t, 1.4, 96); bell(N(2) / 2, t, 1.3, 2.6);
+        if (type === 'tin') { for (let i = 0; i < 7; i++) koto(N(i), t + .1 + i * .06, .08, 1); noise(t, .6, .1, 'bandpass', 800, 3600, 1.2, .1); }
+        else if (type === 'fs') { for (let i = 0; i < 4; i++) taiko(t + .12 + i * .1, .9 + i * .1, 110 + i * 16); [0, 2, 4].forEach((d, i) => koto(N(d + 4), t + .25 + i * .08, .08, 1.2)); shaku(N(4), t + .2, 1.2, .07); }
+        else { for (let i = 0; i < 6; i++) taiko(t + .08 + i * .08, .7 + i * .1, 100 + i * 14); [0, 2, 3, 4, 6, 8, 9, 11].forEach((d, i) => koto(N(d + 3), t + .2 + i * .06, .08, 1.6)); bell(N(4), t + .15, 1.2, 3); bell(N(7) / 2, t + .3, 1, 3); shaku(N(7), t + .3, 2, .09);
+          for (let i = 0; i < 10; i++) osc('sine', 2000 + i * 240, t + .4 + i * .07, .1, .03, .003); } },
+      tinPop: tier => { const t = T0(); if (tier === 0) { osc('sine', 900, t, .07, .05, .002, 1500); return; }
+        metal(N(5 + tier * 2), t, .5 + tier * .2, .08 + tier * .03, [1, 2.76]); osc('sine', 700 + tier * 300, t, .1, .06 + tier * .02, .002, 1700);
+        if (tier >= 2) { for (let i = 0; i < 4; i++) koto(N(4 + i * 2 + tier), t + .05 + i * .05, .05 + tier * .01, .8); } if (tier >= 3) { taiko(t, .9, 100); bell(N(3) / 2, t, 1, 1.8); } },
+      charge: () => { const t = T0(); noise(t, .85, .13, 'bandpass', 400, 5200, 2, .5); osc('sawtooth', 110, t, .8, .04, .4, 330); for (let i = 0; i < 6; i++) osc('sine', 700 + i * 210, t + i * .12, .1, .035, .003); taiko(t + .35, .5, 90); taiko(t + .7, .6, 90); },
       tick: k => { const t = T0(); osc('triangle', 650 + k * 900, t, .05, .1, .001); tok(t, 1200 + k * 600, .06); },
       feverOn: () => { const t = T0(); koto(N(4), t, .08, .6); }
     };
@@ -540,24 +642,30 @@ return {
     for (let i = 0; i < ROWS * COLS; i++) { const d = document.createElement('div'); d.className = 'cell'; $('grid').append(d); cells.push(d); }
     $('fxl').insertAdjacentHTML('beforeend', '<div id="ctBanner"><b></b><small></small></div>');
     { const sky = document.createElement('div'); sky.id = 'ctKites'; let top = $('scene'); while (top.parentElement && top.parentElement.id !== 'stage') top = top.parentElement; top.after(sky); }   // between the scene and the frame/Koji
+    { const host = $('fsBox').parentElement; host.insertAdjacentHTML('beforeend', '<div id="ctRules" hidden></div><div id="ctTitle" hidden><i class="tcR"></i><div class="tcB"><b></b><small class="tcS"></small></div></div><div id="ctWipe" hidden></div>');
+      $('fsBox').insertAdjacentHTML('beforeend', '<span id="ctPips"><i></i><i></i><i></i></span>');
+      const v = document.createElement('div'); v.id = 'ctVeil'; $('ctKites').after(v); }
     buildPaytable();
   },
   paintIdle() { paint([[1, 0, 3, 6, 2], [4, 7, 0, 5, 1], [2, 6, 8, 0, 3], [5, 1, 4, 7, 0]]); dropAll(); },
   splashArt: () => splashSvg(false),
-  roundStart() { document.querySelectorAll('#gates .gate').forEach(g => g.classList.remove('on', 'launch')); board.clear(); bType = null; $('ctKites').replaceChildren(); skyN = 0; },
+  roundStart() { document.querySelectorAll('#gates .gate').forEach(g => g.classList.remove('on', 'launch', 'charge')); holdOff(); board.clear(); bType = null; $('ctKites').replaceChildren(); skyN = 0; },
   clearBoard: async () => { if (inBonus && bType === 'tin') { if (!bonusOpened) { bonusOpened = true; await bonusOpen(); } else await wait(40); return; } await dropOut(); },
   restoreBoard() { if (lastGrid) paint(lastGrid); },
   baseSpin: R => ({ initialGrid: R.initialGrid, step: R.cascadeSteps[0] || null, tins: R.tins, bought: R.bought }),
   playSpin,
   showTrigger,
   bonusMode(on) {
-    inBonus = on; bonusOpened = false; $('scene').classList.toggle('dusk', on); $('scene').classList.toggle('sup', on && bType === 'super'); $('ctKites').classList.toggle('sup', on && bType === 'super'); $('grid').classList.toggle('steepG', on && bType !== 'tin'); $('grid').classList.toggle('supG', on && bType === 'super');
+    inBonus = on; bonusOpened = false; $('scene').classList.toggle('dusk', on); $('scene').classList.toggle('sup', on && bType === 'super'); $('ctKites').classList.toggle('sup', on && bType === 'super'); $('grid').classList.toggle('steepG', on && bType !== 'tin'); $('grid').classList.toggle('supG', on && bType === 'super'); $('grid').classList.toggle('tinG', on && bType === 'tin');
+    document.body.classList.remove('ctTin', 'ctFs', 'ctSup'); holdOff();
     if (on) {
+      document.body.classList.add(BCLS[bType] || 'ctTin'); setEnv(bType); wipe(bType); curStake = curStake || 1;
       char('bonus', 1400 * T()); document.querySelector('#fsBox small').textContent = bType === 'tin' ? S.cfg.fsLabel : 'SPINS LEFT';
-      if (bType === 'tin') { S.music.intensity(.12); setFs(3); }
+      if (bType === 'tin') { S.music.intensity(.12); setFs(3); pips(3, true); }
       else { const B = bonusR.bonus; fsBoost = B.boost; fsMax = B.maxLevel; fsLv = null; setFs(B.startSpins); S.music.intensity(bType === 'super' ? .3 : .08); cells.forEach(d => { d.classList.remove('scat'); }); }
+      setRules(bType);
     } else {
-      S.music.intensity(0); applyLevels(null); setupOutro();
+      setEnv(null); setRules(null); $('fsBox').classList.remove('low'); S.music.intensity(0); applyLevels(null); setupOutro();
       const sk = $('ctKites'); if (sk.children.length) sk.animate([{ opacity: 1 }, { opacity: 1, offset: .6 }, { opacity: 0 }], { duration: 3200 * T(), fill: 'forwards' }).finished.then(() => { sk.replaceChildren(); sk.getAnimations().forEach(a => a.cancel()); }, () => {});
     }
   }
