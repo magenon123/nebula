@@ -445,7 +445,7 @@ async function go(buy) {
     $('win').textContent = fmt(j.payout); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user);
     out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
     out.tier = early ? await early : await bigWin(R.totalPayout, j.payout);
-  } catch (e) { say(e.message); out.err = true; }
+  } catch (e) { if (/^(Type|Reference|Range|Syntax)Error$/.test(e && e.name)) { try { console.error(e); } catch {} say('Something went wrong. Please try again.'); } else say(e.message); out.err = true; }   // never show raw JS errors to the player
   clearTimeout(wd); boost = false; setBusy(false); refreshUi(); return out;
 }
 
