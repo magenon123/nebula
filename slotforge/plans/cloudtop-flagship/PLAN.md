@@ -39,12 +39,12 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 - [x] 2.3 maya: Nebula Studios logo (SVG) + themed loading + features screens (cfg in slot.json, `studio`).
 - [x] 2.4 lead (260d13d): shell opt-in `cfg.studio` (loading footer, info credits line); no change for games without it.
 ### Stage 3: bonuses
-- [~] 3.1 maya+kai (kai client part DONE, env layer = maya): Tin Rush identity (environment layer, tin-well cells, trigger sequence, counter plaque, rules strip).
+- [x] 3.1 maya+kai (kai client part done; env layer = maya): Tin Rush identity (environment layer, tin-well cells, trigger sequence, counter plaque, rules strip).
 - [x] 3.2 kai: Free Spins identity (environment, transition in/out, counter/multiplier readability).
 - [x] 3.3 kai: Super Free Spins identity (distinct from FS).
 ### Stage 4: animation, audio, mobile, branding
-- [ ] 4.1 kai: win presentation scaling + anticipation polish.
-- [ ] 4.2 kai: audio distinct per bonus (slot-music.js usage via slot.js only).
+- [x] 4.1 kai: win presentation scaling + anticipation polish.
+- [x] 4.2 kai: audio distinct per bonus (slot-music.js usage via slot.js only).
 - [ ] 4.3 rin: mobile portrait/landscape + perf review; fix list to owners.
 - [ ] 4.4 maya: branding in info/credits + splash corner.
 ### Stage 5: regression + final review
@@ -52,8 +52,9 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 - [ ] 5.2 lead: final quality review, STATUS.md, deliver file to owner, list remaining defects.
 
 ## Log (newest first; add a line per finished item with commit hash)
-- 3.2/3.3 done (HASH32): FS + Super: trigger sequence (drums beat, veil, riser) + title cards (indigo/gold FS, gold-ray Super), curtain wipe in, end cards out ('STEEPING COMPLETE'), plaque in tag colour, rules plaque + drawer boost legend, LEVEL +N callouts + ring waves on level-up, plaque bump on retrigger, outro stats tally, dataset.bonus='fs'|'super'.
-- 3.1 kai part done (HASH31): Tin Rush trigger (veil, rising bells, pulse, TIN RUSH title card), tin-lid wells + warm locked glow + pours plaque with pips + rules strip (kai.css), reset fly-to-plaque, per-value landing wave/sparkle/sfx, Kite/Grand charge-up anticipation, RUSH COMPLETE end card, outro tally rows, dataset.bonus + --envPulse on #bonusEnv. NOTE: slot.css carries the spliced kai.css below /* KAI */ (leo's file, not committed by kai).
+- 4.1/4.2 done (9068cce): win size classes (tag, sparkle, Koji+coins), tease hold veil + riser, per-bonus trigger/bonus/outro sfx + stingers (trig, end, bigtin, launch, top), tin/FS/Super music already distinct (128/112/142 bpm).
+- 3.2/3.3 done (9f32d6b): FS + Super: trigger sequence (drums beat, veil, riser) + title cards (indigo/gold FS, gold-ray Super), curtain wipe in, end cards out ('STEEPING COMPLETE'), plaque in tag colour, rules plaque + drawer boost legend, LEVEL +N callouts + ring waves on level-up, plaque bump on retrigger, outro stats tally, dataset.bonus='fs'|'super'.
+- 3.1 kai part done (ee10058): Tin Rush trigger (veil, rising bells, pulse, TIN RUSH title card), tin-lid wells + warm locked glow + pours plaque with pips + rules strip (kai.css), reset fly-to-plaque, per-value landing wave/sparkle/sfx, Kite/Grand charge-up anticipation, RUSH COMPLETE end card, outro tally rows, dataset.bonus + --envPulse on #bonusEnv. NOTE: slot.css carries the spliced kai.css below /* KAI */ (leo's file, not committed by kai).
 - bonus-env.html done (maya) f3b2f08: #bonusEnv[data-bonus=tin|fs|super] layers, --envPulse, lite/reduced-motion off; checked 1600x900 + 390x844.
 - 2.2 done (leo): symbol finish in art/lib.cjs shape(): 3-step cel shading + reflected light + auto rim highlight + specular on spheres, stronger shade contrast; symbols.svg regenerated (build.cjs then wobble.cjs symbols.svg; ids/viewBox/win hooks untouched). Restore character.html with git if build.cjs rewrites it raw.
 - 2.1 done (leo): scene far ridge+haze, warm board pool, vignette, tansu depth shadows, eave lamp halos, board inner shadow/warm light, CSS petals (body.lite off), bottom-left props tidied, tile plate finish. Generator: art/light.cjs (run AFTER wobble.cjs). Rebuild/ordering note in slot.css ART-LIGHT block.
