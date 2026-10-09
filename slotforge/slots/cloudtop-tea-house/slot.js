@@ -449,7 +449,7 @@ function setupOutro() {   // a clean tally under the total (the shell counts the
     if (grand) rows.push(['GRAND DRAGON KITE', '+' + fmt(grand * k)]);
   } else {
     const rt = sp.filter(x => x.retrigger).length, best = Math.max(0, ...sp.map(x => x.totalPayout || 0)), top = sp.reduce((a, x) => a + (x.levelUps || []).filter(u => u.popKite).length, 0);
-    rows.push([`${sp.length} SPINS POURED`, '']); if (rt) rows.push([`${rt} ${rt === 1 ? 'RETRIGGER' : 'RETRIGGERS'}`, '']); if (top) rows.push([`${top} DRAWERS FULLY STEEPED`, '']); rows.push(['BEST SPIN', fmt(best * k)]);
+    rows.push([`${sp.length} SPINS POURED` + (rt ? ` (${rt} RETRIGGER${rt === 1 ? '' : 'S'})` : ''), '']); if (top) rows.push([`${top} DRAWERS FULLY STEEPED`, '']); rows.push(['BEST SPIN', fmt(best * k)]);
   }
   $('outroM').querySelector('.medalWrap').insertAdjacentHTML('afterend', `<div id="ctTally">${rows.map((r, i) => `<div style="--d:${400 + i * 330}ms"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>`);
 }
@@ -490,7 +490,7 @@ function steepCell(u, gold) {
     d.animate([{ transform: 'none' }, { transform: 'scale(1.08,.94)', offset: .3 }, { transform: 'scale(.97,1.04)', offset: .62 }, { transform: 'none' }], { duration: 520 * T(), easing: 'ease-out' });
     const [sx, sy] = scr(u.r, u.c); S.shards(sx, sy, lt(7 + u.to * 2), ['#fff6e2', '#f0d8a8', '#c98b4a', gold ? '#ffd23a' : '#e9c995'], { power: .45 + u.to * .08, edge: 'rgba(28,35,64,.5)' });
     const wv = document.createElement('i'); wv.className = 'ctWave t' + Math.min(3, u.to) + (gold ? ' g' : ''); d.append(wv); wv.animate([{ transform: 'scale(.3)', opacity: .95 }, { transform: 'scale(1.7)', opacity: 0 }], { duration: 700 * T(), easing: 'ease-out' }).finished.then(() => wv.remove(), () => wv.remove());
-    const up = document.createElement('div'); up.className = 'ctUp' + (gold ? ' g' : ''); up.textContent = 'LEVEL ' + u.to + (fsBoost[u.to] ? '  +' + fsBoost[u.to] : ''); up.style.left = ctrG(u.r, u.c)[0] + 'px'; up.style.top = ctrG(u.r, u.c)[1] - 30 + 'px'; fxl().append(up);
+    const up = document.createElement('div'); up.className = 'ctUp' + (gold ? ' g' : ''); up.textContent = 'LEVEL ' + u.to + (fsBoost[u.to] ? '  +' + fsBoost[u.to] : ''); up.style.left = Math.min(CW * 4.1, Math.max(CW * .9, ctrG(u.r, u.c)[0])) + 'px'; up.style.top = ctrG(u.r, u.c)[1] - 30 + 'px'; fxl().append(up);
     up.animate([{ opacity: 0, transform: 'translate(-50%,0) scale(.4)' }, { opacity: 1, transform: 'translate(-50%,-14px) scale(1.15)', offset: .25 }, { opacity: 1, transform: 'translate(-50%,-30px) scale(1)', offset: .75 }, { opacity: 0, transform: 'translate(-50%,-52px) scale(1)' }], { duration: 1300 * T(), easing: 'ease-out' }).finished.then(() => up.remove(), () => up.remove());
     if (u.popKite) { sfx.kitePop(); S.music.stinger('top'); flash(1.4); skyKite(u.r, u.c, gold); S.shards(sx, sy, 12, ['#f2d23a', '#d9432e', '#fbf1dc'], { power: .8, edge: 'rgba(28,35,64,.6)' }); }
   });
