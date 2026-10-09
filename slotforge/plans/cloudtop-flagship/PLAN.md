@@ -36,7 +36,7 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 ### Stage 2: core visuals + UI
 - [ ] 2.1 leo: base scene lighting/depth pass (scene, frame glow, petals/steam), keep stage geometry (ART-NOTES.md).
 - [ ] 2.2 leo: symbol finish pass (clear silhouettes, consistent shading) without changing ids/roles.
-- [ ] 2.3 maya: Nebula Studios logo (SVG) + themed loading + features screens (cfg in slot.json, `studio`).
+- [x] 2.3 maya: Nebula Studios logo (SVG) + themed loading + features screens (cfg in slot.json, `studio`).
 - [x] 2.4 lead (260d13d): shell opt-in `cfg.studio` (loading footer, info credits line); no change for games without it.
 ### Stage 3: bonuses
 - [ ] 3.1 maya+kai: Tin Rush identity (environment layer, tin-well cells, trigger sequence, counter plaque, rules strip).
@@ -52,5 +52,6 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 - [ ] 5.2 lead: final quality review, STATUS.md, deliver file to owner, list remaining defects.
 
 ## Log (newest first; add a line per finished item with commit hash)
+- 2.3 done (maya): brand/ kit (nebula-studios.svg, nebula-mark.svg, loading-art.html, loading.css, README.md) + slot.json `studio`; loading+features themed, checked at 1600x900 and 390x844 via ?load=1. Gap: portrait crops lantern/cup art (slice).
 - 2.4 done 260d13d: shell opt-in studio hook (brand/ folder -> SF_BRAND, #lmArt, .lmStudio). Agents share one working tree: commit only own files, no pull --rebase, never commit built html.
 - (start) plan written; known-good = d99fe90.

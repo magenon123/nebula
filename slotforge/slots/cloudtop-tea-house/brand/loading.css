@@ -1,0 +1,55 @@
+/* Cloudtop Tea House: loading + features screens (Nebula Studios brand kit). Appended after the shell css by build-standalone.py.
+   Markup it styles (all created by the shell): #loadM.branded > #lmArt (brand/loading-art.html), .lmLogo, .lmVol, .lmCards>.lmCard, .lmBar, .lmTxt, .lmTap, .lmWarn, .lmStudio(span + .lmStudioLogo svg). #loadM.ready = features phase. */
+#loadM.branded,#loadM.branded.ready{background:#0c0d2e;gap:2.4vh}
+#loadM.branded #lmArt svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* soft dawn scrim behind the centre column so the logo / text stay readable over the art */
+#loadM.branded #lmArt::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 48% 56% at 50% 46%,rgba(12,10,40,.5),rgba(12,10,40,0) 100%)}
+#loadM.branded .lmWarn{position:absolute;bottom:13vh;color:#ffe3c0}
+/* loading phase */
+#loadM.branded .lmLogo{filter:drop-shadow(0 6px 0 rgba(28,18,48,.55)) drop-shadow(0 0 28px rgba(255,200,130,.55))}
+#loadM.branded .lmBar{border-color:#2a1830;background:rgba(28,18,48,.65);box-shadow:inset 0 3px 6px rgba(0,0,0,.55),0 0 0 2px #f2c96b}
+#loadM.branded .lmBar i{background:linear-gradient(90deg,#f59db8,#ffd27a)}
+#loadM.branded .lmTxt{color:#ffe6b8;text-shadow:2px 3px 0 #2a1830}
+/* features phase: paper cards in a cedar frame */
+#loadM.branded .lmVol{background:linear-gradient(#7a4a2e,#4a2a18);color:#fbf1dc;border-color:#2a1830;box-shadow:0 5px 0 rgba(28,18,48,.5),inset 0 0 0 2px #d4ae52}
+#loadM.branded .lmVol b i{background:#f2c96b}
+#loadM.branded .lmCard{position:relative;border:5px solid #2a1830;border-radius:10px;color:#2a1830;
+  background:radial-gradient(ellipse at 30% 0,rgba(255,255,255,.7),transparent 60%),repeating-linear-gradient(90deg,rgba(122,74,46,.05) 0 2px,transparent 2px 7px),linear-gradient(180deg,#fbf1dc,#ecd7ac);
+  box-shadow:inset 0 0 0 3px #d4ae52,inset 0 0 0 5px #7a4a2e,0 12px 0 rgba(28,18,48,.5),0 18px 34px rgba(12,10,40,.5);transform:rotate(-.7deg)}
+#loadM.branded .lmCard:nth-child(even){transform:rotate(.8deg)}
+#loadM.branded .lmCard::before{content:"";position:absolute;left:50%;top:-16px;width:46px;height:20px;margin-left:-23px;border-radius:3px;background:linear-gradient(#f59db8,#d9658a);border:3px solid #2a1830;opacity:.95;transform:rotate(-3deg)}
+#loadM.branded .lmCard h3{color:#b4402c;text-shadow:none;letter-spacing:2px}
+#loadM.branded .lmCard p{color:#3a2216;text-shadow:none}
+#loadM.branded .lmIco svg{filter:drop-shadow(0 4px 0 rgba(28,18,48,.3))}
+#loadM.branded .lmBig{color:#d9432e;-webkit-text-stroke:5px #2a1830;text-shadow:0 5px 0 #2a1830}
+#loadM.branded .lmTap{color:#fff3c8;text-shadow:3px 4px 0 #2a1830,0 0 22px #f59db8}
+/* studio line: subtle 'presented by' above the mark; brighter + a hairline rule in the features footer */
+#loadM.branded .lmStudio{gap:6px;color:#ffeccb;text-shadow:0 1px 3px rgba(12,10,40,.8);letter-spacing:5px;font-size:clamp(10px,1.1vw,13px)}
+#loadM.branded .lmStudio::before{content:"";width:min(220px,40vw);height:1px;background:linear-gradient(90deg,transparent,rgba(242,201,107,.7),transparent);margin-bottom:2px}
+#loadM.branded .lmStudioLogo{opacity:.92;filter:drop-shadow(0 2px 6px rgba(12,10,40,.7))}
+#loadM.branded.ready .lmStudio{color:#fff3dc}
+/* art motion: light, CSS only */
+#teaArt .tw{animation:tTw 3.4s ease-in-out infinite}#teaArt .tw2{animation-delay:-1.1s;animation-duration:4.4s}#teaArt .tw3{animation-delay:-2.3s;animation-duration:2.8s}
+@keyframes tTw{50%{opacity:.15}}
+#teaArt .tl-sw{animation:tSw 5s ease-in-out infinite alternate}#teaArt .tl-sw.l2{animation-duration:6.2s;animation-delay:-1.8s}#teaArt .tl-sw.l3{animation-duration:4.4s;animation-delay:-3s}
+@keyframes tSw{from{transform:rotate(-2.2deg)}to{transform:rotate(2.2deg)}}
+#teaArt .tl-glow{animation:tGl 3s ease-in-out infinite alternate}@keyframes tGl{from{opacity:.14}to{opacity:.34}}
+#teaArt .tl-kite{animation:tKite 7s ease-in-out infinite alternate}#teaArt .tl-kite.k2{animation-duration:8.5s;animation-delay:-2s}#teaArt .tl-kite.k3{animation-duration:6s;animation-delay:-4s}#teaArt .tl-kite.k4{animation-duration:9s;animation-delay:-5s}
+@keyframes tKite{from{transform:translate(-10px,6px) rotate(-3deg)}to{transform:translate(12px,-10px) rotate(3deg)}}
+#teaArt .tl-steam{stroke-dasharray:300;animation:tSt 4.2s ease-out infinite}
+@keyframes tSt{0%{opacity:0;stroke-dashoffset:300;transform:translateY(0)}25%{opacity:.5}100%{opacity:0;stroke-dashoffset:0;transform:translateY(-34px)}}
+#teaArt .tl-c1{animation:tCl 60s linear infinite alternate}#teaArt .tl-c2{animation:tCl 38s ease-in-out infinite alternate-reverse}
+@keyframes tCl{from{transform:translateX(-26px)}to{transform:translateX(26px)}}
+@media (prefers-reduced-motion:reduce){#teaArt *{animation:none!important}}
+/* portrait phones: compact horizontal cards (icon left, text right) so three fit above the studio footer */
+@media (max-aspect-ratio:1/1){
+ #loadM.branded{gap:1.4vh;padding-bottom:84px}
+ #loadM.branded .lmLogo{width:min(80vw,460px)}#loadM.ready.branded .lmLogo{width:min(56vw,300px)}
+ #loadM.branded .lmCards{max-width:94vw;gap:14px;flex-direction:column;align-items:center}
+ #loadM.branded .lmCard{width:min(90vw,380px);display:grid;grid-template-columns:78px 1fr;grid-template-rows:auto 1fr;column-gap:12px;text-align:left;padding:10px 12px;transform:none!important}
+ #loadM.branded .lmCard .lmIco{grid-row:1/3;height:auto;margin:0;align-self:center}
+ #loadM.branded .lmIco svg{height:64px}#loadM.branded .lmBig{font-size:21px;-webkit-text-stroke:2.5px #2a1830}
+ #loadM.branded .lmCard h3{margin:0 0 3px;font-size:17px}#loadM.branded .lmCard p{font-size:11.5px;line-height:1.3}
+ #loadM.branded .lmCard::before{width:34px;height:14px;top:-11px;left:22px;margin-left:0}
+ #loadM.branded .lmTap{font-size:22px}
+}
