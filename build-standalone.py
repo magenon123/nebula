@@ -91,7 +91,7 @@ def assemble(slug, standalone):
         'TITLE': title, 'INFO_TITLE': cfg['infoTitle'],
         'SHELL_CSS': read(SF, 'shell', 'slot-shell.css'), 'SLOT_CSS': slot_css,
         'SHELL_DEFS': read(SF, 'shell', 'shell-defs.svg'), 'SYMBOLS': read(sd, 'symbols.svg'),
-        'SCENE': read(sd, 'scene.html'), 'LOGO': read(sd, 'logo.html'), 'FRAME': read(sd, 'frame.html'),
+        'SCENE': read(sd, 'scene.html') + (read(sd, 'bonus-env.html') if os.path.exists(os.path.join(sd, 'bonus-env.html')) else ''), 'LOGO': read(sd, 'logo.html'), 'FRAME': read(sd, 'frame.html'),
         'CHARACTER': read(sd, 'character.html'), 'SIDE': read(sd, 'side.html') + (read(sd, 'sweep.html') if os.path.exists(os.path.join(sd, 'sweep.html')) else '') + (read(sd, 'flare.html') if os.path.exists(os.path.join(sd, 'flare.html')) else '') + (read(sd, 'astro.html') if os.path.exists(os.path.join(sd, 'astro.html')) else ''), 'INFO': info,
         'SCRIPTS': scripts.replace('</script', '<\\/script'),
     }
