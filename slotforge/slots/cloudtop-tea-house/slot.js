@@ -219,7 +219,7 @@ function setRules(type) {
   const r = $('ctRules'); if (!r) return; if (!type) { r.hidden = true; return; }
   const F = FSI[type] || {}, rt = F.retrigger || {}, k3 = Object.keys(rt)[0];
   const drums = k3 ? `${k3} DRUMS: +${rt[k3]} SPINS` : 'DRUMS: MORE SPINS';   // [full line, short line for a portrait phone (same meaning, bigger type)]
-  const items = type === 'tin' ? [['TINS LOCK IN PLACE', 'TINS STAY LOCKED'], ['NEW TIN: POURS RESET TO 3', 'NEW TIN: POURS BACK TO 3'], ['FULL ROW: KITE LAUNCH x2', 'FULL ROW: KITE x2'], ['ALL 20: GRAND DRAGON KITE', 'ALL 20: GRAND KITE']]
+  const items = type === 'tin' ? [['TINS LOCK IN PLACE', 'TINS STAY LOCKED'], ['NEW TIN: POURS RESET TO 3', 'NEW TIN: POURS TO 3'], ['FULL ROW: KITE LAUNCH x2', 'FULL ROW: KITE x2'], ['ALL 20: GRAND DRAGON KITE', 'ALL 20: GRAND KITE']]
     : type === 'fs' ? [['WINNING DRAWERS STEEP DARKER', 'WINS STEEP DRAWERS'], ['STEEPED DRAWERS BOOST LINES', 'STEEPED DRAWERS BOOST'], [drums, drums]]
     : [['SOME DRAWERS START STEEPED', 'SOME START STEEPED'], ['GOLD DRAWERS PAY THE MOST', 'GOLD PAYS THE MOST'], [drums, drums]];
   const leg = type === 'tin' ? '' : `<div class="lg"><span>DRAWER BOOST</span>${(fsBoost || []).map((b, i) => i ? `<i class="l${i}${i === fsMax && type === 'super' ? ' gd' : ''}">+${b}</i>` : '').join('')}</div>`;
