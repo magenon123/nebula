@@ -46,12 +46,13 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 - [x] 4.1 kai: win presentation scaling + anticipation polish.
 - [x] 4.2 kai: audio distinct per bonus (slot-music.js usage via slot.js only).
 - [ ] 4.3 rin: mobile portrait/landscape + perf review; fix list to owners.
-- [ ] 4.4 maya: branding in info/credits + splash corner.
+- [x] 4.4 maya: branding in info/credits + splash corner.
 ### Stage 5: regression + final review
 - [ ] 5.1 rin/lead: unit tests, smoke-cloudtop, bets/payouts/balance/bonus completion/autoplay/console errors, screenshots desktop + phone.
 - [ ] 5.2 lead: final quality review, STATUS.md, deliver file to owner, list remaining defects.
 
 ## Log (newest first; add a line per finished item with commit hash)
+- 4.4 done (maya): info.html CREDITS block (Nebula mark + game name + "Developed by Nebula Studios" + v1.0, inline-styled, placeholders untouched). Splash corner mark SKIPPED on purpose: splash.html is only a doc comment, the bonus-intro art is kojiSplash in symbols.svg/slot.css (leo/kai files) and a corner mark would clutter the splash; the studio is already on the loading + features screens. bonus-env.html: portrait bleed fix (body.portrait: each env extends 1100px above/below the stage, edge colours continued by ::before/::after gradients; no blank band at 390x844 for tin/fs/super) + Tin Rush furnace glow raised (bigger, brighter ellipses, pulse .88-1).
 - 4.1/4.2 done (9068cce): win size classes (tag, sparkle, Koji+coins), tease hold veil + riser, per-bonus trigger/bonus/outro sfx + stingers (trig, end, bigtin, launch, top), tin/FS/Super music already distinct (128/112/142 bpm).
 - 3.2/3.3 done (9f32d6b): FS + Super: trigger sequence (drums beat, veil, riser) + title cards (indigo/gold FS, gold-ray Super), curtain wipe in, end cards out ('STEEPING COMPLETE'), plaque in tag colour, rules plaque + drawer boost legend, LEVEL +N callouts + ring waves on level-up, plaque bump on retrigger, outro stats tally, dataset.bonus='fs'|'super'.
 - 3.1 kai part done (ee10058): Tin Rush trigger (veil, rising bells, pulse, TIN RUSH title card), tin-lid wells + warm locked glow + pours plaque with pips + rules strip (kai.css), reset fly-to-plaque, per-value landing wave/sparkle/sfx, Kite/Grand charge-up anticipation, RUSH COMPLETE end card, outro tally rows, dataset.bonus + --envPulse on #bonusEnv. NOTE: slot.css carries the spliced kai.css below /* KAI */ (leo's file, not committed by kai).
