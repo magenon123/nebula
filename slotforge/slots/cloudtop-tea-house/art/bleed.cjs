@@ -1,0 +1,17 @@
+/* bleed.cjs (leo, QA D4): portrait-phone bleed art for scene.html (and art/raw/scene.html). Idempotent marker block, inserted before <rect id="sDusk".
+   The art lives OUTSIDE the 1600x900 viewBox (sky above, paving below) and is only shown by `body.portrait #scene .bleed` (slot.css), where the scene
+   is scaled/positioned to line up with the board (see PORTRAIT block in slot.css). Dusk tint copies (.dk) follow #scene.dusk like #sDusk. Run after wobble/light. */
+const fs = require('fs'), path = require('path');
+const cloud = (x, y, s, cls, fl) => `<g transform="translate(${x} ${y}) scale(${s} ${s})"><g class="cl ${cls}"><path fill="${fl}" stroke="#1c2340" stroke-width="${(3 / s).toFixed(1)}" stroke-linejoin="round" d="M0 40 Q-14 38 -12 24 Q-10 10 8 10 Q14 -12 40 -8 Q58 -34 86 -14 Q112 -26 124 -2 Q148 0 148 22 Q150 40 130 40 Z"/><path fill="#f7cdb6" opacity=".85" d="M6 40 Q40 31 76 35 Q110 29 130 40 Z"/><path fill="none" stroke="#fff" stroke-width="${(2.4 / s).toFixed(1)}" opacity=".8" stroke-linecap="round" d="M20 8 Q30 -2 44 -3"/></g></g>`;
+let sky = '';
+[[470, -60, 1.1, 's1'], [900, -150, 1.35, 's2'], [610, -330, 1.0, 's3'], [1010, -470, 1.2, 's1'], [480, -640, 1.3, 's2'], [880, -790, 1.05, 's3']].forEach(a => sky += cloud(a[0], a[1], a[2], a[3], '#fffaf0'));
+let seam = '';
+for (let i = 0; i < 7; i++) seam += `<path d="M${-200 + i * 230} ${1010 + (i % 3) * 200} q60 -10 120 4 t120 -4" fill="none" stroke="#5e5270" stroke-width="3" opacity=".5"/>`;
+for (let i = 0; i < 6; i++) seam += `<path d="M${40 + i * 300} ${910 + (i % 2) * 110} l8 38 l-6 40" fill="none" stroke="#5e5270" stroke-width="3" stroke-linecap="round" opacity=".45"/>`;
+const block = `<!--BLEED:begin--><defs><linearGradient id="ctBlTop" gradientUnits="userSpaceOnUse" x1="0" y1="-1200" x2="0" y2="0"><stop offset="0" stop-color="#3f8fd0"/><stop offset=".55" stop-color="#5aa6dc"/><stop offset="1" stop-color="#6eb1de"/></linearGradient><linearGradient id="ctBlBot" gradientUnits="userSpaceOnUse" x1="0" y1="900" x2="0" y2="1800"><stop offset="0" stop-color="#756780"/><stop offset="1" stop-color="#4e4260"/></linearGradient><linearGradient id="ctBlFade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6db1de"/><stop offset="1" stop-color="#6db1de" stop-opacity="0"/></linearGradient></defs>
+<g class="bleed"><rect x="-600" y="0" width="2800" height="34" fill="url(#ctBlFade)"/><rect x="-600" y="-1200" width="2800" height="1201" fill="url(#ctBlTop)"/>${sky}<rect x="-600" y="899" width="2800" height="901" fill="url(#ctBlBot)"/>${seam}<rect class="dk" x="-600" y="-1200" width="2800" height="1201" fill="#5a3a8a" opacity="0"/><rect class="dk" x="-600" y="899" width="2800" height="901" fill="#ff6a3a" opacity="0"/></g><!--BLEED:end-->`;
+for (const f of ['scene.html', 'raw/scene.html']) {
+  const p = path.join(__dirname, f.startsWith('raw') ? f : '../' + f); let s = fs.readFileSync(p, 'utf8');
+  s = s.replace(/<!--BLEED:begin-->[\s\S]*?<!--BLEED:end-->/, ''); const i = s.indexOf('<rect id="sDusk"');
+  if (i < 0) { console.log('skip', f); continue; } s = s.slice(0, i) + block + s.slice(i); fs.writeFileSync(p, s); console.log('bleed ->', f);
+}

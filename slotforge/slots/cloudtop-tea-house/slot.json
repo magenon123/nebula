@@ -189,6 +189,7 @@
    }
   ]
  },
+ "portrait": {"left": 110, "right": 110},
  "studio": {
   "name": "Nebula Studios",
   "presents": "PRESENTED BY",
