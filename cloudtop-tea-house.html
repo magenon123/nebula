@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="sf-build" content="8d8b8e9 10-10 15:43">
+<meta name="sf-build" content="c8d8328 10-10 16:08">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Koji's Cloudtop Tea House</title>
 <style>
@@ -1768,6 +1768,7 @@ const CFG = {
   anteCost: 3,                                // FS LUCK (bet-up): every spin costs 3x, the FS drums land far more often and Tin Rush cannot trigger (Free Spins only)
   anteLineScale: 1.235,                       // FS LUCK: line wins pay ~23% more (keeps the 3x mode at ~96.2% with FS drums exactly 5x as frequent as the normal game)
   anteFsP: 0.0483,                            // FS scatter per cell in FS LUCK (3x, no tin): tuned with tools/sim.js so the mode returns ~96.2%
+  superBuyP: 0.018,                           // per-cell FS chance that shapes the drum count (4/5/6...) of a BOUGHT Super: kept at the value the 75x price was calibrated with
   fsP: 0.0256,                                 // FS scatter, per cell, all reels; rolled AFTER the tin test with the SAME draw (tin odds never move)
   triggerTins: 6,
   symW: [10, 10, 10, 10, 10, 10, 10, 10],     // pay symbols 0..7
@@ -1905,8 +1906,8 @@ function evaluateSteep(grid, levels, boost) {
 }
 
 /* FS count of a natural SUPER trigger: Binomial(20, fsP) conditioned on >= 4 (inverse CDF, one draw). */
-function superCount(rng) {
-  const p = CFG.fsP, w = []; let tot = 0, comb = 1;
+function superCount(rng, p = CFG.fsP) {
+  const w = []; let tot = 0, comb = 1;
   for (let k = 1; k <= 4; k++) comb = comb * (CELLS - k + 1) / k;     // C(20,4)
   for (let k = 4; k <= CELLS; k++) { const v = comb * p ** k * (1 - p) ** (CELLS - k); w.push(v); tot += v; comb = comb * (CELLS - k) / (k + 1); }
   let u = rng() * tot;
@@ -1978,7 +1979,7 @@ function playRound(rng, { buy = null, ante = false } = {}) {
   const maxWin = CFG.maxWin, fsPHere = ante ? CFG.anteFsP : CFG.fsP, coinHere = CFG.coinP;   // Tin Rush is BUY-ONLY: coinP is 0, no tin coins land in the base game (owner request)
   if (buy) {
     const bc = CFG.buy[buy]; if (!bc) throw new Error('unknown buy ' + buy);
-    const fsBuy = buy === 'fs' || buy === 'super', n = buy === 'fs' ? 3 : buy === 'super' ? superCount(rng) : 0;
+    const fsBuy = buy === 'fs' || buy === 'super', n = buy === 'fs' ? 3 : buy === 'super' ? superCount(rng, CFG.superBuyP) : 0;
     const cells = fsBuy ? fsStart(rng, n) : startTins(rng); let grid;
     const isT = new Set(cells.map(([r, c]) => r * COLS + c)), mark = fsBuy ? FS : TIN;
     for (let tries = 0; tries < 1000; tries++) {   // no line wins on the trigger spin (rejection; tins and FS are blanks)
