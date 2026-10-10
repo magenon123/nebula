@@ -241,3 +241,34 @@ body.portrait .bbc button.go{grid-column:2;grid-row:3/5;width:112px;min-height:4
   .bbc button.go{margin-top:auto;font-size:20px;padding:7px 0 5px;min-height:44px}
   body.portrait .bbc,body.portrait .bbRow{}
 }
+
+/* --- R2.4 bonus anticipation: reel roll halo, hot drums, heartbeat veil, reveal burst --- */
+body.ctRoll #ctVeil{opacity:1;animation:ctVeilBeat .8s ease-in-out infinite}
+body.ctRoll2 #ctVeil{animation-duration:.55s;background:radial-gradient(ellipse at 50% 46%,rgba(30,10,0,0) 16%,rgba(24,8,22,.74) 70%,rgba(10,2,10,.92))}
+body.ctReveal #ctVeil{opacity:1;animation:none}
+@keyframes ctVeilBeat{0%,100%{opacity:.78}14%{opacity:1}28%{opacity:.82}42%{opacity:1}}
+#shaker{will-change:scale}
+.ctReel{position:absolute;top:0;width:128px;height:512px;z-index:5;overflow:hidden;pointer-events:none;border-radius:8px;
+ background:linear-gradient(180deg,rgba(30,16,50,.55),rgba(60,30,90,.25) 50%,rgba(30,16,50,.55));
+ box-shadow:inset 0 0 0 4px rgba(255,214,110,.9),inset 0 0 34px rgba(255,200,90,.85),0 0 24px rgba(255,190,70,.9);animation:ctReelGlow .3s ease-in-out infinite alternate}
+.ctReel.l2{box-shadow:inset 0 0 0 5px #fff6c8,inset 0 0 46px rgba(255,120,60,.95),0 0 34px rgba(255,150,60,1);animation-duration:.2s}
+.ctReel::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,10,40,.78),transparent 24%,transparent 76%,rgba(20,10,40,.78))}
+.ctReel .rs{will-change:transform;animation:ctReelRoll .42s linear infinite;opacity:.9}
+.ctReel i{display:block;position:relative;width:128px;height:128px;box-sizing:border-box;margin:0;background:radial-gradient(circle at 50% 40%,#fdf0d2,#e6cb9c);box-shadow:inset 0 0 0 5px rgba(184,138,82,.8)}
+.ctReel svg.g{position:absolute;left:3%;top:2%;width:94%;height:94%;overflow:visible}
+@keyframes ctReelRoll{from{transform:translateY(-1024px)}to{transform:translateY(0)}}
+@keyframes ctReelGlow{from{opacity:.82}to{opacity:1}}
+.cell.hot{z-index:6}
+.cell.hot svg.g{animation:ctHot var(--hb,.5s) ease-in-out infinite;filter:drop-shadow(0 0 14px #ffd23a)}
+body.lite .cell.hot svg.g{filter:none}
+@keyframes ctHot{0%{transform:scale(1) translate(0,0)}12%{transform:scale(1.2) translate(-2px,1px)}24%{transform:scale(1.02) translate(2px,-1px)}38%{transform:scale(1.15) translate(-1px,-2px)}52%{transform:scale(1) translate(1px,1px)}}
+.ctSpk{position:absolute;width:9px;height:9px;margin:-4px 0 0 -4px;border-radius:50%;background:radial-gradient(#fff,#ffd23a 55%,transparent 72%);pointer-events:none;z-index:7}
+.ctSpk.g{background:radial-gradient(#fff,#ff9a3a 55%,transparent 72%);width:12px;height:12px;margin:-6px 0 0 -6px}
+.ctBurst,.ctShock{position:absolute;pointer-events:none;border-radius:50%;z-index:8}
+.ctBurst{width:300px;height:300px;background:radial-gradient(circle,#fff 0,rgba(255,240,180,.95) 22%,rgba(160,170,255,.55) 48%,transparent 70%)}
+.ctBurst.g{background:radial-gradient(circle,#fff 0,rgba(255,236,150,1) 22%,rgba(255,150,50,.7) 48%,transparent 70%)}
+.ctShock{width:150px;height:150px;border:7px solid #fff6c8;box-shadow:0 0 22px rgba(190,200,255,.95)}
+.ctShock.g{border-color:#ffd23a;box-shadow:0 0 26px rgba(255,170,60,1)}
+body.ctReveal .cell.scat svg.g{filter:drop-shadow(0 0 20px #fff6c8)}
+#grid::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:rgba(14,6,34,.5);opacity:0;transition:opacity .35s}
+body.ctRoll #grid::after{opacity:1}body.ctRoll2 #grid::after{background:rgba(24,6,20,.58)}body.ctReveal #grid::after{opacity:0}

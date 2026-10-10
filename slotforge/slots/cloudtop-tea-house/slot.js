@@ -24,7 +24,43 @@ const envEl = () => document.getElementById('bonusEnv');
 function setEnv(type) { const e = envEl(); if (!e) return; if (type) e.dataset.bonus = type; else { delete e.dataset.bonus; e.style.removeProperty('--envPulse'); } }
 function envPulse(v) { const e = envEl(); if (e) e.style.setProperty('--envPulse', v); }
 const plaqueHit = () => $('fsBox').animate([{ transform: 'none' }, { transform: 'scale(1.2) rotate(-2deg)', offset: .18 }, { transform: 'scale(.96)', offset: .4 }, { transform: 'none' }], { duration: 900 * T(), easing: 'ease-out' });
-const holdOff = () => document.body.classList.remove('ctHold', 'ctAnt');
+/* ---------- kai: bonus anticipation (R2.4). Look + sound only; the outcome is already in the round. ---------- */
+let antIv = 0, antReels = [];
+function zoomBoard(k, ms) {   // camera push-in on the board: the individual `scale` property on the shaker (transform stays free for shake())
+  const sh = $('shaker'); if (!sh.style.scale) { const b = $('frame').getBoundingClientRect(); sh.style.transformOrigin = `${b.left + b.width / 2}px ${b.top + b.height / 2}px`; }
+  sh.style.transition = `scale ${Math.max(120, ms)}ms cubic-bezier(.3,.1,.3,1)`; sh.style.scale = k;
+}
+function holdOff() {
+  document.body.classList.remove('ctHold', 'ctAnt', 'ctRoll', 'ctRoll2', 'ctReveal');
+  clearInterval(antIv); antIv = 0; antReels.forEach(e => e.remove()); antReels = [];
+  cells.forEach(d => d.classList.remove('hot'));
+  const sh = $('shaker'); if (sh.style.scale) { sh.style.transition = 'scale .45s ease-out'; sh.style.scale = ''; setTimeout(() => { if (!sh.style.scale) { sh.style.transition = ''; sh.style.transformOrigin = ''; } }, 500); }
+}
+const REEL_SYMS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 16, 2, 5];
+function mkReel(c, lv) {   // a glowing halo + a fast scrolling strip over a reel that has not landed yet
+  const el = document.createElement('div'); el.className = 'ctReel' + (lv > 1 ? ' l2' : ''); el.style.left = c * CW + 'px';
+  if (!LITE) { const a = Array.from({ length: 8 }, (_, i) => REEL_SYMS[(c * 3 + i * 5 + Math.floor(Math.random() * 4)) % REEL_SYMS.length]);
+    el.innerHTML = '<div class="rs" style="animation-duration:' + (lv > 1 ? .5 : .42) + 's">' + a.concat(a).map(n => `<i><svg class="g"><use href="#s${n}"/></svg></i>`).join('') + '</div>'; }
+  GRID.append(el); antReels.push(el); return el;
+}
+function streamTo(list, lv) {   // sparkles fly from around the board into the landed drums
+  const n = lt(lv > 1 ? 3 : 2);
+  list.forEach(([r, c]) => { const [tx, ty] = ctrG(r, c); for (let i = 0; i < n; i++) {
+    const a = Math.random() * 6.283, d = 260 + Math.random() * 200, e = document.createElement('i'); e.className = 'ctSpk' + (lv > 1 ? ' g' : ''); e.style.left = tx + 'px'; e.style.top = ty + 'px'; fxl().append(e);
+    e.animate([{ transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d * .7}px) scale(.4)`, opacity: 0 }, { opacity: 1, offset: .25 }, { transform: 'translate(0,0) scale(1.1)', opacity: .9 }], { duration: (520 + Math.random() * 260) * T(), easing: 'cubic-bezier(.5,0,.9,.6)' }).finished.then(() => e.remove(), () => e.remove()); } });
+}
+function rollReel(c, lv, h0, hold, first, drums) {   // one reel rolls slowly while the drums that have landed beat
+  after(h0, () => {
+    const B = document.body.classList; B.add('ctHold', 'ctRoll'); B.toggle('ctRoll2', lv > 1);
+    sfx.antRoll(lv); sfx.heart(lv); mkReel(c, lv); zoomBoard(lv > 1 ? 1.08 : 1.05, hold + 400);
+    drums.forEach(([r, cc]) => { const d = at(r, cc); d.style.setProperty('--hb', (lv > 1 ? .36 : .52) + 's'); d.classList.add('hot'); });
+    const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('tease');
+    say(lv > 1 ? 'A FOURTH DRUM... SUPER?!' : first ? 'ONE MORE DRUM...' : 'ONE MORE...', true); shake(.25 + lv * .25);
+    clearInterval(antIv); streamTo(drums, lv); antIv = setInterval(() => streamTo(drums, lv), 190 * T());
+  });
+  after(h0 + hold * .5, () => sfx.heart(lv));
+  after(h0 + hold + 60, () => { const r = antReels.shift(); if (r) r.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160 }).finished.then(() => r.remove(), () => r.remove()); });
+}
 
 /* ---------- MUSIC: "morning on the cliff" (base, 92 bpm) and "kite weather" (Tin Rush, 128 bpm); D Hirajoshi (D E F A Bb) ---------- */
 function musicDefs() {
@@ -131,14 +167,17 @@ function dropCells(list, base = 0) {
   return { end, times };
 }
 /* reel by reel; once five Tea Tins (one short of Tin Rush) or two FS drums have landed the remaining reels hang a beat with a heartbeat before each lands (near-miss slow drop) */
-function dropReels(grid) {
-  let base = 0, end = 0, tease = false, seen = 0, seenF = 0, said = false; const times = {};
+function dropReels(grid, calm) {
+  let base = 0, end = 0, tease = false, seen = 0, seenF = 0, said = false, lvMax = 0; const times = {}, drums = [];
   for (let c = 0; c < COLS; c++) {
-    if (seen >= 5 || seenF >= 2) { if (!tease) after(Math.max(0, base + 60), () => { document.body.classList.add('ctHold'); sfx.hold(); }); tease = true; base += 560; const b0 = base; after(b0 - 500 + c * 92, () => { sfx.beat(); if (!said) { said = true; say('ONE MORE...', true); } shake(.3); }); }
+    const lv = calm ? 0 : seenF >= 3 ? 2 : seenF >= 2 ? 1 : 0, tinT = !calm && seen >= 5;
+    if (lv) {   // FS: 2 drums down -> the rest roll slowly for the 3rd; 3 down -> for the 4th (Super)
+      const hold = lv > 1 ? 820 : 660, h0 = base + c * 92; rollReel(c, lv, h0, hold, !tease, drums.slice()); tease = true; lvMax = Math.max(lvMax, lv); base += hold;
+    } else if (tinT) { if (!tease) after(Math.max(0, base + 60), () => { document.body.classList.add('ctHold'); sfx.hold(); }); tease = true; base += 560; const b0 = base; after(b0 - 500 + c * 92, () => { sfx.beat(); if (!said) { said = true; say('ONE MORE...', true); } shake(.3); }); }
     const r = dropCells(Array.from({ length: ROWS }, (_, i) => [i, c]), base); end = Math.max(end, r.end); Object.assign(times, r.times);
-    for (let i = 0; i < ROWS; i++) { if (grid[i][c] === TIN) seen++; else if (grid[i][c] === FSS) seenF++; }
+    for (let i = 0; i < ROWS; i++) { if (grid[i][c] === TIN) seen++; else if (grid[i][c] === FSS) { seenF++; drums.push([i, c]); } }
   }
-  return { end, tease, times };
+  return { end, tease, times, lvMax };
 }
 async function dropOut() {
   clearLinks(); GRID.classList.remove('focus'); let end = 0;
@@ -272,15 +311,15 @@ async function evalWins(st, ctx, run) {
 }
 async function baseSpin(sp, run, ctx) {
   char('spin', 950 * T()); paint(sp.initialGrid); sfx.drop();
-  const dt = dropReels(sp.initialGrid), tins = tinCells(sp.initialGrid); tinsNow = tins.length;
+  const dt = dropReels(sp.initialGrid, !!sp.bought), tins = tinCells(sp.initialGrid); tinsNow = tins.length;
   tins.slice().sort((a, b) => dt.times[a[0] * COLS + a[1]] - dt.times[b[0] * COLS + b[1]]).forEach(([r, c], i) => { const t = dt.times[r * COLS + c]; after(t, () => { sfx.tin(i); ring(at(r, c)); }); });
   fsCellsOf(sp.initialGrid).sort((a, b) => dt.times[a[0] * COLS + a[1]] - dt.times[b[0] * COLS + b[1]]).forEach(([r, c], i) => { const t = dt.times[r * COLS + c]; after(t, () => { sfx.drum(i); ring(at(r, c)); }); });
-  if (dt.tease) after(Math.max(300, dt.end - 1500), () => { const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('tease'); });
+  if (dt.tease && !dt.lvMax) after(Math.max(300, dt.end - 1500), () => { const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('tease'); });
   await wait(dt.end + 260); holdOff();
   if (dt.tease) {
     const nF = fsCellsOf(sp.initialGrid).length, ch = $('char'), hit = tins.length >= 6 || nF >= 3; ch.classList.add(hit ? 'exhale' : 'slump'); setTimeout(() => ch.classList.remove('tease', 'exhale', 'slump'), 750 * T());
     if (!hit && tins.length >= 4) { say('ALMOST... JUST ONE MORE TIN', true); await wait(650); }
-    else if (!hit && nF === 2) { say('ALMOST... JUST ONE MORE DRUM', true); await wait(650); }
+    else if (!hit && nF === 2) { say('ALMOST... JUST ONE MORE DRUM', true); await wait(520); }
   }
   const st = sp.step;
   if (st) {
@@ -294,18 +333,45 @@ async function showTrigger(R) {
   const ch = $('char'), koji = st => { ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add(st); };
   document.body.classList.add('ctAnt');   // the room dims, only the triggering pieces keep their light
   let list, nm, sound, step;
-  if (bType !== 'tin') {   // FS drums: the three (four) drums beat one after another, faster and louder each time
+  if (bType !== 'tin') {   // FS drums
     list = R.fsScatter.cells.slice().sort((a, b) => a[1] - b[1] || a[0] - b[0]); nm = list.length; step = 150; sound = i => sfx.drum(i);
   } else { list = R.tins ? R.tins.cells.slice() : tinCells(lastGrid); list.sort((a, b) => a[1] - b[1] || a[0] - b[0]); nm = list.length; step = Math.max(70, 150 - nm * 4); sound = i => sfx.tin(i); }
-  restCells(); GRID.classList.add('focus'); clearLinks(); koji('tease'); sfx.antRise(bType);
-  say(bType === 'super' ? `${nm} DRUMS! SUPER FREE SPINS` : bType === 'fs' ? `${nm} DRUMS! FREE SPINS` : `${nm} TEA TINS! TIN RUSH`, true);
-  list.forEach(([r, c], i) => { FX.act(at(r, c), i * step, c); at(r, c).classList.add('scat'); after(i * step, () => { sound(i); ring(at(r, c), 500); gold(r, c, lt(6), .6 + i * .05); }); });
-  await wait(list.length * step + 450);
-  /* all together: a flash, the pieces burst, then the title card */
-  list.forEach(([r, c]) => { ring(at(r, c), 700); gold(r, c, lt(10), 1.1); });
-  koji('special'); setTimeout(() => ch.classList.remove('special'), 1000 * T());
+  restCells(); GRID.classList.add('focus'); clearLinks(); koji('tease');
+  if (bType === 'tin') {
+    sfx.antRise(bType);
+    say(`${nm} TEA TINS! TIN RUSH`, true);
+    list.forEach(([r, c], i) => { FX.act(at(r, c), i * step, c); at(r, c).classList.add('scat'); after(i * step, () => { sound(i); ring(at(r, c), 500); gold(r, c, lt(6), .6 + i * .05); }); });
+    await wait(list.length * step + 450);
+    list.forEach(([r, c]) => { ring(at(r, c), 700); gold(r, c, lt(10), 1.1); });
+  } else {
+    const sup = bType === 'super';
+    if (R.bought) {   // a bought bonus has had no reel tease: a short strong build-up (the drums beat, faster each time, the board leans in)
+      document.body.classList.add('ctHold', 'ctRoll'); document.body.classList.toggle('ctRoll2', sup); zoomBoard(sup ? 1.08 : 1.05, 1500);
+      sfx.antRise(bType); say(sup ? 'THE DRUMS ARE CALLING...' : 'THE DRUMS BEGIN...', true);
+      list.forEach(([r, c]) => { const d = at(r, c); d.style.setProperty('--hb', (sup ? .36 : .5) + 's'); d.classList.add('hot', 'scat'); FX.act(d, 0, c); });
+      streamTo(list, sup ? 2 : 1); antIv = setInterval(() => streamTo(list, sup ? 2 : 1), 190 * T());
+      list.forEach((_, i) => { after(i * 330 + 80, () => { sfx.drum(i); sfx.heart(sup ? 2 : 1); list.forEach(([r, c]) => ring(at(r, c), 420)); shake(.3 + i * .15); }); });
+      await wait(Math.max(1100, list.length * 330 + 350));
+    }
+    /* the reveal: everything holds for a breath, then flash + a big burst */
+    document.body.classList.remove('ctHold', 'ctRoll', 'ctRoll2'); document.body.classList.add('ctReveal');
+    clearInterval(antIv); antIv = 0; list.forEach(([r, c]) => { const d = at(r, c); d.classList.remove('hot'); d.classList.add('scat'); });
+    sfx.impact(sup ? 2 : 1); S.music.duck(.1, 2.2, 1.2); zoomBoard(sup ? 1.16 : 1.1, 140);
+    flash(sup ? 3.6 : 2.6); shake(sup ? 3.4 : 2.4); revealBurst(list, sup);
+    list.forEach(([r, c], i) => { FX.act(at(r, c), i * 60, c); ring(at(r, c), 900); gold(r, c, lt(sup ? 18 : 12), sup ? 1.5 : 1.2); });
+    embers(lt(sup ? 90 : 55), innerWidth / 2, innerHeight / 2, true); koji('special'); setTimeout(() => ch.classList.remove('special'), 1000 * T());
+    say(sup ? `${nm} DRUMS! SUPER FREE SPINS` : `${nm} DRUMS! FREE SPINS`, true);
+    await wait(sup ? 850 : 650);   // hold on the lit drums
+    zoomBoard(1, 500);
+  }
   await titleCard(bType, `${nm} ${bType === 'tin' ? 'TEA TINS' : 'DRUMS'}`, bType === 'super' ? 2300 : 1900);
   holdOff();
+}
+function revealBurst(list, sup) {   // a shockwave ring + glowing disc out of the board's centre, one extra ring per drum
+  const mk = (cls, x, y, big, delay) => { const e = document.createElement('div'); e.className = cls; e.style.left = x + 'px'; e.style.top = y + 'px'; fxl().append(e);
+    e.animate([{ transform: 'translate(-50%,-50%) scale(.1)', opacity: .95 }, { transform: `translate(-50%,-50%) scale(${big})`, opacity: 0 }], { duration: 900 * T(), delay: delay * T(), easing: 'cubic-bezier(.1,.7,.3,1)', fill: 'backwards' }).finished.then(() => e.remove(), () => e.remove()); };
+  mk('ctBurst' + (sup ? ' g' : ''), CW * COLS / 2, CH * ROWS / 2, sup ? 7 : 5.5, 0);
+  list.forEach(([r, c], i) => { const [x, y] = ctrG(r, c); mk('ctShock' + (sup ? ' g' : ''), x, y, sup ? 4.2 : 3.2, 40 + i * 60); });
 }
 
 /* ---------- Tin Rush (hold and win) ---------- */
@@ -527,7 +593,7 @@ async function fsSpin(sp, run0, ctx) {
   setFs(dec, true); char('spin', 950 * T()); say(sup ? 'SUPER STEEP...' : 'STEEPING...');
   paint(sp.landed); applyLevels(sp.levels); sfx.drop();
   const dt = dropReels(sp.landed); fsCellsOf(sp.landed).sort((a, b) => dt.times[a[0] * COLS + a[1]] - dt.times[b[0] * COLS + b[1]]).forEach(([r, c], i) => { const t = dt.times[r * COLS + c]; after(t, () => { sfx.drum(i); ring(at(r, c)); }); });
-  if (dt.tease) after(Math.max(300, dt.end - 1500), () => { const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('tease'); });
+  if (dt.tease && !dt.lvMax) after(Math.max(300, dt.end - 1500), () => { const ch = $('char'); ch.classList.remove(...S.cfg.char.states); void ch.offsetWidth; ch.classList.add('tease'); });
   await wait(dt.end + 260); holdOff();
   if (dt.tease) { const ch = $('char'); ch.classList.add(sp.fsCount >= 3 ? 'exhale' : 'slump'); setTimeout(() => ch.classList.remove('tease', 'exhale', 'slump'), 750 * T()); }
   if (sp.bundle) await flipBundles(sp.bundle, sp.grid);
@@ -632,6 +698,12 @@ return {
         for (let i = 0; i < n; i++) bell(N(i * (type === 'tin' ? 2 : 1) + 1) / 2, t + .15 + i * (type === 'super' ? .17 : .2), .5 + i * .06, .9);
         if (type !== 'tin') for (let i = 0; i < 6; i++) taiko(t + i * (.32 - i * .03), .35 + i * .1, 92 + i * 6); else for (let i = 0; i < 4; i++) taiko(t + .2 + i * .36, .5 + i * .12, 100);
         if (type === 'super') for (let i = 0; i < 12; i++) osc('sine', 1800 + i * 170, t + .3 + i * .1, .12, .025, .003); },
+      /* kai R2.4: a reel rolls slowly (riser), the drums' heartbeat, and the reveal impact (lv 1 = Free Spins, 2 = Super) */
+      antRoll: lv => { const t = T0(), d = lv > 1 ? .82 : .68; noise(t, d, .12 + lv * .04, 'bandpass', 300 + lv * 120, 3000 + lv * 1400, 1.7, d * .9); osc('sawtooth', 92 + lv * 14, t, d, .03 + lv * .01, d * .8, 190 + lv * 80);
+        for (let i = 0; i < 5 + lv * 2; i++) osc('triangle', 520 + i * 95 * lv, t + i * d / (5 + lv * 2), .1, .035, .003, 700 + i * 110); if (lv > 1) for (let i = 0; i < 8; i++) osc('sine', 1800 + i * 210, t + .1 + i * .08, .12, .025, .004); },
+      heart: lv => { const t = T0(); taiko(t, .55 + lv * .17, 74); taiko(t + .17, .4 + lv * .12, 74); osc('sine', 48, t, .3, .2 + lv * .06, .004, 34); if (lv > 1) noise(t, .12, .06, 'lowpass', 400, 120); },
+      impact: lv => { const t = T0(); taiko(t, 1.5, 70); osc('sine', 62, t, .9, .32, .004, 30); noise(t, .9, .2, 'lowpass', 1800, 90, .8, .001); bell(147, t, 1.6, 3); for (let i = 0; i < 4; i++) koto(N(i * 2 + 3), t + .06 + i * .05, .08, 1.2);
+        if (lv > 1) { metal(N(0) / 2, t, 3, .16, [1, 2.4, 4.1]); for (let i = 0; i < 6; i++) taiko(t + .12 + i * .07, .8 + i * .08, 80 + i * 10); shaku(N(7), t + .15, 2, .09); for (let i = 0; i < 10; i++) osc('sine', 2000 + i * 230, t + .2 + i * .06, .12, .03, .003); } },
       hold: () => { const t = T0(); noise(t, 1.4, .1, 'bandpass', 300, 2600, 1.4, .7); taiko(t + .1, .45, 84); taiko(t + .48, .38, 84); taiko(t + .9, .5, 84); },
       titleHit: (type, end) => { const t = T0();
         if (end) { [3, 2, 0].forEach((d, i) => koto(N(d + 2), t + i * .16, .08, 1.3)); bell(N(0) / 2, t + .3, .8, 2); return; }

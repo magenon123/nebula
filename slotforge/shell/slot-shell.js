@@ -468,6 +468,19 @@ $('swFeat').onclick = () => { auto.stopFeat = !auto.stopFeat; $('swFeat').classL
 $('swBig').onclick = () => { auto.stopBig = !auto.stopBig; $('swBig').classList.toggle('on', auto.stopBig); };
 $('bAuto').onclick = () => { if (auto.left > 0) { auto.left = 0; refreshUi(); return; } if (!busy) openM('autoM'); };
 $('autoGo').onclick = () => { closeM('autoM'); auto.left = auto.pickN; runAuto(); };
+/* opt-in (slot.json autoplayCustom): a typed number of spins, 1-9999, with a START button of its own */
+if (cfg.autoplayCustom) {
+  const box = document.createElement('div'); box.className = 'apCustom';
+  box.innerHTML = '<div class="apRow"><input id="apN" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5" autocomplete="off" placeholder="Type spins" aria-label="Custom number of spins (1-9999)"><button class="btn pri" id="apStart" type="button">START</button></div><div class="apMsg" id="apMsg" role="alert"></div>';
+  $('autoOpts').after(box);
+  const inp = $('apN'), msg = $('apMsg');
+  const parse = () => { const v = inp.value.trim(); if (!/^\d+$/.test(v)) return { err: v ? 'Digits only, please.' : 'Type a number of spins from 1 to 9999.' }; const n = +v; if (n < 1 || n > 9999) return { err: 'Choose between 1 and 9999 spins.' }; return { n }; };
+  inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(0, 5); msg.textContent = ''; inp.classList.remove('bad'); if (inp.value) [...$('autoOpts').children].forEach(x => x.classList.remove('sel')); });
+  const go = () => { const r = parse(); if (r.err) { msg.textContent = r.err; inp.classList.add('bad'); inp.focus(); return; } closeM('autoM'); auto.left = r.n; runAuto(); };
+  $('apStart').onclick = go;
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); go(); } if (e.key !== 'Escape') e.stopPropagation(); });
+  $('autoOpts').addEventListener('click', e => { if (e.target.closest('.opt')) { inp.value = ''; msg.textContent = ''; inp.classList.remove('bad'); } });
+}
 
 /* ---------- bonus buy screen + confirmation ---------- */
 let pendingBuy = null;
