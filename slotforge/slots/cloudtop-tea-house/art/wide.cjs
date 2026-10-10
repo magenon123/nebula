@@ -9,7 +9,7 @@ const cloud = (x, y, s, fl) => `<g transform="translate(${x} ${y}) scale(${s} ${
 for (const f of ['scene.html', 'raw/scene.html']) {
   const p = path.join(__dirname, f.startsWith('raw') ? f : '../' + f); let s = fs.readFileSync(p, 'utf8');
   for (const n of ['', 0, 1, 2]) s = s.replace(new RegExp(`<!--WIDE${n}:begin-->[\\s\\S]*?<!--WIDE${n}:end-->`), '');
-  const a = s.indexOf('<g id="sFar"'), b = s.indexOf('<g id="sKites"'), c = s.indexOf('<g id="sLedge"'), d = s.indexOf('<g id="sShop"');
+  const a0 = s.indexOf('<!--LIGHT:far:begin-->'), a = a0 >= 0 ? a0 : s.indexOf('<g id="sFar"'), b = s.indexOf('<g id="sKites"'), c = s.indexOf('<g id="sLedge"'), d = s.indexOf('<g id="sShop"');
   const at = s.indexOf('<g id="sSun"');
   if (a < 0 || b < a || c < b || d < c || at < 0) { console.log('skip', f); continue; }
   const far = strip(s.slice(a, b)), gr = strip(s.slice(c, d));

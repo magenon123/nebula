@@ -42,9 +42,8 @@ export const CFG = {
   // base game
   tinStartP: 0.09,                            // per-cell tin chance used ONLY to shape the start of a BOUGHT Tin Rush (same distribution as before)
   coinP: 0,                                   // Tin Rush can only be bought (owner): no tin coins land in any natural round, so two bonuses can never start together
-  anteCost: 3,                                // FS LUCK (bet-up): every spin costs 3x, the FS drums land far more often and Tin Rush cannot trigger (Free Spins only)
-  anteLineScale: 1.235,                       // FS LUCK: line wins pay ~23% more (keeps the 3x mode at ~96.2% with FS drums exactly 5x as frequent as the normal game)
-  anteFsP: 0.0483,                            // FS scatter per cell in FS LUCK (3x, no tin): tuned with tools/sim.js so the mode returns ~96.2%
+  anteCost: 3,                                // FS LUCK (bet-up): every spin costs 3x, FS drums trigger Free Spins / Super 5x as often (no other change to the maths)
+  anteFsMult: 5,                              // FS LUCK: Free Spins, Super (4) and Super (5+) are each exactly this many times as likely as in the normal game. NOT tuned to a target RTP: the RTP is whatever this produces
   superBuyP: 0.018,                           // per-cell FS chance that shapes the drum count (4/5/6...) of a BOUGHT Super: kept at the value the 75x price was calibrated with
   fsP: 0.0256,                                 // FS scatter, per cell, all reels; rolled AFTER the tin test with the SAME draw (tin odds never move)
   triggerTins: 6,
@@ -83,7 +82,7 @@ function drawCell(rng, c, noSpecial, wildW = CFG.wildW) {
 }
 
 /* Line evaluation on a grid WITHOUT bundles. Tin (10) and bundle (9) are blanks. Returns { total, wins:[{line,sym,len,mult,payout,cells}] }. */
-export function evaluateLines(grid, scale = 1) {
+export function evaluateLines(grid) {
   const wins = []; let total = 0;
   for (let l = 0; l < LINES.length; l++) {
     const L = LINES[l], s = grid[L[0]][0];
@@ -91,7 +90,7 @@ export function evaluateLines(grid, scale = 1) {
     let len = 1;
     while (len < COLS) { const x = grid[L[len]][len]; if (x === s || x === WILD) len++; else break; }
     if (len < 3) continue;
-    const mult = CFG.pay[s][len - 3] * CFG.payScale * scale;
+    const mult = CFG.pay[s][len - 3] * CFG.payScale;
     if (!(mult > 0)) continue;
     wins.push({ line: l, sym: s, len, mult, payout: mult, cells: L.slice(0, len).map((r, c) => [r, c]) });
     total += mult;
@@ -252,8 +251,17 @@ function startTins(rng) {   // natural tin-count distribution conditioned on >= 
 
 const bonusObj = (b, total) => ({ startSpins: CFG.startRespins, totalPayout: total, spins: b.spins });
 
+/* FS LUCK: number of FS drums on the opening grid. Normal game: Binomial(20, fsP). Here every k >= 3 is anteFsMult x as likely; k = 0..2 share the remaining probability in their normal proportions. */
+function luckFsCount(rng) {
+  const p = CFG.fsP, w = []; let c = 1, hi = 0;
+  for (let k = 0; k <= CELLS; k++) { w.push(c * p ** k * (1 - p) ** (CELLS - k)); if (k >= 3) hi += w[k]; c = c * (CELLS - k) / (k + 1); }
+  const hiM = CFG.anteFsMult, loM = (1 - hiM * hi) / (1 - hi); let u = rng();
+  for (let k = 0; k <= CELLS; k++) { u -= w[k] * (k >= 3 ? hiM : loM); if (u < 0) return k; }
+  return 0;
+}
+
 export function playRound(rng, { buy = null, ante = false } = {}) {
-  const maxWin = CFG.maxWin, fsPHere = ante ? CFG.anteFsP : CFG.fsP, coinHere = CFG.coinP;   // Tin Rush is BUY-ONLY: coinP is 0, no tin coins land in the base game (owner request)
+  const maxWin = CFG.maxWin, fsPHere = CFG.fsP, coinHere = CFG.coinP;   // Tin Rush is BUY-ONLY: coinP is 0, no tin coins land in the base game (owner request)
   if (buy) {
     const bc = CFG.buy[buy]; if (!bc) throw new Error('unknown buy ' + buy);
     const fsBuy = buy === 'fs' || buy === 'super', n = buy === 'fs' ? 3 : buy === 'super' ? superCount(rng, CFG.superBuyP) : 0;
@@ -275,7 +283,12 @@ export function playRound(rng, { buy = null, ante = false } = {}) {
       bonusTriggered: true, bonus: bonusObj(b, total), totalPayout: total, capped: b.capped || total >= maxWin };
   }
   const grid = emptyGrid(), tinCells = [], bundleCells = []; let fsCells = [], suppressed = 0;
-  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+  if (ante) {   // FS LUCK: the number of FS drums is drawn directly: every count of 3+ drums (Free Spins, Super 4, Super 5+) is exactly CFG.anteFsMult times as likely as in the normal game; counts 0-2 share the rest in their normal proportions
+    const n = luckFsCount(rng), at = new Set(fsStart(rng, n).map(([r, c]) => r * COLS + c));
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      if (at.has(r * COLS + c)) { grid[r][c] = FS; fsCells.push([r, c]); } else grid[r][c] = drawCell(rng, c, false);
+    }
+  } else for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
     const u = rng();
     if (u < coinHere) { grid[r][c] = TIN; tinCells.push([r, c]); }
     else if (u < coinHere + fsPHere) { grid[r][c] = FS; fsCells.push([r, c]); }
@@ -294,7 +307,7 @@ export function playRound(rng, { buy = null, ante = false } = {}) {
     for (const [r, c] of bundleCells) step.grid[r][c] = flipTo;
     step.bundle = { cells: bundleCells, flipTo };
   }
-  const ev = evaluateLines(step.grid, ante ? CFG.anteLineScale : 1); step.wins = ev.wins; step.payout = ev.total;
+  const ev = evaluateLines(step.grid); step.wins = ev.wins; step.payout = ev.total;
   const base = Math.min(maxWin, ev.total);
   const round = { v: 1, cost: ante ? CFG.anteCost : 1, ante: !!ante, bought: null, bonusType: null, initialGrid, cascadeSteps: [step], tins: { count: tinCells.length, cells: tinCells }, fsScatter: { count: fsCells.length, cells: fsCells, suppressed }, basePayout: base,
     bonusTriggered: false, bonus: null, totalPayout: base, capped: false };

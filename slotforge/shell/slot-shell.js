@@ -435,7 +435,8 @@ async function go(buy) {
         run = await hooks.playSpin(sp, run, ctx); await wait(300);
       }
       $('fsBox').hidden = true; music.theme('base', 2.4); music.intensity(0); $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); if (ambCtl && ambCtl.bonus) ambCtl.bonus(false); $('outroV').textContent = fmt(0);
-      if (tierOf(R.totalPayout) && (!navigator.webdriver || /[?&]merge=1/.test(location.search))) bonusDone = true;   // (automated tests keep the separate outro unless ?merge=1)   // a big-win screen follows and shows the total: don't say the amount twice
+      const noBig = !!(cfg.noBigWinAfter && R.bonusType && cfg.noBigWinAfter.includes(R.bonusType));   // opt-in per slot: these bonus types end with their own outro only (no coin rain / dark win screen)
+      if (!noBig && tierOf(R.totalPayout) && (!navigator.webdriver || /[?&]merge=1/.test(location.search))) bonusDone = true;   // (automated tests keep the separate outro unless ?merge=1)   // a big-win screen follows and shows the total: don't say the amount twice
       else {
       openM('outroM'); const skip = () => { skipBig = true; }; $('outroM').addEventListener('click', skip); sfx.outro(); embers(80, innerWidth / 2, innerHeight / 2, true);
       await countUp($('outroV'), j.payout, 1800 * T() + 400, 0, k => sfx.tick(k)); $('outroM').removeEventListener('click', skip);
@@ -444,7 +445,7 @@ async function go(buy) {
     }
     $('win').textContent = fmt(j.payout); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user);
     out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
-    out.tier = early ? await early : await bigWin(R.totalPayout, j.payout);
+    out.tier = early ? await early : (cfg.noBigWinAfter && R.bonusType && cfg.noBigWinAfter.includes(R.bonusType)) ? null : await bigWin(R.totalPayout, j.payout);
   } catch (e) { if (/^(Type|Reference|Range|Syntax)Error$/.test(e && e.name)) { try { console.error(e); } catch {} say('Something went wrong. Please try again.'); } else say(e.message); out.err = true; }   // never show raw JS errors to the player
   clearTimeout(wd); boost = false; setBusy(false); refreshUi(); return out;
 }

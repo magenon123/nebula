@@ -462,6 +462,7 @@ body.portrait #scene .bleed{display:inline}
 @media (max-height:430px) and (orientation:landscape){
 #logo{left:560px;top:8px;width:480px;height:109px}
 }
+#sBotFade{display:none}@media (max-aspect-ratio:16/9){body:not(.portrait) #sBotFade{display:inline}}
 /* KAI */
 /* ===== kai: bonus presentation (Tin Rush, Free Spins, Super). Transform/opacity animations only; body.lite trims the rest. ===== */
 body{--bA:#d9432e;--bB:#ffd23a;--bG:rgba(255,160,60,.55)}

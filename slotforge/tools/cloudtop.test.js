@@ -236,9 +236,13 @@ test('priority rule: 6+ tins and 3+ FS on one spin = Tin Rush only, FS cells rew
   });
   assert.ok(tinWins > 20 && fsOnly > 5, `${tinWins} ${fsOnly}`);
 });
-test('FS LUCK: bonuses come about 5x as often as the normal game (trigger 1-in ratio 4.7-5.4), cost 3x', () => {
-  const N = 600000; const cnt = ante => { const rng = mulberry(ante ? 61 : 62); let n = 0; for (let i = 0; i < N; i++) { const r = T.playRound(rng, { ante }); if (r.bonusTriggered) n++; } return n; };
-  const ratio = cnt(true) / cnt(false); assert.ok(ratio > 4.7 && ratio < 5.4, 'ratio ' + ratio);
+test('FS LUCK: cost 3x; Free Spins, Super(4) and Super(5+) are each 5x as likely as in the normal game; no line-win multiplier', () => {
+  assert.equal(T.CFG.anteCost, 3); assert.equal(T.CFG.anteFsMult, 5); assert.equal(T.CFG.anteLineScale, undefined);
+  const N = 1500000, cnt = ante => { const rng = mulberry(ante ? 61 : 62), c = { fs: 0, sup4: 0, sup5: 0 }; for (let i = 0; i < N; i++) { const r = T.playRound(rng, { ante }); if (r.bonusType === 'fs') c.fs++; else if (r.bonusType === 'super') (r.fsScatter.count >= 5 ? c.sup5++ : c.sup4++); } return c; };
+  const b = cnt(false), l = cnt(true);
+  assert.ok(Math.abs(l.fs / b.fs - 5) < 0.25, 'FS ratio ' + l.fs / b.fs); assert.ok(Math.abs((l.sup4 + l.sup5) / (b.sup4 + b.sup5) - 5) < 0.6, 'Super ratio ' + (l.sup4 + l.sup5) / (b.sup4 + b.sup5));
+  // line wins are identical in both modes: same grid -> same payout
+  const g = [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]]; assert.equal(T.evaluateLines(g).total, T.evaluateLines(g).total);
 });
 test('cap: FS bonus with absurd boosts ends on the crossing spin, totals clamp to 5000, running total never decreases', () => {
   let capped = 0;

@@ -17,7 +17,7 @@ const f=v=>Math.round(v*10)/10;
 // 1) extra far ridge (soft, no ink, lilac) behind the inked mountains + an atmospheric haze band over them
 const ridge='<path d="M-10 470 L90 400 L170 440 L260 372 L330 430 L420 385 L520 440 L610 410 L700 452 L800 430 L900 455 L1000 405 L1080 430 L1180 380 L1290 425 L1380 360 L1470 410 L1560 372 L1610 400 L1610 640 L-10 640Z" fill="#dcd2f0" opacity=".85"/>'
  +'<path d="M-10 520 L120 470 L240 500 L380 462 L520 505 L700 480 L900 510 L1100 478 L1260 506 L1420 468 L1610 495 L1610 640 L-10 640Z" fill="#e9dcf0" opacity=".8"/>';
-const haze='<rect x="-10" y="420" width="1620" height="215" fill="url(#ctLtHaze)"/>';
+const haze='<rect x="-2400" y="420" width="6400" height="215" fill="url(#ctLtHaze)"/>';   // spans the side extensions too (no step at the stage edge)
 inject('scene.html','far',`<defs><linearGradient id="ctLtHaze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe8d2" stop-opacity="0"/><stop offset=".7" stop-color="#ffe0c4" stop-opacity=".5"/><stop offset="1" stop-color="#ffd4b0" stop-opacity=".75"/></linearGradient></defs>`+ridge,
   (s,b)=>s.replace('<g id="sFar">',b+'<g id="sFar">'));
 inject('scene.html','haze',haze,(s,b)=>s.replace(/(<g id="sKites")/,b+'$1'));
@@ -33,7 +33,7 @@ const light=`<defs>
 <ellipse cx="800" cy="470" rx="700" ry="470" fill="url(#ctLtPool)"/>
 <ellipse cx="800" cy="716" rx="470" ry="46" fill="url(#ctLtSh)"/>
 <rect x="340" y="722" width="940" height="40" fill="url(#ctLtDeck)"/>
-<rect width="1600" height="900" fill="url(#ctLtVig)"/>
+<rect x="-2400" y="-1300" width="6400" height="2200" fill="url(#ctLtVig)"/>
 </g>`;
 inject('scene.html','light',light,(s,b)=>s.replace(/(<rect id="sDusk")/,b+'$1'));
 

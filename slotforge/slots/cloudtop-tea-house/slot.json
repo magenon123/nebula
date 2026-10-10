@@ -170,7 +170,7 @@
   "name": "FS Luck",
   "sym": 16,
   "vol": 3,
-  "text": "Pay 3x per spin and the festival drums (FS) land 5 times as often as in the normal game, and line wins pay about 23% more. Free Spins and Super Free Spins come far more often. Stays on until you switch it off.",
+  "text": "Pay 3x per spin and the festival drums (FS) land 5 times as often as in the normal game, so Free Spins and Super Free Spins come far more often. Stays on until you switch it off.",
   "badge": "FS LUCK ×3",
   "onMsg": "FS LUCK ON. TOTAL BET x3",
   "offMsg": "FS LUCK OFF"
@@ -199,5 +199,8 @@
   "presents": "PRESENTED BY",
   "credit": "A Nebula Studios game",
   "logo": "brand/nebula-studios.svg"
- }
+ },
+ "noBigWinAfter": [
+  "tin"
+ ]
 }
