@@ -123,14 +123,8 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   check('spin: win status line', /FINE CUP/.test(s.msg), s.msg);
   await page.evaluate(NORMAL);
   await page.keyboard.press('Space'); await sleep(250); check('Space starts a spin', await page.$eval('#spin', e => e.classList.contains('busy') || e.disabled)); check('Space spin settles', await settle());
-
-  // 2-tin tease: two tins in the first reels, bonus not reached
-  await page.evaluate(FORCE(`x => !x.bonusTriggered && x.tins.count >= 4 && x.tins.count <= 5 && x.tins.cells.filter(t => t[1] <= 1).length >= 2`, 23));
-  await watchMsgs(); await page.evaluate(() => { window.__tease = false; setInterval(() => { if (document.getElementById('char').classList.contains('tease')) window.__tease = true; }, 30); });
-  await clk('#spin'); const sawOne = await waitCond(() => document.getElementById('msg').textContent.includes('ONE MORE'), 20000);
-  check('tease: "ONE MORE..." with the slow drop after 2 tins', sawOne); await sleep(450); await shot('05-tease');
-  check('tease: Koji holds his breath (char.tease)', await waitCond(() => window.__tease, 8000));
-  check('tease settles', await settle()); check('tease: near-miss copy seen', await sawMsg(/ALMOST\.\.\. JUST ONE MORE TIN/));
+  // (the old 2-tin tease is gone: Tin Rush is buy-only, natural rounds never contain tins; the FS-drum tease is tested below)
+  check('buy-only Tin Rush: 3000 natural rounds contain no tins', await page.evaluate(() => { const o = window.__origPR || SLOT_ENGINE.playRound; let n = 0; for (let i = 0; i < 3000; i++) { const r = o(Math.random, {}); if (r.tins.count || r.bonusType === 'tin') n++; } return n === 0; }));
   await page.evaluate(NORMAL);
 
   // buy screen: ONE card, no Fever
@@ -279,12 +273,7 @@ const NORMAL = `if (window.__origPR) SLOT_ENGINE.playRound = window.__origPR;`;
   check('FS tease: "ONE MORE..." with the slow drop after 2 drums', await waitCond(() => document.getElementById('msg').textContent.includes('ONE MORE'), 20000)); await sleep(500); await shot('R7-fs-tease');
   check('FS tease: Koji holds his breath', await waitCond(() => window.__tease2, 8000)); check('FS tease settles', await settle()); check('FS tease: near-miss copy', await sawMsg(/ONE MORE DRUM/)); await page.evaluate(NORMAL);
 
-  // Tin Rush priority: 6+ tins and 3+ FS in the same spin -> Tin Rush only (engine rewrites the FS cells), Tin Rush keeps its own POURS LEFT label
-  await page.evaluate(FORCE(`x => !x.bought && x.bonusType === 'tin' && x.fsScatter.suppressed >= 3 && x.totalPayout < 400`, 67)); await watchMsgs(); await clk('#spin');
-  check('Tin priority: Tin Rush intro (no FS bonus)', await waitFor('#introM', 120000)); await sleep(900);
-  check('Tin priority: TIN RUSH ribbon, 3 POURS, no drums on the board, normal splash', /TIN RUSH/.test(await txt('#introRibbon')) && (await txt('#introN')) === '3' && (await page.$$eval('#grid .cell use[href="#s16"]', u => u.length)) === 0 && !(await page.$eval('#introM', e => e.classList.contains('sup'))));
-  await clk('#introM', { position: { x: 80, y: 80 } }); await sleep(900); check('Tin Rush counter label is POURS LEFT again', /POURS LEFT/.test(await txt('#fsBox small')), await txt('#fsBox small'));
-  await runBonus('prio', 'R7-prio'); check('Tin priority: outro', await waitFor('#outroM', 120000)); await sleep(2800); await shot('R7-tin-outro'); await clk('#outroM', { position: { x: 60, y: 60 } }); check('Tin priority round settles', await settle()); await page.evaluate(NORMAL);
+  // (Tin Rush priority test removed: Tin Rush is buy-only, so a natural round can never start two bonuses; see the 'buy-only' check above)
 
   // THE OWNER'S BUG: across Tin Rush, Free Spins, Super (all bonuses above) the counter never showed "n / m" and the shell's bonus line never appeared
   { const all = await page.evaluate(() => window.__fsAll), msgs = await page.evaluate(() => window.__msgAll);
