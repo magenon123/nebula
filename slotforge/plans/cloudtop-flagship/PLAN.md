@@ -60,6 +60,14 @@ Known-good rollback: git commit `d99fe90` (local tag `cloudtop-known-good`; `git
 - [x] D6 LOW portrait intro chips wrap badly (kai); D7 LOW rules strip text tiny on phone (kai); D8 LOW bonus-buy screen scroll on phones (kai); tablet 768x1024 rules strip over logo (kai)
 - [x] D9 LOW raw JS error text shown to player: shell now shows a friendly message (lead)
 
+## ROUND 2 (owner requests after delivery) + TEAM RULE: ONLY 2 AGENTS AT A TIME (owner: 5 agents burn credits). Lead may be one of the two.
+- [ ] R2.1 sides of EVERY background not completed (wide screens: base scene, frame sides, bonus-env layers; check 21:9 / 32:9 and tablet landscape): leo (owns scene/frame/side/bonus-env.html now)
+- [ ] R2.2 FS LUCK: pays 3x for a "5x bonus luck" (FS/Super trigger 5x as often as the normal game) NOT 14x: lead (math, slot.json fever text: badge still says x2!)
+- [ ] R2.3 Tin Rush becomes BUY-ONLY (no natural trigger; two bonuses can never start together): lead (engine coinP=0, base game re-tuned to 96.0-96.5%, tests updated)
+- [ ] R2.4 far bigger anticipation before a bonus (FS drums, slow-roll last reel, dim/zoom/heartbeat, build-up) : kai
+- [ ] R2.5 autoplay: custom number of spins typed in (opt-in via slot.json `autoplayCustom`; shell edit allowed for kai this round): kai
+- [ ] R3 STAKE ENGINE SUBMISSION (owner brief, see slotforge/plans/cloudtop-flagship/STAKE-ENGINE.md): after R2. Read official docs https://stakeengine.org/docs first; keep the standalone game as fallback; do not modify other games.
+
 ## Log (newest first; add a line per finished item with commit hash)
 - FINAL (lead): rebuilt; engine/math untouched (git diff d99fe90 engines = none; slot.json only studio/portrait added); 26/26 unit tests pass; smoke-cloudtop RESULT: PASS (full run); other five games byte-identical to d99fe90. Delivered cloudtop-tea-house-standalone.html. REMAINING (not done): real-device/iOS/GPU perf and sound never checked by a human; Super FS heaviest moment (software-render fps low); landscape intro Koji partly covered by medal; portrait outro ribbon overlaps Koji's lower face slightly; symbols are re-shaded, not redrawn (owner may want new art); splash corner mark skipped; real-server mode untested.
 - kai D1,D2,D3,D6,D7,D8 + tablet strip fixed (commit: see git log 'kai phone fixes'): splash split into 2 columns on landscape phone + fit-zoom, 44px hit areas (bet arrows now side by side), compact buy cards, portrait chips/quote/rules strip.

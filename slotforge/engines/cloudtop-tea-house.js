@@ -40,7 +40,7 @@ export const CFG = {
   maxWin: 5000,
   buy: { tin: { cost: 60 }, fs: { cost: 21 }, super: { cost: 75 } },
   // base game
-  coinP: 0.09,
+  coinP: 0,                                   // Tin Rush can only be bought (owner): no tin coins land in any natural round, so two bonuses can never start together
   anteCost: 3,                                // FS LUCK (bet-up): every spin costs 3x, the FS drums land far more often and Tin Rush cannot trigger (Free Spins only)
   anteFsP: 0.04935,                            // FS scatter per cell in FS LUCK (3x, no tin): tuned with tools/sim.js so the mode returns ~96.2%
   fsP: 0.018,                                 // FS scatter, per cell, all reels; rolled AFTER the tin test with the SAME draw (tin odds never move)
@@ -250,7 +250,7 @@ function startTins(rng) {   // natural tin-count distribution conditioned on >= 
 const bonusObj = (b, total) => ({ startSpins: CFG.startRespins, totalPayout: total, spins: b.spins });
 
 export function playRound(rng, { buy = null, ante = false } = {}) {
-  const maxWin = CFG.maxWin, fsPHere = ante ? CFG.anteFsP : CFG.fsP, coinHere = ante ? 0 : CFG.coinP;   // FS LUCK: no tin coins at all
+  const maxWin = CFG.maxWin, fsPHere = ante ? CFG.anteFsP : CFG.fsP, coinHere = CFG.coinP;   // Tin Rush is BUY-ONLY: coinP is 0, no tin coins land in the base game (owner request)
   if (buy) {
     const bc = CFG.buy[buy]; if (!bc) throw new Error('unknown buy ' + buy);
     const fsBuy = buy === 'fs' || buy === 'super', n = buy === 'fs' ? 3 : buy === 'super' ? superCount(rng) : 0;
