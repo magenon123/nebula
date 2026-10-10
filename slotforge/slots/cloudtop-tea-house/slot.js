@@ -622,7 +622,7 @@ function buildPaytable() {
     INFO.paytable.slice().reverse().map(p => row(p.id, p.name, f(p.pays[3]) + f(p.pays[4]) + f(p.pays[5]))).join('') +
     row(WILD, 'Smiling Kite (Wild)', '<td colspan="3">Stands in on reels 2-4</td>') + row(BUNDLE, 'Furoshiki Bundle', '<td colspan="3">All bundles flip to one symbol</td>') +
     row(FSS, 'FS Drum (Bonus)', `<td colspan="3">${FSI.triggers.fs} FS: FREE SPINS, ${FSI.triggers.super}+ FS: SUPER</td>`) +
-    row(TIN, 'Tea Tin (Bonus)', `<td colspan="3">${INFO.triggerTins}+ anywhere: TIN RUSH</td>`) +
+    row(TIN, 'Tea Tin (Bonus)', `<td colspan="3">Bonus Buy only: TIN RUSH</td>`) +
     row(12, 'Mini Tin', `<td colspan="3">${J.mini}x</td>`) + row(13, 'Minor Tin', `<td colspan="3">${J.minor}x</td>`) + row(14, 'Major Tin', `<td colspan="3">${J.major}x</td>`) + row(GRAND, 'Grand Dragon Kite', `<td colspan="3">+${INFO.grandBonus}x, full board</td>`);
   /* Steeping Drawers: numbers come from engine info().fsBonus, never retyped */
   const rt = o => Object.keys(o).map(k => `${k} FS: +${o[k]}`).join(', ');

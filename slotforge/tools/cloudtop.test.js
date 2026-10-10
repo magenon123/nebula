@@ -116,11 +116,16 @@ test('bought round: trigger spin pays exactly 0, no bundles/wilds, >= 6 tins, ca
     assert.equal(r.bonus.spins[0].newTins.length, n);
   }
 });
-test('buy start distribution = natural trigger distribution (tin count)', () => {
-  const rng = mulberry(77), nat = new Array(21).fill(0), buy = new Array(21).fill(0); let nn = 0;
-  for (let i = 0; i < 400000; i++) { const r = T.playRound(rng); if (r.bonusType === 'tin') { nat[r.tins.count]++; nn++; } }
-  for (let i = 0; i < nn; i++) buy[T.playRound(rng, { buy: 'tin' }).tins.count]++;
-  for (const k of [6, 7, 8]) assert.ok(Math.abs(nat[k] / nn - buy[k] / nn) < 0.05, `count ${k}: ${nat[k] / nn} vs ${buy[k] / nn}`);
+test('bought Tin Rush start: tin count follows the binomial(tinStartP) conditioned on >= 6', () => {
+  const rng = mulberry(77), p = T.CFG.tinStartP, N = 60000, buy = new Array(21).fill(0), pr = new Array(21).fill(0); let c = 1, tot = 0;
+  for (let k = 0; k <= 20; k++) { pr[k] = k >= 6 ? c * p ** k * (1 - p) ** (20 - k) : 0; tot += pr[k]; c = c * (20 - k) / (k + 1); }
+  for (let i = 0; i < N; i++) buy[T.playRound(rng, { buy: 'tin' }).tins.count]++;
+  for (const k of [6, 7, 8]) assert.ok(Math.abs(buy[k] / N - pr[k] / tot) < 0.02, `count ${k}: ${buy[k] / N} vs ${pr[k] / tot}`);
+});
+test('Tin Rush is BUY-ONLY: 300k natural base rounds and 100k FS LUCK rounds never contain a tin or a tin bonus', () => {
+  const rng = mulberry(5); let fsNat = 0;
+  for (const ante of [false, true]) for (let i = 0; i < (ante ? 100000 : 300000); i++) { const r = T.playRound(rng, { ante }); assert.equal(r.tins.count, 0); assert.notEqual(r.bonusType, 'tin'); if (r.bonusType) fsNat++; }
+  assert.ok(fsNat > 1000);
 });
 test('CONTRACT v1 on random rounds, base and buy; JSON-safe; bounded respins', () => {
   const rng = mulberry(2024);
@@ -231,11 +236,9 @@ test('priority rule: 6+ tins and 3+ FS on one spin = Tin Rush only, FS cells rew
   });
   assert.ok(tinWins > 20 && fsOnly > 5, `${tinWins} ${fsOnly}`);
 });
-test('Tin trigger rate is not moved by FS scatters (P(>=6 tins) equals the binomial of coinP)', () => {
-  const p = T.CFG.coinP, rng = mulberry(51); let pk = 0, c = 1;
-  for (let k = 0; k < 20; k++) { if (k >= 6) pk += c * p ** k * (1 - p) ** (20 - k); c = c * (20 - k) / (k + 1); }
-  let n = 0; const N = 600000; for (let i = 0; i < N; i++) if (T.playRound(rng).bonusType === 'tin') n++;
-  assert.ok(Math.abs(n / N - pk) < 5 * Math.sqrt(pk * (1 - pk) / N), `${n / N} vs ${pk}`);
+test('FS LUCK: bonuses come about 5x as often as the normal game (trigger 1-in ratio 4.7-5.4), cost 3x', () => {
+  const N = 600000; const cnt = ante => { const rng = mulberry(ante ? 61 : 62); let n = 0; for (let i = 0; i < N; i++) { const r = T.playRound(rng, { ante }); if (r.bonusTriggered) n++; } return n; };
+  const ratio = cnt(true) / cnt(false); assert.ok(ratio > 4.7 && ratio < 5.4, 'ratio ' + ratio);
 });
 test('cap: FS bonus with absurd boosts ends on the crossing spin, totals clamp to 5000, running total never decreases', () => {
   let capped = 0;
@@ -274,5 +277,5 @@ test('info() exposes buy prices, level tables, retrigger tables and FS rates', (
   const i = T.info();
   assert.deepEqual(i.buy, T.CFG.buy); assert.deepEqual(i.fsBonus.fs.boost, T.CFG.fs.boost); assert.deepEqual(i.fsBonus.super.boost, T.CFG.super.boost);
   assert.deepEqual(i.fsBonus.fs.retrigger, T.CFG.fs.retrig); assert.equal(i.fsBonus.super.startSpins5, 16); assert.equal(i.fsBonus.fs.maxLineMult, 1 + 5 * T.CFG.fs.boost[3]);
-  assert.ok(i.fsRates.oneIn3 > 150 && i.fsRates.oneIn3 < 260 && i.fsRates.oneIn4 > 2000 && i.fsRates.oneIn4 < 3500);
+  assert.ok(i.fsRates.oneIn3 > 60 && i.fsRates.oneIn3 < 120 && i.fsRates.oneIn4 > 400 && i.fsRates.oneIn4 < 1100, JSON.stringify(i.fsRates));
 });

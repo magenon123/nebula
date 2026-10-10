@@ -40,10 +40,12 @@ export const CFG = {
   maxWin: 5000,
   buy: { tin: { cost: 60 }, fs: { cost: 21 }, super: { cost: 75 } },
   // base game
+  tinStartP: 0.09,                            // per-cell tin chance used ONLY to shape the start of a BOUGHT Tin Rush (same distribution as before)
   coinP: 0,                                   // Tin Rush can only be bought (owner): no tin coins land in any natural round, so two bonuses can never start together
   anteCost: 3,                                // FS LUCK (bet-up): every spin costs 3x, the FS drums land far more often and Tin Rush cannot trigger (Free Spins only)
-  anteFsP: 0.04935,                            // FS scatter per cell in FS LUCK (3x, no tin): tuned with tools/sim.js so the mode returns ~96.2%
-  fsP: 0.018,                                 // FS scatter, per cell, all reels; rolled AFTER the tin test with the SAME draw (tin odds never move)
+  anteLineScale: 1.235,                       // FS LUCK: line wins pay ~23% more (keeps the 3x mode at ~96.2% with FS drums exactly 5x as frequent as the normal game)
+  anteFsP: 0.0483,                            // FS scatter per cell in FS LUCK (3x, no tin): tuned with tools/sim.js so the mode returns ~96.2%
+  fsP: 0.0256,                                 // FS scatter, per cell, all reels; rolled AFTER the tin test with the SAME draw (tin odds never move)
   triggerTins: 6,
   symW: [10, 10, 10, 10, 10, 10, 10, 10],     // pay symbols 0..7
   wildW: 1, bundleW: 3,                       // wild only reels 2-4
@@ -80,7 +82,7 @@ function drawCell(rng, c, noSpecial, wildW = CFG.wildW) {
 }
 
 /* Line evaluation on a grid WITHOUT bundles. Tin (10) and bundle (9) are blanks. Returns { total, wins:[{line,sym,len,mult,payout,cells}] }. */
-export function evaluateLines(grid) {
+export function evaluateLines(grid, scale = 1) {
   const wins = []; let total = 0;
   for (let l = 0; l < LINES.length; l++) {
     const L = LINES[l], s = grid[L[0]][0];
@@ -88,7 +90,7 @@ export function evaluateLines(grid) {
     let len = 1;
     while (len < COLS) { const x = grid[L[len]][len]; if (x === s || x === WILD) len++; else break; }
     if (len < 3) continue;
-    const mult = CFG.pay[s][len - 3] * CFG.payScale;
+    const mult = CFG.pay[s][len - 3] * CFG.payScale * scale;
     if (!(mult > 0)) continue;
     wins.push({ line: l, sym: s, len, mult, payout: mult, cells: L.slice(0, len).map((r, c) => [r, c]) });
     total += mult;
@@ -241,7 +243,7 @@ function fsStart(rng, n) {   // n FS cells at uniform positions
 
 function startTins(rng) {   // natural tin-count distribution conditioned on >= triggerTins, positions uniform
   let n;
-  for (;;) { n = 0; for (let i = 0; i < CELLS; i++) if (rng() < CFG.coinP) n++; if (n >= CFG.triggerTins) break; }
+  for (;;) { n = 0; for (let i = 0; i < CELLS; i++) if (rng() < CFG.tinStartP) n++; if (n >= CFG.triggerTins) break; }
   const all = []; for (let i = 0; i < CELLS; i++) all.push(i);
   for (let k = 0; k < n; k++) { const j = k + Math.floor(rng() * (CELLS - k)); const t = all[k]; all[k] = all[j]; all[j] = t; }
   return all.slice(0, n).sort((a, b) => a - b).map(i => [Math.floor(i / COLS), i % COLS]);
@@ -291,7 +293,7 @@ export function playRound(rng, { buy = null, ante = false } = {}) {
     for (const [r, c] of bundleCells) step.grid[r][c] = flipTo;
     step.bundle = { cells: bundleCells, flipTo };
   }
-  const ev = evaluateLines(step.grid); step.wins = ev.wins; step.payout = ev.total;
+  const ev = evaluateLines(step.grid, ante ? CFG.anteLineScale : 1); step.wins = ev.wins; step.payout = ev.total;
   const base = Math.min(maxWin, ev.total);
   const round = { v: 1, cost: ante ? CFG.anteCost : 1, ante: !!ante, bought: null, bonusType: null, initialGrid, cascadeSteps: [step], tins: { count: tinCells.length, cells: tinCells }, fsScatter: { count: fsCells.length, cells: fsCells, suppressed }, basePayout: base,
     bonusTriggered: false, bonus: null, totalPayout: base, capped: false };

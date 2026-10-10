@@ -2,7 +2,7 @@
  "id": "cloudtop-tea-house",
  "title": "Koji's Cloudtop Tea House",
  "logoText": "CLOUDTOP TEA HOUSE",
- "infoTitle": "CLOUDTOP TEA HOUSE \u00b7 BONUSES",
+ "infoTitle": "CLOUDTOP TEA HOUSE · BONUSES",
  "api": "/api/slot/cloudtop-tea-house/spin",
  "engineSource": "slotforge/engines/cloudtop-tea-house.js",
  "storage": "ct",
@@ -54,6 +54,7 @@
  ],
  "defaultBet": 1,
  "maxWin": 5000,
+ "autoplayCustom": true,
  "anteCost": 3,
  "scatterSym": 10,
  "char": {
@@ -169,9 +170,9 @@
   "name": "FS Luck",
   "sym": 16,
   "vol": 3,
-  "text": "Pay 3x per spin and the festival drums (FS) land far more often: Free Spins and Super Free Spins come about every 14 spins. Tin Rush is switched off while it is on. Stays on until you switch it off.",
-  "badge": "FS LUCK \u00d72",
-  "onMsg": "FS LUCK ON. TOTAL BET x2",
+  "text": "Pay 3x per spin and the festival drums (FS) land 5 times as often as in the normal game, and line wins pay about 23% more. Free Spins and Super Free Spins come far more often. Stays on until you switch it off.",
+  "badge": "FS LUCK ×3",
+  "onMsg": "FS LUCK ON. TOTAL BET x3",
   "offMsg": "FS LUCK OFF"
  },
  "loading": {
@@ -180,7 +181,7 @@
    {
     "sym": 10,
     "title": "TIN RUSH",
-    "text": "Land 6 Tea Tins for a hold-and-win round. Complete a row for the Kite Launch that doubles it, fill the board for the Grand Dragon Kite."
+    "text": "Buy your way in: the Tins drop and a hold-and-win round starts. Complete a row for the Kite Launch that doubles it, fill the board for the Grand Dragon Kite."
    },
    {
     "sym": 16,
@@ -189,7 +190,10 @@
    }
   ]
  },
- "portrait": {"left": 110, "right": 110},
+ "portrait": {
+  "left": 110,
+  "right": 110
+ },
  "studio": {
   "name": "Nebula Studios",
   "presents": "PRESENTED BY",
