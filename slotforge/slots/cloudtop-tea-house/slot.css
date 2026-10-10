@@ -451,7 +451,7 @@ body.lite .ltLamp{animation:none}
 /* ART-LIGHT end */
 /* PORTRAIT (QA D4): the shell zooms the board group #ga by --g; here the scene is aligned to it (same scale/offset) so the tea house wraps the board exactly as on
    desktop; sky + paving bleed (scene.html .bleed, art/bleed.cjs) fills above/below. --gyT = board group top: low enough that the board sits just above Bonus Buy. */
-.bleed{display:none}
+.bleed{display:inline}
 body.portrait #stage{--gyT:max(100px,calc(var(--H,1600px) - 1498px))}
 body.portrait #ga{top:calc(var(--gyT) / var(--g,1))!important}
 body.portrait #stage #scene{left:calc(var(--gx,0px) * var(--g,1))!important;top:var(--gyT)!important;transform:scale(var(--g,1));transform-origin:0 0;overflow:visible}

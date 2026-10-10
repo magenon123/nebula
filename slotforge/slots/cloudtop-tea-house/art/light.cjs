@@ -24,7 +24,7 @@ inject('scene.html','haze',haze,(s,b)=>s.replace(/(<g id="sKites")/,b+'$1'));
 // 2) lighting on top of the whole backdrop: warm pool around the board, deck light, depth shadows of the tansu, vignette
 const light=`<defs>
 <radialGradient id="ctLtPool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd58a" stop-opacity=".5"/><stop offset=".45" stop-color="#ffc070" stop-opacity=".22"/><stop offset="1" stop-color="#ffb060" stop-opacity="0"/></radialGradient>
-<radialGradient id="ctLtVig" cx=".5" cy=".47" r=".75"><stop offset=".55" stop-color="#2a1f4a" stop-opacity="0"/><stop offset=".85" stop-color="#2a1f4a" stop-opacity=".22"/><stop offset="1" stop-color="#1c1438" stop-opacity=".5"/></radialGradient>
+<radialGradient id="ctLtVig" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="1" gradientTransform="translate(800 423) scale(1500 700)"><stop offset=".5" stop-color="#2a1f4a" stop-opacity="0"/><stop offset=".85" stop-color="#2a1f4a" stop-opacity=".22"/><stop offset="1" stop-color="#1c1438" stop-opacity=".5"/></radialGradient>
 <radialGradient id="ctLtSh" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#2a1a40" stop-opacity=".5"/><stop offset=".6" stop-color="#2a1a40" stop-opacity=".2"/><stop offset="1" stop-color="#2a1a40" stop-opacity="0"/></radialGradient>
 <linearGradient id="ctLtSide" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2a1a40" stop-opacity="0"/><stop offset="1" stop-color="#2a1a40" stop-opacity=".38"/></linearGradient>
 <linearGradient id="ctLtDeck" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1a40" stop-opacity=".4"/><stop offset="1" stop-color="#2a1a40" stop-opacity="0"/></linearGradient>
