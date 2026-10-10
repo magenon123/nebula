@@ -1,6 +1,7 @@
 /* node --test tools/cloudtop.test.js : rule tests for Koji's Cloudtop Tea House + contract on random rounds (base and buy) */
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import * as T from '../engines/cloudtop-tea-house.js';
 import { mulberry } from './sim.js';
 import { checkRound } from './check-round.js';
@@ -238,6 +239,12 @@ test('priority rule: 6+ tins and 3+ FS on one spin = Tin Rush only, FS cells rew
 });
 test('FS LUCK: cost 3x; Free Spins, Super(4) and Super(5+) are each 5x as likely as in the normal game; no line-win multiplier', () => {
   assert.equal(T.CFG.anteCost, 3); assert.equal(T.CFG.anteFsMult, 5); assert.equal(T.CFG.anteLineScale, undefined);
+  // the card the player reads (slot.json fever.text) and the info screen state the real numbers
+  const fev = JSON.parse(readFileSync(new URL('../slots/cloudtop-tea-house/slot.json', import.meta.url))).fever.text, inf = readFileSync(new URL('../slots/cloudtop-tea-house/info.html', import.meta.url), 'utf8');
+  for (const n of [T.CFG.fs.luckSpins, T.CFG.fs.spins, T.CFG.super.luckSpins, T.CFG.super.spins]) assert.ok(fev.includes(String(n)), 'card mentions ' + n);
+  for (const n of [T.CFG.fs.luckSpins, T.CFG.fs.spins, T.CFG.super.luckSpins, T.CFG.super.spins, T.CFG.super.luckSpins5, T.CFG.super.spins5]) assert.ok(inf.includes(String(n)), 'info mentions ' + n);
+  const r = (() => { const rng = mulberry(77); for (let i = 0; i < 200000; i++) { const x = T.playRound(rng, { ante: true }); if (x.bonusType === 'fs') return x; } })();
+  assert.equal(r.bonus.startSpins, T.CFG.fs.luckSpins); assert.equal(T.playRound(mulberry(3), { buy: 'fs' }).bonus.startSpins, T.CFG.fs.spins);   // bought bonuses keep the normal spins
   const N = 1500000, cnt = ante => { const rng = mulberry(ante ? 61 : 62), c = { fs: 0, sup4: 0, sup5: 0 }; for (let i = 0; i < N; i++) { const r = T.playRound(rng, { ante }); if (r.bonusType === 'fs') c.fs++; else if (r.bonusType === 'super') (r.fsScatter.count >= 5 ? c.sup5++ : c.sup4++); } return c; };
   const b = cnt(false), l = cnt(true);
   assert.ok(Math.abs(l.fs / b.fs - 5) < 0.25, 'FS ratio ' + l.fs / b.fs); assert.ok(Math.abs((l.sup4 + l.sup5) / (b.sup4 + b.sup5) - 5) < 0.6, 'Super ratio ' + (l.sup4 + l.sup5) / (b.sup4 + b.sup5));

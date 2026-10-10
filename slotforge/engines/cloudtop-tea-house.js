@@ -63,8 +63,8 @@ export const CFG = {
   grandBonus: 500,
   // Free Spins / Super Free Spins (Steeping Drawers). boost[level] = extra multiplier points of a drawer at that level.
   fsPBonus: 0.026,                            // FS scatter per cell inside the bonuses (retrigger); no tins there
-  fs:    { spins: 10, maxLevel: 3, boost: [0, 1, 2, 4],     wildW: 1.9, retrig: { 3: 4, 4: 7, 5: 10 },  maxSpins: 40 },
-  super: { spins: 12, spins5: 16, maxLevel: 4, boost: [0, 1, 3, 5, 8], wildW: 2.86, retrig: { 3: 5, 4: 8, 5: 12 }, maxSpins: 50, preSteep: 4, preLevel: 2 }
+  fs:    { spins: 10, luckSpins: 11, luckSpins5: 11, maxLevel: 3, boost: [0, 1, 2, 4],     wildW: 1.9, retrig: { 3: 4, 4: 7, 5: 10 },  maxSpins: 40 },
+  super: { spins: 12, spins5: 16, luckSpins: 15, luckSpins5: 25, maxLevel: 4, boost: [0, 1, 3, 5, 8], wildW: 2.86, retrig: { 3: 5, 4: 8, 5: 12 }, maxSpins: 50, preSteep: 4, preLevel: 2 }
 };
 
 const pickW = (rng, tbl) => { let t = 0; for (const e of tbl) t += e[1]; let u = rng() * t; for (const e of tbl) { u -= e[1]; if (u < 0) return e[0]; } return tbl[tbl.length - 1][0]; };
@@ -192,14 +192,14 @@ function superCount(rng, p = CFG.fsP) {
 }
 
 /* The bonus. type 'fs' | 'super'; n = FS count on the trigger grid (5+ in super = 16 spins). capLeft = remaining cap. Returns { spins, total (uncapped sum), capped, info } */
-function playSteep(rng, type, n, capLeft) {
+function playSteep(rng, type, n, capLeft, luck = false) {
   const T = CFG[type], levels = Array.from({ length: ROWS }, () => new Array(COLS).fill(0)), preSteep = [];
   if (type === 'super') {
     const all = []; for (let i = 0; i < CELLS; i++) all.push(i);
     for (let k = 0; k < T.preSteep; k++) { const j = k + Math.floor(rng() * (CELLS - k)); const t = all[k]; all[k] = all[j]; all[j] = t; }
     for (const i of all.slice(0, T.preSteep).sort((a, b) => a - b)) { const r = Math.floor(i / COLS), c = i % COLS; levels[r][c] = T.preLevel; preSteep.push({ r, c, level: T.preLevel }); }
   }
-  const startSpins = type === 'super' && n >= 5 ? T.spins5 : T.spins;
+  const startSpins = luck ? (type === 'super' && n >= 5 ? T.luckSpins5 : T.luckSpins) : type === 'super' && n >= 5 ? T.spins5 : T.spins;   // FS LUCK head start: more starting spins (natural FS LUCK rounds only)
   let left = startSpins, awarded = startSpins, run = 0, capped = false, extra = 0;
   const spins = [];
   while (left > 0) {
@@ -317,7 +317,7 @@ export function playRound(rng, { buy = null, ante = false } = {}) {
     round.bonusTriggered = true; round.bonus = bonusObj(b, total); round.bonusType = 'tin';
     round.totalPayout = Math.min(maxWin, base + total); round.capped = b.capped || round.totalPayout >= maxWin;
   } else if (fsCells.length >= 3) {
-    const n = fsCells.length, type = n === 3 ? 'fs' : 'super', b = playSteep(rng, type, n, maxWin - base), total = Math.min(maxWin - base, b.total);
+    const n = fsCells.length, type = n === 3 ? 'fs' : 'super', b = playSteep(rng, type, n, maxWin - base, ante), total = Math.min(maxWin - base, b.total);
     round.bonusTriggered = true; round.bonus = fsBonusObj(b, total); round.bonusType = type;
     round.totalPayout = Math.min(maxWin, base + total); round.capped = b.capped || round.totalPayout >= maxWin;
   }
