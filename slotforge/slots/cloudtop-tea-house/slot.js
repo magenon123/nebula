@@ -731,6 +731,9 @@ return {
   },
   particleColor: (p, a) => p.w ? 'rgba(0,0,0,0)' : p.c ? `rgba(255,${190 + (p.l % 50)},70,${a})` : `rgba(255,${200 + (p.l % 40)},${215 + (p.l % 30)},${a})`,
   init() {
+    try { if (matchMedia('(pointer:coarse)').matches || /[?&]lite=1/.test(location.search)) document.body.classList.add('touch'); } catch {}   // touch-sized controls (bet arrows, menu, autoplay) follow the device, not the quality level
+    /* PERFORMANCE: the ambient scenery (clouds, kites, petals, lamps, environment particles) moves slowly; drawing it at 60 fps only burns the weak GPUs. Give every slow endless animation a stepped timing so it repaints 10-24 times a second: the motion looks the same, the repaint work drops by 3-6x. */
+    try { document.querySelectorAll('#bonusEnv *, #scene *, #petals *, #frameArt *, #logo *').forEach(el => { const cs = getComputedStyle(el); if (cs.animationName === 'none' || cs.animationIterationCount !== 'infinite') return; const dur = parseFloat(cs.animationDuration); if (!(dur >= 1.5)) return; const fps = dur >= 20 ? 10 : dur >= 6 ? 15 : 24; el.style.animationTimingFunction = `steps(${Math.max(6, Math.round(dur * fps))})`; }); } catch (e) { /* cosmetic only */ }
     for (let i = 0; i < ROWS * COLS; i++) { const d = document.createElement('div'); d.className = 'cell'; $('grid').append(d); cells.push(d); }
     $('fxl').insertAdjacentHTML('beforeend', '<div id="ctBanner"><b></b><small></small></div>');
     { const sky = document.createElement('div'); sky.id = 'ctKites'; let top = $('scene'); while (top.parentElement && top.parentElement.id !== 'stage') top = top.parentElement; top.after(sky); }   // between the scene and the frame/Koji

@@ -152,22 +152,22 @@ body.portrait #ctRules .lo{display:none}body.portrait #ctRules .sh{display:inlin
 }
 
 /* --- D2 phones: >=44px effective hit areas (stage is scaled ~.43, so 44px = ~102 stage units) --- */
-body.lite #menuBtn{position:relative}
-body.lite #menuBtn::after{content:"";position:absolute;inset:-24px}
-body.lite #bAuto::after{content:"";position:absolute;inset:-17px;border-radius:50%}
-body.lite:not(.portrait) #bAuto::after{inset:-25px}
+body.touch #menuBtn{position:relative}
+body.touch #menuBtn::after{content:"";position:absolute;inset:-24px}
+body.touch #bAuto::after{content:"";position:absolute;inset:-17px;border-radius:50%}
+body.touch:not(.portrait) #bAuto::after{inset:-25px}
 /* the bet arrows sit side by side (lower | raise) so each gets its own 44px-wide hit area, fully inside the bet bar */
-body.lite #barR{padding-left:24px}
-body.lite #chev{right:6px;left:auto;top:0;bottom:0;width:216px;height:auto;flex-direction:row;justify-content:space-between}
-body.lite #chev button{position:relative;width:104px;height:auto;flex:none;border-radius:12px;background:rgba(255,255,255,.07)}
-body.lite #chev #m{order:1}body.lite #chev #p{order:2}
-body.lite #chev button::after{content:"";position:absolute;left:0;right:0;top:-12px;bottom:-12px}
-body.lite #chev svg{width:40px;height:24px;transform:rotate(90deg);stroke:#fff}
-body.portrait.lite #barR{width:540px}
-body.portrait.lite #barL{width:820px}
-body.lite:not(.portrait) #barL{width:560px}
-body.lite:not(.portrait) #barR{left:740px;width:520px}
-body.lite:not(.portrait) #chev{right:72px}
+body.touch #barR{padding-left:24px}
+body.touch #chev{right:6px;left:auto;top:0;bottom:0;width:216px;height:auto;flex-direction:row;justify-content:space-between}
+body.touch #chev button{position:relative;width:104px;height:auto;flex:none;border-radius:12px;background:rgba(255,255,255,.07)}
+body.touch #chev #m{order:1}body.touch #chev #p{order:2}
+body.touch #chev button::after{content:"";position:absolute;left:0;right:0;top:-12px;bottom:-12px}
+body.touch #chev svg{width:40px;height:24px;transform:rotate(90deg);stroke:#fff}
+body.portrait.touch #barR{width:540px}
+body.portrait.touch #barL{width:820px}
+body.touch:not(.portrait) #barL{width:560px}
+body.touch:not(.portrait) #barR{left:740px;width:520px}
+body.touch:not(.portrait) #chev{right:72px}
 
 /* --- D8 bonus buy screen on phones: compact cards --- */
 body.portrait .modal.bb{padding:12px 10px 10px;justify-content:flex-start}
@@ -272,3 +272,6 @@ body.lite .cell.hot svg.g{filter:none}
 body.ctReveal .cell.scat svg.g{filter:drop-shadow(0 0 20px #fff6c8)}
 #grid::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:rgba(14,6,34,.5);opacity:0;transition:opacity .35s}
 body.ctRoll #grid::after{opacity:1}body.ctRoll2 #grid::after{background:rgba(24,6,20,.58)}body.ctReveal #grid::after{opacity:0}
+
+/* PERFORMANCE: the Koji splash art (inside <symbol>s) kept ~25 infinite animations ticking all game long although nothing draws them; run them only while the intro/outro splash is open */
+body:not(:has(#introM:not([hidden]),#outroM:not([hidden]))) :is(#kojiSplash,#kojiSplashSuper,#spEarL,#spEarR) *{animation-play-state:paused!important}

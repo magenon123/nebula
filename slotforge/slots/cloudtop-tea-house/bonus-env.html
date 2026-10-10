@@ -51,7 +51,11 @@ body.portrait #bonusEnv .env::after{top:2000px;bottom:0;background:linear-gradie
 #bonusEnv .envTin{--tg:linear-gradient(90deg,#0a0610 0.0%,#0a0610 12.5%,#0a050f 25.0%,#0b050f 37.5%,#0b050f 50.0%,#0b050f 62.5%,#09050f 75.0%,#0a0610 87.5%,#0a0610 100.0%);--tgR:linear-gradient(270deg,#0a0610 0.0%,#0a0610 12.5%,#0a050f 25.0%,#0b050f 37.5%,#0b050f 50.0%,#0b050f 62.5%,#09050f 75.0%,#0a0610 87.5%,#0a0610 100.0%);--bg2:linear-gradient(90deg,#f65918 0.0%,#ff601c 12.5%,#ff8b31 25.0%,#fe9e3a 37.5%,#fe9e3a 50.0%,#fe9e3a 62.5%,#ff8930 75.0%,#ff601c 87.5%,#f65918 100.0%);--bg2R:linear-gradient(270deg,#f65918 0.0%,#ff601c 12.5%,#ff8b31 25.0%,#fe9e3a 37.5%,#fe9e3a 50.0%,#fe9e3a 62.5%,#ff8930 75.0%,#ff601c 87.5%,#f65918 100.0%);--bf:#f65918}
 #bonusEnv .envFs{--tg:linear-gradient(90deg,#b9a880 0.0%,#84bb71 12.5%,#bfe9d8 25.0%,#d9f0df 37.5%,#b2d99b 50.0%,#ddf2e1 62.5%,#bfe9d8 75.0%,#87c363 87.5%,#baa880 100.0%);--tgR:linear-gradient(270deg,#b9a880 0.0%,#84bb71 12.5%,#bfe9d8 25.0%,#d9f0df 37.5%,#b2d99b 50.0%,#ddf2e1 62.5%,#bfe9d8 75.0%,#87c363 87.5%,#baa880 100.0%);--bg2:linear-gradient(90deg,#ab9870 0.0%,#7ab46b 12.5%,#61a595 25.0%,#58a090 37.5%,#aad2c4 50.0%,#58a090 62.5%,#58a090 75.0%,#559e8e 87.5%,#ab9870 100.0%);--bg2R:linear-gradient(270deg,#ab9870 0.0%,#7ab46b 12.5%,#61a595 25.0%,#58a090 37.5%,#aad2c4 50.0%,#58a090 62.5%,#58a090 75.0%,#559e8e 87.5%,#ab9870 100.0%);--bf:#ab9870}
 #bonusEnv .envSuper{--tg:linear-gradient(90deg,#1c0638 0.0%,#1c0638 12.5%,#26103b 25.0%,#29123b 37.5%,#2d133d 50.0%,#29123b 62.5%,#26103b 75.0%,#1c0638 87.5%,#1c0638 100.0%);--tgR:linear-gradient(270deg,#1c0638 0.0%,#1c0638 12.5%,#26103b 25.0%,#29123b 37.5%,#2d133d 50.0%,#29123b 62.5%,#26103b 75.0%,#1c0638 87.5%,#1c0638 100.0%);--bg2:linear-gradient(90deg,#2a0636 0.0%,#2a0636 12.5%,#2a0636 25.0%,#2a0636 37.5%,#2a0636 50.0%,#2a0636 62.5%,#2a0636 75.0%,#2a0636 87.5%,#2a0636 100.0%);--bg2R:linear-gradient(270deg,#2a0636 0.0%,#2a0636 12.5%,#2a0636 25.0%,#2a0636 37.5%,#2a0636 50.0%,#2a0636 62.5%,#2a0636 75.0%,#2a0636 87.5%,#2a0636 100.0%);--bf:#2a0636}
-body.lite #bonusEnv *{animation:none!important}
+/* LITE / weak devices: the big light motion (sun, glow, shafts, furnace) stays, the ~400 tiny particles and the huge rotating rays stop */
+body.lite #bonusEnv :is(.tw,.rise,.drift,.sway,.wisp,.fall,.rays){animation:none!important}
+body.lite #bonusEnv .rise,body.lite #bonusEnv .fall,body.lite #bonusEnv .wisp{display:none}
+/* the side copies only matter when the window is not (almost exactly) 16:9: at 16:9 they are off screen, so do not draw them */
+@media (min-aspect-ratio:1769/1000) and (max-aspect-ratio:1787/1000){#bonusEnv svg.mir{display:none}}
 @media (prefers-reduced-motion:reduce){#bonusEnv *{animation:none!important}#bonusEnv .env{transition-duration:.01s}}
 
 /* one continuous vignette per env (a CSS radial gradient centred on the stage board, same ellipse + stops as the old per-svg one): it runs on under the side copies, so no brightness step at the seam */
@@ -59,6 +63,10 @@ body.lite #bonusEnv *{animation:none!important}
 #bonusEnv .envTin>.vig{background:radial-gradient(ellipse 1152px 648px at calc(var(--ox) + 800px) calc(var(--oy) + 450px),rgba(0,0,0,0) 45%,rgba(0,0,0,.78) 100%)}
 #bonusEnv .envFs>.vig{background:radial-gradient(ellipse 1120px 630px at calc(var(--ox) + 800px) calc(var(--oy) + 450px),rgba(12,58,58,0) 50%,rgba(12,58,58,.55) 100%)}
 #bonusEnv .envSuper>.vig{background:radial-gradient(ellipse 1152px 648px at calc(var(--ox) + 800px) calc(var(--oy) + 450px),rgba(42,4,54,0) 50%,rgba(42,4,54,.7) 100%)}
+
+/* PERFORMANCE: the hidden environments used to keep ~400 infinite animations ticking underneath the base game. Everything is paused unless its environment is the active one. */
+#bonusEnv .env,#bonusEnv .env *{animation-play-state:paused!important}
+#bonusEnv[data-bonus="tin"] .envTin,#bonusEnv[data-bonus="tin"] .envTin *,#bonusEnv[data-bonus="fs"] .envFs,#bonusEnv[data-bonus="fs"] .envFs *,#bonusEnv[data-bonus="super"] .envSuper,#bonusEnv[data-bonus="super"] .envSuper *{animation-play-state:running!important}
 </style>
 <div id="bonusEnv" aria-hidden="true"><div class="env envTin"><svg class="mir ml" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true"><defs>
 <linearGradient x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05030c"/><stop offset=".45" stop-color="#120a1e"/><stop offset=".8" stop-color="#2a0f14"/><stop offset="1" stop-color="#4a1608"/></linearGradient>

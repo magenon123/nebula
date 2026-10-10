@@ -48,17 +48,21 @@ if (LITE) {
    level 2 drops every remaining filter and blend, level 3 swaps the scene artwork for its soft one-bitmap copy. The level is remembered on that device (?q=0 resets,
    ?q=1..3 forces one). ?fps=1 shows a live readout (fps, quality level, phone mode, build) to screenshot. Automated tests are never throttled. */
 const QKEY = P + '_q';
-let QLV = (() => { const m = /[?&]q=(\d)/.exec(location.search); if (m) { store.set(QKEY, +m[1]); return +m[1]; } return Math.max(LITE ? 1 : 0, +store.get(QKEY, 0) || 0); })();
-const applyQ = () => { document.body.classList.toggle('q2', QLV >= 2); document.body.classList.toggle('q3', QLV >= 3); };
+let QLV = (() => { const m = /[?&]q=(\d)/.exec(location.search); if (m) { store.set(QKEY, +m[1]); return +m[1]; } return Math.max(LITE ? 1 : 0, +store.get(QKEY, 0) || 0, (cfg.autoQuality && ((navigator.hardwareConcurrency || 8) <= 2 || (navigator.deviceMemory || 8) <= 2)) ? 1 : 0); })();
+const AUTOQ = !!cfg.autoQuality;   // opt-in (slot.json): weak computers step down by themselves BEFORE the first spin, and level 1 switches the ambient motion off (same as phone mode)
+const applyQ = () => { document.body.classList.toggle('q2', QLV >= 2); document.body.classList.toggle('q3', QLV >= 3); if (AUTOQ && !LITE) document.body.classList.toggle('lite', QLV >= 1); };
 applyQ();
 (function governor() {
   const show = /[?&]fps=1/.test(location.search); let box = null;
   if (show) { box = document.createElement('div'); box.style.cssText = 'position:fixed;left:6px;top:6px;z-index:99999;background:rgba(0,0,0,.72);color:#9f9;font:12px/1.35 monospace;padding:4px 7px;border-radius:6px;pointer-events:none;white-space:pre'; document.body.appendChild(box); }
   const build = (document.querySelector('meta[name="sf-build"]') || {}).content || '?';
-  let last = performance.now(), acc = 0, n = 0, bad = 0, cool = 0, all = 0, allN = 0, lastShow = last, spins = 0, wasBusy = false;   // (the first spin is a warm-up: images and code are still loading)
+  let idleD = [], idleN = 0, idleFrom = performance.now() + 1500; let last = performance.now(), acc = 0, n = 0, bad = 0, cool = 0, all = 0, allN = 0, lastShow = last, spins = 0, wasBusy = false;   // (the first spin is a warm-up: images and code are still loading)
   (function f(t) { const d = t - last; last = t;
     const busy = $('spin').classList.contains('busy'); if (busy && !wasBusy) spins++; wasBusy = busy;
     if (d < 250) { all += d; allN++; if (busy) { acc += d; n++; } }
+    if (AUTOQ && !busy && !document.hidden && QLV < 3 && !document.getElementById('loadM') && (!navigator.webdriver || /[?&]gov=1/.test(location.search)) && !document.querySelector('.modal:not([hidden])') && !$('big').classList.contains('show')) {   // idle probe: the ambient scenery alone must hold ~30 fps
+      if (t < idleFrom) idleN = 0; else if (d < 250) { idleD.push(d); if (idleD.length >= 100) { const m = idleD.sort((x, y) => x - y)[50]; idleD = []; if (m > 33) { QLV++; store.set(QKEY, QLV); applyQ(); idleFrom = t + 2500; } else idleFrom = t + 20000; } } }
+    else idleD = [];
     if (busy && n >= 45) { const avg = acc / n; acc = 0; n = 0;
       if ((!navigator.webdriver || /[?&]gov=1/.test(location.search)) && spins >= 2 && QLV < 3 && t > cool) { if (avg > 36) bad++; else bad = 0; if (bad >= 2 || avg > 55) { QLV++; bad = 0; cool = t + 3000; store.set(QKEY, QLV); applyQ(); } } }
     if (box && t - lastShow > 500) { lastShow = t; box.textContent = Math.round(1000 / (all / (allN || 1))) + ' fps (avg) | quality ' + QLV + (LITE ? ' | phone mode' : '') + '\nDPR ' + devicePixelRatio + ' | ' + innerWidth + 'x' + innerHeight + '\nbuild ' + build; all = 0; allN = 0; }
@@ -353,20 +357,21 @@ function coinRain(lv) {
   const iv = setInterval(spawn, Math.max(14, (190 - lv * 22) / 5));
   return () => clearInterval(iv);   // stop making new coins; the ones in the air finish their fall
 }
-async function bigWin(x, amt) {
+async function bigWin(x, amt, opt = {}) {
   const t = tierOf(x); if (!t) return null;
   const isMax = x >= cfg.maxWin - 1e-9;   // the cap itself gets its own gold presentation
+  const light = !!opt.light && !isMax, QK = opt.quick ? .55 : 1;   // light = only the banner text + colour glow (no dark backdrop, no coins); quick = shorter, used inside bonuses
   const steps = LADDER.filter(l => x >= l.min).map(l => ({ ...l })); if (isMax) steps.push({ min: x, name: 'MAX WIN', lv: 5, max: true });
   const N = steps.length, last = N - 1, B = $('big'), title = $('bigT'), amtEl = $('bigA');
   const th = steps.map((st, i) => i === 0 ? 0 : amt * st.min / x), end = i => i === last ? amt : th[i + 1];   // the amount at which each level begins
-  const dur = i => (i === last ? 2200 + steps[i].lv * 450 : 1500) * T();
+  const dur = i => (i === last ? 2200 + steps[i].lv * 450 : 1500) * T() * QK;
   amtEl.textContent = fmt(0); $('bigX').textContent = '';
-  B.classList.add('show'); let stopRain = () => {}, seg = -1, segT0 = 0, done = false, lastTap = 0, lt = 0;
+  B.classList.toggle('light', light); B.classList.add('show'); let stopRain = () => {}, seg = -1, segT0 = 0, done = false, lastTap = 0, lt = 0;
   const showStep = (i, now) => {
     seg = i; segT0 = now; const st = steps[i];
     B.classList.toggle('maxwin', !!st.max); B.dataset.lv = st.lv; title.textContent = st.name;
     title.style.animation = 'none'; void title.offsetWidth; title.style.animation = '';   // replay the pop-in for the new level
-    stopRain(); stopRain = coinRain(st.lv);
+    stopRain(); stopRain = light ? () => {} : coinRain(st.lv);
     const k = Math.min(4, st.lv); shake(k + .6); flash(k); sfx.big(k); music.duck([0, .5, .38, .28, .2][k] || .2, 1.2 + k * .8, 1.6); if (i === 0) music.stinger('win');
   };
   bigTap = () => { const now = performance.now(); if (now - lastTap < 220) return; lastTap = now;   // a tap goes straight to the next level; the count carries on from there
@@ -381,8 +386,8 @@ async function bigWin(x, amt) {
       if (now - lt > 75) { lt = now; sfx.tick(Math.min(1, v / amt)); }
       requestAnimationFrame(f); })(performance.now()); });
   stopRain(); $('bigX').textContent = x.toFixed(1) + 'x BET'; sfx.hit(); bigTap = null;
-  await Promise.race([new Promise(r => { bigTap = r; }), sleep(auto.left > 0 ? 700 : (steps[last].max ? 6000 : 3200))]); bigTap = null;
-  B.classList.remove('show'); bonusDone = false; return t.lv;
+  await Promise.race([new Promise(r => { bigTap = r; }), sleep(auto.left > 0 ? 700 : (steps[last].max ? 6000 : 3200 * QK))]); bigTap = null;
+  B.classList.remove('show'); setTimeout(() => B.classList.remove('light'), 400); bonusDone = false; return t.lv;
 }
 $('big').onclick = () => { skipBig = true; if (bigTap) bigTap(); };
 
@@ -420,7 +425,7 @@ async function go(buy) {
     let early = null;   // a plain (no-bonus) big win starts its screen the moment the final win lands; the board's tidy-up finishes behind it
     const ctx = { stake, onWin: (a, b) => { $('win').textContent = fmt(b);
       if (!early && !R.bonusTriggered && j.payout > 0 && b >= j.payout - 0.005 && tierOf(R.totalPayout))
-        early = (async () => { await sleep(140 * T()); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user); return bigWin(R.totalPayout, j.payout); })(); } };
+        early = (async () => { await sleep(140 * T()); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user); return bigWin(R.totalPayout, j.payout, { light: !!(cfg.lightBigWin && cfg.lightBigWin.spin) }); })(); } };
     run = await hooks.playSpin(hooks.baseSpin ? hooks.baseSpin(R) : R, 0, ctx);
     if (R.bonusTriggered) {
       out.bonus = true; inBonus = true;
@@ -432,7 +437,9 @@ async function go(buy) {
         if (cfg.fsCounter === 'running' && sp.spinsLeft != null) total = sp.spinIndex + sp.spinsLeft;   // optional: N grows with retriggers (default: final total, as EmberClaw)
         if (!cfg.ownCounter) $('fs').textContent = `${sp.spinIndex} / ${total}` + (sp.retrigger ? '  +' + sp.retrigger : ''); if (!cfg.ownCounter) say(tpl(cfg.text.freeSpin, { n: sp.spinIndex, total }) + (sp.retrigger ? tpl(cfg.text.freeSpinRetrigger, { r: sp.retrigger }) : ''), !!sp.retrigger);
         await hooks.clearBoard();
-        run = await hooks.playSpin(sp, run, ctx); await wait(300);
+        const runBefore = run; run = await hooks.playSpin(sp, run, ctx);
+        if (cfg.lightBigWin && cfg.lightBigWin.bonusSpin) { const dW = run - runBefore, xW = dW / stake; if (dW > 0 && xW < cfg.maxWin && tierOf(xW)) await bigWin(xW, dW, { light: true, quick: true }); }   // a big win INSIDE a bonus: banner text + colour only, no coins / dark screen
+        await wait(300);
       }
       $('fsBox').hidden = true; music.theme('base', 2.4); music.intensity(0); $(cc.el).classList.remove(cc.bonusClass); if (hooks.bonusMode) hooks.bonusMode(false); if (ambCtl && ambCtl.bonus) ambCtl.bonus(false); $('outroV').textContent = fmt(0);
       const noBig = !!(cfg.noBigWinAfter && R.bonusType && cfg.noBigWinAfter.includes(R.bonusType));   // opt-in per slot: these bonus types end with their own outro only (no coin rain / dark win screen)
@@ -445,7 +452,7 @@ async function go(buy) {
     }
     $('win').textContent = fmt(j.payout); balance = j.user.balance; $('bal').textContent = fmt(balance); syncParent(j.user);
     out.payout = j.payout; say(j.payout > 0 ? tpl(cfg.text.win, { amt: fmt(j.payout) }) : cfg.text.lose, j.payout > 0);
-    out.tier = early ? await early : (cfg.noBigWinAfter && R.bonusType && cfg.noBigWinAfter.includes(R.bonusType)) ? null : await bigWin(R.totalPayout, j.payout);
+    out.tier = early ? await early : (cfg.noBigWinAfter && R.bonusType && cfg.noBigWinAfter.includes(R.bonusType)) ? null : await bigWin(R.totalPayout, j.payout, { light: !R.bonusTriggered && !!(cfg.lightBigWin && cfg.lightBigWin.spin) });
   } catch (e) { if (/^(Type|Reference|Range|Syntax)Error$/.test(e && e.name)) { try { console.error(e); } catch {} say('Something went wrong. Please try again.'); } else say(e.message); out.err = true; }   // never show raw JS errors to the player
   clearTimeout(wd); boost = false; setBusy(false); refreshUi(); return out;
 }

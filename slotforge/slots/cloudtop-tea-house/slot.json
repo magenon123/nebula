@@ -170,7 +170,7 @@
   "name": "FS Luck",
   "sym": 16,
   "vol": 3,
-  "text": "Pay 3x per spin. Free Spins and Super come 5x as often and start with MORE SPINS: Free Spins 11 (not 10), Super 15 (not 12).",
+  "text": "Pay 3x per spin. Free Spins and Super come 5x as often with MORE SPINS: Free Spins 11 instead of 10, Super 15 instead of 12.",
   "badge": "FS LUCK ×3",
   "onMsg": "FS LUCK ON. TOTAL BET x3",
   "offMsg": "FS LUCK OFF"
@@ -202,5 +202,10 @@
  },
  "noBigWinAfter": [
   "tin"
- ]
+ ],
+ "lightBigWin": {
+  "spin": true,
+  "bonusSpin": true
+ },
+ "autoQuality": true
 }
