@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="sf-build" content="c8d8328 10-10 16:08">
+<meta name="sf-build" content="3a71d13 10-10 16:08">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Koji's Cloudtop Tea House (offline demo)</title>
 <style>
@@ -1880,7 +1880,7 @@ function playRush(rng, startCells, capLeft) {
 /* bonus-only helper for tools: bonus value with a conditioned start (same as a bought round, uncapped by the base). type: 'tin' | 'fs' | 'super' */
 function bonusOnly(rng, type = 'tin') {
   if (type === 'tin') return Math.min(CFG.maxWin, playRush(rng, startTins(rng), CFG.maxWin).total);
-  const n = type === 'fs' ? 3 : superCount(rng);
+  const n = type === 'fs' ? 3 : superCount(rng, CFG.superBuyP);
   return Math.min(CFG.maxWin, playSteep(rng, n === 3 ? 'fs' : 'super', n, CFG.maxWin).total);
 }
 

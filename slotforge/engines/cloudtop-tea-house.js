@@ -157,7 +157,7 @@ function playRush(rng, startCells, capLeft) {
 /* bonus-only helper for tools: bonus value with a conditioned start (same as a bought round, uncapped by the base). type: 'tin' | 'fs' | 'super' */
 export function bonusOnly(rng, type = 'tin') {
   if (type === 'tin') return Math.min(CFG.maxWin, playRush(rng, startTins(rng), CFG.maxWin).total);
-  const n = type === 'fs' ? 3 : superCount(rng);
+  const n = type === 'fs' ? 3 : superCount(rng, CFG.superBuyP);
   return Math.min(CFG.maxWin, playSteep(rng, n === 3 ? 'fs' : 'super', n, CFG.maxWin).total);
 }
 
